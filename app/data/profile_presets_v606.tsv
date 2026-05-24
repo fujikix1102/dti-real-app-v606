@@ -1,0 +1,101 @@
+Model ID	H0	f_EDE	omega_cdm	omega_b	sigma8	S8	Profile role
+Planck_2018_LCDM_Base	67.36	0.000	0.12000	0.02237	0.8111	0.8320	baseline reference
+ACT_DR4_LCDM_Baseline	67.90	0.000	0.11740	0.02240	0.8150	0.8240	baseline reference
+SPT_3G_2024_CMB_Only	68.30	0.000	0.11920	0.02250	0.8080	0.8170	baseline reference
+WMAP_9Year_Final_Re	70.00	0.000	0.11370	0.02264	0.8210	0.8210	baseline reference
+Combined_CMB_Lens_2025	67.55	0.000	0.11950	0.02242	0.8095	0.8270	baseline reference
+Poulin_2019_EDE_Planck	71.73	0.089	0.13060	0.02253	0.8390	0.8340	EDE reference region
+Ivanov_2020_EDE_Joint	71.15	0.105	0.12999	0.02286	0.8322	0.8366	EDE reference region
+Smith_2020_EDE_ACT	71.60	0.091	0.12800	0.02260	0.8300	0.8310	EDE reference region
+Lin_2021_AxiCLASS_Max	72.80	0.122	0.13320	0.02245	0.8490	0.8220	EDE reference region
+Niedermann_Sloth_2020	71.40	0.080	0.12850	0.02255	0.8310	0.8330	EDE reference region
+DESI_2024_Thawing_EDE	70.87	0.075	0.12550	0.02245	0.8240	0.8280	DESI-era reference
+Cold_New_EDE_2025_Fit	71.40	0.112	0.13100	0.02265	0.8350	0.8290	Vacuum phase transition
+JWST_Massive_Galaxy_z10	72.20	0.095	0.12900	0.02280	0.8410	0.8180	High-z growth stress
+Karwal_2024_Fractional	70.50	0.062	0.12480	0.02235	0.8210	0.8250	EDE reference region
+Moss_2025_DM_Decay_EDE	71.95	0.101	0.12620	0.02258	0.8190	0.8090	EDE reference region
+K_essence_Reconstructed	72.50	0.115	0.13250	0.02270	0.8460	0.8120	EDE reference region
+Hill_2020_S8_Growth_Lim	68.50	0.046	0.12300	0.02250	0.8160	0.8240	stress-test region
+DES_Y5_Dovekie_2026_Lim	69.20	0.038	0.12150	0.02240	0.8180	0.8210	Lensing-suppressed region
+KiDS_1000_Cosmic_Shear	67.20	0.000	0.11820	0.02230	0.7600	0.7660	baseline reference
+DES_Y3_Shear_Baseline	67.60	0.000	0.11790	0.02260	0.7760	0.7760	baseline reference
+High_EDE_Overcomp_Max	75.50	0.160	0.14000	0.02350	0.9000	0.9000	Extreme bounds stress
+Riess_2022_SHOES_Anchor	73.04	0.000	0.12000	0.02237	0.8110	0.8300	baseline reference
+CCHP_2023_TRGB_Anchor	69.60	0.000	0.12000	0.02237	0.8110	0.8300	baseline reference
+Megamaser_MCP_Final	73.90	0.000	0.12000	0.02237	0.8110	0.8300	baseline reference
+Pantheon_Plus_SN_Only	73.40	0.000	0.11980	0.02245	0.8050	0.8250	baseline reference
+FUJIKI_DTI_Candidate_v6	72.90	0.082	0.12700	0.02440	0.8229	0.8019	DTI candidate region
+DTI_5H_Max_Strain_End	74.50	0.135	0.13450	0.02520	0.8640	0.8420	Extreme bounds stress
+DTI_AxiCLASS_HighH0	72.90	0.082	0.12700	0.02440	0.8541	0.8322	DTI candidate region
+Empirical_Misfit_Bounds	71.50	0.050	0.12500	0.02300	0.8380	0.8350	baseline reference
+Theoretical_Horizon_Lim	66.00	0.000	0.11500	0.02200	0.7950	0.8120	baseline reference
+Planck_2018_no_lensing	67.44	0.000	0.11933	0.02242	0.8120	0.8301	baseline reference
+Planck_2018_CamSpec	67.27	0.000	0.12011	0.02230	0.8102	0.8344	baseline reference
+ACT_DR4_plus_WMAP9	67.60	0.000	0.11890	0.02240	0.8110	0.8270	baseline reference
+SPT_3G_2022_TE_EE	68.70	0.000	0.11820	0.02260	0.8010	0.8110	baseline reference
+HSC_Y3_Cosmic_Shear_1	67.80	0.000	0.11900	0.02250	0.7710	0.7720	baseline reference
+HSC_Y3_Cosmic_Shear_2	67.30	0.000	0.12050	0.02230	0.7650	0.7690	baseline reference
+KiDS_VIKING_450_Shear	67.40	0.000	0.11670	0.02240	0.7420	0.7460	baseline reference
+DES_Y1_3x2pt_Baseline	67.20	0.000	0.12100	0.02220	0.7860	0.7990	baseline reference
+DES_Y3_3x2pt_Optimal	68.00	0.000	0.11700	0.02270	0.7790	0.7750	baseline reference
+DES_Y5_Combined_2026	68.45	0.000	0.11860	0.02245	0.7910	0.8030	baseline reference
+SDSS_DR16_eBOSS_Max	67.60	0.000	0.11910	0.02240	0.8100	0.8250	baseline reference
+BOSS_DR12_Full_Shape	67.00	0.000	0.11980	0.02220	0.8020	0.8310	baseline reference
+Agnello_2025_StrongLens	73.10	0.000	0.11850	0.02240	0.8090	0.8180	baseline reference
+H0LiCOW_6_Clusters_Max	73.30	0.000	0.11700	0.02250	0.8150	0.8110	baseline reference
+TDCOSMO_2024_Lensing	74.20	0.000	0.11600	0.02260	0.8210	0.8050	baseline reference
+STRIDES_Strong_Lens_H0	71.80	0.000	0.12100	0.02230	0.8040	0.8220	baseline reference
+Mortsell_2024_SNIa_Lensed	72.85	0.000	0.12020	0.02235	0.8110	0.8290	baseline reference
+Poulin_2021_EDE_ACT_DR4	70.90	0.110	0.13210	0.02250	0.8420	0.8400	EDE reference region
+Smith_2022_EDE_SPT3G	71.30	0.085	0.12940	0.02255	0.8330	0.8290	EDE reference region
+Gomez_Valent_2024_Axi	71.55	0.098	0.13010	0.02270	0.8360	0.8340	EDE reference region
+Niedermann_2022_Cold1	71.48	0.092	0.12910	0.02260	0.8340	0.8350	Vacuum phase transition
+Niedermann_2024_Cold2	71.20	0.108	0.13050	0.02240	0.8310	0.8390	Vacuum phase transition
+Allali_2023_Early_Quint	72.10	0.118	0.13410	0.02230	0.8510	0.8190	EDE reference region
+Ye_Piao_2020_AdS_EDE_1	72.30	0.090	0.12800	0.02250	0.8290	0.8220	EDE reference region
+Ye_Piao_2022_AdS_EDE_2	73.10	0.120	0.13250	0.02260	0.8430	0.8150	EDE reference region
+Braglia_2021_Enhanced	71.90	0.102	0.13120	0.02240	0.8380	0.8260	EDE reference region
+Abellan_2022_Mirror_DM	71.65	0.078	0.12750	0.02250	0.8220	0.8240	EDE reference region
+Seto_Takahashi_2023_Axi	72.05	0.085	0.12880	0.02258	0.8290	0.8210	EDE reference region
+He_Piao_2024_V_Coupled	71.85	0.114	0.13020	0.02262	0.8340	0.8310	EDE reference region
+Wang_Piao_2025_Pre_Rec	72.40	0.105	0.13190	0.02275	0.8410	0.8240	EDE reference region
+DESI_DR1_BAO_Planck_1	67.45	0.000	0.11970	0.02240	0.8090	0.8280	baseline reference
+DESI_DR1_BAO_Planck_2	68.10	0.000	0.11720	0.02250	0.8140	0.8190	baseline reference
+DESI_DR2_BAO_2026_Pref	67.85	0.000	0.11850	0.02242	0.8105	0.8250	baseline reference
+Euclid_2025_First_FS_1	67.50	0.000	0.11920	0.02240	0.8080	0.8290	baseline reference
+Euclid_2026_Joint_LSS	67.75	0.000	0.11840	0.02245	0.8120	0.8210	baseline reference
+Vera_Rubin_LSST_2025_P	67.40	0.000	0.11990	0.02235	0.8030	0.8270	baseline reference
+Roman_Space_Telescope_1	67.65	0.000	0.11880	0.02240	0.8110	0.8240	baseline reference
+KiDS_1000_Full_3x2pt	68.10	0.000	0.11650	0.02260	0.7650	0.7590	baseline reference
+ACT_DR6_Cosmic_Shear_1	67.70	0.000	0.11800	0.02245	0.8010	0.8150	baseline reference
+SPT_3G_Y3_Cosmic_Shear	68.00	0.000	0.11750	0.02255	0.7980	0.8090	baseline reference
+Freese_2024_Natural_EDE	71.25	0.076	0.12680	0.02248	0.8250	0.8290	EDE reference region
+Kamionkowski_2023_Rev1	71.50	0.100	0.13000	0.02250	0.8350	0.8320	EDE reference region
+Kamionkowski_2025_Rev2	71.90	0.092	0.12850	0.02260	0.8310	0.8240	EDE reference region
+Knox_Millea_2020_Hubble	72.00	0.110	0.13150	0.02250	0.8400	0.8350	EDE reference region
+Vagnozzi_2021_Critique	68.20	0.025	0.12120	0.02245	0.8130	0.8210	Lensing-suppressed region
+Efstathiou_2021_H0_LSS	67.80	0.000	0.11900	0.02242	0.8080	0.8260	baseline reference
+Spergel_2024_Complement	67.50	0.000	0.11950	0.02238	0.8100	0.8280	baseline reference
+Silk_2025_High_z_Anom	73.50	0.140	0.13650	0.02480	0.8750	0.8450	High-z growth stress
+Verde_2023_Tension_Review	67.40	0.000	0.11980	0.02237	0.8110	0.8310	baseline reference
+Di_Valentino_2021_Mega	73.20	0.000	0.11750	0.02250	0.8160	0.8090	baseline reference
+Planck_2018_Alternative	67.18	0.000	0.12070	0.02225	0.8130	0.8380	baseline reference
+ACT_DR4_no_lensing	68.30	0.000	0.11620	0.02250	0.8220	0.8180	baseline reference
+SPT_Pol_Final_Baseline	67.95	0.000	0.11890	0.02245	0.8130	0.8250	baseline reference
+BICEP_Keck_2021_BMode	67.36	0.000	0.12000	0.02237	0.8111	0.8320	baseline reference
+DESI_DR1_Om0_Evolution	68.25	0.000	0.11650	0.02255	0.8160	0.8120	baseline reference
+FUJIKI_DTI_v6_0_1_tuned	72.90	0.082	0.12700	0.02440	0.8229	0.8019	DTI candidate region
+FUJIKI_DTI_v6_0_2_widget	72.90	0.082	0.12700	0.02440	0.8229	0.8019	DTI candidate region
+FUJIKI_DTI_v6_0_3_labels	72.90	0.082	0.12700	0.02440	0.8229	0.8019	DTI candidate region
+FUJIKI_DTI_v6_0_4_likel	72.90	0.082	0.12700	0.02440	0.8229	0.8019	DTI candidate region
+FUJIKI_DTI_v6_0_5_fixed	72.90	0.082	0.12700	0.02440	0.8229	0.8019	DTI candidate region
+DTI_5H_Level1_Triage	72.00	0.065	0.12450	0.02380	0.8310	0.8180	DTI candidate region
+DTI_5H_Level2_Inference	72.50	0.074	0.12580	0.02410	0.8260	0.8090	DTI candidate region
+DTI_5H_Level3_Canonical	72.90	0.082	0.12700	0.02440	0.8229	0.8019	DTI candidate region
+DTI_5H_Level4_Stress_1	73.50	0.105	0.13100	0.02480	0.8480	0.8250	Extreme bounds stress
+DTI_5H_Level5_Stress_2	74.00	0.122	0.13320	0.02500	0.8590	0.8340	Extreme bounds stress
+Misfit_Calibration_Ref1	70.00	0.030	0.12200	0.02280	0.8210	0.8290	baseline reference
+Misfit_Calibration_Ref2	70.50	0.045	0.12350	0.02310	0.8270	0.8240	baseline reference
+Misfit_Calibration_Ref3	71.00	0.055	0.12480	0.02330	0.8320	0.8190	baseline reference
+Misfit_Calibration_Ref4	71.50	0.062	0.12550	0.02350	0.8350	0.8130	baseline reference
+Misfit_Calibration_Ref5	72.00	0.070	0.12620	0.02380	0.8370	0.8080	baseline reference
