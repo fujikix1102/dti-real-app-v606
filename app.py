@@ -1614,6 +1614,121 @@ if external_api_result:
         st.code(json.dumps(external_api_result, indent=2, sort_keys=True), language="json")
 
 
+def _render_local_axiclass_fixed_example_v606():
+    st.header("8c. Local-only AxiCLASS fixed-example probe")
+
+    st.markdown("""
+<div class="boundary-card">
+<b>This is a local-only AxiCLASS fixed-example probe.</b><br>
+It is experimental and non-canonical.<br>
+It does not accept arbitrary user input.<br>
+It is not a likelihood evaluation.<br>
+It is not a posterior comparison.<br>
+It is not a Planck validation pipeline.<br>
+It does not update manuscript checkpoints.
+</div>
+""", unsafe_allow_html=True)
+
+    enable_local_axiclass = st.checkbox(
+        "Enable local-only AxiCLASS fixed-example probe",
+        value=False,
+        key="enable_local_axiclass_fixed_example_v606",
+    )
+
+    if not enable_local_axiclass:
+        st.caption("Disabled by default. This local-only section does not run automatically.")
+        return
+
+    local_endpoint = st.text_input(
+        "Local AxiCLASS compact endpoint",
+        value="http://127.0.0.1:8010/axiclass/fixed-example-compact",
+        key="local_axiclass_fixed_endpoint_v606",
+    )
+
+    st.caption(
+        "Start the local API separately: cd /Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/"
+        "paper_20260305_102018_audit_sensitivity/_DTI_AXICLASS_API_SCAFFOLD_LOCAL_20260524_161545/"
+        "dti-axiclass-api && bash run_local.sh"
+    )
+
+    if st.button("Run local AxiCLASS fixed example", key="run_local_axiclass_fixed_example_v606", width="stretch"):
+        try:
+            response = requests.post(local_endpoint, timeout=30)
+            st.session_state["local_axiclass_fixed_result_v606"] = response.json()
+            st.session_state["local_axiclass_fixed_http_status_v606"] = response.status_code
+        except Exception as exc:
+            st.session_state["local_axiclass_fixed_result_v606"] = {
+                "status": "failed",
+                "message": repr(exc),
+                "boundary": {
+                    "experimental": True,
+                    "non_canonical": True,
+                    "fixed_example_only": True,
+                    "arbitrary_user_input": False,
+                    "likelihood_evaluation": False,
+                    "posterior_comparison": False,
+                    "planck_validation": False,
+                    "canonical_checkpoint_update": False,
+                    "streamlit_frontend_update": False,
+                },
+                "local_server_start": "cd /Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_AXICLASS_API_SCAFFOLD_LOCAL_20260524_161545/dti-axiclass-api && bash run_local.sh",
+            }
+            st.session_state["local_axiclass_fixed_http_status_v606"] = None
+
+    result = st.session_state.get("local_axiclass_fixed_result_v606")
+    http_status = st.session_state.get("local_axiclass_fixed_http_status_v606")
+
+    if not result:
+        return
+
+    st.markdown("##### Local AxiCLASS result")
+    st.caption(f"HTTP status: {http_status}")
+
+    if result.get("status") == "ok":
+        st.success("Local AxiCLASS fixed-example endpoint returned status: ok")
+    else:
+        st.warning("Local AxiCLASS fixed-example endpoint did not return ok. Check that the local API is running.")
+        if result.get("local_server_start"):
+            st.code(result.get("local_server_start"), language="bash")
+
+    derived = result.get("derived", {})
+    if isinstance(derived, dict) and derived:
+        derived_rows = []
+        for key in ["h", "Omega0_m", "Omega_Lambda", "age", "rs_drag", "sigma8"]:
+            if key in derived:
+                derived_rows.append({"quantity": key, "value": derived.get(key)})
+        if derived_rows:
+            st.markdown("##### Derived values")
+            st.dataframe(pd.DataFrame(derived_rows), hide_index=True, width="stretch")
+
+    bg = result.get("compact_background_summary", {})
+    if isinstance(bg, dict) and bg:
+        selected_rows = []
+        for key in ["(.)rho_scf", "(.)Omega_scf", "(.)p_scf", "(.)w_scf", "phi_scf", "phi'_scf", "V_scf", "V'_scf", "V''_scf"]:
+            item = bg.get(key)
+            if isinstance(item, dict):
+                selected_rows.append({
+                    "field": key,
+                    "len": item.get("len"),
+                    "first": item.get("first"),
+                    "last": item.get("last"),
+                })
+        if selected_rows:
+            st.markdown("##### Selected SCF / axion background summary")
+            st.dataframe(pd.DataFrame(selected_rows), hide_index=True, width="stretch")
+
+    boundary = result.get("boundary", {})
+    if isinstance(boundary, dict) and boundary:
+        boundary_rows = [{"flag": k, "value": v} for k, v in boundary.items() if k != "note"]
+        if boundary_rows:
+            st.markdown("##### Boundary flags")
+            st.dataframe(pd.DataFrame(boundary_rows), hide_index=True, width="stretch")
+
+    with st.expander("Raw local AxiCLASS compact response", expanded=False):
+        st.code(json.dumps(result, indent=2, sort_keys=True), language="json")
+
+_render_local_axiclass_fixed_example_v606()
+
 st.header("9. Interpretation boundary")
 
 audit_summary_text = f"""DTI-Core Grand Auditor v6.0.6 audit summary
