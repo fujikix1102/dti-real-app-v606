@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 import numpy as np
+import requests
 
 
 def dom_safe_json_box(obj, label="Result"):
@@ -1509,6 +1510,125 @@ st.markdown("""
 <b>Interpretation:</b> useful for triage and model comparison; not valid as a statistical exclusion criterion.
 </div>
 """, unsafe_allow_html=True)
+
+
+
+def extract_external_class_api_payload_v606(text):
+    import re
+
+    defaults = {
+        "H0": 72.9,
+        "omega_b": 0.0244,
+        "omega_cdm": 0.127,
+        "f_EDE": 0.082,
+        "z_c": 3500.0,
+        "n_s": 0.9847,
+        "ln10_10_As": 3.058,
+        "tau_reio": 0.0511,
+    }
+
+    aliases = {
+        "H0": ["H0", "H_0"],
+        "omega_b": ["omega_b", "ombh2", "omega_bh2"],
+        "omega_cdm": ["omega_cdm", "omch2", "omega_c"],
+        "f_EDE": ["f_EDE", "fde", "fEDE"],
+        "z_c": ["z_c", "zc"],
+        "n_s": ["n_s", "ns"],
+        "ln10_10_As": ["ln10_10_As", "ln10^{10}A_s", "ln10_10As"],
+        "tau_reio": ["tau_reio", "tau"],
+    }
+
+    payload = dict(defaults)
+    text = str(text or "")
+
+    for key, names in aliases.items():
+        for name in names:
+            pattern = rf"(?<![A-Za-z0-9_]){re.escape(name)}\s*[:=]\s*([-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)"
+            m = re.search(pattern, text)
+            if m:
+                try:
+                    payload[key] = float(m.group(1))
+                    break
+                except Exception:
+                    pass
+
+    return payload
+
+
+st.header("8b. External CLASS API sandbox")
+
+st.markdown("""
+<div class="boundary-card">
+<b>External compute mode:</b> this section sends the current parameter block to the public Render CLASS API backend.<br>
+<b>Backend:</b> <code>https://dti-class-api.onrender.com/class/compute</code><br>
+<b>Boundary:</b> exploratory, non-canonical, not a likelihood evaluation, not a posterior comparison, and not a Planck validation pipeline.<br>
+<b>Current backend scope:</b> LCDM-like CLASS propagation only. <code>f_EDE</code> and <code>z_c</code> are passed for interface compatibility but are not used as AxiCLASS EDE microphysics in this minimal backend.
+</div>
+""", unsafe_allow_html=True)
+
+external_api_url = st.text_input(
+    "External CLASS API endpoint",
+    value="https://dti-class-api.onrender.com/class/compute",
+    key="external_class_api_endpoint_v606",
+)
+
+external_api_text = st.session_state.get("paper_text_widget", st.session_state.get("paper_text", ""))
+external_api_payload = extract_external_class_api_payload_v606(external_api_text)
+
+st.markdown("##### Payload sent to external API")
+st.dataframe(pd.DataFrame([external_api_payload]), hide_index=True, width="stretch")
+
+if st.button("Run external CLASS API for current input model", key="run_external_class_api_v606", width="stretch"):
+    try:
+        response = requests.post(external_api_url, json=external_api_payload, timeout=90)
+        st.session_state["external_class_api_result_v606"] = response.json()
+        st.session_state["external_class_api_http_status_v606"] = response.status_code
+    except Exception as exc:
+        st.session_state["external_class_api_result_v606"] = {
+            "status": "failed",
+            "message": repr(exc),
+            "boundary": {
+                "likelihood_evaluation": False,
+                "posterior_comparison": False,
+                "canonical_checkpoint_update": False,
+            },
+        }
+        st.session_state["external_class_api_http_status_v606"] = None
+
+external_api_result = st.session_state.get("external_class_api_result_v606")
+external_api_http_status = st.session_state.get("external_class_api_http_status_v606")
+
+if external_api_result:
+    st.markdown("##### External CLASS API result")
+    st.caption(f"HTTP status: {external_api_http_status}")
+
+    status_value = str(external_api_result.get("status", "unknown"))
+    if status_value == "ok":
+        st.success("External CLASS API returned status: ok")
+    elif status_value == "unavailable":
+        st.warning("External CLASS API is available, but classy/PyCLASS is unavailable on the backend.")
+    else:
+        st.warning(f"External CLASS API returned status: {status_value}")
+
+    derived = external_api_result.get("derived", {})
+    if isinstance(derived, dict) and derived:
+        derived_rows = []
+        for key in [
+            "h",
+            "Omega_m_computed",
+            "A_s",
+            "sigma8_CLASS",
+            "S8_CLASS",
+            "rs_drag_Mpc_CLASS",
+            "age_Gyr_CLASS",
+        ]:
+            if key in derived:
+                derived_rows.append({"quantity": key, "value": derived.get(key)})
+        if derived_rows:
+            st.dataframe(pd.DataFrame(derived_rows), hide_index=True, width="stretch")
+
+    with st.expander("Raw external API response", expanded=False):
+        st.code(json.dumps(external_api_result, indent=2, sort_keys=True), language="json")
 
 
 st.header("9. Interpretation boundary")
