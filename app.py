@@ -1028,25 +1028,43 @@ st.markdown("""
 with st.sidebar:
     st.header("1. Parameter profile cartridge")
 
+    preset_names = list(PRESETS.keys())
+    current_selected = st.session_state.get("selected_preset", preset_names[0] if preset_names else "")
+    if current_selected not in preset_names and preset_names:
+        current_selected = preset_names[0]
+
     selected_preset = st.selectbox(
         "Load registered profile",
-        list(PRESETS.keys()),
-        key="selected_preset",
+        preset_names,
+        index=preset_names.index(current_selected) if current_selected in preset_names else 0,
+        key="selected_preset_selector_v606",
     )
 
-    preset_note = PRESETS.get(selected_preset, {}).get("note", "")
+    if selected_preset and selected_preset != st.session_state.get("selected_preset"):
+        st.session_state["selected_preset"] = selected_preset
+        st.session_state["pending_paper_text"] = PRESETS.get(selected_preset, {}).get("text", "")
+        st.rerun()
+
+    preset_note = PRESETS.get(st.session_state.get("selected_preset", selected_preset), {}).get("note", "")
     if preset_note:
         st.info(preset_note)
 
+    # Ensure the visible text box is never empty when a preset is active.
+    if not st.session_state.get("paper_text_widget") and st.session_state.get("paper_text"):
+        st.session_state["paper_text_widget"] = st.session_state.get("paper_text", "")
+
     st.text_area("Profile text / generated block", key="paper_text_widget", height=270)
+
+    if st.session_state.get("paper_text_widget", "") != st.session_state.get("paper_text", ""):
+        st.session_state["pending_paper_text"] = st.session_state.get("paper_text_widget", "")
 
     col_sidebar_1, col_sidebar_2 = st.columns(2)
     with col_sidebar_1:
-        if st.button("Text to form", width="stretch"):
-            st.session_state["pending_parse_text_to_form"] = True
+        if st.button("Text to form", width="stretch", key="sidebar_text_to_form_v606"):
+            sync_form_from_text()
             st.rerun()
     with col_sidebar_2:
-        if st.button("Form to text", width="stretch"):
+        if st.button("Form to text", width="stretch", key="sidebar_form_to_text_v606"):
             st.session_state["pending_paper_text"] = form_to_text()
             st.rerun()
 
