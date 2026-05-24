@@ -1033,6 +1033,15 @@ with st.sidebar:
     current_selected = st.session_state.get("selected_preset", preset_names[0] if preset_names else "")
     if current_selected not in preset_names and preset_names:
         current_selected = preset_names[0]
+        st.session_state["selected_preset"] = current_selected
+
+    # Hard initial sync: the first visible sidebar text box must contain the active preset text.
+    active_preset_text = PRESETS.get(current_selected, {}).get("text", "")
+    if active_preset_text:
+        if not st.session_state.get("paper_text") or not st.session_state.get("paper_text_widget"):
+            st.session_state["paper_text"] = active_preset_text
+            st.session_state["paper_text_widget"] = active_preset_text
+            st.session_state["pending_paper_text"] = active_preset_text
 
     selected_preset = st.selectbox(
         "Load registered profile",
@@ -1042,21 +1051,29 @@ with st.sidebar:
     )
 
     if selected_preset and selected_preset != st.session_state.get("selected_preset"):
+        selected_text = PRESETS.get(selected_preset, {}).get("text", "")
         st.session_state["selected_preset"] = selected_preset
-        st.session_state["pending_paper_text"] = PRESETS.get(selected_preset, {}).get("text", "")
+        st.session_state["paper_text"] = selected_text
+        st.session_state["paper_text_widget"] = selected_text
+        st.session_state["pending_paper_text"] = selected_text
         st.rerun()
 
     preset_note = PRESETS.get(st.session_state.get("selected_preset", selected_preset), {}).get("note", "")
     if preset_note:
         st.info(preset_note)
 
-    # Ensure the visible text box is never empty when a preset is active.
-    if not st.session_state.get("paper_text_widget") and st.session_state.get("paper_text"):
-        st.session_state["paper_text_widget"] = st.session_state.get("paper_text", "")
+    # Keep the visible text box populated on first load and after reruns.
+    active_profile_for_text = st.session_state.get("selected_preset", selected_preset)
+    fallback_text = PRESETS.get(active_profile_for_text, {}).get("text", "")
+    if not st.session_state.get("paper_text_widget") and fallback_text:
+        st.session_state["paper_text_widget"] = fallback_text
+    if not st.session_state.get("paper_text") and st.session_state.get("paper_text_widget"):
+        st.session_state["paper_text"] = st.session_state.get("paper_text_widget", "")
 
     st.text_area("Profile text / generated block", key="paper_text_widget", height=270)
 
     if st.session_state.get("paper_text_widget", "") != st.session_state.get("paper_text", ""):
+        st.session_state["paper_text"] = st.session_state.get("paper_text_widget", "")
         st.session_state["pending_paper_text"] = st.session_state.get("paper_text_widget", "")
 
     col_sidebar_1, col_sidebar_2 = st.columns(2)
