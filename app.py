@@ -1333,7 +1333,7 @@ if st.button("Run RK45 background proxy for current input model", width="stretch
         st.error(f"RK45 proxy failed: {e}")
 
 st.markdown("---")
-st.header("8. Planck-like fit-region profile")
+st.header("7. Planck-like fit-region profile")
 
 st.markdown("""
 <div class="boundary-card">
@@ -1515,7 +1515,7 @@ def extract_external_class_api_payload_v606(text):
     return payload
 
 
-st.header("6. External CLASS API sandbox")
+st.header("8. External CLASS API sandbox")
 
 st.markdown("""
 <div class="boundary-card">
