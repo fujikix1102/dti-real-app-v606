@@ -987,7 +987,27 @@ init_session()
 apply_pending_paper_text()
 
 st.title("DTI-Core Grand Auditor v6.0.6")
-st.caption("Researcher-ready parameter audit interface: source metadata, parameter search, locked AxiCLASS benchmark, safe fit-region profile, and optional non-canonical live CLASS sandbox.")
+st.caption("Public parameter-profile audit interface for cosmological model comparison, benchmark proximity review, and reproducibility-first inspection.")
+st.markdown("""
+<div class="card">
+<b>Purpose:</b> inspect and compare cosmological parameter profiles using registered presets, candidate/reference forms, and locked benchmark references.<br>
+<b>Included:</b> 100 parameter-profile presets, profile search, candidate/reference comparison, AxiCLASS FIX1 locked benchmark values, and optional exploratory CLASS/AxiCLASS sandbox output.<br>
+<b>Not included:</b> likelihood evaluation, posterior comparison, Planck validation, or final cosmological conclusion.<br>
+<b>Positioning:</b> FUJIKI DTI is included as one registered candidate profile, not as the only supported use case.
+</div>
+""", unsafe_allow_html=True)
+
+with st.expander("Quick Start", expanded=False):
+    st.markdown("""
+    1. Select a registered profile from the sidebar.
+    2. Inspect the generated parameter block.
+    3. Use text-to-form or form-to-text conversion.
+    4. Compare candidate and reference parameter burdens.
+    5. Inspect locked AxiCLASS FIX1 benchmark context.
+    6. Treat optional live sandbox output as exploratory and non-canonical.
+    """)
+
+
 
 st.info("DOM-safe rendering mode: live/exploratory outputs are rendered as stable code blocks instead of dynamic JSON widgets.")
 
