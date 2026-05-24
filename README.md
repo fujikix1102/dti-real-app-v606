@@ -69,9 +69,9 @@ This app does **not** perform:
 - MCMC sampling
 - external chain reanalysis
 - final cosmological validation
-- proof of H0 tension resolution
-- proof of S8 tension resolution
-- proof of a unique physical mechanism
+- claim that the H0 tension is resolved
+- claim that the S8 tension is resolved
+- claim of a unique physical mechanism
 
 The app should not be interpreted as a replacement for Cobaya, MontePython, CLASS, AxiCLASS, CAMB, or formal Planck likelihood pipelines.
 
@@ -200,3 +200,48 @@ Current public version:
     v6.0.6-presets-expanded-inline
 
 The current public app was exported from the local adopted v6.0.6 line and deployed through GitHub + Streamlit Community Cloud.
+
+---
+
+## External CLASS API backend
+
+This public Streamlit app is connected to an external Render-hosted CLASS API backend:
+
+    https://dti-class-api.onrender.com
+
+The compute endpoint is:
+
+    https://dti-class-api.onrender.com/class/compute
+
+The backend repository is:
+
+    https://github.com/fujikix1102/dti-class-api
+
+### What the external backend does
+
+The backend runs exploratory CLASS/PyCLASS propagation outside the Streamlit Community Cloud frontend.
+
+This separation keeps the public Streamlit app lightweight while allowing heavier numerical propagation to run on a dedicated API service.
+
+The current backend returns values such as:
+
+- h
+- Omega_m_computed
+- A_s
+- sigma8_CLASS
+- S8_CLASS
+- rs_drag_Mpc_CLASS
+- age_Gyr_CLASS
+
+### Boundary
+
+The external backend is:
+
+- exploratory
+- non-canonical
+- not a likelihood evaluation
+- not a posterior comparison
+- not a Planck validation pipeline
+- not a manuscript checkpoint updater
+
+The current backend scope is LCDM-like CLASS propagation. Parameters such as f_EDE and z_c are passed for interface compatibility, but they are not used as AxiCLASS EDE microphysics in the minimal public backend.
