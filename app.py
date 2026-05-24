@@ -1009,15 +1009,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-with st.expander("Quick Start", expanded=False):
-    st.markdown("""
-    1. Select a registered profile from the sidebar.
-    2. Inspect the generated parameter block.
-    3. Use text-to-form or form-to-text conversion.
-    4. Compare candidate and reference parameter burdens.
-    5. Inspect locked AxiCLASS FIX1 benchmark context.
-    6. Treat optional live sandbox output as exploratory and non-canonical.
-    """)
 
 
 
