@@ -168,7 +168,7 @@ Omega_m=0.315
 sigma8=0.811
 S8=0.832
 ln10_10_As=3.044""",
-        "note": "Default preset for the FUJIKI DTI candidate.",
+        "note": "Default registered candidate profile.",
     },
     "Ivanov2020 EDE best-fit style": {
         "text": """TARGET_MODEL block:
@@ -1024,10 +1024,10 @@ st.markdown("""
 
 
 with st.sidebar:
-    st.header("1. Literature text cartridge")
+    st.header("1. Parameter profile cartridge")
     preset_names = list(PRESETS.keys())
     selected = st.selectbox(
-        "Load literature preset",
+        "Load registered profile",
         preset_names,
         index=preset_names.index(st.session_state.selected_preset) if st.session_state.selected_preset in preset_names else 0,
     )
@@ -1038,7 +1038,7 @@ with st.sidebar:
 
     st.info(PRESETS[st.session_state.selected_preset]["note"])
 
-    st.text_area("Free text / generated text", key="paper_text_widget", height=270)
+    st.text_area("Profile text / generated block", key="paper_text_widget", height=270)
     if st.session_state.paper_text_widget != st.session_state.paper_text:
         st.session_state.pending_paper_text = st.session_state.paper_text_widget
 
@@ -1053,7 +1053,7 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    st.success("AxiCLASS FIX1 locked values: read-only")
+    st.success("AxiCLASS FIX1 benchmark: read-only")
     st.caption("Changing presets or form values does not recompute this locked benchmark.")
 
 
