@@ -1615,43 +1615,48 @@ if external_api_result:
 
 
 def _render_local_axiclass_fixed_example_v606():
-    st.header("8c. Local-only AxiCLASS fixed-example probe")
+    st.header("8c. Local-only AxiCLASS fixed-example check")
 
     st.markdown("""
 <div class="boundary-card">
-<b>This is a local-only AxiCLASS fixed-example probe.</b><br>
-It is experimental and non-canonical.<br>
-It does not accept arbitrary user input.<br>
-It is not a likelihood evaluation.<br>
-It is not a posterior comparison.<br>
-It is not a Planck validation pipeline.<br>
-It does not update manuscript checkpoints.
+<b>Local-only experimental check.</b><br>
+This section can query a local AxiCLASS fixed-example API running on this computer.<br>
+It is intended for implementation testing and reproducibility inspection only.<br><br>
+<b>Scope:</b> one source-locked fixed example only. It does not accept arbitrary user input.<br>
+<b>Not included:</b> likelihood evaluation, posterior comparison, Planck validation, MCMC sampling, or manuscript checkpoint updates.<br>
+<b>Status:</b> experimental, non-canonical, and not part of the public deployed workflow.
 </div>
 """, unsafe_allow_html=True)
 
+    st.caption(
+        "Use this section only when the local dti-axiclass-api server is already running. "
+        "The public app and Render CLASS API are not modified by this local check."
+    )
+
     enable_local_axiclass = st.checkbox(
-        "Enable local-only AxiCLASS fixed-example probe",
+        "Enable local-only AxiCLASS fixed-example check",
         value=False,
         key="enable_local_axiclass_fixed_example_v606",
     )
 
     if not enable_local_axiclass:
-        st.caption("Disabled by default. This local-only section does not run automatically.")
+        st.info("Disabled by default. Enable only for local implementation testing.")
         return
 
     local_endpoint = st.text_input(
-        "Local AxiCLASS compact endpoint",
+        "Local compact endpoint",
         value="http://127.0.0.1:8010/axiclass/fixed-example-compact",
         key="local_axiclass_fixed_endpoint_v606",
     )
 
-    st.caption(
-        "Start the local API separately: cd /Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/"
-        "paper_20260305_102018_audit_sensitivity/_DTI_AXICLASS_API_SCAFFOLD_LOCAL_20260524_161545/"
-        "dti-axiclass-api && bash run_local.sh"
-    )
+    with st.expander("How to start the local AxiCLASS API", expanded=False):
+        st.code(
+            'cd "/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_AXICLASS_API_SCAFFOLD_LOCAL_20260524_161545/dti-axiclass-api"\n'
+            'bash run_local.sh',
+            language="bash",
+        )
 
-    if st.button("Run local AxiCLASS fixed example", key="run_local_axiclass_fixed_example_v606", width="stretch"):
+    if st.button("Run local fixed-example check", key="run_local_axiclass_fixed_example_v606", width="stretch"):
         try:
             response = requests.post(local_endpoint, timeout=30)
             st.session_state["local_axiclass_fixed_result_v606"] = response.json()
@@ -1681,13 +1686,13 @@ It does not update manuscript checkpoints.
     if not result:
         return
 
-    st.markdown("##### Local AxiCLASS result")
+    st.markdown("##### Local fixed-example result")
     st.caption(f"HTTP status: {http_status}")
 
     if result.get("status") == "ok":
-        st.success("Local AxiCLASS fixed-example endpoint returned status: ok")
+        st.success("Local fixed-example endpoint returned status: ok")
     else:
-        st.warning("Local AxiCLASS fixed-example endpoint did not return ok. Check that the local API is running.")
+        st.warning("Local fixed-example endpoint did not return ok. Check that the local API is running.")
         if result.get("local_server_start"):
             st.code(result.get("local_server_start"), language="bash")
 
@@ -1714,7 +1719,7 @@ It does not update manuscript checkpoints.
                     "last": item.get("last"),
                 })
         if selected_rows:
-            st.markdown("##### Selected SCF / axion background summary")
+            st.markdown("##### Selected scalar-field / axion background summary")
             st.dataframe(pd.DataFrame(selected_rows), hide_index=True, width="stretch")
 
     boundary = result.get("boundary", {})
@@ -1724,7 +1729,7 @@ It does not update manuscript checkpoints.
             st.markdown("##### Boundary flags")
             st.dataframe(pd.DataFrame(boundary_rows), hide_index=True, width="stretch")
 
-    with st.expander("Raw local AxiCLASS compact response", expanded=False):
+    with st.expander("Raw local compact response", expanded=False):
         st.code(json.dumps(result, indent=2, sort_keys=True), language="json")
 
 _render_local_axiclass_fixed_example_v606()
