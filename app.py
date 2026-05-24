@@ -1027,9 +1027,7 @@ st.info("DOM-safe rendering mode: live/exploratory outputs are rendered as stabl
 
 st.markdown("""
 <div class="boundary-card">
-<b>Scope:</b> This app audits and compares published or proposed cosmological parameter blocks. It helps identify parameter burdens, nearest registered references, and fixed AxiCLASS benchmark context.<br>
-<b>Not included:</b> no likelihood evaluation, no posterior comparison, no Planck likelihood validation, no Delta-chi2 claim, no automatic claim of H0/S8 tension resolution.<br>
-<b>Locked vs live:</b> AxiCLASS FIX1 values are fixed benchmark references. Optional live CLASS runs are exploratory and non-canonical.
+<b>Benchmark boundary:</b> AxiCLASS FIX1 values are read-only benchmark references. Optional live CLASS/AxiCLASS sandbox output is exploratory and non-canonical.
 </div>
 """, unsafe_allow_html=True)
 
