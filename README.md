@@ -1,14 +1,19 @@
 # DTI-Core Grand Auditor v6.0.6
 
-**DTI-Core Grand Auditor** is a public Streamlit interface for inspecting, comparing, and auditing cosmological parameter profiles.
+**Public parameter-profile audit interface for cosmological model comparison, benchmark proximity review, and reproducibility-first inspection.**
 
-Public app:
+## Public links
 
-https://dti-real-app-v606.streamlit.app
+| Item | URL |
+|---|---|
+| Public Streamlit app | https://dti-real-app-v606.streamlit.app |
+| Frontend GitHub repository | https://github.com/fujikix1102/dti-real-app-v606 |
+| External CLASS API backend | https://dti-class-api.onrender.com |
+| Backend GitHub repository | https://github.com/fujikix1102/dti-class-api |
 
-GitHub repository:
+## One-line repository description
 
-https://github.com/fujikix1102/dti-real-app-v606
+Public Streamlit interface for cosmological parameter-profile auditing, connected to an exploratory Render-hosted CLASS/PyCLASS backend.
 
 ---
 

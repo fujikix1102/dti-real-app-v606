@@ -994,9 +994,14 @@ st.caption("Public parameter-profile audit interface for cosmological model comp
 st.markdown("""
 <div class="card">
 <b>Purpose:</b> inspect and compare cosmological parameter profiles using registered presets, candidate/reference forms, and locked benchmark references.<br>
-<b>Included:</b> 100 parameter-profile presets, profile search, candidate/reference comparison, AxiCLASS FIX1 locked benchmark values, and optional exploratory CLASS/AxiCLASS sandbox output.<br>
+<b>Included:</b> 100 parameter-profile presets, profile search, candidate/reference comparison, AxiCLASS FIX1 locked benchmark values, and an external Render-hosted CLASS API sandbox.<br>
 <b>Not included:</b> likelihood evaluation, posterior comparison, Planck validation, or final cosmological conclusion.<br>
-<b>Positioning:</b> FUJIKI DTI is included as one registered candidate profile, not as the only supported use case.
+<b>Positioning:</b> FUJIKI DTI is included as one registered candidate profile, not as the only supported use case.<br><br>
+<b>Public routes:</b><br>
+<a href="https://dti-real-app-v606.streamlit.app" target="_blank">Public Streamlit app</a> ·
+<a href="https://github.com/fujikix1102/dti-real-app-v606" target="_blank">Frontend GitHub</a> ·
+<a href="https://dti-class-api.onrender.com/health" target="_blank">External CLASS API health</a> ·
+<a href="https://github.com/fujikix1102/dti-class-api" target="_blank">Backend GitHub</a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1537,7 +1542,8 @@ st.header("8. External CLASS API sandbox")
 st.markdown("""
 <div class="boundary-card">
 <b>External compute mode:</b> this section sends the current parameter block to the public Render CLASS API backend.<br>
-<b>Backend:</b> <code>https://dti-class-api.onrender.com/class/compute</code><br>
+<b>Compute endpoint:</b> <code>https://dti-class-api.onrender.com/class/compute</code><br>
+<b>Health endpoint:</b> <code>https://dti-class-api.onrender.com/health</code><br>
 <b>Boundary:</b> exploratory, non-canonical, not a likelihood evaluation, not a posterior comparison, and not a Planck validation pipeline.<br>
 <b>Current backend scope:</b> LCDM-like CLASS propagation only. <code>f_EDE</code> and <code>z_c</code> are passed for interface compatibility but are not used as AxiCLASS EDE microphysics in this minimal backend.
 </div>
