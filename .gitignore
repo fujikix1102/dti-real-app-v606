@@ -10,3 +10,8 @@ venv/
 .streamlit/secrets.toml
 logs/
 *.log
+# Local backups and audit scratch files
+_local_backups_do_not_commit/
+_local_archive_do_not_commit/
+*_audit_*.tsv
+*.bak_*
