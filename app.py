@@ -1333,46 +1333,6 @@ if st.button("Run RK45 background proxy for current input model", width="stretch
         st.error(f"RK45 proxy failed: {e}")
 
 st.markdown("---")
-st.header("6. Optional live CLASS sandbox")
-st.markdown(
-    """
-This section is a public exploratory sandbox.  
-It does not replace locked FIX1 values. It does not update the manuscript, canonical pointers, or checkpoints.  
-Full EDE/scalar-field exploration may fail to converge, so LCDM-like CLASS propagation is kept separate.
-"""
-)
-
-enable_live = st.checkbox("Enable exploratory live CLASS calculation", value=False)
-if enable_live:
-    st.warning("This is a non-locked / non-canonical / exploratory run.")
-    if st.button("Run LCDM-like CLASS propagation for current input model", type="primary", width="stretch"):
-        try:
-            h = target_model.get("h", target_model.get("H0", np.nan) / 100.0)
-            ob = target_model.get("omega_b", np.nan)
-            oc = target_model.get("omega_cdm", np.nan)
-            lnAs = target_model.get("ln10_10_As", 3.044)
-            ns = target_model.get("n_s", 0.965)
-            if np.isnan(h) or np.isnan(ob) or np.isnan(oc):
-                st.error("h/H0, omega_b, and omega_cdm are required.")
-            else:
-                result = run_live_class_lcdm_like(h, ob, oc, lnAs, ns)
-                cols = st.columns(4)
-                with cols[0]:
-                    st.markdown(card("z_rec", f"{result['z_rec']:.4f}", "live LCDM-like", "gray"), unsafe_allow_html=True)
-                with cols[1]:
-                    st.markdown(card("rs_rec", f"{result['rs_rec_Mpc']:.4f} Mpc", "live LCDM-like", "gray"), unsafe_allow_html=True)
-                with cols[2]:
-                    color, note = safety_class_for_param("sigma8", result["sigma8"], delta_df)
-                    st.markdown(card("sigma8", f"{result['sigma8']:.6f}", note, color), unsafe_allow_html=True)
-                with cols[3]:
-                    color, note = safety_class_for_param("S8", result["S8"], delta_df)
-                    st.markdown(card("S8", f"{result['S8']:.6f}", note, color), unsafe_allow_html=True)
-                dom_safe_json_box(result, label="Computation output")
-        except Exception as e:
-            st.error(f"Live CLASS sandbox failed: {e}")
-
-st.markdown("---")
-
 st.header("8. Planck-like fit-region profile")
 
 st.markdown("""
@@ -1555,7 +1515,7 @@ def extract_external_class_api_payload_v606(text):
     return payload
 
 
-st.header("8b. External CLASS API sandbox")
+st.header("6. External CLASS API sandbox")
 
 st.markdown("""
 <div class="boundary-card">
