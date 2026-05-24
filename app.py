@@ -1057,38 +1057,58 @@ st.markdown("""
 
 with st.sidebar:
     st.header("1. Parameter profile cartridge")
-    preset_names = list(PRESETS.keys())
-    selected = st.selectbox(
-        "Load registered profile",
-        preset_names,
-        index=preset_names.index(st.session_state.selected_preset) if st.session_state.selected_preset in preset_names else 0,
-    )
-    if selected != st.session_state.selected_preset:
-        st.session_state.selected_preset = selected
-        st.session_state.pending_paper_text = PRESETS[selected]["text"]
-        st.rerun()
 
-    st.info(PRESETS[st.session_state.selected_preset]["note"])
+    selected_preset = st.selectbox(
+        "Load registered profile",
+        list(PRESETS.keys()),
+        key="selected_preset",
+    )
+
+    preset_note = PRESETS.get(selected_preset, {}).get("note", "")
+    if preset_note:
+        st.info(preset_note)
 
     st.text_area("Profile text / generated block", key="paper_text_widget", height=270)
-    if st.session_state.paper_text_widget != st.session_state.paper_text:
-        st.session_state.pending_paper_text = st.session_state.paper_text_widget
 
-    c1, c2 = st.columns(2)
-    with c1:
+    col_sidebar_1, col_sidebar_2 = st.columns(2)
+    with col_sidebar_1:
         if st.button("Text to form", width="stretch"):
-            sync_form_from_text()
+            st.session_state["pending_parse_text_to_form"] = True
             st.rerun()
-    with c2:
+    with col_sidebar_2:
         if st.button("Form to text", width="stretch"):
-            st.session_state.pending_paper_text = form_to_text()
+            st.session_state["pending_paper_text"] = form_to_text()
             st.rerun()
 
     st.markdown("---")
+    st.subheader("2. Current profile status")
+
+    active_profile_name = st.session_state.get("selected_preset", selected_preset)
+    try:
+        active_profile_role = PRESETS.get(active_profile_name, {}).get("role", "registered or custom profile")
+    except Exception:
+        active_profile_role = "registered or custom profile"
+
+    st.markdown(f"**Active profile:** {active_profile_name}")
+    st.markdown(f"**Profile role:** {active_profile_role}")
+    st.markdown("**Mode:** Candidate / Reference comparison")
     st.success("AxiCLASS FIX1 benchmark: read-only")
     st.caption("Changing presets or form values does not recompute this locked benchmark.")
 
+    st.markdown("---")
+    st.subheader("3. Export / share")
 
+    current_block = st.session_state.get("paper_text_widget", st.session_state.get("paper_text", ""))
+    st.download_button(
+        "Download current parameter block",
+        data=str(current_block),
+        file_name="current_parameter_block.txt",
+        mime="text/plain",
+        width="stretch",
+    )
+
+    st.link_button("Open GitHub", "https://github.com/fujikix1102/dti-real-app-v606", width="stretch")
+    st.link_button("Open public app", "https://dti-real-app-v606.streamlit.app", width="stretch")
 st.header("1. Candidate / Reference parameter input form")
 st.markdown(
     "Parameter names are fixed. Edit only the values. Use the button to convert form values into text and feed the audit/search engine."
