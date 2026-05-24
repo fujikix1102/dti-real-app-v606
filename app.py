@@ -984,36 +984,6 @@ h1, h2, h3 { letter-spacing: 0.01em; }
 )
 
 
-# Public sidebar status/export blocks.
-st.sidebar.markdown("---")
-st.sidebar.subheader("2. Current profile status")
-
-_active_profile_name = st.session_state.get("selected_preset", "custom / manual profile")
-try:
-    _active_profile_role = PRESETS.get(_active_profile_name, {}).get("role", "registered or custom profile")
-except Exception:
-    _active_profile_role = "registered or custom profile"
-
-st.sidebar.markdown(f"**Active profile:** {_active_profile_name}")
-st.sidebar.markdown(f"**Profile role:** {_active_profile_role}")
-st.sidebar.markdown("**Mode:** Candidate / Reference comparison")
-st.sidebar.success("AxiCLASS FIX1 benchmark: read-only")
-st.sidebar.caption("Changing presets or form values does not recompute this locked benchmark.")
-
-st.sidebar.markdown("---")
-st.sidebar.subheader("3. Export / share")
-
-_current_block = st.session_state.get("paper_text_widget", st.session_state.get("paper_text", ""))
-st.sidebar.download_button(
-    "Download current parameter block",
-    data=str(_current_block),
-    file_name="current_parameter_block.txt",
-    mime="text/plain",
-    width="stretch",
-)
-
-st.sidebar.link_button("Open GitHub", "https://github.com/fujikix1102/dti-real-app-v606", width="stretch")
-st.sidebar.link_button("Open public app", "https://dti-real-app-v606.streamlit.app", width="stretch")
 
 init_session()
 apply_pending_paper_text()
@@ -1105,10 +1075,11 @@ with st.sidebar:
         file_name="current_parameter_block.txt",
         mime="text/plain",
         width="stretch",
+        key="sidebar_download_current_parameter_block_v606",
     )
 
-    st.link_button("Open GitHub", "https://github.com/fujikix1102/dti-real-app-v606", width="stretch")
-    st.link_button("Open public app", "https://dti-real-app-v606.streamlit.app", width="stretch")
+    st.markdown("[Open GitHub](https://github.com/fujikix1102/dti-real-app-v606)")
+    st.markdown("[Open public app](https://dti-real-app-v606.streamlit.app)")
 st.header("1. Candidate / Reference parameter input form")
 st.markdown(
     "Parameter names are fixed. Edit only the values. Use the button to convert form values into text and feed the audit/search engine."
