@@ -997,6 +997,18 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<div class="card">
+<b>How to use this app:</b><br>
+1. Select a registered profile from the left sidebar.<br>
+2. Inspect the generated parameter block.<br>
+3. Use <b>Text to form</b> or <b>Form to text</b> to move between text and editable fields.<br>
+4. Compare candidate and reference parameter burdens.<br>
+5. Check the locked AxiCLASS FIX1 benchmark values as read-only references.<br>
+6. Treat optional live CLASS/AxiCLASS sandbox output as exploratory and non-canonical.
+</div>
+""", unsafe_allow_html=True)
+
 with st.expander("Quick Start", expanded=False):
     st.markdown("""
     1. Select a registered profile from the sidebar.
