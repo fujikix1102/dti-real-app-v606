@@ -15,3 +15,5 @@ _local_backups_do_not_commit/
 _local_archive_do_not_commit/
 *_audit_*.tsv
 *.bak_*
+# Local-only freeze / audit artifacts
+_local_freeze_do_not_commit/
