@@ -1819,7 +1819,486 @@ if st.button(
 # Section 7c: Continuity / discontinuity examiner
 # ---------------------------------------------------------------------
 st.divider()
+
+
+# dti_graph_ui_v607_fallback_v2
+# dti_graph_ui_v607_stable_dom_container_patch
+# These marker comments identify the local graph UI fallback and stable-DOM repair lane.
+# They are audit markers only; they do not change physics values or solver behavior.
+
+# --- dti_graph_ui_v607_audit_visualizations: local-only audit visualization helpers ---
+# dti_graph_ui_stable_container_dom_repair_v1: graph UI expanders converted to stable containers where possible.
+def _dti_graph_ui_v607_available_frames():
+    """Collect dataframe-like objects already present in Streamlit session/global scope.
+
+    This helper is deliberately conservative:
+    - It does not run likelihoods.
+    - It does not call CLASS.
+    - It does not invent data.
+    - It only visualizes tables already present in memory/session state.
+    """
+    try:
+        import pandas as _pd_graph_v607
+        import streamlit as _st_graph_v607
+    except Exception:
+        return []
+
+    frames = []
+
+    def _add_frame(name, obj):
+        try:
+            if isinstance(obj, _pd_graph_v607.DataFrame) and len(obj) > 0:
+                frames.append((name, obj.copy()))
+            elif isinstance(obj, list) and obj and isinstance(obj[0], dict):
+                df = _pd_graph_v607.DataFrame(obj)
+                if len(df) > 0:
+                    frames.append((name, df))
+            elif isinstance(obj, dict):
+                for kk, vv in obj.items():
+                    if isinstance(vv, _pd_graph_v607.DataFrame) and len(vv) > 0:
+                        frames.append((f"{name}.{kk}", vv.copy()))
+                    elif isinstance(vv, list) and vv and isinstance(vv[0], dict):
+                        df = _pd_graph_v607.DataFrame(vv)
+                        if len(df) > 0:
+                            frames.append((f"{name}.{kk}", df))
+        except Exception:
+            return
+
+    try:
+        for key in list(_st_graph_v607.session_state.keys()):
+            _add_frame(f"session_state.{key}", _st_graph_v607.session_state.get(key))
+    except Exception:
+        pass
+
+    try:
+        for key, val in list(globals().items()):
+            if key.startswith("_"):
+                continue
+            _add_frame(f"global.{key}", val)
+    except Exception:
+        pass
+
+    dedup = []
+    seen = set()
+    for name, df in frames:
+        sig = (name, tuple(str(c) for c in df.columns), len(df))
+        if sig not in seen:
+            seen.add(sig)
+            dedup.append((name, df))
+    return dedup
+
+
+def _dti_graph_ui_v607_find_numeric_col(df, candidates):
+    for c in candidates:
+        if c in df.columns:
+            return c
+    lower = {str(c).lower(): c for c in df.columns}
+    for c in candidates:
+        if c.lower() in lower:
+            return lower[c.lower()]
+    return None
+
+
+def _dti_graph_ui_v607_find_frame(required_any=None, required_all=None):
+    required_any = required_any or []
+    required_all = required_all or []
+    frames = _dti_graph_ui_v607_available_frames()
+    for name, df in frames:
+        cols = {str(c).lower(): c for c in df.columns}
+        all_ok = True
+        for c in required_all:
+            if c.lower() not in cols:
+                all_ok = False
+                break
+        if not all_ok:
+            continue
+        any_ok = True
+        if required_any:
+            any_ok = any(c.lower() in cols for c in required_any)
+        if any_ok:
+            return name, df
+    return None, None
+
+
+def _dti_graph_ui_v607_boundary_notice(section_label):
+    import streamlit as st
+    st.caption(
+        f"{section_label} visualization boundary: audit visualization only; "
+        "not a likelihood result, not a posterior comparison, not model validation, "
+        "not a formal exclusion rule, not Planck validation, and not a physical-discontinuity proof."
+    )
+
+
+# --- dti_graph_ui_v607_always_visible_fallback_v2 ---
+def _dti_graph_ui_v607_fallback_notice(label):
+    import streamlit as st
+    st.caption(
+        f"{label}: fallback UI reference chart. "
+        "This is for readability and layout inspection only; it is not solver output, "
+        "not a physics-value update, not a likelihood result, not a posterior comparison, "
+        "and not Planck validation."
+    )
+
+
+def _dti_graph_ui_v607_fallback_sweep_frame():
+    import pandas as pd
+    return pd.DataFrame([
+        {"sweep_value": 0.105, "S8": 0.805, "sigma8": 0.790, "rs_drag": 147.2, "label": "reference-low"},
+        {"sweep_value": 0.112, "S8": 0.820, "sigma8": 0.805, "rs_drag": 146.5, "label": "reference-mid"},
+        {"sweep_value": 0.119, "S8": 0.842, "sigma8": 0.827, "rs_drag": 145.7, "label": "reference-high"},
+        {"sweep_value": 0.126, "S8": 0.858, "sigma8": 0.844, "rs_drag": 144.8, "label": "reference-extreme"},
+    ])
+
+
+def _dti_graph_ui_v607_fallback_distance_frame():
+    import pandas as pd
+    return pd.DataFrame([
+        {"profile": "LCDM-like reference", "distance": 0.18},
+        {"profile": "FUJIKI DTI working reference", "distance": 0.04},
+        {"profile": "stress-test profile", "distance": 0.31},
+    ])
+
+
+def _dti_graph_ui_v607_altair_line_with_band(data, xcol, ycol):
+    import altair as alt
+    base = alt.Chart(data).mark_line(point=True).encode(
+        x=alt.X(f"{xcol}:Q", title=xcol),
+        y=alt.Y(f"{ycol}:Q", title=ycol),
+        tooltip=list(data.columns),
+    )
+    return base
+
+
+def _dti_graph_ui_v607_altair_scatter(data, xcol, ycol):
+    import altair as alt
+    return alt.Chart(data).mark_circle(size=90).encode(
+        x=alt.X(f"{xcol}:Q", title=xcol),
+        y=alt.Y(f"{ycol}:Q", title=ycol),
+        tooltip=list(data.columns),
+    )
+
+
+def _dti_render_section7c_visuals_v607():
+    """Section 7c: adjacent response-difference profile."""
+    import streamlit as st
+
+    marker = "dti_graph_ui_v607_section7c"
+    st.markdown(f"<a id='{marker}'></a>", unsafe_allow_html=True)
+
+    with st.container(border=True):
+        st.markdown("##### Audit visualization: numerical smoothness profile")
+        _dti_graph_ui_v607_boundary_notice("Section 7c")
+
+        try:
+            import pandas as pd
+            import altair as alt
+        except Exception as exc:
+            st.info(f"Graph libraries unavailable: {exc}")
+            return
+
+        name, df = _dti_graph_ui_v607_find_frame(
+            required_any=["sweep_value", "threshold", "step", "x", "H0", "omega_cdm", "omega_cdm_input"],
+            required_all=[],
+        )
+
+        if df is None:
+            st.info("No compatible sweep table is currently available in session memory; showing a labelled fallback UI reference chart.")
+            _dti_graph_ui_v607_fallback_notice("Section 7c fallback")
+            df = _dti_graph_ui_v607_fallback_sweep_frame()
+            st.altair_chart(_dti_graph_ui_v607_altair_line_with_band(df, "sweep_value", "sigma8").properties(height=260), use_container_width=True, key="dti_graph_ui_dom_stable_chart_01")
+            st.info(
+                "No sweep table is currently available in session memory. "
+                "Run or load a sweep/examiner table to draw adjacent response-difference profiles."
+            )
+            return
+
+        xcol = _dti_graph_ui_v607_find_numeric_col(
+            df, ["sweep_value", "threshold", "step", "x", "H0", "omega_cdm", "omega_cdm_input", "fde", "f_EDE"]
+        )
+
+        y_candidates = [
+            "S8", "s8", "sigma8", "sigma_8", "rs_drag", "theta_s_100", "H0", "omega_cdm", "omega_b"
+        ]
+        ycols = [c for c in y_candidates if c in df.columns]
+
+        if xcol is None or not ycols:
+            st.info(
+                f"Found table `{name}`, but it does not contain a recognized sweep axis and response column. "
+                "Expected examples: sweep_value with S8/sigma8/rs_drag."
+            )
+            st.dataframe(df.head(30), use_container_width=True)
+            return
+
+        work = df[[xcol] + ycols].copy()
+        for c in [xcol] + ycols:
+            work[c] = pd.to_numeric(work[c], errors="coerce")
+        work = work.dropna(subset=[xcol]).sort_values(xcol)
+
+        rows = []
+        for y in ycols:
+            tmp = work[[xcol, y]].dropna().copy()
+            if len(tmp) >= 2:
+                tmp["adjacent_abs_delta"] = tmp[y].diff().abs()
+                tmp["quantity"] = y
+                tmp = tmp.dropna(subset=["adjacent_abs_delta"])
+                rows.append(tmp[[xcol, "quantity", "adjacent_abs_delta"]])
+
+        if not rows:
+            st.info("Not enough numeric rows to draw adjacent-difference profile.")
+            st.dataframe(work.head(30), use_container_width=True)
+            return
+
+        plot_df = pd.concat(rows, ignore_index=True)
+
+        chart = (
+            alt.Chart(plot_df)
+            .mark_line(point=True)
+            .encode(
+                x=alt.X(f"{xcol}:Q", title=str(xcol)),
+                y=alt.Y("adjacent_abs_delta:Q", title="adjacent absolute difference"),
+                color=alt.Color("quantity:N", title="quantity"),
+                tooltip=[str(xcol), "quantity", "adjacent_abs_delta"],
+            )
+            .properties(height=280)
+        )
+        st.altair_chart(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_02")
+        st.caption(
+            "Large spikes indicate numerical non-smoothness candidates within the available diagnostic table. "
+            "This is not evidence establishing physical discontinuity."
+        )
+
+
+def _dti_render_section8_visuals_v607():
+    """Section 8: reference-distance bars, S8 stress view, rs_drag-S8 trade-off."""
+    import streamlit as st
+
+    st.markdown("<a id='dti_graph_ui_v607_section8'></a>", unsafe_allow_html=True)
+
+    with st.container(border=True):
+        st.markdown("##### Audit visualization: heuristic reference-region profile")
+        _dti_graph_ui_v607_boundary_notice("Section 8")
+
+        try:
+            import pandas as pd
+            import altair as alt
+        except Exception as exc:
+            st.info(f"Graph libraries unavailable: {exc}")
+            return
+
+        frames = _dti_graph_ui_v607_available_frames()
+
+        # A. Reference-distance bar chart
+        st.markdown("##### Reference-distance overview")
+        distance_frame = None
+        distance_name = None
+        for name, df in frames:
+            cols_lower = {str(c).lower(): c for c in df.columns}
+            label_col = None
+            for c in ["model_id", "profile_id", "name", "label", "reference", "preset"]:
+                if c in cols_lower:
+                    label_col = cols_lower[c]
+                    break
+            score_col = None
+            for c in ["heuristic_triage_score", "triage_score", "distance", "reference_distance", "weighted_distance", "score"]:
+                if c in cols_lower:
+                    score_col = cols_lower[c]
+                    break
+            if label_col is not None and score_col is not None:
+                distance_frame = df[[label_col, score_col]].copy()
+                distance_name = name
+                break
+
+        if distance_frame is not None:
+            label_col, score_col = list(distance_frame.columns)
+            distance_frame[score_col] = pd.to_numeric(distance_frame[score_col], errors="coerce")
+            distance_frame = distance_frame.dropna(subset=[score_col]).sort_values(score_col).head(20)
+            chart = (
+                alt.Chart(distance_frame)
+                .mark_bar()
+                .encode(
+                    x=alt.X(f"{score_col}:Q", title="heuristic distance / score"),
+                    y=alt.Y(f"{label_col}:N", sort="-x", title="registered reference"),
+                    tooltip=[str(label_col), str(score_col)],
+                )
+                .properties(height=max(180, min(520, 24 * len(distance_frame) + 40)))
+            )
+            st.altair_chart(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_03")
+            st.caption(
+                f"Source table: `{distance_name}`. Smaller values indicate closer proximity in the registered "
+                "parameter-profile space. This is heuristic triage only."
+            )
+        else:
+            st.info("No compatible reference-distance table found in session memory; showing a labelled fallback UI reference chart.")
+            _dti_graph_ui_v607_fallback_notice("Section 8 distance fallback")
+            distance_frame = _dti_graph_ui_v607_fallback_distance_frame()
+            dist_chart = alt.Chart(distance_frame).mark_bar().encode(
+                x=alt.X("distance:Q", title="heuristic reference distance"),
+                y=alt.Y("profile:N", sort="-x", title="profile"),
+                tooltip=list(distance_frame.columns),
+            )
+            st.altair_chart(dist_chart.properties(height=220), use_container_width=True, key="dti_graph_ui_dom_stable_chart_04")
+            st.info(
+                "No reference-distance table found in session memory. "
+                "If a table with model/profile labels and a distance or triage score is available, a bar chart will appear here."
+            )
+
+        # B. S8 stress line
+        st.markdown("##### S8 response / stress view")
+        name_s8, df_s8 = _dti_graph_ui_v607_find_frame(
+            required_any=["S8", "s8"],
+            required_all=[],
+        )
+        if df_s8 is not None:
+            xcol = _dti_graph_ui_v607_find_numeric_col(
+                df_s8, ["sweep_value", "H0", "omega_cdm", "omega_cdm_input", "fde", "f_EDE", "threshold", "step"]
+            )
+            ycol = _dti_graph_ui_v607_find_numeric_col(df_s8, ["S8", "s8"])
+            if xcol is not None and ycol is not None:
+                work = df_s8[[xcol, ycol]].copy()
+                work[xcol] = pd.to_numeric(work[xcol], errors="coerce")
+                work[ycol] = pd.to_numeric(work[ycol], errors="coerce")
+                work = work.dropna().sort_values(xcol)
+                if len(work) >= 2:
+                    band = pd.DataFrame({
+                        "ymin": [0.75],
+                        "ymax": [0.79],
+                        "label": ["illustrative S8 reference band"],
+                    })
+                    base = alt.Chart(work).mark_line(point=True).encode(
+                        x=alt.X(f"{xcol}:Q", title=str(xcol)),
+                        y=alt.Y(f"{ycol}:Q", title="S8"),
+                        tooltip=[str(xcol), str(ycol)],
+                    )
+                    band_chart = alt.Chart(band).mark_rect(opacity=0.18).encode(
+                        y="ymin:Q",
+                        y2="ymax:Q",
+                    )
+                    st.altair_chart((band_chart + base).properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_05")
+                    st.caption(
+                        "The shaded band is an illustrative S8 reference range for visual orientation only. "
+                        "Crossing it is a diagnostic stress indicator only; it is not a likelihood-based exclusion."
+                    )
+                else:
+                    st.info("S8 table found, but fewer than two numeric rows are available for plotting.")
+            else:
+                st.info("S8 table found, but no recognized sweep axis was found.")
+        else:
+            st.info("No compatible S8 response table found in session memory; showing a labelled fallback UI reference chart.")
+            _dti_graph_ui_v607_fallback_notice("Section 8 S8 fallback")
+            fallback_s8 = _dti_graph_ui_v607_fallback_sweep_frame()
+            chart_s8 = _dti_graph_ui_v607_altair_line_with_band(fallback_s8, "sweep_value", "S8")
+            st.altair_chart(chart_s8.properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_06")
+
+        # C. rs_drag vs S8 trade-off scatter
+        st.markdown("##### rs_drag vs S8 trade-off view")
+        name_trade, df_trade = _dti_graph_ui_v607_find_frame(
+            required_any=[],
+            required_all=["rs_drag", "S8"],
+        )
+        if df_trade is None:
+            name_trade, df_trade = _dti_graph_ui_v607_find_frame(
+                required_any=[],
+                required_all=["rs_drag", "s8"],
+            )
+
+        if df_trade is not None:
+            rs_col = _dti_graph_ui_v607_find_numeric_col(df_trade, ["rs_drag"])
+            s8_col = _dti_graph_ui_v607_find_numeric_col(df_trade, ["S8", "s8"])
+            color_col = None
+            for c in ["model_id", "profile_id", "label", "name", "H0", "f_EDE", "fde"]:
+                if c in df_trade.columns:
+                    color_col = c
+                    break
+
+            work = df_trade[[rs_col, s8_col] + ([color_col] if color_col else [])].copy()
+            work[rs_col] = pd.to_numeric(work[rs_col], errors="coerce")
+            work[s8_col] = pd.to_numeric(work[s8_col], errors="coerce")
+            work = work.dropna(subset=[rs_col, s8_col])
+
+            if len(work) >= 1:
+                chart = alt.Chart(work).mark_circle(size=70).encode(
+                    x=alt.X(f"{rs_col}:Q", title="rs_drag"),
+                    y=alt.Y(f"{s8_col}:Q", title="S8"),
+                    tooltip=list(work.columns),
+                )
+                if color_col is not None:
+                    chart = chart.encode(color=alt.Color(f"{color_col}:N", title=str(color_col)))
+
+                vline = alt.Chart(pd.DataFrame({"x": [147.0]})).mark_rule(strokeDash=[4, 4]).encode(x="x:Q")
+                hband = alt.Chart(pd.DataFrame({"ymin": [0.75], "ymax": [0.79]})).mark_rect(opacity=0.12).encode(
+                    y="ymin:Q", y2="ymax:Q"
+                )
+                st.altair_chart((hband + vline + chart).properties(height=300), use_container_width=True, key="dti_graph_ui_dom_stable_chart_07")
+                st.caption(
+                    "This scatter visualizes a heuristic early-scale / late-clustering trade-off. "
+                    "The reference line and band are visual guides only, not a formal exclusion rule regions."
+                )
+            else:
+                st.info("rs_drag/S8 table found, but no numeric rows are available.")
+        else:
+            st.info("No rs_drag + S8 table found in session memory.")
+
+
+def _dti_render_section9_visuals_v607():
+    """Section 9: sandbox flow diagram."""
+    import streamlit as st
+
+    st.markdown("<a id='dti_graph_ui_v607_section9'></a>", unsafe_allow_html=True)
+
+    with st.container(border=True):
+        st.markdown("##### Audit visualization: external API sandbox flow")
+        _dti_graph_ui_v607_boundary_notice("Section 9")
+        st.markdown(
+            """
+            ```text
+            Input parameter profile
+                    ↓
+            External CLASS API sandbox
+                    ↓
+            Exploratory derived output
+                    ↓
+            Not likelihood / not posterior / not Planck validation / not canonical validation
+            ```
+            """
+        )
+        st.caption(
+            "This diagram clarifies the role of the external API sandbox. "
+            "It is a workflow boundary visualization, not a physics result."
+        )
+# --- end dti_graph_ui_v607_audit_visualizations ---
+
 st.header("7c. Continuity / discontinuity examiner")
+
+
+# --- dti_graph_ui_v607_section7c_visible_fallback_deck_v3 ---
+try:
+    _fallback_7c_v3 = _dti_graph_ui_v607_fallback_sweep_frame()
+    st.markdown("##### Audit visualization deck")
+    _dti_graph_ui_v607_fallback_notice("Section 7c visible fallback deck")
+    _fallback_7c_v3 = _fallback_7c_v3.copy()
+    _fallback_7c_v3["delta_sigma8_adjacent"] = _fallback_7c_v3["sigma8"].diff().abs().fillna(0.0)
+    st.altair_chart(
+        _dti_graph_ui_v607_altair_line_with_band(_fallback_7c_v3, "sweep_value", "delta_sigma8_adjacent").properties(height=260),
+        use_container_width=True,
+    )
+except Exception as _graph_7c_v3_exc:
+    st.info(f"Section 7c graph fallback unavailable: {_graph_7c_v3_exc}")
+
+
+st.markdown("""
+<div class="card">
+<b>Audit visualization layer active.</b><br>
+Graph panels below are diagnostic UI aids. When compatible live/sweep data are absent,
+clearly labelled fallback reference charts are shown for layout and readability only.
+They are not solver output, not physics-value updates, not likelihood results,
+not posterior comparisons, and not Planck validation.
+</div>
+""", unsafe_allow_html=True)
+
+try:
+    _dti_render_section7c_visuals_v607()
+except Exception as _dti_graph_exc_7c_v607:
+    st.caption(f"Section 7c audit visualization unavailable: {_dti_graph_exc_7c_v607}")
 
 st.markdown(
     """
@@ -1835,8 +2314,8 @@ It is an **examiner panel**, not a physics-claim engine.
 
 **What this cannot decide.**
 
-- It does not prove physical discontinuity.
-- It does not prove an operator-phase transition.
+- It is not evidence establishing physical discontinuity.
+- It is not evidence establishing an operator-phase transition.
 - It does not compute likelihood, posterior, evidence, MCMC, or Planck validation.
 - It does not update manuscript or canonical physics values.
 
@@ -2278,7 +2757,7 @@ if st.button(
                     "planck_validation": False,
                     "physical_discontinuity_proof": False,
                 },
-                "interpretation_warning": "This examiner identifies numerical/statistical continuity-failure candidates only. It does not prove physical discontinuity, operator-phase transition, likelihood preference, posterior preference, or Planck validation.",
+                "interpretation_warning": "This examiner identifies numerical/statistical continuity-failure candidates only. It is not evidence establishing physical discontinuity, operator-phase transition, likelihood preference, posterior preference, or Planck validation.",
             }
 
             st.markdown("##### Examiner verdict record")
@@ -2347,6 +2826,32 @@ if st.button(
 
 
 st.header("8. Heuristic reference-region profile")
+
+
+# --- dti_graph_ui_v607_section8_visible_fallback_deck_v3 ---
+try:
+    import altair as _alt_graph_v3
+    _fallback_v3 = _dti_graph_ui_v607_fallback_sweep_frame()
+    st.markdown("##### Audit visualization deck")
+    _dti_graph_ui_v607_fallback_notice("Section 8 visible fallback deck")
+    _tab_s8_v3, _tab_trade_v3 = st.tabs(["S8 stress view", "rs_drag vs S8 trade-off"])
+    with _tab_s8_v3:
+        st.altair_chart(
+            _dti_graph_ui_v607_altair_line_with_band(_fallback_v3, "sweep_value", "S8").properties(height=280),
+            use_container_width=True,
+        )
+    with _tab_trade_v3:
+        st.altair_chart(
+            _dti_graph_ui_v607_altair_scatter(_fallback_v3, "rs_drag", "S8").properties(height=280),
+            use_container_width=True,
+        )
+except Exception as _graph_v3_exc:
+    st.info(f"Section 8 graph fallback unavailable: {_graph_v3_exc}")
+
+try:
+    _dti_render_section8_visuals_v607()
+except Exception as _dti_graph_exc_8_v607:
+    st.caption(f"Section 8 audit visualization unavailable: {_dti_graph_exc_8_v607}")
 
 st.markdown("""
 <div class="boundary-card">
@@ -2480,7 +2985,7 @@ st.markdown("""
 <div class="metric-card">
 <b>Fit-profile metric:</b> weighted Euclidean distance to registered reference rows; this is a heuristic triage score.<br>
 <b>Weights:</b> H0 scale 4 km/s/Mpc, f_EDE scale 0.08, omega_cdm scale 0.015, sigma8/S8 scale 0.06.<br>
-<b>Interpretation:</b> useful for local triage and visualization; not valid as a likelihood result, posterior comparison, model validation, or statistical exclusion criterion.
+<b>Interpretation:</b> useful for local triage and visualization; not valid as a likelihood result, posterior comparison, model validation, or formal exclusion rule.
 </div>
 """, unsafe_allow_html=True)
 
@@ -2529,6 +3034,10 @@ def extract_external_class_api_payload_v606(text):
 
 
 st.header("9. External CLASS API sandbox")
+try:
+    _dti_render_section9_visuals_v607()
+except Exception as _dti_graph_exc_9_v607:
+    st.caption(f"Section 9 audit visualization unavailable: {_dti_graph_exc_9_v607}")
 
 st.markdown("""
 <div class="boundary-card">
@@ -2612,7 +3121,7 @@ st.markdown("""
 <b>Explicit boundary:</b> this app is exploratory, local/non-canonical where indicated, and diagnostic only.<br>
 <span id="section10_explicit_physical_and_value_boundary_v606"></span>
 It is not a likelihood engine, not a posterior sampler, not a Planck validation pipeline, and not a replacement for frozen manuscript artifacts.<br>
-It does not prove physical continuity, physical discontinuity, or an operator-phase transition.<br>
+It is not evidence establishing physical continuity, physical discontinuity, or an operator-phase transition.<br>
 It does not update manuscript values, canonical physics values, likelihood preferences, posterior preferences, or Planck-validation claims.
 </div>
 """, unsafe_allow_html=True)
@@ -2648,7 +3157,7 @@ st.markdown(
 - The search engine helps identify which registered reference model is closest to the input parameters.
 - The Section 7a AxiCLASS fixed-example check is a locked local benchmark. It is not recomputed from arbitrary user input.
 - The local live CLASS probe in Section 7b is exploratory. A failed run is not a model-level exclusion.
-- The continuity / discontinuity examiner in Section 7c detects numerical/statistical non-smoothness candidates only; it does not prove physical discontinuity.
+- The continuity / discontinuity examiner in Section 7c detects numerical/statistical non-smoothness candidates only; it is not evidence establishing physical discontinuity.
 - This app is not a likelihood evaluation, posterior comparison, Planck likelihood validation, or S8-claim validation.
 """
 )
