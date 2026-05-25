@@ -1615,7 +1615,7 @@ if external_api_result:
 
 
 def _render_local_axiclass_fixed_example_v606():
-    st.header("8. Local experimental probes")
+    st.header("9. Local experimental probes")
     st.markdown(
         """
     This section groups local-only experimental probes that run on this computer.
@@ -1624,12 +1624,12 @@ def _render_local_axiclass_fixed_example_v606():
 
     **Subsections**
 
-    - **8a. Local-only AxiCLASS fixed-example check**: source-locked fixed example, no arbitrary input.
-    - **8b. Local-only vanilla CLASS live probe**: manual real-valued local inputs, derived CLASS quantities only.
+    - **9a. Local-only AxiCLASS fixed-example check**: source-locked fixed example, no arbitrary input.
+    - **9b. Local-only vanilla CLASS live probe**: manual real-valued local inputs, derived CLASS quantities only.
         """
     )
 
-    st.header("8a. Local-only AxiCLASS fixed-example check")
+    st.header("9a. Local-only AxiCLASS fixed-example check")
 
     st.markdown("""
 <div class="boundary-card">
@@ -1749,10 +1749,10 @@ It is intended for implementation testing and reproducibility inspection only.<b
 _render_local_axiclass_fixed_example_v606()
 
 # ---------------------------------------------------------------------
-# Section 8b: Local-only vanilla CLASS live probe
+# Section 9b: Local-only vanilla CLASS live probe
 # ---------------------------------------------------------------------
 st.divider()
-st.header("8b. Local-only vanilla CLASS live probe")
+st.header("9b. Local-only vanilla CLASS live probe")
 
 st.markdown(
     """
@@ -2073,7 +2073,7 @@ if st.button(
         except Exception as exc:
             st.error(f"Local vanilla CLASS live probe failed: {exc}")
 
-st.header("9. Interpretation boundary")
+st.header("10. Interpretation boundary")
 
 audit_summary_text = f"""DTI-Core Grand Auditor v6.0.6 audit summary
 
@@ -2103,8 +2103,8 @@ st.download_button(
 st.markdown(
     """
 - The search engine helps identify which registered reference model is closest to the input parameters.
-- The Section 8a AxiCLASS fixed-example check is a locked local benchmark. It is not recomputed from arbitrary user input.
-- The local live CLASS probe in Section 8b is exploratory. A failed run is not a model-level exclusion.
+- The Section 9a AxiCLASS fixed-example check is a locked local benchmark. It is not recomputed from arbitrary user input.
+- The local live CLASS probe in Section 9b is exploratory. A failed run is not a model-level exclusion.
 - This app is not a likelihood evaluation, posterior comparison, Planck likelihood validation, or S8-claim validation.
 """
 )
