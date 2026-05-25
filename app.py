@@ -1615,7 +1615,21 @@ if external_api_result:
 
 
 def _render_local_axiclass_fixed_example_v606():
-    st.header("8c. Local-only AxiCLASS fixed-example check")
+    st.header("8. Local experimental probes")
+    st.markdown(
+        """
+    This section groups local-only experimental probes that run on this computer.
+
+    These probes are useful for implementation checks, reproducibility inspection, and immediate derived-quantity inspection. They are intentionally separated from the public deployed app, Render services, manuscript checkpoints, and likelihood/posterior analysis.
+
+    **Subsections**
+
+    - **8a. Local-only AxiCLASS fixed-example check**: source-locked fixed example, no arbitrary input.
+    - **8b. Local-only vanilla CLASS live probe**: manual real-valued local inputs, derived CLASS quantities only.
+        """
+    )
+
+    st.header("8a. Local-only AxiCLASS fixed-example check")
 
     st.markdown("""
 <div class="boundary-card">
@@ -1734,6 +1748,331 @@ It is intended for implementation testing and reproducibility inspection only.<b
 
 _render_local_axiclass_fixed_example_v606()
 
+# ---------------------------------------------------------------------
+# Section 8b: Local-only vanilla CLASS live probe
+# ---------------------------------------------------------------------
+st.divider()
+st.header("8b. Local-only vanilla CLASS live probe")
+
+st.markdown(
+    """
+**Purpose.** This subsection accepts local manual real-valued cosmological inputs and sends them to a local vanilla CLASS live derived-parameter endpoint.
+
+The default input source is now the **current sidebar profile where compatible**. This prevents the live probe from silently using an unrelated preset while a different TARGET_MODEL block is selected in the sidebar.
+
+**Compatibility rule.**
+
+- Used by vanilla CLASS probe: `H0`, `omega_cdm`, `omega_b`, `n_s`, `ln(10^10 A_s)`.
+- Shown but not used by vanilla CLASS probe: `f_EDE`.
+- Treated as reference/display only, not input: `sigma8`, `S8`.
+
+This probe returns CLASS-derived quantities only. It does not compute likelihood, posterior, evidence, MCMC chains, Planck validation, or manuscript values.
+    """
+)
+
+def _section8b_parse_float_from_text(text, names):
+    import re
+
+    if not isinstance(text, str):
+        return None
+
+    for name in names:
+        escaped = re.escape(name)
+        patterns = [
+            rf"(?m)^\s*{escaped}\s*=\s*([-+]?[0-9]+(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?)",
+            rf"(?m)^\s*{escaped}\s*:\s*([-+]?[0-9]+(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?)",
+        ]
+        for pat in patterns:
+            m = re.search(pat, text)
+            if m:
+                try:
+                    return float(m.group(1))
+                except Exception:
+                    pass
+    return None
+
+_active_profile_text_8b = st.session_state.get("paper_text_widget", "")
+if not _active_profile_text_8b:
+    _active_profile_text_8b = st.session_state.get("paper_text", "")
+
+_active_profile_name_8b = st.session_state.get("selected_preset", "current sidebar profile")
+
+_current_sidebar_values_8b = {
+    "H0": _section8b_parse_float_from_text(_active_profile_text_8b, ["H0"]),
+    "omega_cdm": _section8b_parse_float_from_text(_active_profile_text_8b, ["omega_cdm", "omch2", "omega_c"]),
+    "omega_b": _section8b_parse_float_from_text(_active_profile_text_8b, ["omega_b", "ombh2", "omega_baryon"]),
+    "n_s": _section8b_parse_float_from_text(_active_profile_text_8b, ["n_s", "ns"]),
+    "ln1010A_s": _section8b_parse_float_from_text(_active_profile_text_8b, ["ln1010A_s", "ln10_10_As", "ln10_10_A_s", "ln_10_10_A_s"]),
+    "f_EDE": _section8b_parse_float_from_text(_active_profile_text_8b, ["f_EDE", "fEDE", "f_ede"]),
+    "sigma8_reference": _section8b_parse_float_from_text(_active_profile_text_8b, ["sigma8", "sigma_8"]),
+    "S8_reference": _section8b_parse_float_from_text(_active_profile_text_8b, ["S8", "S_8"]),
+}
+
+_fallback_live_values_8b = {
+    "H0": 72.9,
+    "omega_cdm": 0.127,
+    "omega_b": 0.0244,
+    "n_s": 0.9847,
+    "ln1010A_s": 3.058,
+}
+
+_current_compatible_values_8b = {
+    "H0": _current_sidebar_values_8b["H0"] if _current_sidebar_values_8b["H0"] is not None else _fallback_live_values_8b["H0"],
+    "omega_cdm": _current_sidebar_values_8b["omega_cdm"] if _current_sidebar_values_8b["omega_cdm"] is not None else _fallback_live_values_8b["omega_cdm"],
+    "omega_b": _current_sidebar_values_8b["omega_b"] if _current_sidebar_values_8b["omega_b"] is not None else _fallback_live_values_8b["omega_b"],
+    "n_s": _current_sidebar_values_8b["n_s"] if _current_sidebar_values_8b["n_s"] is not None else _fallback_live_values_8b["n_s"],
+    "ln1010A_s": _current_sidebar_values_8b["ln1010A_s"] if _current_sidebar_values_8b["ln1010A_s"] is not None else _fallback_live_values_8b["ln1010A_s"],
+}
+
+_live_presets_8b = {
+    "Use current sidebar profile where compatible": _current_compatible_values_8b,
+    "FUJIKI DTI candidate": {
+        "H0": 72.9,
+        "omega_cdm": 0.127,
+        "omega_b": 0.0244,
+        "n_s": 0.9847,
+        "ln1010A_s": 3.058,
+    },
+    "Planck-like baseline": {
+        "H0": 67.4,
+        "omega_cdm": 0.1200,
+        "omega_b": 0.0224,
+        "n_s": 0.965,
+        "ln1010A_s": 3.044,
+    },
+    "High-H0 vanilla test": {
+        "H0": 73.0,
+        "omega_cdm": 0.1200,
+        "omega_b": 0.0224,
+        "n_s": 0.970,
+        "ln1010A_s": 3.044,
+    },
+    "Custom": None,
+}
+
+enable_live_vanilla_probe = st.checkbox(
+    "Enable local-only vanilla CLASS live probe",
+    value=False,
+    key="enable_live_vanilla_probe_v606_8d",
+)
+
+live_probe_url = st.text_input(
+    "Local vanilla CLASS live probe endpoint",
+    value="http://127.0.0.1:8011/axiclass/live-vanilla-probe",
+    key="live_vanilla_probe_url_v606_8d",
+)
+
+selected_live_input_source_8b = st.selectbox(
+    "Input source",
+    list(_live_presets_8b.keys()),
+    index=0,
+    key="live_vanilla_input_source_v606_8d",
+)
+
+_selected_defaults_8b = _live_presets_8b.get(selected_live_input_source_8b)
+if _selected_defaults_8b is None:
+    _selected_defaults_8b = {
+        "H0": st.session_state.get("live_vanilla_H0_v606_8d", _fallback_live_values_8b["H0"]),
+        "omega_cdm": st.session_state.get("live_vanilla_omega_cdm_v606_8d", _fallback_live_values_8b["omega_cdm"]),
+        "omega_b": st.session_state.get("live_vanilla_omega_b_v606_8d", _fallback_live_values_8b["omega_b"]),
+        "n_s": st.session_state.get("live_vanilla_ns_v606_8d", _fallback_live_values_8b["n_s"]),
+        "ln1010A_s": st.session_state.get("live_vanilla_ln1010As_v606_8d", _fallback_live_values_8b["ln1010A_s"]),
+    }
+
+_source_signature_8b = (
+    selected_live_input_source_8b,
+    _active_profile_name_8b,
+    _selected_defaults_8b["H0"],
+    _selected_defaults_8b["omega_cdm"],
+    _selected_defaults_8b["omega_b"],
+    _selected_defaults_8b["n_s"],
+    _selected_defaults_8b["ln1010A_s"],
+)
+
+if st.session_state.get("live_vanilla_source_signature_v606_8d") != _source_signature_8b:
+    st.session_state["live_vanilla_H0_v606_8d"] = float(_selected_defaults_8b["H0"])
+    st.session_state["live_vanilla_omega_cdm_v606_8d"] = float(_selected_defaults_8b["omega_cdm"])
+    st.session_state["live_vanilla_omega_b_v606_8d"] = float(_selected_defaults_8b["omega_b"])
+    st.session_state["live_vanilla_ns_v606_8d"] = float(_selected_defaults_8b["n_s"])
+    st.session_state["live_vanilla_ln1010As_v606_8d"] = float(_selected_defaults_8b["ln1010A_s"])
+    st.session_state["live_vanilla_source_signature_v606_8d"] = _source_signature_8b
+
+st.markdown("##### Current sidebar profile compatibility readout")
+
+_compat_rows_8b = [
+    {"field": "active_profile", "value": str(_active_profile_name_8b), "used_by_vanilla_probe": "context"},
+    {"field": "H0", "value": _current_sidebar_values_8b["H0"], "used_by_vanilla_probe": "YES"},
+    {"field": "omega_cdm", "value": _current_sidebar_values_8b["omega_cdm"], "used_by_vanilla_probe": "YES"},
+    {"field": "omega_b", "value": _current_sidebar_values_8b["omega_b"], "used_by_vanilla_probe": "YES"},
+    {"field": "n_s", "value": _current_sidebar_values_8b["n_s"], "used_by_vanilla_probe": "YES if present; fallback otherwise"},
+    {"field": "ln1010A_s", "value": _current_sidebar_values_8b["ln1010A_s"], "used_by_vanilla_probe": "YES if present; fallback otherwise"},
+    {"field": "f_EDE", "value": _current_sidebar_values_8b["f_EDE"], "used_by_vanilla_probe": "NO; vanilla CLASS probe ignores this"},
+    {"field": "sigma8_reference", "value": _current_sidebar_values_8b["sigma8_reference"], "used_by_vanilla_probe": "NO; reference/display only"},
+    {"field": "S8_reference", "value": _current_sidebar_values_8b["S8_reference"], "used_by_vanilla_probe": "NO; reference/display only"},
+]
+st.dataframe(_compat_rows_8b, width="stretch", hide_index=True)
+
+col_live_1, col_live_2, col_live_3 = st.columns(3)
+
+with col_live_1:
+    live_H0 = st.number_input(
+        "H0",
+        min_value=40.0,
+        max_value=100.0,
+        step=0.1,
+        key="live_vanilla_H0_v606_8d",
+    )
+    live_omega_b = st.number_input(
+        "omega_b",
+        min_value=0.005,
+        max_value=0.080,
+        step=0.0001,
+        format="%.5f",
+        key="live_vanilla_omega_b_v606_8d",
+    )
+
+with col_live_2:
+    live_omega_cdm = st.number_input(
+        "omega_cdm",
+        min_value=0.010,
+        max_value=0.300,
+        step=0.001,
+        format="%.5f",
+        key="live_vanilla_omega_cdm_v606_8d",
+    )
+    live_ns = st.number_input(
+        "n_s",
+        min_value=0.80,
+        max_value=1.20,
+        step=0.0001,
+        format="%.5f",
+        key="live_vanilla_ns_v606_8d",
+    )
+
+with col_live_3:
+    live_ln1010As = st.number_input(
+        "ln(10^10 A_s)",
+        min_value=1.0,
+        max_value=5.0,
+        step=0.001,
+        format="%.5f",
+        key="live_vanilla_ln1010As_v606_8d",
+    )
+
+live_payload = {
+    "H0": float(live_H0),
+    "omega_cdm": float(live_omega_cdm),
+    "omega_b": float(live_omega_b),
+    "n_s": float(live_ns),
+    "ln1010A_s": float(live_ln1010As),
+}
+
+st.caption(
+    "The JSON below is the actual payload sent to the local vanilla CLASS live probe. It should match the compatible current sidebar profile values unless Custom is selected."
+)
+
+st.json(live_payload)
+
+import json as _json_section8b
+import io as _io_section8b
+import csv as _csv_section8b
+
+_payload_json_8b = _json_section8b.dumps(live_payload, indent=2, sort_keys=True)
+st.download_button(
+    "Download live probe input JSON",
+    data=_payload_json_8b,
+    file_name="section8b_live_vanilla_input_payload.json",
+    mime="application/json",
+    key="download_section8b_live_payload_json_v606",
+)
+
+_payload_tsv_buf_8b = _io_section8b.StringIO()
+_payload_tsv_writer_8b = _csv_section8b.writer(_payload_tsv_buf_8b, delimiter="\t")
+_payload_tsv_writer_8b.writerow(["field", "value"])
+for _k_8b, _v_8b in live_payload.items():
+    _payload_tsv_writer_8b.writerow([_k_8b, _v_8b])
+
+st.download_button(
+    "Download live probe input TSV",
+    data=_payload_tsv_buf_8b.getvalue(),
+    file_name="section8b_live_vanilla_input_payload.tsv",
+    mime="text/tab-separated-values",
+    key="download_section8b_live_payload_tsv_v606",
+)
+
+if st.button(
+    "Run local vanilla CLASS live probe",
+    key="run_live_vanilla_probe_v606_8d",
+    width="stretch",
+):
+    if not enable_live_vanilla_probe:
+        st.warning("Enable the local-only vanilla CLASS live probe before running.")
+    else:
+        try:
+            import requests
+
+            response = requests.post(live_probe_url, json=live_payload, timeout=240)
+            st.write(f"HTTP status: {response.status_code}")
+
+            try:
+                data = response.json()
+            except Exception:
+                data = {"status": "error", "detail": response.text}
+
+            st.markdown("##### Local vanilla CLASS live probe result")
+            st.json(data)
+
+            if data.get("status") == "ok":
+                st.success("Local vanilla CLASS live probe returned status: ok")
+
+                derived = data.get("derived_parameters", {})
+                if isinstance(derived, dict) and derived:
+                    rows = []
+                    for key in [
+                        "h",
+                        "Omega0_m",
+                        "Omega_Lambda",
+                        "age",
+                        "rs_drag",
+                        "sigma8",
+                        "S8",
+                    ]:
+                        if key in derived:
+                            rows.append({"quantity": key, "value": derived[key]})
+                    if rows:
+                        st.table(rows)
+
+                    result_json = _json_section8b.dumps(data, indent=2, sort_keys=True)
+                    st.download_button(
+                        "Download live probe result JSON",
+                        data=result_json,
+                        file_name="section8b_live_vanilla_result.json",
+                        mime="application/json",
+                        key="download_section8b_live_result_json_v606",
+                    )
+
+                    result_tsv_buf = _io_section8b.StringIO()
+                    result_tsv_writer = _csv_section8b.writer(result_tsv_buf, delimiter="\t")
+                    result_tsv_writer.writerow(["quantity", "value"])
+                    for row in rows:
+                        result_tsv_writer.writerow([row["quantity"], row["value"]])
+                    st.download_button(
+                        "Download live probe result TSV",
+                        data=result_tsv_buf.getvalue(),
+                        file_name="section8b_live_vanilla_result.tsv",
+                        mime="text/tab-separated-values",
+                        key="download_section8b_live_result_tsv_v606",
+                    )
+
+                st.info(
+                    "Interpretation boundary: derived-parameter probe only; f_EDE is not used by vanilla CLASS here; sigma8/S8 from the sidebar are reference values, not inputs; this is not likelihood, posterior, Planck validation, or manuscript values."
+                )
+            else:
+                st.warning("Local vanilla CLASS live probe did not return ok. Check that the 8011 API is running.")
+
+        except Exception as exc:
+            st.error(f"Local vanilla CLASS live probe failed: {exc}")
+
 st.header("9. Interpretation boundary")
 
 audit_summary_text = f"""DTI-Core Grand Auditor v6.0.6 audit summary
@@ -1764,8 +2103,8 @@ st.download_button(
 st.markdown(
     """
 - The search engine helps identify which registered reference model is closest to the input parameters.
-- AxiCLASS FIX1 is a locked benchmark. It is not recomputed from the current input.
-- The live CLASS sandbox is exploratory. A failed run is not a model-level exclusion.
+- The Section 8a AxiCLASS fixed-example check is a locked local benchmark. It is not recomputed from arbitrary user input.
+- The local live CLASS probe in Section 8b is exploratory. A failed run is not a model-level exclusion.
 - This app is not a likelihood evaluation, posterior comparison, Planck likelihood validation, or S8-claim validation.
 """
 )
