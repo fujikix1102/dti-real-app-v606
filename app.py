@@ -26,6 +26,594 @@ def dom_safe_json_box(obj, label="Result"):
 
 import pandas as pd
 import streamlit as st
+
+
+
+# --- DTI_SAFE_PURGE_GRAPH_VISUAL_ROUTES_NO_INDENT_BREAK_V1 ---
+# Local-only closure:
+# - 8011 realtime excluded
+# - graph rendering excluded
+# - graph/audit visualization wording hidden
+# - no fallback/global/disabled TSV route route
+_DTI_SAFE_PURGE_GRAPH_VISUAL_ROUTES_NO_INDENT_BREAK_V1 = True
+
+def _DTI_DISABLED_GRAPH_CALL(*args, **kwargs):
+    return None
+
+_DTI_HIDDEN_VISUAL_PHRASES_V1 = [
+    "境界確認",
+    "Boundary confirmation",
+    "Boundary table",
+    "Boundary confirmation",
+    "disabled graph route",
+    "disabled graph route",
+    "disabled visual material",
+    "disabled visual route",
+    "disabled TSV route",
+    "disabled TSV route",
+    "static PNG",
+    "trade-off visualization",
+]
+
+try:
+    _dti_orig_markdown_v1 = st.markdown
+    _dti_orig_info_v1 = st.info
+    _dti_orig_caption_v1 = st.caption
+    _dti_orig_button_v1 = st.button
+except Exception:
+    _dti_orig_markdown_v1 = None
+    _dti_orig_info_v1 = None
+    _dti_orig_caption_v1 = None
+    _dti_orig_button_v1 = None
+
+def _DTI_TEXT_IS_HIDDEN_VISUAL_V1(x):
+    try:
+        s = str(x)
+    except Exception:
+        return False
+    return any(p in s for p in _DTI_HIDDEN_VISUAL_PHRASES_V1)
+
+def _DTI_MARKDOWN_FILTER_V1(x, *args, **kwargs):
+    if _DTI_TEXT_IS_HIDDEN_VISUAL_V1(x):
+        return None
+    if _dti_orig_markdown_v1 is not None:
+        return _dti_orig_markdown_v1(x, *args, **kwargs)
+    return None
+
+def _DTI_INFO_FILTER_V1(x, *args, **kwargs):
+    if _DTI_TEXT_IS_HIDDEN_VISUAL_V1(x):
+        return None
+    if _dti_orig_info_v1 is not None:
+        return _dti_orig_info_v1(x, *args, **kwargs)
+    return None
+
+def _DTI_CAPTION_FILTER_V1(x, *args, **kwargs):
+    if _DTI_TEXT_IS_HIDDEN_VISUAL_V1(x):
+        return None
+    if _dti_orig_caption_v1 is not None:
+        return _dti_orig_caption_v1(x, *args, **kwargs)
+    return None
+
+def _DTI_BUTTON_FILTER_V1(x, *args, **kwargs):
+    if "8011" in str(x) or _DTI_TEXT_IS_HIDDEN_VISUAL_V1(x):
+        return False
+    if _dti_orig_button_v1 is not None:
+        return _dti_orig_button_v1(x, *args, **kwargs)
+    return False
+
+try:
+    st.markdown = _DTI_MARKDOWN_FILTER_V1
+    st.info = _DTI_INFO_FILTER_V1
+    st.caption = _DTI_CAPTION_FILTER_V1
+    st.button = _DTI_BUTTON_FILTER_V1
+except Exception:
+    pass
+# --- /DTI_SAFE_PURGE_GRAPH_VISUAL_ROUTES_NO_INDENT_BREAK_V1 ---
+
+# --- DTI_LOCAL_FINAL_NOGRAPH_CLEAN_UI_V1 ---
+# Local UI closure policy:
+# - 8011 realtime probe is disabled.
+# - All graph rendering is disabled.
+# - Audit visualization material is hidden.
+# - Section 8 is payload / boundary confirmation only.
+# - Tables and text boundary confirmations may remain.
+DTI_LOCAL_FINAL_NOGRAPH_CLEAN_UI_V1 = True
+DTI_8011_REALTIME_DISABLED_V1 = True
+DTI_ALL_GRAPHS_DISABLED_V1 = True
+DTI_AUDIT_VISUAL_ITEMS_HIDDEN_V1 = True
+DTI_SECTION8_PAYLOAD_BOUNDARY_ONLY_V1 = True
+
+def _dti_local_final_text_is_visual_noise_v1(x):
+    s = str(x)
+    noise_terms = [
+        "監査可視化レイヤー",
+        "Audit visualization",
+        "audit visualization",
+        "visualization deck",
+        "graph API",
+        "グラフAPI",
+        "グラフは無効",
+        "graph disabled",
+        "no graph",
+        "No graph",
+        "8011",
+        "live vanilla",
+        "ライブプローブ",
+        "ローカルのバニラCLASS",
+        "disabled visual route",
+        "fallback chart",
+        "フォールバック",
+        "S8 stress",
+        "S8応答",
+        "stress view",
+        "trade-off",
+        "トレードオフ",
+        "rs_drag",
+        "sweep_value",
+        "smoothness graph",
+        "数値平滑性プロファイル",
+        "ヒューリスティック参照領域",
+        "Candidate payload / boundary confirmation",
+        "reference-distance",
+        "基準距離",
+    ]
+    return any(t in s for t in noise_terms)
+
+try:
+    import streamlit as st
+
+    _dti_original_pyplot_v1 = getattr(st, "pyplot", None)
+    _dti_original_line_chart_v1 = getattr(st, "line_chart", None)
+    _dti_original_area_chart_v1 = getattr(st, "area_chart", None)
+    _dti_original_bar_chart_v1 = getattr(st, "bar_chart", None)
+    _dti_original_altair_chart_v1 = getattr(st, "altair_chart", None)
+    _dti_original_plotly_chart_v1 = getattr(st, "plotly_chart", None)
+    _dti_original_graphviz_chart_v1 = getattr(st, "graphviz_chart", None)
+    _dti_original_map_v1 = getattr(st, "map", None)
+    _dti_original_button_v1 = getattr(st, "button", None)
+    _dti_original_text_input_v1 = getattr(st, "text_input", None)
+    _dti_original_markdown_v1 = getattr(st, "markdown", None)
+    _dti_original_info_v1 = getattr(st, "info", None)
+    _dti_original_caption_v1 = getattr(st, "caption", None)
+    _dti_original_write_v1 = getattr(st, "write", None)
+    _dti_original_header_v1 = getattr(st, "header", None)
+
+    def _dti_silent_chart_v1(*args, **kwargs):
+        return None
+
+    def _dti_safe_button_v1(label, *args, **kwargs):
+        if _dti_local_final_text_is_visual_noise_v1(label):
+            return False
+        return _dti_original_button_v1(label, *args, **kwargs)
+
+    def _dti_safe_text_input_v1(label, *args, **kwargs):
+        value = kwargs.get("value", None)
+        if _dti_local_final_text_is_visual_noise_v1(label) or _dti_local_final_text_is_visual_noise_v1(value):
+            return "DTI_LOCAL_8011_DISABLED"
+        return _dti_original_text_input_v1(label, *args, **kwargs)
+
+    def _dti_safe_markdown_v1(body, *args, **kwargs):
+        if _dti_local_final_text_is_visual_noise_v1(body):
+            return None
+        return _dti_original_markdown_v1(body, *args, **kwargs)
+
+    def _dti_safe_info_v1(body, *args, **kwargs):
+        if _dti_local_final_text_is_visual_noise_v1(body):
+            return None
+        return _dti_original_info_v1(body, *args, **kwargs)
+
+    def _dti_safe_caption_v1(body, *args, **kwargs):
+        if _dti_local_final_text_is_visual_noise_v1(body):
+            return None
+        return _dti_original_caption_v1(body, *args, **kwargs)
+
+    def _dti_safe_write_v1(*args, **kwargs):
+        if args and any(_dti_local_final_text_is_visual_noise_v1(a) for a in args):
+            return None
+        return _dti_original_write_v1(*args, **kwargs)
+
+    def _dti_safe_header_v1(body, *args, **kwargs):
+        s = str(body)
+        if "8." in s and ("Heuristic" in s or "ヒューリスティック" in s):
+            body = "8. Candidate payload / boundary confirmation"
+        return _dti_original_header_v1(body, *args, **kwargs)
+
+    st.pyplot = _dti_silent_chart_v1
+    st.line_chart = _dti_silent_chart_v1
+    st.area_chart = _dti_silent_chart_v1
+    st.bar_chart = _dti_silent_chart_v1
+    st.altair_chart = _dti_silent_chart_v1
+    st.plotly_chart = _dti_silent_chart_v1
+    st.graphviz_chart = _dti_silent_chart_v1
+    st.map = _dti_silent_chart_v1
+    st.button = _dti_safe_button_v1
+    st.text_input = _dti_safe_text_input_v1
+    st.markdown = _dti_safe_markdown_v1
+    st.info = _dti_safe_info_v1
+    st.caption = _dti_safe_caption_v1
+    st.write = _dti_safe_write_v1
+    st.header = _dti_safe_header_v1
+except Exception:
+    pass
+# --- DTI_LOCAL_FINAL_NOGRAPH_CLEAN_UI_V1_END ---
+
+# --- dti_disable_8011_errors_visual_items_final_fix_v1 ---
+# Local-only UI safety patch.
+# Policy:
+# - 8011 realtime probe is disabled.
+# - All graph rendering is disabled.
+# - Audit-visualization material blocks are hidden.
+# - Section 8 is payload/boundary confirmation only.
+# - No likelihood evaluation, posterior comparison, Planck validation, or physics-value update.
+
+DTI_8011_REALTIME_DISABLED_FINAL = True
+DTI_ALL_GRAPHS_DISABLED_FINAL = True
+DTI_AUDIT_VISUAL_ITEMS_HIDDEN_FINAL = True
+DTI_SECTION8_PAYLOAD_BOUNDARY_ONLY_FINAL = True
+
+try:
+    import streamlit as _dti_st_final
+except Exception:
+    _dti_st_final = None
+
+if _dti_st_final is not None:
+    def _dti_disabled_graph_notice_final(*args, **kwargs):
+        try:
+            _dti_st_final.info(
+                "No 8011 realtime graph, no disabled visual route, no synthetic graph, "
+                "no UI-reference graph, no fixed-reference graph, no disabled TSV route, "
+                "and no disabled TSV route is rendered."
+            )
+        except Exception:
+            pass
+        return None
+
+    def _dti_silent_visual_item_final(*args, **kwargs):
+        return None
+
+    # Disable graph APIs.
+    try:
+        _dti_st_final.pyplot = _dti_disabled_graph_notice_final
+        _dti_st_final.altair_chart = _dti_disabled_graph_notice_final
+        _dti_st_final.line_chart = _dti_disabled_graph_notice_final
+        _dti_st_final.area_chart = _dti_disabled_graph_notice_final
+        _dti_st_final.bar_chart = _dti_disabled_graph_notice_final
+        _dti_st_final.plotly_chart = _dti_disabled_graph_notice_final
+        _dti_st_final.vega_lite_chart = _dti_disabled_graph_notice_final
+    except Exception:
+        pass
+
+    # Hide audit-visualization labels/notices that are now out of scope.
+    _dti_original_markdown_final = _dti_st_final.markdown
+    _dti_original_info_final = _dti_st_final.info
+    _dti_original_caption_final = _dti_st_final.caption
+    _dti_original_button_final = _dti_st_final.button
+
+    def _dti_text_should_hide_final(x):
+        s = str(x)
+        hide_tokens = [
+            "監査可視化レイヤー",
+            "Audit visualization",
+            "audit visualization",
+            "S8 stress",
+            "S8応答",
+            "rs_dragとS8",
+            "rs_drag と S8",
+            "trade-off",
+            "トレードオフ",
+            "グラフAPI",
+            "8011",
+            "live vanilla",
+            "ライブプローブ",
+            "ローカルのバニラCLASSライブプローブ",
+            "fallback",
+            "フォールバック",
+            "visualization panel",
+            "可視化",
+            "heuristic reference",
+            "ヒューリスティック",
+            "reference-distance",
+            "参照距離",
+        ]
+        return any(tok in s for tok in hide_tokens)
+
+    def _dti_markdown_filter_final(body, *args, **kwargs):
+        if _dti_text_should_hide_final(body):
+            return None
+        return _dti_original_markdown_final(body, *args, **kwargs)
+
+    def _dti_info_filter_final(body, *args, **kwargs):
+        if _dti_text_should_hide_final(body):
+            return None
+        return _dti_original_info_final(body, *args, **kwargs)
+
+    def _dti_caption_filter_final(body, *args, **kwargs):
+        if _dti_text_should_hide_final(body):
+            return None
+        return _dti_original_caption_final(body, *args, **kwargs)
+
+    def _dti_button_filter_final(label, *args, **kwargs):
+        if _dti_text_should_hide_final(label):
+            return False
+        return _dti_original_button_final(label, *args, **kwargs)
+
+    try:
+        _dti_st_final.markdown = _dti_markdown_filter_final
+        _dti_st_final.info = _dti_info_filter_final
+        _dti_st_final.caption = _dti_caption_filter_final
+        _dti_st_final.button = _dti_button_filter_final
+    except Exception:
+        pass
+# --- dti_disable_8011_errors_visual_items_final_fix_v1_end ---
+
+
+# --- dti_section8_payload_boundary_only_v1 ---
+# Local-only UI downgrade:
+# Section 8 is not an evaluation, graph, distance-ranking, S8-stress, or reference-region scoring panel.
+# It is kept only as a candidate payload / boundary confirmation area.
+# This does not perform likelihood evaluation, posterior comparison, Planck validation,
+# physics-value update, graph generation, or 8011 realtime probing.
+_DTI_SECTION8_PAYLOAD_BOUNDARY_ONLY_V1 = True
+
+try:
+    _dti_sec8_orig_header_v1 = st.header
+    _dti_sec8_orig_subheader_v1 = st.subheader
+    _dti_sec8_orig_markdown_v1 = st.markdown
+    _dti_sec8_orig_info_v1 = st.info
+    _dti_sec8_orig_caption_v1 = st.caption
+    _dti_sec8_orig_write_v1 = st.write
+    _dti_sec8_orig_tabs_v1 = st.tabs
+except Exception:
+    _dti_sec8_orig_header_v1 = None
+    _dti_sec8_orig_subheader_v1 = None
+    _dti_sec8_orig_markdown_v1 = None
+    _dti_sec8_orig_info_v1 = None
+    _dti_sec8_orig_caption_v1 = None
+    _dti_sec8_orig_write_v1 = None
+    _dti_sec8_orig_tabs_v1 = None
+
+_DTI_SECTION8_SUPPRESS_PHRASES_V1 = [
+    "監査可視化レイヤー",
+    "可視化レイヤー",
+    "S8応力",
+    "S8 stress",
+    "stress view",
+    "rs_dragとS8",
+    "rs_drag と S8",
+    "trade-off",
+    "トレードオフ",
+    "基準距離",
+    "参照距離",
+    "heuristic reference distance",
+    "heuristic reference-region",
+    "Heuristic reference-region",
+    "適合領域参照",
+    "登録済みの適合領域参照",
+    "距離バー",
+    "代替UI参照チャート",
+    "代表UI参照チャート",
+    "fallback",
+    "Fallback",
+    "フォールバック",
+    "graph API",
+    "グラフ API",
+    "グラフAPI",
+    "graph disabled",
+    "グラフは無効",
+    "グラフが無効",
+    "グラフ描画",
+    "グラフ表示",
+    "プロファイル距離",
+    "distance table",
+    "distance or trigger score",
+    "trigger score",
+    "トリガースコア",
+]
+
+_DTI_SECTION8_RENAME_MAP_V1 = {
+    "8. Candidate payload / boundary confirmation": "8. Candidate payload / boundary confirmation",
+    "8. 候補パラメータ送信前の境界確認": "8. 候補パラメータ送信前の境界確認",
+}
+
+def _dti_section8_as_text_v1(obj):
+    try:
+        return str(obj)
+    except Exception:
+        return ""
+
+def _dti_section8_should_suppress_v1(obj):
+    s = _dti_section8_as_text_v1(obj)
+    return any(p in s for p in _DTI_SECTION8_SUPPRESS_PHRASES_V1)
+
+def _dti_section8_rewrite_text_v1(obj):
+    s = _dti_section8_as_text_v1(obj)
+    for old, new in _DTI_SECTION8_RENAME_MAP_V1.items():
+        if old in s:
+            return s.replace(old, new)
+    return obj
+
+def _dti_section8_boundary_notice_v1():
+    try:
+        _dti_sec8_orig_info_v1(
+            "Section 8 is restricted to candidate-payload and boundary confirmation only. "
+            "No graph, no 8011 realtime probe, no heuristic distance ranking, no S8 stress review, "
+            "no likelihood evaluation, no posterior comparison, no Planck validation, and no physics-value update."
+        )
+    except Exception:
+        pass
+
+def _dti_section8_header_wrapper_v1(*args, **kwargs):
+    if args:
+        first = _dti_section8_rewrite_text_v1(args[0])
+        if _dti_section8_as_text_v1(first).startswith("8. Candidate payload"):
+            result = _dti_sec8_orig_header_v1(first, *args[1:], **kwargs)
+            _dti_section8_boundary_notice_v1()
+            return result
+        args = (first,) + args[1:]
+    return _dti_sec8_orig_header_v1(*args, **kwargs)
+
+def _dti_section8_text_wrapper_factory_v1(orig_func):
+    def wrapper(*args, **kwargs):
+        if args and _dti_section8_should_suppress_v1(args[0]):
+            return None
+        return orig_func(*args, **kwargs)
+    return wrapper
+
+class _DTISection8DummyTabV1:
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+def _dti_section8_tabs_wrapper_v1(labels, *args, **kwargs):
+    label_text = " ".join([_dti_section8_as_text_v1(x) for x in labels]) if isinstance(labels, (list, tuple)) else _dti_section8_as_text_v1(labels)
+    if _dti_section8_should_suppress_v1(label_text):
+        try:
+            _dti_sec8_orig_info_v1(
+                "Section 8 visualization tabs are hidden. This local line keeps only payload/boundary confirmation."
+            )
+        except Exception:
+            pass
+        n = len(labels) if isinstance(labels, (list, tuple)) else 1
+        return [_DTISection8DummyTabV1() for _ in range(n)]
+    return _dti_sec8_orig_tabs_v1(labels, *args, **kwargs)
+
+try:
+    if _dti_sec8_orig_header_v1 is not None:
+        st.header = _dti_section8_header_wrapper_v1
+    if _dti_sec8_orig_subheader_v1 is not None:
+        st.subheader = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_subheader_v1)
+    if _dti_sec8_orig_markdown_v1 is not None:
+        st.markdown = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_markdown_v1)
+    if _dti_sec8_orig_info_v1 is not None:
+        st.info = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_info_v1)
+    if _dti_sec8_orig_caption_v1 is not None:
+        st.caption = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_caption_v1)
+    if _dti_sec8_orig_write_v1 is not None:
+        st.write = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_write_v1)
+    if _dti_sec8_orig_tabs_v1 is not None:
+        st.tabs = _dti_section8_tabs_wrapper_v1
+except Exception:
+    pass
+# --- dti_section8_payload_boundary_only_v1 END ---
+
+
+# --- DTI_HARD_DISABLE_8011_REALTIME_AND_ALL_GRAPHS_V1 ---
+# Policy:
+# - 8011 realtime probe is disabled in this local line.
+# - All graph rendering is disabled.
+# - No fallback, synthetic, illustrative, UI-reference, fixed-reference, or prebuilt graph is drawn.
+# - Tables/text may remain visible.
+# - This does not change manuscript values, physics values, likelihoods, posteriors, or Planck validation.
+
+DTI_8011_REALTIME_DISABLED = True
+DTI_ALL_GRAPHS_DISABLED = True
+
+def _dti_disabled_graph_notice_v1(label="Graph"):
+    try:
+        st.info(
+            f"{label}: graph disabled. 8011 realtime and all graph rendering are intentionally disabled in this local line. "
+            "No fallback, synthetic, illustrative, UI-reference, fixed-reference, profile-bound TSV, global TSV, or live 8011 graph is drawn."
+        )
+    except Exception:
+        pass
+
+def _dti_disabled_graph_api_v1(*args, **kwargs):
+    return None
+
+def _dti_disabled_8011_realtime_v1(*args, **kwargs):
+    raise RuntimeError(
+        "8011 realtime probe is disabled by DTI_HARD_DISABLE_8011_REALTIME_AND_ALL_GRAPHS_V1."
+    )
+
+# Disable common Streamlit graph APIs globally.
+for _dti_graph_api_name in [
+    "pyplot",
+    "line_chart",
+    "bar_chart",
+    "area_chart",
+    "scatter_chart",
+    "altair_chart",
+    "vega_lite_chart",
+    "plotly_chart",
+    "graphviz_chart",
+    "bokeh_chart",
+    "map",
+]:
+    if hasattr(st, _dti_graph_api_name):
+        setattr(st, _dti_graph_api_name, _dti_disabled_graph_api_v1)
+
+# Disable matplotlib display paths that call pyplot through Streamlit above.
+# Do not monkeypatch pandas/tables. Tables remain allowed.
+# --- END DTI_HARD_DISABLE_8011_REALTIME_AND_ALL_GRAPHS_V1 ---
+
+# --- DTI_HIDE_AUDIT_VISUALIZATION_ITEMS_V1 ---
+# Policy:
+# - Hide audit-visualization material blocks.
+# - Hide graph API disabled notices.
+# - Keep ordinary explanatory text, tables, profile blocks, and boundary text visible.
+# - This does not restore graphs, 8011 realtime, likelihood evaluation, posterior comparison, Planck validation, or physics-value updates.
+
+DTI_AUDIT_VISUALIZATION_ITEMS_DISABLED = True
+
+_DTI_HIDDEN_UI_TEXT_TOKENS_V1 = [
+    "監査可視化レイヤー",
+    "監査可視化 レイヤー",
+    "監査可視化は利用できません",
+    "可視化の境界",
+    "数値平滑性プロファイル",
+    "Candidate payload / boundary confirmation",
+    "基準距離の概要",
+    "S8応力レビュー",
+    "Boundary table",
+    "rs_dragとS8のトレードオフ比較",
+    "Boundary confirmation",
+    "グラフAPI：",
+    "グラフ API：",
+    "graph disabled",
+    "all graph rendering",
+    "disabled visual route",
+    "UI-reference",
+    "global TSV",
+    "profile-bound TSV",
+    "Audit visualization",
+    "diagnostic UI aids",
+]
+
+def _dti_should_hide_visual_ui_text_v1(obj):
+    try:
+        s = str(obj)
+    except Exception:
+        return False
+    return any(tok in s for tok in _DTI_HIDDEN_UI_TEXT_TOKENS_V1)
+
+def _dti_make_hidden_ui_wrapper_v1(original_func):
+    def _wrapped(*args, **kwargs):
+        if args and _dti_should_hide_visual_ui_text_v1(args[0]):
+            return None
+        if "body" in kwargs and _dti_should_hide_visual_ui_text_v1(kwargs.get("body")):
+            return None
+        if "label" in kwargs and _dti_should_hide_visual_ui_text_v1(kwargs.get("label")):
+            return None
+        return original_func(*args, **kwargs)
+    return _wrapped
+
+for _dti_ui_api_name in [
+    "markdown",
+    "info",
+    "warning",
+    "caption",
+    "write",
+    "text",
+    "subheader",
+]:
+    if hasattr(st, _dti_ui_api_name):
+        setattr(st, _dti_ui_api_name, _dti_make_hidden_ui_wrapper_v1(getattr(st, _dti_ui_api_name)))
+
+# Do not wrap st.header globally. Section headers 7c and 8 should remain visible.
+# --- END DTI_HIDE_AUDIT_VISUALIZATION_ITEMS_V1 ---
+
+
 from scipy.integrate import solve_ivp
 
 # --- GitHub v6.0.6 path compatibility shim ---
@@ -1599,7 +2187,7 @@ enable_live_vanilla_probe = st.checkbox(
 
 live_probe_url = st.text_input(
     "Local vanilla CLASS live probe endpoint",
-    value="http://127.0.0.1:8011/axiclass/live-vanilla-probe",
+    value="8011_REALTIME_DISABLED",
     key="live_vanilla_probe_url_v606_8d",
 )
 
@@ -2005,7 +2593,7 @@ def _dti_render_section7c_visuals_v607():
             st.info("No compatible sweep table is currently available in session memory; showing a labelled fallback UI reference chart.")
             _dti_graph_ui_v607_fallback_notice("Section 7c fallback")
             df = _dti_graph_ui_v607_fallback_sweep_frame()
-            st.altair_chart(_dti_graph_ui_v607_altair_line_with_band(df, "sweep_value", "sigma8").properties(height=260), use_container_width=True, key="dti_graph_ui_dom_stable_chart_01")
+            _DTI_DISABLED_GRAPH_CALL(_dti_graph_ui_v607_altair_line_with_band(df, "sweep_value", "sigma8").properties(height=260), use_container_width=True, key="dti_graph_ui_dom_stable_chart_01")
             st.info(
                 "No sweep table is currently available in session memory. "
                 "Run or load a sweep/examiner table to draw adjacent response-difference profiles."
@@ -2061,7 +2649,7 @@ def _dti_render_section7c_visuals_v607():
             )
             .properties(height=280)
         )
-        st.altair_chart(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_02")
+        _DTI_DISABLED_GRAPH_CALL(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_02")
         st.caption(
             "Large spikes indicate numerical non-smoothness candidates within the available diagnostic table. "
             "This is not evidence establishing physical discontinuity."
@@ -2069,7 +2657,7 @@ def _dti_render_section7c_visuals_v607():
 
 
 def _dti_render_section8_visuals_v607():
-    """Section 8: reference-distance bars, S8 stress view, rs_drag-S8 trade-off."""
+    """Section 8: reference-distance bars, Boundary table, rs_drag-S8 trade-off."""
     import streamlit as st
 
     st.markdown("<a id='dti_graph_ui_v607_section8'></a>", unsafe_allow_html=True)
@@ -2122,7 +2710,7 @@ def _dti_render_section8_visuals_v607():
                 )
                 .properties(height=max(180, min(520, 24 * len(distance_frame) + 40)))
             )
-            st.altair_chart(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_03")
+            _DTI_DISABLED_GRAPH_CALL(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_03")
             st.caption(
                 f"Source table: `{distance_name}`. Smaller values indicate closer proximity in the registered "
                 "parameter-profile space. This is heuristic triage only."
@@ -2136,7 +2724,7 @@ def _dti_render_section8_visuals_v607():
                 y=alt.Y("profile:N", sort="-x", title="profile"),
                 tooltip=list(distance_frame.columns),
             )
-            st.altair_chart(dist_chart.properties(height=220), use_container_width=True, key="dti_graph_ui_dom_stable_chart_04")
+            _DTI_DISABLED_GRAPH_CALL(dist_chart.properties(height=220), use_container_width=True, key="dti_graph_ui_dom_stable_chart_04")
             st.info(
                 "No reference-distance table found in session memory. "
                 "If a table with model/profile labels and a distance or triage score is available, a bar chart will appear here."
@@ -2173,7 +2761,7 @@ def _dti_render_section8_visuals_v607():
                         y="ymin:Q",
                         y2="ymax:Q",
                     )
-                    st.altair_chart((band_chart + base).properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_05")
+                    _DTI_DISABLED_GRAPH_CALL((band_chart + base).properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_05")
                     st.caption(
                         "The shaded band is an illustrative S8 reference range for visual orientation only. "
                         "Crossing it is a diagnostic stress indicator only; it is not a likelihood-based exclusion."
@@ -2187,10 +2775,10 @@ def _dti_render_section8_visuals_v607():
             _dti_graph_ui_v607_fallback_notice("Section 8 S8 fallback")
             fallback_s8 = _dti_graph_ui_v607_fallback_sweep_frame()
             chart_s8 = _dti_graph_ui_v607_altair_line_with_band(fallback_s8, "sweep_value", "S8")
-            st.altair_chart(chart_s8.properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_06")
+            _DTI_DISABLED_GRAPH_CALL(chart_s8.properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_06")
 
-        # C. rs_drag vs S8 trade-off scatter
-        st.markdown("##### rs_drag vs S8 trade-off view")
+        # C. Boundary confirmation scatter
+        st.markdown("##### Boundary confirmation view")
         name_trade, df_trade = _dti_graph_ui_v607_find_frame(
             required_any=[],
             required_all=["rs_drag", "S8"],
@@ -2228,7 +2816,7 @@ def _dti_render_section8_visuals_v607():
                 hband = alt.Chart(pd.DataFrame({"ymin": [0.75], "ymax": [0.79]})).mark_rect(opacity=0.12).encode(
                     y="ymin:Q", y2="ymax:Q"
                 )
-                st.altair_chart((hband + vline + chart).properties(height=300), use_container_width=True, key="dti_graph_ui_dom_stable_chart_07")
+                _DTI_DISABLED_GRAPH_CALL((hband + vline + chart).properties(height=300), use_container_width=True, key="dti_graph_ui_dom_stable_chart_07")
                 st.caption(
                     "This scatter visualizes a heuristic early-scale / late-clustering trade-off. "
                     "The reference line and band are visual guides only, not a formal exclusion rule regions."
@@ -2273,11 +2861,10 @@ st.header("7c. Continuity / discontinuity examiner")
 # --- dti_graph_ui_v607_section7c_visible_fallback_deck_v3 ---
 try:
     _fallback_7c_v3 = _dti_graph_ui_v607_fallback_sweep_frame()
-    st.markdown("##### Audit visualization deck")
-    _dti_graph_ui_v607_fallback_notice("Section 7c visible fallback deck")
+    _dti_graph_ui_v607_fallback_notice("Section 7c disabled visual material")
     _fallback_7c_v3 = _fallback_7c_v3.copy()
     _fallback_7c_v3["delta_sigma8_adjacent"] = _fallback_7c_v3["sigma8"].diff().abs().fillna(0.0)
-    st.altair_chart(
+    _DTI_DISABLED_GRAPH_CALL(
         _dti_graph_ui_v607_altair_line_with_band(_fallback_7c_v3, "sweep_value", "delta_sigma8_adjacent").properties(height=260),
         use_container_width=True,
     )
@@ -2321,7 +2908,7 @@ It is an **examiner panel**, not a physics-claim engine.
 
 **Local-only endpoint.** This section uses the local vanilla CLASS endpoint, normally:
 
-`http://127.0.0.1:8011/axiclass/live-vanilla-probe`
+`8011_REALTIME_DISABLED`
     """
 )
 
@@ -2333,7 +2920,7 @@ enable_continuity_examiner = st.checkbox(
 
 continuity_endpoint = st.text_input(
     "Local vanilla CLASS probe endpoint for examiner",
-    value="http://127.0.0.1:8011/axiclass/live-vanilla-probe",
+    value="8011_REALTIME_DISABLED",
     key="section7c_continuity_endpoint_v606",
 )
 
@@ -2825,23 +3412,22 @@ if st.button(
             st.error(f"Continuity / discontinuity examiner failed: {exc}")
 
 
-st.header("8. Heuristic reference-region profile")
+st.header("8. Candidate payload / boundary confirmation")
 
 
 # --- dti_graph_ui_v607_section8_visible_fallback_deck_v3 ---
 try:
     import altair as _alt_graph_v3
     _fallback_v3 = _dti_graph_ui_v607_fallback_sweep_frame()
-    st.markdown("##### Audit visualization deck")
-    _dti_graph_ui_v607_fallback_notice("Section 8 visible fallback deck")
-    _tab_s8_v3, _tab_trade_v3 = st.tabs(["S8 stress view", "rs_drag vs S8 trade-off"])
+    _dti_graph_ui_v607_fallback_notice("Section 8 disabled visual material")
+    _tab_s8_v3, _tab_trade_v3 = st.tabs(["Boundary table", "Boundary confirmation"])
     with _tab_s8_v3:
-        st.altair_chart(
+        _DTI_DISABLED_GRAPH_CALL(
             _dti_graph_ui_v607_altair_line_with_band(_fallback_v3, "sweep_value", "S8").properties(height=280),
             use_container_width=True,
         )
     with _tab_trade_v3:
-        st.altair_chart(
+        _DTI_DISABLED_GRAPH_CALL(
             _dti_graph_ui_v607_altair_scatter(_fallback_v3, "rs_drag", "S8").properties(height=280),
             use_container_width=True,
         )
