@@ -1355,267 +1355,8 @@ if st.button("Run RK45 background proxy for current input model", width="stretch
         st.error(f"RK45 proxy failed: {e}")
 
 st.markdown("---")
-st.header("7. Planck-like fit-region profile")
-
-st.markdown("""
-<div class="boundary-card">
-<b>Important:</b> this section is a heuristic fit-region profile, not a Planck likelihood evaluation.<br>
-It does not compute Planck likelihoods, Delta chi-square, posterior probabilities, or exclusion levels.<br>
-It is designed to help users see whether an input parameter block is close to registered reference regions.
-</div>
-""", unsafe_allow_html=True)
-
-fit_df = pd.DataFrame([
-    {
-        "Model ID": "Planck 2018 LCDM-like baseline",
-        "H0": 67.36,
-        "f_EDE": 0.000,
-        "omega_cdm": 0.12000,
-        "sigma8": 0.8226,
-        "S8": 0.8413,
-        "Profile role": "baseline reference"
-    },
-    {
-        "Model ID": "Ivanov-style EDE reference",
-        "H0": 71.15,
-        "f_EDE": 0.105,
-        "omega_cdm": 0.12999,
-        "sigma8": 0.8314,
-        "S8": 0.8340,
-        "Profile role": "EDE reference region"
-    },
-    {
-        "Model ID": "FUJIKI DTI candidate reference",
-        "H0": 72.90,
-        "f_EDE": 0.082,
-        "omega_cdm": 0.12700,
-        "sigma8": 0.8229,
-        "S8": 0.8019,
-        "Profile role": "DTI candidate region"
-    },
-    {
-        "Model ID": "High-EDE stress region",
-        "H0": 75.50,
-        "f_EDE": 0.160,
-        "omega_cdm": 0.14000,
-        "sigma8": 0.9000,
-        "S8": 0.9000,
-        "Profile role": "stress-test region"
-    }
-])
-
-def _safe_float_from_state(names, default):
-    for name in names:
-        try:
-            value = st.session_state.get(name, None)
-            if value is not None and str(value).strip() != "":
-                return float(value)
-        except Exception:
-            pass
-    return float(default)
-
-current_h0_val = _safe_float_from_state(["target_H0", "H0", "h_input"], 72.90)
-if current_h0_val < 10:
-    current_h0_val = current_h0_val * 100.0
-
-current_fede_val = _safe_float_from_state(["target_f_EDE", "f_EDE", "fede_input"], 0.082)
-current_ocdm_val = _safe_float_from_state(["target_omega_cdm", "omega_cdm"], 0.127)
-current_sig8_val = _safe_float_from_state(["target_sigma8", "sigma8"], 0.8229)
-current_s8_val = _safe_float_from_state(["target_S8", "S8"], 0.8019)
-
-profile_weights = {
-    "H0": 1.0 / 4.0,
-    "f_EDE": 1.0 / 0.08,
-    "omega_cdm": 1.0 / 0.015,
-    "sigma8": 1.0 / 0.06,
-    "S8": 1.0 / 0.06,
-}
-
-def profile_distance(row):
-    terms = []
-    terms.append(((current_h0_val - float(row["H0"])) * profile_weights["H0"]) ** 2)
-    terms.append(((current_fede_val - float(row["f_EDE"])) * profile_weights["f_EDE"]) ** 2)
-    terms.append(((current_ocdm_val - float(row["omega_cdm"])) * profile_weights["omega_cdm"]) ** 2)
-    terms.append(((current_sig8_val - float(row["sigma8"])) * profile_weights["sigma8"]) ** 2)
-    terms.append(((current_s8_val - float(row["S8"])) * profile_weights["S8"]) ** 2)
-    return float(np.sqrt(sum(terms)))
-
-fit_df["profile_distance"] = fit_df.apply(profile_distance, axis=1)
-nearest_row = fit_df.iloc[int(np.argmin(fit_df["profile_distance"].values))]
-nearest_distance = float(nearest_row["profile_distance"])
-
-if nearest_distance < 1.25:
-    profile_status = "near registered reference region"
-    profile_color = "#50c878"
-elif nearest_distance < 2.50:
-    profile_status = "caution: between registered regions"
-    profile_color = "#f57c00"
-else:
-    profile_status = "outside registered reference region"
-    profile_color = "#ff5252"
-
-fit_col1, fit_col2 = st.columns(2)
-
-with fit_col1:
-    st.markdown("##### Registered fit-region references")
-    st.dataframe(fit_df, hide_index=True, width="stretch")
-
-with fit_col2:
-    st.markdown("##### Current input profile position")
-    st.markdown(
-        f"""
-        <div class="source-card">
-        <b>Nearest registered region:</b> {nearest_row["Model ID"]}<br>
-        <b>Profile role:</b> {nearest_row["Profile role"]}<br>
-        <b>Normalized profile distance:</b> {nearest_distance:.3f}<br>
-        <b>Status:</b> <span style="color:{profile_color}; font-weight:800;">{profile_status}</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <div style="padding:16px; border-radius:10px; border:1px solid {profile_color}; background-color:rgba(120,120,120,0.10); color:{profile_color};">
-        <b>Fit-region profile readout</b><br>
-        H0={current_h0_val:.3f}, f_EDE={current_fede_val:.4f}, omega_cdm={current_ocdm_val:.5f}, sigma8={current_sig8_val:.5f}, S8={current_s8_val:.5f}<br>
-        This is a normalized reference-distance diagnostic, not a Delta-chi-square or likelihood result.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-st.markdown("""
-<div class="metric-card">
-<b>Fit-profile metric:</b> weighted Euclidean distance to registered reference rows.<br>
-<b>Weights:</b> H0 scale 4 km/s/Mpc, f_EDE scale 0.08, omega_cdm scale 0.015, sigma8/S8 scale 0.06.<br>
-<b>Interpretation:</b> useful for triage and model comparison; not valid as a statistical exclusion criterion.
-</div>
-""", unsafe_allow_html=True)
-
-
-
-def extract_external_class_api_payload_v606(text):
-    import re
-
-    defaults = {
-        "H0": 72.9,
-        "omega_b": 0.0244,
-        "omega_cdm": 0.127,
-        "f_EDE": 0.082,
-        "z_c": 3500.0,
-        "n_s": 0.9847,
-        "ln10_10_As": 3.058,
-        "tau_reio": 0.0511,
-    }
-
-    aliases = {
-        "H0": ["H0", "H_0"],
-        "omega_b": ["omega_b", "ombh2", "omega_bh2"],
-        "omega_cdm": ["omega_cdm", "omch2", "omega_c"],
-        "f_EDE": ["f_EDE", "fde", "fEDE"],
-        "z_c": ["z_c", "zc"],
-        "n_s": ["n_s", "ns"],
-        "ln10_10_As": ["ln10_10_As", "ln10^{10}A_s", "ln10_10As"],
-        "tau_reio": ["tau_reio", "tau"],
-    }
-
-    payload = dict(defaults)
-    text = str(text or "")
-
-    for key, names in aliases.items():
-        for name in names:
-            pattern = rf"(?<![A-Za-z0-9_]){re.escape(name)}\s*[:=]\s*([-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)"
-            m = re.search(pattern, text)
-            if m:
-                try:
-                    payload[key] = float(m.group(1))
-                    break
-                except Exception:
-                    pass
-
-    return payload
-
-
-st.header("8. External CLASS API sandbox")
-
-st.markdown("""
-<div class="boundary-card">
-<b>External compute mode:</b> this section sends the current parameter block to the public Render CLASS API backend.<br>
-<b>Compute endpoint:</b> <code>https://dti-class-api.onrender.com/class/compute</code><br>
-<b>Health endpoint:</b> <code>https://dti-class-api.onrender.com/health</code><br>
-<b>Boundary:</b> exploratory, non-canonical, not a likelihood evaluation, not a posterior comparison, and not a Planck validation pipeline.<br>
-<b>Current backend scope:</b> LCDM-like CLASS propagation only. <code>f_EDE</code> and <code>z_c</code> are passed for interface compatibility but are not used as AxiCLASS EDE microphysics in this minimal backend.
-</div>
-""", unsafe_allow_html=True)
-
-external_api_url = st.text_input(
-    "External CLASS API endpoint",
-    value="https://dti-class-api.onrender.com/class/compute",
-    key="external_class_api_endpoint_v606",
-)
-
-external_api_text = st.session_state.get("paper_text_widget", st.session_state.get("paper_text", ""))
-external_api_payload = extract_external_class_api_payload_v606(external_api_text)
-
-st.markdown("##### Payload sent to external API")
-st.dataframe(pd.DataFrame([external_api_payload]), hide_index=True, width="stretch")
-
-if st.button("Run external CLASS API for current input model", key="run_external_class_api_v606", width="stretch"):
-    try:
-        response = requests.post(external_api_url, json=external_api_payload, timeout=90)
-        st.session_state["external_class_api_result_v606"] = response.json()
-        st.session_state["external_class_api_http_status_v606"] = response.status_code
-    except Exception as exc:
-        st.session_state["external_class_api_result_v606"] = {
-            "status": "failed",
-            "message": repr(exc),
-            "boundary": {
-                "likelihood_evaluation": False,
-                "posterior_comparison": False,
-                "canonical_checkpoint_update": False,
-            },
-        }
-        st.session_state["external_class_api_http_status_v606"] = None
-
-external_api_result = st.session_state.get("external_class_api_result_v606")
-external_api_http_status = st.session_state.get("external_class_api_http_status_v606")
-
-if external_api_result:
-    st.markdown("##### External CLASS API result")
-    st.caption(f"HTTP status: {external_api_http_status}")
-
-    status_value = str(external_api_result.get("status", "unknown"))
-    if status_value == "ok":
-        st.success("External CLASS API returned status: ok")
-    elif status_value == "unavailable":
-        st.warning("External CLASS API is available, but classy/PyCLASS is unavailable on the backend.")
-    else:
-        st.warning(f"External CLASS API returned status: {status_value}")
-
-    derived = external_api_result.get("derived", {})
-    if isinstance(derived, dict) and derived:
-        derived_rows = []
-        for key in [
-            "h",
-            "Omega_m_computed",
-            "A_s",
-            "sigma8_CLASS",
-            "S8_CLASS",
-            "rs_drag_Mpc_CLASS",
-            "age_Gyr_CLASS",
-        ]:
-            if key in derived:
-                derived_rows.append({"quantity": key, "value": derived.get(key)})
-        if derived_rows:
-            st.dataframe(pd.DataFrame(derived_rows), hide_index=True, width="stretch")
-
-    with st.expander("Raw external API response", expanded=False):
-        st.code(json.dumps(external_api_result, indent=2, sort_keys=True), language="json")
-
-
 def _render_local_axiclass_fixed_example_v606():
-    st.header("9. Local experimental probes")
+    st.header("7. Local experimental probes")
     st.markdown(
         """
     This section groups local-only experimental probes that run on this computer.
@@ -1624,12 +1365,12 @@ def _render_local_axiclass_fixed_example_v606():
 
     **Subsections**
 
-    - **9a. Local-only AxiCLASS fixed-example check**: source-locked fixed example, no arbitrary input.
-    - **9b. Local-only vanilla CLASS live probe**: manual real-valued local inputs, derived CLASS quantities only.
+    - **7a. Local-only AxiCLASS fixed-example check**: source-locked fixed example, no arbitrary input.
+    - **7b. Local-only vanilla CLASS live probe**: manual real-valued local inputs, derived CLASS quantities only.
         """
     )
 
-    st.header("9a. Local-only AxiCLASS fixed-example check")
+    st.header("7a. Local-only AxiCLASS fixed-example check")
 
     st.markdown("""
 <div class="boundary-card">
@@ -1749,10 +1490,10 @@ It is intended for implementation testing and reproducibility inspection only.<b
 _render_local_axiclass_fixed_example_v606()
 
 # ---------------------------------------------------------------------
-# Section 9b: Local-only vanilla CLASS live probe
+# Section 7b: Local-only vanilla CLASS live probe
 # ---------------------------------------------------------------------
 st.divider()
-st.header("9b. Local-only vanilla CLASS live probe")
+st.header("7b. Local-only vanilla CLASS live probe")
 
 st.markdown(
     """
@@ -2073,6 +1814,265 @@ if st.button(
         except Exception as exc:
             st.error(f"Local vanilla CLASS live probe failed: {exc}")
 
+st.header("8. Planck-like fit-region profile")
+
+st.markdown("""
+<div class="boundary-card">
+<b>Important:</b> this section is a heuristic fit-region profile, not a Planck likelihood evaluation.<br>
+It does not compute Planck likelihoods, Delta chi-square, posterior probabilities, or exclusion levels.<br>
+It is designed to help users see whether an input parameter block is close to registered reference regions.
+</div>
+""", unsafe_allow_html=True)
+
+fit_df = pd.DataFrame([
+    {
+        "Model ID": "Planck 2018 LCDM-like baseline",
+        "H0": 67.36,
+        "f_EDE": 0.000,
+        "omega_cdm": 0.12000,
+        "sigma8": 0.8226,
+        "S8": 0.8413,
+        "Profile role": "baseline reference"
+    },
+    {
+        "Model ID": "Ivanov-style EDE reference",
+        "H0": 71.15,
+        "f_EDE": 0.105,
+        "omega_cdm": 0.12999,
+        "sigma8": 0.8314,
+        "S8": 0.8340,
+        "Profile role": "EDE reference region"
+    },
+    {
+        "Model ID": "FUJIKI DTI candidate reference",
+        "H0": 72.90,
+        "f_EDE": 0.082,
+        "omega_cdm": 0.12700,
+        "sigma8": 0.8229,
+        "S8": 0.8019,
+        "Profile role": "DTI candidate region"
+    },
+    {
+        "Model ID": "High-EDE stress region",
+        "H0": 75.50,
+        "f_EDE": 0.160,
+        "omega_cdm": 0.14000,
+        "sigma8": 0.9000,
+        "S8": 0.9000,
+        "Profile role": "stress-test region"
+    }
+])
+
+def _safe_float_from_state(names, default):
+    for name in names:
+        try:
+            value = st.session_state.get(name, None)
+            if value is not None and str(value).strip() != "":
+                return float(value)
+        except Exception:
+            pass
+    return float(default)
+
+current_h0_val = _safe_float_from_state(["target_H0", "H0", "h_input"], 72.90)
+if current_h0_val < 10:
+    current_h0_val = current_h0_val * 100.0
+
+current_fede_val = _safe_float_from_state(["target_f_EDE", "f_EDE", "fede_input"], 0.082)
+current_ocdm_val = _safe_float_from_state(["target_omega_cdm", "omega_cdm"], 0.127)
+current_sig8_val = _safe_float_from_state(["target_sigma8", "sigma8"], 0.8229)
+current_s8_val = _safe_float_from_state(["target_S8", "S8"], 0.8019)
+
+profile_weights = {
+    "H0": 1.0 / 4.0,
+    "f_EDE": 1.0 / 0.08,
+    "omega_cdm": 1.0 / 0.015,
+    "sigma8": 1.0 / 0.06,
+    "S8": 1.0 / 0.06,
+}
+
+def profile_distance(row):
+    terms = []
+    terms.append(((current_h0_val - float(row["H0"])) * profile_weights["H0"]) ** 2)
+    terms.append(((current_fede_val - float(row["f_EDE"])) * profile_weights["f_EDE"]) ** 2)
+    terms.append(((current_ocdm_val - float(row["omega_cdm"])) * profile_weights["omega_cdm"]) ** 2)
+    terms.append(((current_sig8_val - float(row["sigma8"])) * profile_weights["sigma8"]) ** 2)
+    terms.append(((current_s8_val - float(row["S8"])) * profile_weights["S8"]) ** 2)
+    return float(np.sqrt(sum(terms)))
+
+fit_df["profile_distance"] = fit_df.apply(profile_distance, axis=1)
+nearest_row = fit_df.iloc[int(np.argmin(fit_df["profile_distance"].values))]
+nearest_distance = float(nearest_row["profile_distance"])
+
+if nearest_distance < 1.25:
+    profile_status = "near registered reference region"
+    profile_color = "#50c878"
+elif nearest_distance < 2.50:
+    profile_status = "caution: between registered regions"
+    profile_color = "#f57c00"
+else:
+    profile_status = "outside registered reference region"
+    profile_color = "#ff5252"
+
+fit_col1, fit_col2 = st.columns(2)
+
+with fit_col1:
+    st.markdown("##### Registered fit-region references")
+    st.dataframe(fit_df, hide_index=True, width="stretch")
+
+with fit_col2:
+    st.markdown("##### Current input profile position")
+    st.markdown(
+        f"""
+        <div class="source-card">
+        <b>Nearest registered region:</b> {nearest_row["Model ID"]}<br>
+        <b>Profile role:</b> {nearest_row["Profile role"]}<br>
+        <b>Normalized profile distance:</b> {nearest_distance:.3f}<br>
+        <b>Status:</b> <span style="color:{profile_color}; font-weight:800;">{profile_status}</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""
+        <div style="padding:16px; border-radius:10px; border:1px solid {profile_color}; background-color:rgba(120,120,120,0.10); color:{profile_color};">
+        <b>Fit-region profile readout</b><br>
+        H0={current_h0_val:.3f}, f_EDE={current_fede_val:.4f}, omega_cdm={current_ocdm_val:.5f}, sigma8={current_sig8_val:.5f}, S8={current_s8_val:.5f}<br>
+        This is a normalized reference-distance diagnostic, not a Delta-chi-square or likelihood result.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+st.markdown("""
+<div class="metric-card">
+<b>Fit-profile metric:</b> weighted Euclidean distance to registered reference rows.<br>
+<b>Weights:</b> H0 scale 4 km/s/Mpc, f_EDE scale 0.08, omega_cdm scale 0.015, sigma8/S8 scale 0.06.<br>
+<b>Interpretation:</b> useful for triage and model comparison; not valid as a statistical exclusion criterion.
+</div>
+""", unsafe_allow_html=True)
+
+
+
+def extract_external_class_api_payload_v606(text):
+    import re
+
+    defaults = {
+        "H0": 72.9,
+        "omega_b": 0.0244,
+        "omega_cdm": 0.127,
+        "f_EDE": 0.082,
+        "z_c": 3500.0,
+        "n_s": 0.9847,
+        "ln10_10_As": 3.058,
+        "tau_reio": 0.0511,
+    }
+
+    aliases = {
+        "H0": ["H0", "H_0"],
+        "omega_b": ["omega_b", "ombh2", "omega_bh2"],
+        "omega_cdm": ["omega_cdm", "omch2", "omega_c"],
+        "f_EDE": ["f_EDE", "fde", "fEDE"],
+        "z_c": ["z_c", "zc"],
+        "n_s": ["n_s", "ns"],
+        "ln10_10_As": ["ln10_10_As", "ln10^{10}A_s", "ln10_10As"],
+        "tau_reio": ["tau_reio", "tau"],
+    }
+
+    payload = dict(defaults)
+    text = str(text or "")
+
+    for key, names in aliases.items():
+        for name in names:
+            pattern = rf"(?<![A-Za-z0-9_]){re.escape(name)}\s*[:=]\s*([-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)"
+            m = re.search(pattern, text)
+            if m:
+                try:
+                    payload[key] = float(m.group(1))
+                    break
+                except Exception:
+                    pass
+
+    return payload
+
+
+st.header("9. External CLASS API sandbox")
+
+st.markdown("""
+<div class="boundary-card">
+<b>External compute mode:</b> this section sends the current parameter block to the public Render CLASS API backend.<br>
+<b>Compute endpoint:</b> <code>https://dti-class-api.onrender.com/class/compute</code><br>
+<b>Health endpoint:</b> <code>https://dti-class-api.onrender.com/health</code><br>
+<b>Boundary:</b> exploratory, non-canonical, not a likelihood evaluation, not a posterior comparison, and not a Planck validation pipeline.<br>
+<b>Current backend scope:</b> LCDM-like CLASS propagation only. <code>f_EDE</code> and <code>z_c</code> are passed for interface compatibility but are not used as AxiCLASS EDE microphysics in this minimal backend.
+</div>
+""", unsafe_allow_html=True)
+
+external_api_url = st.text_input(
+    "External CLASS API endpoint",
+    value="https://dti-class-api.onrender.com/class/compute",
+    key="external_class_api_endpoint_v606",
+)
+
+external_api_text = st.session_state.get("paper_text_widget", st.session_state.get("paper_text", ""))
+external_api_payload = extract_external_class_api_payload_v606(external_api_text)
+
+st.markdown("##### Payload sent to external API")
+st.dataframe(pd.DataFrame([external_api_payload]), hide_index=True, width="stretch")
+
+if st.button("Run external CLASS API for current input model", key="run_external_class_api_v606", width="stretch"):
+    try:
+        response = requests.post(external_api_url, json=external_api_payload, timeout=90)
+        st.session_state["external_class_api_result_v606"] = response.json()
+        st.session_state["external_class_api_http_status_v606"] = response.status_code
+    except Exception as exc:
+        st.session_state["external_class_api_result_v606"] = {
+            "status": "failed",
+            "message": repr(exc),
+            "boundary": {
+                "likelihood_evaluation": False,
+                "posterior_comparison": False,
+                "canonical_checkpoint_update": False,
+            },
+        }
+        st.session_state["external_class_api_http_status_v606"] = None
+
+external_api_result = st.session_state.get("external_class_api_result_v606")
+external_api_http_status = st.session_state.get("external_class_api_http_status_v606")
+
+if external_api_result:
+    st.markdown("##### External CLASS API result")
+    st.caption(f"HTTP status: {external_api_http_status}")
+
+    status_value = str(external_api_result.get("status", "unknown"))
+    if status_value == "ok":
+        st.success("External CLASS API returned status: ok")
+    elif status_value == "unavailable":
+        st.warning("External CLASS API is available, but classy/PyCLASS is unavailable on the backend.")
+    else:
+        st.warning(f"External CLASS API returned status: {status_value}")
+
+    derived = external_api_result.get("derived", {})
+    if isinstance(derived, dict) and derived:
+        derived_rows = []
+        for key in [
+            "h",
+            "Omega_m_computed",
+            "A_s",
+            "sigma8_CLASS",
+            "S8_CLASS",
+            "rs_drag_Mpc_CLASS",
+            "age_Gyr_CLASS",
+        ]:
+            if key in derived:
+                derived_rows.append({"quantity": key, "value": derived.get(key)})
+        if derived_rows:
+            st.dataframe(pd.DataFrame(derived_rows), hide_index=True, width="stretch")
+
+    with st.expander("Raw external API response", expanded=False):
+        st.code(json.dumps(external_api_result, indent=2, sort_keys=True), language="json")
+
+
 st.header("10. Interpretation boundary")
 
 audit_summary_text = f"""DTI-Core Grand Auditor v6.0.6 audit summary
@@ -2103,8 +2103,8 @@ st.download_button(
 st.markdown(
     """
 - The search engine helps identify which registered reference model is closest to the input parameters.
-- The Section 9a AxiCLASS fixed-example check is a locked local benchmark. It is not recomputed from arbitrary user input.
-- The local live CLASS probe in Section 9b is exploratory. A failed run is not a model-level exclusion.
+- The Section 7a AxiCLASS fixed-example check is a locked local benchmark. It is not recomputed from arbitrary user input.
+- The local live CLASS probe in Section 7b is exploratory. A failed run is not a model-level exclusion.
 - This app is not a likelihood evaluation, posterior comparison, Planck likelihood validation, or S8-claim validation.
 """
 )
