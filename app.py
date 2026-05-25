@@ -1814,13 +1814,545 @@ if st.button(
         except Exception as exc:
             st.error(f"Local vanilla CLASS live probe failed: {exc}")
 
-st.header("8. Planck-like fit-region profile")
+
+# ---------------------------------------------------------------------
+# Section 7c: Continuity / discontinuity examiner
+# ---------------------------------------------------------------------
+st.divider()
+st.header("7c. Continuity / discontinuity examiner")
+
+st.markdown(
+    """
+**Purpose.** This local-only examiner tests whether small changes along a selected parameter path produce smooth or non-smooth changes in local vanilla CLASS derived quantities.
+
+It is an **examiner panel**, not a physics-claim engine.
+
+**What this can decide.**
+
+- Whether the tested numerical response is smooth within the chosen grid and tolerance.
+- Whether a jump-like candidate appears in the tested derived quantities.
+- Whether the result is inconclusive because the grid, endpoint, or solver failed.
+
+**What this cannot decide.**
+
+- It does not prove physical discontinuity.
+- It does not prove an operator-phase transition.
+- It does not compute likelihood, posterior, evidence, MCMC, or Planck validation.
+- It does not update manuscript or canonical physics values.
+
+**Local-only endpoint.** This section uses the local vanilla CLASS endpoint, normally:
+
+`http://127.0.0.1:8011/axiclass/live-vanilla-probe`
+    """
+)
+
+enable_continuity_examiner = st.checkbox(
+    "Enable local-only continuity / discontinuity examiner",
+    value=False,
+    key="enable_section7c_continuity_examiner_v606",
+)
+
+continuity_endpoint = st.text_input(
+    "Local vanilla CLASS probe endpoint for examiner",
+    value="http://127.0.0.1:8011/axiclass/live-vanilla-probe",
+    key="section7c_continuity_endpoint_v606",
+)
+
+st.markdown("##### Base profile")
+
+_base_profile_7c = {
+    "H0": float(st.session_state.get("live_vanilla_H0_v606_8d", 72.9)),
+    "omega_cdm": float(st.session_state.get("live_vanilla_omega_cdm_v606_8d", 0.127)),
+    "omega_b": float(st.session_state.get("live_vanilla_omega_b_v606_8d", 0.0244)),
+    "n_s": float(st.session_state.get("live_vanilla_ns_v606_8d", 0.9847)),
+    "ln1010A_s": float(st.session_state.get("live_vanilla_ln1010As_v606_8d", 3.058)),
+}
+
+st.caption(
+    "The base values are taken from Section 7b when available. They can be edited below for this examiner run only."
+)
+
+col7c_base_1, col7c_base_2, col7c_base_3 = st.columns(3)
+
+with col7c_base_1:
+    c7c_base_H0 = st.number_input(
+        "7c base H0",
+        min_value=40.0,
+        max_value=100.0,
+        value=_base_profile_7c["H0"],
+        step=0.1,
+        key="section7c_base_H0_v606",
+    )
+    c7c_base_omega_b = st.number_input(
+        "7c base omega_b",
+        min_value=0.005,
+        max_value=0.080,
+        value=_base_profile_7c["omega_b"],
+        step=0.0001,
+        format="%.5f",
+        key="section7c_base_omega_b_v606",
+    )
+
+with col7c_base_2:
+    c7c_base_omega_cdm = st.number_input(
+        "7c base omega_cdm",
+        min_value=0.010,
+        max_value=0.300,
+        value=_base_profile_7c["omega_cdm"],
+        step=0.001,
+        format="%.5f",
+        key="section7c_base_omega_cdm_v606",
+    )
+    c7c_base_ns = st.number_input(
+        "7c base n_s",
+        min_value=0.80,
+        max_value=1.20,
+        value=_base_profile_7c["n_s"],
+        step=0.0001,
+        format="%.5f",
+        key="section7c_base_ns_v606",
+    )
+
+with col7c_base_3:
+    c7c_base_ln1010As = st.number_input(
+        "7c base ln(10^10 A_s)",
+        min_value=1.0,
+        max_value=5.0,
+        value=_base_profile_7c["ln1010A_s"],
+        step=0.001,
+        format="%.5f",
+        key="section7c_base_ln1010As_v606",
+    )
+
+_base_payload_7c = {
+    "H0": float(c7c_base_H0),
+    "omega_cdm": float(c7c_base_omega_cdm),
+    "omega_b": float(c7c_base_omega_b),
+    "n_s": float(c7c_base_ns),
+    "ln1010A_s": float(c7c_base_ln1010As),
+}
+
+st.markdown("##### Sweep design")
+
+col7c_sweep_1, col7c_sweep_2, col7c_sweep_3 = st.columns(3)
+
+with col7c_sweep_1:
+    sweep_param_7c = st.selectbox(
+        "Parameter to vary",
+        ["H0", "omega_cdm", "omega_b", "n_s", "ln1010A_s"],
+        index=0,
+        key="section7c_sweep_param_v606",
+    )
+    grid_n_7c = st.number_input(
+        "Grid points",
+        min_value=3,
+        max_value=31,
+        value=9,
+        step=2,
+        key="section7c_grid_n_v606",
+    )
+
+with col7c_sweep_2:
+    default_center_7c = float(_base_payload_7c[sweep_param_7c])
+    default_span_7c = {
+        "H0": 1.0,
+        "omega_cdm": 0.004,
+        "omega_b": 0.001,
+        "n_s": 0.01,
+        "ln1010A_s": 0.03,
+    }.get(sweep_param_7c, 1.0)
+
+    sweep_start_7c = st.number_input(
+        "Sweep start",
+        value=float(default_center_7c - default_span_7c),
+        step=float(default_span_7c / 10.0),
+        format="%.6f",
+        key="section7c_sweep_start_v606",
+    )
+    sweep_end_7c = st.number_input(
+        "Sweep end",
+        value=float(default_center_7c + default_span_7c),
+        step=float(default_span_7c / 10.0),
+        format="%.6f",
+        key="section7c_sweep_end_v606",
+    )
+
+with col7c_sweep_3:
+    jump_threshold_7c = st.number_input(
+        "Relative jump threshold",
+        min_value=0.001,
+        max_value=20.0,
+        value=5.0,
+        step=0.1,
+        format="%.4f",
+        key="section7c_jump_threshold_v606",
+    )
+    repeat_count_7c = st.number_input(
+        "Repeat count per grid point",
+        min_value=1,
+        max_value=5,
+        value=1,
+        step=1,
+        key="section7c_repeat_count_v606",
+    )
+
+st.caption(
+    "Relative jump score is a simple local diagnostic: max adjacent finite-difference jump divided by median adjacent finite-difference scale. The default threshold is 5.0 to avoid classifying ordinary smooth finite-difference variation as a jump. It is not a physical-discontinuity proof."
+)
+
+st.json(
+    {
+        "base_payload": _base_payload_7c,
+        "sweep": {
+            "parameter": sweep_param_7c,
+            "start": float(sweep_start_7c),
+            "end": float(sweep_end_7c),
+            "grid_points": int(grid_n_7c),
+            "repeat_count": int(repeat_count_7c),
+            "relative_jump_threshold": float(jump_threshold_7c),
+        },
+        "boundary": {
+            "local_only": True,
+            "experimental": True,
+            "non_canonical": True,
+            "likelihood_evaluation": False,
+            "posterior_comparison": False,
+            "planck_validation": False,
+            "physical_discontinuity_proof": False,
+        },
+    }
+)
+
+def _section7c_median(values):
+    vals = sorted([float(v) for v in values if v is not None])
+    if not vals:
+        return None
+    n = len(vals)
+    if n % 2:
+        return vals[n // 2]
+    return 0.5 * (vals[n // 2 - 1] + vals[n // 2])
+
+def _section7c_grid(start, end, n):
+    n = int(n)
+    if n <= 1:
+        return [float(start)]
+    return [float(start) + (float(end) - float(start)) * i / (n - 1) for i in range(n)]
+
+def _section7c_jump_scores(rows, quantity):
+    micro_jitter_abs_delta_threshold_7c = 1.0e-5
+    micro_jitter_quantities_7c = {"rs_drag"}
+
+    good = []
+    for row in rows:
+        val = row.get(quantity)
+        x = row.get("sweep_value")
+        status = row.get("status")
+        if status == "ok" and val is not None and x is not None:
+            good.append((float(x), float(val)))
+    good.sort()
+    if len(good) < 3:
+        return {
+            "quantity": quantity,
+            "n_good": len(good),
+            "max_abs_step": None,
+            "median_abs_step": None,
+            "relative_jump_score": None,
+            "micro_jitter_abs_delta_threshold": (
+                micro_jitter_abs_delta_threshold_7c
+                if quantity in micro_jitter_quantities_7c
+                else None
+            ),
+            "micro_jitter_guard_applied": False,
+            "verdict": "insufficient_resolution",
+        }
+
+    diffs = []
+    for (_, y0), (_, y1) in zip(good[:-1], good[1:]):
+        diffs.append(abs(y1 - y0))
+
+    med = _section7c_median(diffs)
+    max_step = max(diffs) if diffs else None
+
+    if med is None or med == 0:
+        rel = None if max_step is None else float("inf")
+    else:
+        rel = max_step / med
+
+    micro_jitter_guard_applied = False
+    if rel is None:
+        verdict = "inconclusive"
+    elif rel > float(jump_threshold_7c):
+        if (
+            quantity in micro_jitter_quantities_7c
+            and max_step is not None
+            and max_step < micro_jitter_abs_delta_threshold_7c
+        ):
+            verdict = "micro_jitter_not_jump"
+            micro_jitter_guard_applied = True
+        else:
+            verdict = "jump_candidate"
+    else:
+        verdict = "continuous_response"
+
+    return {
+        "quantity": quantity,
+        "n_good": len(good),
+        "max_abs_step": max_step,
+        "median_abs_step": med,
+        "relative_jump_score": rel,
+        "micro_jitter_abs_delta_threshold": (
+            micro_jitter_abs_delta_threshold_7c
+            if quantity in micro_jitter_quantities_7c
+            else None
+        ),
+        "micro_jitter_guard_applied": micro_jitter_guard_applied,
+        "verdict": verdict,
+    }
+
+
+if st.button(
+    "Run continuity / discontinuity examiner",
+    key="run_section7c_continuity_examiner_v606",
+    width="stretch",
+):
+    if not enable_continuity_examiner:
+        st.warning("Enable the local-only continuity / discontinuity examiner before running.")
+    else:
+        try:
+            import requests
+            import json as _json_section7c
+            import io as _io_section7c
+            import csv as _csv_section7c
+
+            grid_values_7c = _section7c_grid(sweep_start_7c, sweep_end_7c, int(grid_n_7c))
+            result_rows_7c = []
+            raw_responses_7c = []
+
+            with st.spinner("Running local continuity / discontinuity examiner..."):
+                for sweep_value in grid_values_7c:
+                    repeated_derived = []
+                    repeated_status = []
+                    repeated_error = []
+
+                    for rep in range(int(repeat_count_7c)):
+                        payload = dict(_base_payload_7c)
+                        payload[sweep_param_7c] = float(sweep_value)
+
+                        try:
+                            response = requests.post(
+                                continuity_endpoint,
+                                json=payload,
+                                timeout=240,
+                            )
+                            try:
+                                data = response.json()
+                            except Exception:
+                                data = {
+                                    "status": "error",
+                                    "detail": response.text,
+                                }
+
+                            raw_responses_7c.append(
+                                {
+                                    "sweep_value": float(sweep_value),
+                                    "repeat": rep,
+                                    "http_status": response.status_code,
+                                    "payload": payload,
+                                    "response": data,
+                                }
+                            )
+
+                            if response.status_code == 200 and data.get("status") == "ok":
+                                repeated_status.append("ok")
+                                repeated_derived.append(data.get("derived_parameters", {}))
+                            else:
+                                repeated_status.append("error")
+                                repeated_error.append(str(data.get("detail", data))[:300])
+
+                        except Exception as exc:
+                            repeated_status.append("error")
+                            repeated_error.append(str(exc)[:300])
+                            raw_responses_7c.append(
+                                {
+                                    "sweep_value": float(sweep_value),
+                                    "repeat": rep,
+                                    "http_status": None,
+                                    "payload": payload,
+                                    "response": {
+                                        "status": "error",
+                                        "detail": str(exc),
+                                    },
+                                }
+                            )
+
+                    row = {
+                        "sweep_parameter": sweep_param_7c,
+                        "sweep_value": float(sweep_value),
+                        "status": "ok" if repeated_status and all(x == "ok" for x in repeated_status) else "error",
+                        "repeat_count": int(repeat_count_7c),
+                        "error": "; ".join(repeated_error[:2]),
+                    }
+
+                    quantities = [
+                        "h",
+                        "Omega0_m",
+                        "Omega_Lambda",
+                        "age",
+                        "rs_drag",
+                        "sigma8",
+                        "S8",
+                    ]
+
+                    for q in quantities:
+                        vals = []
+                        for derived in repeated_derived:
+                            if isinstance(derived, dict) and q in derived:
+                                vals.append(float(derived[q]))
+                        row[q] = _section7c_median(vals) if vals else None
+
+                    result_rows_7c.append(row)
+
+            st.markdown("##### Examiner grid output")
+            st.dataframe(result_rows_7c, width="stretch", hide_index=True)
+
+            score_rows_7c = []
+            for q in [
+                "h",
+                "Omega0_m",
+                "Omega_Lambda",
+                "age",
+                "rs_drag",
+                "sigma8",
+                "S8",
+            ]:
+                score_rows_7c.append(_section7c_jump_scores(result_rows_7c, q))
+
+            st.markdown("##### Continuity / discontinuity score table")
+            st.dataframe(score_rows_7c, width="stretch", hide_index=True)
+
+            any_solver_failure = any(row.get("status") != "ok" for row in result_rows_7c)
+            jump_candidates = [
+                row for row in score_rows_7c if row.get("verdict") == "jump_candidate"
+            ]
+            micro_jitter_rows = [
+                row for row in score_rows_7c if row.get("verdict") == "micro_jitter_not_jump"
+            ]
+
+            if any_solver_failure:
+                overall_verdict_7c = "solver_failure_or_partial_grid"
+                st.warning("Overall bounded verdict: solver_failure_or_partial_grid")
+            elif jump_candidates:
+                overall_verdict_7c = "jump_candidate"
+                st.warning("Overall bounded verdict: jump_candidate")
+            elif micro_jitter_rows:
+                overall_verdict_7c = "continuous_response_within_tested_grid_after_micro_jitter_guard"
+                st.success("Overall bounded verdict: continuous_response_within_tested_grid_after_micro_jitter_guard")
+            else:
+                overall_verdict_7c = "continuous_response_within_tested_grid"
+                st.success("Overall bounded verdict: continuous_response_within_tested_grid")
+
+            examiner_record_7c = {
+                "status": "ok",
+                "examiner": "7c. Continuity / discontinuity examiner",
+                "overall_bounded_verdict": overall_verdict_7c,
+                "base_payload": _base_payload_7c,
+                "sweep": {
+                    "parameter": sweep_param_7c,
+                    "start": float(sweep_start_7c),
+                    "end": float(sweep_end_7c),
+                    "grid_points": int(grid_n_7c),
+                    "repeat_count": int(repeat_count_7c),
+                    "relative_jump_threshold": float(jump_threshold_7c),
+                    "micro_jitter_abs_delta_threshold": 1.0e-5,
+                    "micro_jitter_guard_quantities": ["rs_drag"],
+                },
+                "retained_jump_candidate_count": len(jump_candidates),
+                "micro_jitter_not_jump_count": len(micro_jitter_rows),
+                "scores": score_rows_7c,
+                "boundary": {
+                    "local_only": True,
+                    "experimental": True,
+                    "non_canonical": True,
+                    "likelihood_evaluation": False,
+                    "posterior_comparison": False,
+                    "planck_validation": False,
+                    "physical_discontinuity_proof": False,
+                },
+                "interpretation_warning": "This examiner identifies numerical/statistical continuity-failure candidates only. It does not prove physical discontinuity, operator-phase transition, likelihood preference, posterior preference, or Planck validation.",
+            }
+
+            st.markdown("##### Examiner verdict record")
+            st.json(examiner_record_7c)
+
+            grid_tsv_buf_7c = _io_section7c.StringIO()
+            grid_fields_7c = list(result_rows_7c[0].keys()) if result_rows_7c else []
+            writer_7c = _csv_section7c.DictWriter(
+                grid_tsv_buf_7c,
+                fieldnames=grid_fields_7c,
+                delimiter="\t",
+            )
+            writer_7c.writeheader()
+            for row in result_rows_7c:
+                writer_7c.writerow(row)
+
+            score_tsv_buf_7c = _io_section7c.StringIO()
+            score_fields_7c = list(score_rows_7c[0].keys()) if score_rows_7c else []
+            score_writer_7c = _csv_section7c.DictWriter(
+                score_tsv_buf_7c,
+                fieldnames=score_fields_7c,
+                delimiter="\t",
+            )
+            score_writer_7c.writeheader()
+            for row in score_rows_7c:
+                score_writer_7c.writerow(row)
+
+            st.download_button(
+                "Download 7c grid output TSV",
+                data=grid_tsv_buf_7c.getvalue(),
+                file_name="section7c_continuity_grid_output.tsv",
+                mime="text/tab-separated-values",
+                key="download_section7c_grid_output_tsv_v606",
+            )
+
+            st.download_button(
+                "Download 7c jump scores TSV",
+                data=score_tsv_buf_7c.getvalue(),
+                file_name="section7c_continuity_jump_scores.tsv",
+                mime="text/tab-separated-values",
+                key="download_section7c_jump_scores_tsv_v606",
+            )
+
+            st.download_button(
+                "Download 7c examiner verdict JSON",
+                data=_json_section7c.dumps(examiner_record_7c, indent=2, sort_keys=True),
+                file_name="section7c_continuity_examiner_verdict.json",
+                mime="application/json",
+                key="download_section7c_examiner_verdict_json_v606",
+            )
+
+            st.download_button(
+                "Download 7c raw response JSON",
+                data=_json_section7c.dumps(raw_responses_7c, indent=2, sort_keys=True),
+                file_name="section7c_continuity_raw_responses.json",
+                mime="application/json",
+                key="download_section7c_raw_responses_json_v606",
+            )
+
+            st.info(
+                "Interpretation boundary: this is a local numerical examiner only. A jump_candidate is not a physical-discontinuity proof."
+            )
+
+        except Exception as exc:
+            st.error(f"Continuity / discontinuity examiner failed: {exc}")
+
+
+st.header("8. Heuristic reference-region profile")
 
 st.markdown("""
 <div class="boundary-card">
-<b>Important:</b> this section is a heuristic fit-region profile, not a Planck likelihood evaluation.<br>
+<b>Important:</b> this section is a heuristic reference-region profile, not a Planck likelihood evaluation.<br>
 It does not compute Planck likelihoods, Delta chi-square, posterior probabilities, or exclusion levels.<br>
-It is designed to help users see whether an input parameter block is close to registered reference regions.
+It is designed to help users inspect distance to registered reference rows. It is not a model-validation claim.
 </div>
 """, unsafe_allow_html=True)
 
@@ -1844,13 +2376,13 @@ fit_df = pd.DataFrame([
         "Profile role": "EDE reference region"
     },
     {
-        "Model ID": "FUJIKI DTI candidate reference",
+        "Model ID": "FUJIKI DTI working reference",
         "H0": 72.90,
         "f_EDE": 0.082,
         "omega_cdm": 0.12700,
         "sigma8": 0.8229,
         "S8": 0.8019,
-        "Profile role": "DTI candidate region"
+        "Profile role": "DTI working reference region"
     },
     {
         "Model ID": "High-EDE stress region",
@@ -1946,9 +2478,9 @@ with fit_col2:
 
 st.markdown("""
 <div class="metric-card">
-<b>Fit-profile metric:</b> weighted Euclidean distance to registered reference rows.<br>
+<b>Fit-profile metric:</b> weighted Euclidean distance to registered reference rows; this is a heuristic triage score.<br>
 <b>Weights:</b> H0 scale 4 km/s/Mpc, f_EDE scale 0.08, omega_cdm scale 0.015, sigma8/S8 scale 0.06.<br>
-<b>Interpretation:</b> useful for triage and model comparison; not valid as a statistical exclusion criterion.
+<b>Interpretation:</b> useful for local triage and visualization; not valid as a likelihood result, posterior comparison, model validation, or statistical exclusion criterion.
 </div>
 """, unsafe_allow_html=True)
 
@@ -2075,6 +2607,17 @@ if external_api_result:
 
 st.header("10. Interpretation boundary")
 
+st.markdown("""
+<div class="boundary-card">
+<b>Explicit boundary:</b> this app is exploratory, local/non-canonical where indicated, and diagnostic only.<br>
+<span id="section10_explicit_physical_and_value_boundary_v606"></span>
+It is not a likelihood engine, not a posterior sampler, not a Planck validation pipeline, and not a replacement for frozen manuscript artifacts.<br>
+It does not prove physical continuity, physical discontinuity, or an operator-phase transition.<br>
+It does not update manuscript values, canonical physics values, likelihood preferences, posterior preferences, or Planck-validation claims.
+</div>
+""", unsafe_allow_html=True)
+
+
 audit_summary_text = f"""DTI-Core Grand Auditor v6.0.6 audit summary
 
 Candidate source: {candidate_source_paper}
@@ -2105,6 +2648,7 @@ st.markdown(
 - The search engine helps identify which registered reference model is closest to the input parameters.
 - The Section 7a AxiCLASS fixed-example check is a locked local benchmark. It is not recomputed from arbitrary user input.
 - The local live CLASS probe in Section 7b is exploratory. A failed run is not a model-level exclusion.
+- The continuity / discontinuity examiner in Section 7c detects numerical/statistical non-smoothness candidates only; it does not prove physical discontinuity.
 - This app is not a likelihood evaluation, posterior comparison, Planck likelihood validation, or S8-claim validation.
 """
 )
