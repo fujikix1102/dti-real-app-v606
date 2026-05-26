@@ -33,6 +33,7 @@ _DTI_ORIGINAL_STREAMLIT_MARKDOWN_NO_RECURSION = st.markdown
 _DTI_MARKDOWN_RECURSION_FIX_V1 = True
 _DTI_DISABLE_MARKDOWN_MONKEYPATCH_PASS_GLOBAL_V1 = True
 _DTI_DISABLE_ALL_STREAMLIT_MONKEYPATCHES_GLOBAL_V1 = True
+_DTI_DISABLE_REMAINING_HEADER_MONKEYPATCHES_GLOBAL_V1 = True
 
 # --- DTI_README_DOWNLOAD_AND_8011_GUIDANCE_V3_SAFE ---
 # Local-only documentation UI and softer local 8011 unavailable guidance.
@@ -1453,7 +1454,7 @@ try:
     pass  # DTI_DISABLE_ALL_STREAMLIT_MONKEYPATCHES_V1: disabled st.info assignment; was = _dti_safe_info_v1
     pass  # DTI_DISABLE_ALL_STREAMLIT_MONKEYPATCHES_V1: disabled st.caption assignment; was = _dti_safe_caption_v1
     pass  # DTI_DISABLE_ALL_STREAMLIT_MONKEYPATCHES_V1: disabled st.write assignment; was = _dti_safe_write_v1
-    st.header = _dti_safe_header_v1
+    pass  # DTI_DISABLE_REMAINING_HEADER_MONKEYPATCHES_V1: disabled st.header assignment
 except Exception:
     pass
 # --- DTI_LOCAL_FINAL_NOGRAPH_CLEAN_UI_V1_END ---
@@ -1701,7 +1702,7 @@ def _dti_section8_tabs_wrapper_v1(labels, *args, **kwargs):
 
 try:
     if _dti_sec8_orig_header_v1 is not None:
-        st.header = _dti_section8_header_wrapper_v1
+        pass  # DTI_DISABLE_REMAINING_HEADER_MONKEYPATCHES_V1: disabled st.header assignment
     if _dti_sec8_orig_subheader_v1 is not None:
         pass  # DTI_DISABLE_ALL_STREAMLIT_MONKEYPATCHES_V1: disabled st.subheader assignment; was = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_subheader_v1)
     if _dti_sec8_orig_markdown_v1 is not None:
