@@ -4476,6 +4476,303 @@ AXICLASS_RESULTS = DATA_DIR / "axiclass_fix1_results.tsv"
 AXICLASS_DELTA = DATA_DIR / "axiclass_fix1_delta.tsv"
 # --- /DTI_AXICLASS_FIX1_DATA_DIR_RESOLVER_V1 ---
 
+
+# --- DTI_PROFILE_CATEGORY_GUIDE_V1_SAFE_FIXINDENT ---
+# Sidebar profile category guide.
+# UI organization only. It does not modify profile_presets_v606.tsv.
+# It does not replace the existing active profile selector.
+# It does not enable 7c, graph rendering, likelihood evaluation,
+# posterior comparison, Planck validation, physics-value updates,
+# manuscript updates, Render API changes, or Streamlit Secret changes.
+_DTI_PROFILE_CATEGORY_GUIDE_V1_SAFE_FIXINDENT = True
+
+_DTI_PROFILE_CATEGORY_ORDER_V1_SAFE_FIXINDENT = [
+    "Baseline Anchors",
+    "Local H0 & Lensed Catalogs",
+    "LSS & Cosmic Shear",
+    "Competing EDE / New Physics",
+    "Fujiki DTI Current",
+    "DTI 5H Framework",
+    "Fujiki DTI Historical Archive",
+    "Misfit Calibration References",
+    "Other / Review queue",
+]
+
+_DTI_PROFILE_CATEGORY_NOTES_V1_SAFE_FIXINDENT = {
+    "Baseline Anchors": "CMB / baseline reference profiles used as starting anchors.",
+    "Local H0 & Lensed Catalogs": "Local expansion and strong-lensing H0 reference profiles.",
+    "LSS & Cosmic Shear": "S8 / growth / large-scale-structure pressure profiles.",
+    "Competing EDE / New Physics": "Mainstream EDE and new-physics comparison profiles.",
+    "Fujiki DTI Current": "Current FUJIKI DTI front-facing candidate/reference profiles.",
+    "DTI 5H Framework": "5H triage, inference, canonical, and stress profiles.",
+    "Fujiki DTI Historical Archive": "Earlier FUJIKI DTI development versions; hidden from first-pass focus.",
+    "Misfit Calibration References": "Calibration and audit-reference profiles.",
+    "Other / Review queue": "Profiles not yet mapped into a front-facing category.",
+}
+
+def _dti_profile_category_for_model_v1_safe_fixindent(model_id):
+    mid = str(model_id)
+
+    baseline_exact = {
+        "Planck_2018_LCDM_Base",
+        "Planck_2018_no_lensing",
+        "Planck_2018_CamSpec",
+        "ACT_DR4_LCDM_Baseline",
+        "ACT_DR4_no_lensing",
+        "ACT_DR4_plus_WMAP9",
+        "SPT_3G_2024_CMB_Only",
+        "SPT_3G_2022_TE_EE",
+        "SPT_Pol_Final_Baseline",
+        "WMAP_9Year_Final_Re",
+        "Combined_CMB_Lens_2025",
+        "Planck_2018_Alternative",
+        "BICEP_Keck_2021_BMode",
+    }
+
+    local_h0_exact = {
+        "Riess_2022_SHOES_Anchor",
+        "CCHP_2023_TRGB_Anchor",
+        "Megamaser_MCP_Final",
+        "Pantheon_Plus_SN_Only",
+        "Agnello_2025_StrongLens",
+        "H0LiCOW_6_Clusters_Max",
+        "TDCOSMO_2024_Lensing",
+        "STRIDES_Strong_Lens_H0",
+        "Mortsell_2024_SNIa_Lensed",
+    }
+
+    lss_exact = {
+        "Hill_2020_S8_Growth_Lim",
+        "DES_Y1_3x2pt_Baseline",
+        "DES_Y3_3x2pt_Optimal",
+        "DES_Y3_Shear_Baseline",
+        "DES_Y5_Combined_2026",
+        "DES_Y5_Dovekie_2026_Lim",
+        "KiDS_1000_Cosmic_Shear",
+        "KiDS_1000_Full_3x2pt",
+        "KiDS_VIKING_450_Shear",
+        "HSC_Y3_Cosmic_Shear_1",
+        "HSC_Y3_Cosmic_Shear_2",
+        "ACT_DR6_Cosmic_Shear_1",
+        "SPT_3G_Y3_Cosmic_Shear",
+        "SDSS_DR16_eBOSS_Max",
+        "BOSS_DR12_Full_Shape",
+        "DESI_DR1_BAO_Planck_1",
+        "DESI_DR1_BAO_Planck_2",
+        "DESI_DR2_BAO_2026_Pref",
+        "Euclid_2025_First_FS_1",
+        "Euclid_2026_Joint_LSS",
+        "Vera_Rubin_LSST_2025_P",
+        "Roman_Space_Telescope_1",
+        "DESI_DR1_Om0_Evolution",
+    }
+
+    ede_exact = {
+        "Poulin_2019_EDE_Planck",
+        "Ivanov_2020_EDE_Joint",
+        "Smith_2020_EDE_ACT",
+        "Poulin_2021_EDE_ACT_DR4",
+        "Smith_2022_EDE_SPT3G",
+        "Lin_2021_AxiCLASS_Max",
+        "Gomez_Valent_2024_Axi",
+        "Niedermann_Sloth_2020",
+        "Niedermann_2022_Cold1",
+        "Niedermann_2024_Cold2",
+        "Allali_2023_Early_Quint",
+        "Ye_Piao_2020_AdS_EDE_1",
+        "Ye_Piao_2022_AdS_EDE_2",
+        "Braglia_2021_Enhanced",
+        "Abellan_2022_Mirror_DM",
+        "Seto_Takahashi_2023_Axi",
+        "DESI_2024_Thawing_EDE",
+        "Cold_New_EDE_2025_Fit",
+        "Freese_2024_Natural_EDE",
+        "He_Piao_2024_V_Coupled",
+        "Wang_Piao_2025_Pre_Rec",
+        "JWST_Massive_Galaxy_z10",
+        "Karwal_2024_Fractional",
+        "Moss_2025_DM_Decay_EDE",
+        "K_essence_Reconstructed",
+        "High_EDE_Overcomp_Max",
+        "Kamionkowski_2023_Rev1",
+        "Kamionkowski_2025_Rev2",
+        "Knox_Millea_2020_Hubble",
+        "Vagnozzi_2021_Critique",
+        "Efstathiou_2021_H0_LSS",
+        "Spergel_2024_Complement",
+        "Silk_2025_High_z_Anom",
+        "Verde_2023_Tension_Review",
+        "Di_Valentino_2021_Mega",
+    }
+
+    current_dti_exact = {
+        "FUJIKI_DTI_Candidate_v6",
+        "DTI_AxiCLASS_HighH0",
+        "Empirical_Misfit_Bounds",
+        "Theoretical_Horizon_Lim",
+    }
+
+    dti_5h_exact = {
+        "DTI_5H_Level1_Triage",
+        "DTI_5H_Level2_Inference",
+        "DTI_5H_Level3_Canonical",
+        "DTI_5H_Level4_Stress_1",
+        "DTI_5H_Level5_Stress_2",
+        "DTI_5H_Max_Strain_End",
+    }
+
+    historical_exact = {
+        "FUJIKI_DTI_v6_0_1_tuned",
+        "FUJIKI_DTI_v6_0_2_widget",
+        "FUJIKI_DTI_v6_0_3_labels",
+        "FUJIKI_DTI_v6_0_4_likel",
+        "FUJIKI_DTI_v6_0_5_fixed",
+    }
+
+    calibration_exact = {
+        "Misfit_Calibration_Ref1",
+        "Misfit_Calibration_Ref2",
+        "Misfit_Calibration_Ref3",
+        "Misfit_Calibration_Ref4",
+        "Misfit_Calibration_Ref5",
+    }
+
+    if mid in baseline_exact:
+        return "Baseline Anchors"
+    if mid in local_h0_exact:
+        return "Local H0 & Lensed Catalogs"
+    if mid in lss_exact:
+        return "LSS & Cosmic Shear"
+    if mid in ede_exact:
+        return "Competing EDE / New Physics"
+    if mid in current_dti_exact:
+        return "Fujiki DTI Current"
+    if mid in dti_5h_exact:
+        return "DTI 5H Framework"
+    if mid in historical_exact:
+        return "Fujiki DTI Historical Archive"
+    if mid in calibration_exact:
+        return "Misfit Calibration References"
+
+    if mid.startswith("FUJIKI_DTI_v6_0_"):
+        return "Fujiki DTI Historical Archive"
+    if mid.startswith("DTI_5H_"):
+        return "DTI 5H Framework"
+    if mid.startswith("Misfit_Calibration_"):
+        return "Misfit Calibration References"
+    if "Shear" in mid or "DES_" in mid or "KiDS" in mid or "HSC_" in mid or "BOSS" in mid or "eBOSS" in mid:
+        return "LSS & Cosmic Shear"
+    if "EDE" in mid or "Axi" in mid or "Quint" in mid or "Mirror" in mid or "Fractional" in mid:
+        return "Competing EDE / New Physics"
+    if "H0" in mid or "Lens" in mid or "SHOES" in mid or "TRGB" in mid or "SNIa" in mid:
+        return "Local H0 & Lensed Catalogs"
+    if "Planck" in mid or "ACT" in mid or "SPT" in mid or "WMAP" in mid or "CMB" in mid or "BICEP" in mid:
+        return "Baseline Anchors"
+
+    return "Other / Review queue"
+
+def _dti_profile_role_for_model_v1_safe_fixindent(model_id):
+    category = _dti_profile_category_for_model_v1_safe_fixindent(model_id)
+    role_map = {
+        "Baseline Anchors": "baseline reference",
+        "Local H0 & Lensed Catalogs": "high-H0 / local-distance reference",
+        "LSS & Cosmic Shear": "S8 / growth-pressure constraint",
+        "Competing EDE / New Physics": "comparison / stress-test target",
+        "Fujiki DTI Current": "front-facing DTI candidate/reference",
+        "DTI 5H Framework": "5H triage / inference / stress profile",
+        "Fujiki DTI Historical Archive": "historical DTI archive",
+        "Misfit Calibration References": "calibration reference",
+        "Other / Review queue": "unclassified review item",
+    }
+    return role_map.get(category, "unclassified review item")
+
+def _dti_build_profile_category_map_v1_safe_fixindent(presets):
+    grouped = {cat: [] for cat in _DTI_PROFILE_CATEGORY_ORDER_V1_SAFE_FIXINDENT}
+    try:
+        model_ids = list(presets.keys())
+    except Exception:
+        model_ids = []
+    for model_id in model_ids:
+        category = _dti_profile_category_for_model_v1_safe_fixindent(model_id)
+        grouped.setdefault(category, []).append(model_id)
+    for category in grouped:
+        grouped[category] = sorted(grouped[category], key=lambda x: str(x).lower())
+    return grouped
+
+def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
+    import streamlit as st
+
+    grouped = _dti_build_profile_category_map_v1_safe_fixindent(presets)
+
+    st.sidebar.markdown("### Profile category guide")
+    st.sidebar.caption(
+        "The full preset inventory is grouped for readability. "
+        "This guide does not change the underlying TSV or run new cosmology."
+    )
+
+    visible_first_pass = [
+        "Baseline Anchors",
+        "Local H0 & Lensed Catalogs",
+        "LSS & Cosmic Shear",
+        "Competing EDE / New Physics",
+        "Fujiki DTI Current",
+        "DTI 5H Framework",
+    ]
+
+    available = [cat for cat in visible_first_pass if grouped.get(cat)]
+    if not available:
+        available = [cat for cat in _DTI_PROFILE_CATEGORY_ORDER_V1_SAFE_FIXINDENT if grouped.get(cat)]
+
+    default_index = 0
+    if "Fujiki DTI Current" in available:
+        default_index = available.index("Fujiki DTI Current")
+
+    selected_category = st.sidebar.selectbox(
+        "Profile category guide",
+        available,
+        index=default_index,
+        key="dti_profile_category_guide_category_v1_safe_fixindent",
+        help="Use this guide to understand the large profile inventory before using the existing active profile selector.",
+    )
+
+    st.sidebar.caption(_DTI_PROFILE_CATEGORY_NOTES_V1_SAFE_FIXINDENT.get(selected_category, ""))
+
+    model_ids = grouped.get(selected_category, [])
+    if model_ids:
+        preview_model = st.sidebar.selectbox(
+            "Category model preview",
+            model_ids,
+            index=0,
+            key="dti_profile_category_guide_model_preview_v1_safe_fixindent",
+            help="Preview profiles in this category. The existing active profile selector remains unchanged.",
+        )
+        st.sidebar.caption(f"Role: {_dti_profile_role_for_model_v1_safe_fixindent(preview_model)}")
+
+    show_archive = st.sidebar.checkbox(
+        "Show archive category counts",
+        value=False,
+        key="dti_profile_category_guide_show_archive_counts_v1_safe_fixindent",
+        help="Shows counts for historical, calibration, and review-queue profiles.",
+    )
+
+    with st.sidebar.expander("Profile category counts", expanded=False):
+        for category in _DTI_PROFILE_CATEGORY_ORDER_V1_SAFE_FIXINDENT:
+            if not show_archive and category in {
+                "Fujiki DTI Historical Archive",
+                "Misfit Calibration References",
+                "Other / Review queue",
+            }:
+                continue
+            st.write(f"{category}: {len(grouped.get(category, []))}")
+
+        st.caption(
+            "Boundary: category guide only. No TSV modification, no likelihood evaluation, "
+            "no posterior comparison, no Planck validation, no 7c execution, no graph rendering, "
+            "and no physics-value update."
+        )
+# --- /DTI_PROFILE_CATEGORY_GUIDE_V1_SAFE_FIXINDENT ---
+
+
 C_LIGHT = 299792458.0
 G_CONST = 6.67430e-11
 MPC_TO_M = 3.085677581e22
@@ -5512,6 +5809,9 @@ with st.sidebar:
             st.session_state["paper_text"] = active_preset_text
             st.session_state["paper_text_widget"] = active_preset_text
             st.session_state["pending_paper_text"] = active_preset_text
+
+    # DTI_PROFILE_CATEGORY_GUIDE_CALL_V1_SAFE_FIXINDENT
+    _dti_render_profile_category_guide_v1_safe_fixindent(PRESETS)
 
     selected_preset = st.selectbox(
         "Load registered profile",
