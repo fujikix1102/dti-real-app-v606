@@ -1408,6 +1408,364 @@ def _dti_render_parameter_quality_matrix_v1g():
     )
 # --- /DTI_PARAMETER_QUALITY_MATRIX_V1G ---
 
+
+# --- DTI_PARAMETER_QUALITY_MATRIX_VISUAL_V1G ---
+# Visual/readability refinement for Parameter Quality Matrix.
+# UI and meta-scoring only.
+# This does not enable 7c, graph rendering, likelihood evaluation,
+# posterior comparison, Planck validation, physics-value updates,
+# manuscript updates, Render API changes, or Streamlit Secret changes.
+_DTI_PARAMETER_QUALITY_MATRIX_VISUAL_V1G = True
+
+def _dti_parameter_quality_badge_v1g(score):
+    try:
+        value = int(score)
+    except Exception:
+        return "GRAY - awaiting data"
+    if value >= 80:
+        return "GREEN - strong lead"
+    if value >= 60:
+        return "YELLOW - useful partial"
+    if value >= 40:
+        return "ORANGE - needs control"
+    if value >= 20:
+        return "RED - blocked for claim"
+    return "GRAY - awaiting data"
+
+def _dti_parameter_quality_badge_style_v1g(label):
+    s = "" if label is None else str(label)
+    if s.startswith("GREEN"):
+        return "background-color: #00A86B; color: #FFFFFF; font-weight: 800; border-radius: 999px;"
+    if s.startswith("YELLOW"):
+        return "background-color: #FFC400; color: #111111; font-weight: 900; border-radius: 999px;"
+    if s.startswith("ORANGE"):
+        return "background-color: #FF7A00; color: #FFFFFF; font-weight: 900; border-radius: 999px;"
+    if s.startswith("RED"):
+        return "background-color: #E53935; color: #FFFFFF; font-weight: 900; border-radius: 999px;"
+    if s.startswith("GRAY"):
+        return "background-color: #6B7280; color: #FFFFFF; font-weight: 800; border-radius: 999px;"
+    return ""
+
+def _dti_parameter_quality_row_style_v1g(row):
+    label = str(row.get("quality_badge", ""))
+    badge_style = _dti_parameter_quality_badge_style_v1g(label)
+
+    # Avoid the old full-row gray look.
+    # Keep normal table readability and color only the evaluation columns.
+    normal = ""
+    score_style = ""
+    readiness_style = ""
+
+    if label.startswith("GREEN"):
+        score_style = "background-color: rgba(0, 168, 107, 0.22); color: #FFFFFF; font-weight: 800;"
+        readiness_style = score_style
+    elif label.startswith("YELLOW"):
+        score_style = "background-color: rgba(255, 196, 0, 0.26); color: #FFFFFF; font-weight: 800;"
+        readiness_style = score_style
+    elif label.startswith("ORANGE"):
+        score_style = "background-color: rgba(255, 122, 0, 0.30); color: #FFFFFF; font-weight: 800;"
+        readiness_style = score_style
+    elif label.startswith("RED"):
+        score_style = "background-color: rgba(229, 57, 53, 0.28); color: #FFFFFF; font-weight: 800;"
+        readiness_style = score_style
+    elif label.startswith("GRAY"):
+        score_style = "background-color: rgba(107, 114, 128, 0.20); color: #FFFFFF; font-weight: 700;"
+        readiness_style = score_style
+
+    styles = []
+    for col in row.index:
+        if col == "quality_badge":
+            styles.append(badge_style)
+        elif col in ["quality_score", "claim_readiness"]:
+            styles.append(score_style)
+        elif col in ["research_role", "role_group", "parameter"]:
+            styles.append("font-weight: 800;")
+        else:
+            styles.append(normal)
+    return styles
+
+def _dti_render_color_meaning_v1g():
+    import streamlit as st
+
+    st.markdown("#### Color meaning")
+
+    c1, c2, c3, c4, c5 = st.columns(5)
+
+    with c1:
+        st.markdown(
+            """
+<div style="background:#00A86B;color:#FFFFFF;font-weight:900;padding:0.35rem 0.75rem;border-radius:999px;text-align:center;">
+GREEN - strong lead
+</div>
+<p style="font-size:0.85rem;margin-top:0.5rem;">Strong lead. Prioritize source-lock and strict follow-up.</p>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with c2:
+        st.markdown(
+            """
+<div style="background:#FFC400;color:#111111;font-weight:900;padding:0.35rem 0.75rem;border-radius:999px;text-align:center;">
+YELLOW - useful partial
+</div>
+<p style="font-size:0.85rem;margin-top:0.5rem;">Useful partial result. Needs one or more controls.</p>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with c3:
+        st.markdown(
+            """
+<div style="background:#FF7A00;color:#FFFFFF;font-weight:900;padding:0.35rem 0.75rem;border-radius:999px;text-align:center;">
+ORANGE - needs control
+</div>
+<p style="font-size:0.85rem;margin-top:0.5rem;">Control-needed direction. Do not claim yet.</p>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with c4:
+        st.markdown(
+            """
+<div style="background:#E53935;color:#FFFFFF;font-weight:900;padding:0.35rem 0.75rem;border-radius:999px;text-align:center;">
+RED - blocked for claim
+</div>
+<p style="font-size:0.85rem;margin-top:0.5rem;">Blocked for claim-making, but useful as a boundary.</p>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with c5:
+        st.markdown(
+            """
+<div style="background:#6B7280;color:#FFFFFF;font-weight:900;padding:0.35rem 0.75rem;border-radius:999px;text-align:center;">
+GRAY - awaiting data
+</div>
+<p style="font-size:0.85rem;margin-top:0.5rem;">Not scored yet. This is not a zero score.</p>
+            """,
+            unsafe_allow_html=True,
+        )
+
+def _dti_render_parameter_quality_matrix_v1g():
+    import streamlit as st
+    import pandas as pd
+
+    st.markdown("### Parameter Quality Matrix")
+    st.info(
+        "This matrix highlights promising parameter directions, control-needed zones, and blocked claim paths. "
+        "Scores are UI meta-scores for research triage only; they are not likelihood, posterior, Planck, or physics-value results."
+    )
+
+    _dti_render_color_meaning_v1g()
+
+    rows = [
+        {
+            "parameter": "omega_cdm",
+            "research_role": "compensating direction",
+            "role_group": "Matter-sector compensation",
+            "current_value": "selected profile",
+            "positive_signal": "Can identify a narrow compensating parameter direction.",
+            "risk_blocker": "Needs companion-variable and seed-stability checks.",
+            "stability": 13,
+            "signal": 15,
+            "control": 13,
+            "risk": 7,
+            "next_test": "Audit whether the compensating direction remains narrow and sign-stable.",
+            "safe_interpretation": "Candidate compensating parameter direction.",
+        },
+        {
+            "parameter": "A_planck / calibration",
+            "research_role": "nuisance-control boundary",
+            "role_group": "Calibration and nuisance control",
+            "current_value": "selected profile",
+            "positive_signal": "Can test whether a result survives nuisance-control restrictions.",
+            "risk_blocker": "Must not be used as a physics mechanism.",
+            "stability": 13,
+            "signal": 13,
+            "control": 14,
+            "risk": 7,
+            "next_test": "Repeat under FIX or TIGHT nuisance boundaries before stronger wording.",
+            "safe_interpretation": "Nuisance-boundedness check.",
+        },
+        {
+            "parameter": "H0",
+            "research_role": "branch coordinate",
+            "role_group": "Branch geometry",
+            "current_value": "selected profile",
+            "positive_signal": "Can expose branch-level response direction.",
+            "risk_blocker": "Not sufficient alone for a cosmological claim.",
+            "stability": 12,
+            "signal": 16,
+            "control": 12,
+            "risk": 8,
+            "next_test": "Compare fixed-H0 branches under the same audit boundary.",
+            "safe_interpretation": "Useful branch label and response coordinate.",
+        },
+        {
+            "parameter": "f_EDE",
+            "research_role": "early-time scan coordinate",
+            "role_group": "Early-time modification",
+            "current_value": "selected profile",
+            "positive_signal": "Can mark a controlled early-time modification direction.",
+            "risk_blocker": "Requires source-locked comparison before mechanism language.",
+            "stability": 10,
+            "signal": 15,
+            "control": 10,
+            "risk": 9,
+            "next_test": "Check whether the same pattern persists across adjacent f_EDE values.",
+            "safe_interpretation": "Promising controlled scan coordinate.",
+        },
+        {
+            "parameter": "sigma8 / S8",
+            "research_role": "stress indicator",
+            "role_group": "Growth-stress diagnostic",
+            "current_value": "selected profile",
+            "positive_signal": "Can reveal growth-stress burden and residual tension.",
+            "risk_blocker": "A stress indicator is not by itself a model proof.",
+            "stability": 10,
+            "signal": 14,
+            "control": 10,
+            "risk": 10,
+            "next_test": "Separate diagnostic stress from claim-level evidence.",
+            "safe_interpretation": "Diagnostic stress coordinate.",
+        },
+        {
+            "parameter": "omega_b",
+            "research_role": "baryon-sector control",
+            "role_group": "Control parameter",
+            "current_value": "selected profile",
+            "positive_signal": "Can help separate baryon-sector load from dark-sector load.",
+            "risk_blocker": "Usually not sufficient as the main driver.",
+            "stability": 10,
+            "signal": 9,
+            "control": 11,
+            "risk": 8,
+            "next_test": "Hold other parameters fixed and inspect whether the response is load-bearing.",
+            "safe_interpretation": "Useful control parameter.",
+        },
+        {
+            "parameter": "n_s",
+            "research_role": "spectral-tilt companion",
+            "role_group": "Shape compensation",
+            "current_value": "selected profile",
+            "positive_signal": "Can expose spectral-tilt compensation.",
+            "risk_blocker": "Needs CMB-shape consistency checks before strong interpretation.",
+            "stability": 9,
+            "signal": 10,
+            "control": 9,
+            "risk": 9,
+            "next_test": "Check whether tilt movement is companion behavior or a primary driver.",
+            "safe_interpretation": "Companion shape parameter.",
+        },
+        {
+            "parameter": "unconnected future parameter",
+            "research_role": "awaiting data",
+            "role_group": "Future source-of-record slot",
+            "current_value": "not connected",
+            "positive_signal": "Reserved for a future audited parameter direction.",
+            "risk_blocker": "No source-of-record input yet.",
+            "stability": 0,
+            "signal": 0,
+            "control": 0,
+            "risk": 0,
+            "next_test": "Connect audited source data before scoring.",
+            "safe_interpretation": "Awaiting data; not a zero score.",
+            "force_gray": True,
+        },
+    ]
+
+    for row in rows:
+        if row.get("force_gray"):
+            row["quality_score"] = None
+            row["claim_readiness"] = None
+            row["quality_badge"] = "GRAY - awaiting data"
+        else:
+            raw = int(row["stability"]) + int(row["signal"]) + int(row["control"]) - int(row["risk"])
+            score = max(0, min(100, int(round(raw * 100 / 60))))
+            row["quality_score"] = score
+            row["claim_readiness"] = max(1, min(7, int(round(score * 7 / 100))))
+            row["quality_badge"] = _dti_parameter_quality_badge_v1g(score)
+
+    df = pd.DataFrame(rows)
+
+    display_cols = [
+        "parameter",
+        "research_role",
+        "role_group",
+        "current_value",
+        "quality_badge",
+        "quality_score",
+        "claim_readiness",
+        "positive_signal",
+        "risk_blocker",
+        "next_test",
+        "safe_interpretation",
+    ]
+
+    df_view = df[display_cols].copy()
+
+    sort_df = df.copy()
+    sort_df["quality_sort"] = sort_df["quality_score"].fillna(-1)
+    sort_df["readiness_sort"] = sort_df["claim_readiness"].fillna(-1)
+    sort_df = sort_df.sort_values(["quality_sort", "readiness_sort"], ascending=False)
+
+    st.markdown("#### Total evaluation table")
+    st.caption(
+        "Sorted by quality score, claim readiness, and control score. "
+        "GRAY means awaiting data, not zero quality."
+    )
+
+    try:
+        styled = df_view.style.apply(_dti_parameter_quality_row_style_v1g, axis=1)
+        st.dataframe(styled, use_container_width=True, hide_index=True)
+    except Exception:
+        st.dataframe(df_view, use_container_width=True, hide_index=True)
+
+    st.markdown("#### Next-test priority order")
+    st.caption("This is the practical test order, not a scientific ranking of truth.")
+
+    priority_rows = sort_df[~sort_df.get("force_gray", False)].head(5)
+
+    for idx, row in enumerate(priority_rows.to_dict("records"), start=1):
+        badge = row["quality_badge"]
+        badge_style = _dti_parameter_quality_badge_style_v1g(badge)
+        st.markdown(
+            f"""
+<div style="border:1px solid rgba(255,255,255,0.18);border-radius:0.75rem;padding:0.85rem;margin:0.65rem 0;">
+  <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+    <strong>{idx}. {row['parameter']}</strong>
+    <span style="{badge_style};padding:0.22rem 0.65rem;">{badge}</span>
+    <span style="opacity:0.85;">score {row['quality_score']}/100 · readiness {row['claim_readiness']}/7</span>
+  </div>
+  <div style="margin-top:0.55rem;"><strong>Role:</strong> {row['research_role']} / {row['role_group']}</div>
+  <div><strong>Current value:</strong> {row['current_value']}</div>
+  <div><strong>Why it matters:</strong> {row['positive_signal']}</div>
+  <div><strong>Next test:</strong> {row['next_test']}</div>
+  <div><strong>Safe wording:</strong> {row['safe_interpretation']}</div>
+</div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("#### How to read this matrix")
+    st.code(
+        """Use rule:
+1. GREEN and YELLOW are research leads.
+2. ORANGE is not bad; it means control is needed before stronger wording.
+3. RED is blocked for claim-making, but can still define a useful boundary.
+4. GRAY is awaiting data. It is not a zero score.
+5. Do not use this matrix as likelihood, posterior, Planck validation, graph proof, or final physics evidence.""",
+        language="text",
+    )
+
+    st.caption(
+        "Boundary: Parameter Quality Matrix V1G is UI/meta-scoring only. "
+        "It does not perform likelihood evaluation, posterior comparison, Planck validation, graph rendering, "
+        "7c execution, physics-value updates, manuscript updates, Render API modification, or Streamlit Secret modification."
+    )
+# --- /DTI_PARAMETER_QUALITY_MATRIX_VISUAL_V1G ---
+
+
 # --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7a.
 # Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
@@ -4403,6 +4761,9 @@ def _render_local_axiclass_fixed_example_v606():
 
     # DTI_DISCOVERY_SCORE_PANEL_CALL_V1E
     _dti_render_discovery_score_panel_v1e()
+
+    # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1G
+    _dti_render_parameter_quality_matrix_v1g()
 
     # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1G
     _dti_render_parameter_quality_matrix_v1g()
