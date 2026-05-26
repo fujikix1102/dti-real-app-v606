@@ -3730,14 +3730,14 @@ def _dti_sidebar_candidate_reference_form_v2():
     preset_names = list(preset_values.keys())
 
     candidate_preset = st.selectbox(
-        "Candidate preset",
+        "Candidate preset — ACTIVE comparison input",
         preset_names,
         index=0 if preset_names else 0,
         key="dti_ui_candidate_preset_v1",
         help="Candidate 側の初期値を選びます。手入力で上書きできます。",
     )
     reference_preset = st.selectbox(
-        "Reference preset",
+        "Reference preset — ACTIVE comparison input",
         preset_names,
         index=1 if len(preset_names) > 1 else 0,
         key="dti_ui_reference_preset_v1",
@@ -4704,7 +4704,7 @@ def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
 
     grouped = _dti_build_profile_category_map_v1_safe_fixindent(presets)
 
-    st.sidebar.markdown("### Profile category guide")
+    st.sidebar.markdown("### Profile category browser / preview only")
     st.sidebar.caption(
         "The full preset inventory is grouped for readability. "
         "This guide does not change the underlying TSV or run new cosmology."
@@ -4728,7 +4728,7 @@ def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
         default_index = available.index("Fujiki DTI Current")
 
     selected_category = st.sidebar.selectbox(
-        "Profile category guide",
+        "Profile category browser / preview only",
         available,
         index=default_index,
         key="dti_profile_category_guide_category_v1_safe_fixindent",
@@ -4740,7 +4740,7 @@ def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
     model_ids = grouped.get(selected_category, [])
     if model_ids:
         preview_model = st.sidebar.selectbox(
-            "Category model preview",
+            "Category model preview — not loaded yet",
             model_ids,
             index=0,
             key="dti_profile_category_guide_model_preview_v1_safe_fixindent",
@@ -4771,6 +4771,14 @@ def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
             "and no physics-value update."
         )
 # --- /DTI_PROFILE_CATEGORY_GUIDE_V1_SAFE_FIXINDENT ---
+
+# --- DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL ---
+# Minimal label-only clarification:
+# - category guide is preview-only
+# - registered/profile and Candidate/Reference selectors are active controls
+# - no selector replacement
+_DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL = True
+# --- /DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL ---
 
 
 C_LIGHT = 299792458.0
@@ -5814,7 +5822,7 @@ with st.sidebar:
     _dti_render_profile_category_guide_v1_safe_fixindent(PRESETS)
 
     selected_preset = st.selectbox(
-        "Load registered profile",
+        "Load registered profile — ACTIVE loader",
         preset_names,
         index=preset_names.index(current_selected) if current_selected in preset_names else 0,
         key="selected_preset_selector_v606",
