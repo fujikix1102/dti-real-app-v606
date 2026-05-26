@@ -4712,10 +4712,50 @@ def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
     st.sidebar.caption("When SHOW ALL is selected, the browser preview is intended for full inventory audit. Use ACTIVE loader below to load a model.")
 
     if st.sidebar.checkbox("Show complete profile TSV inventory", value=False, key="show_complete_profile_tsv_inventory_v1e"):
-        _dti_all_profile_ids_v1e = list(PRESETS.keys())
-        st.sidebar.caption(f"Full TSV inventory preview: {len(_dti_all_profile_ids_v1e)} registered profiles. Preview only; active loader unchanged.")
-        with st.sidebar.expander("Full profile TSV inventory — preview only", expanded=False):
-            st.sidebar.write(_dti_all_profile_ids_v1e)
+        # DTI_SHOW_ALL_PROFILES_TABLE_V1F
+        # Preview-only full inventory table. This does not change the active loader.
+        try:
+            _dti_tsv_path_v1f = DATA_DIR / "profile_presets_v606.tsv"
+            if _dti_tsv_path_v1f.exists():
+                _dti_all_df_v1f = pd.read_csv(_dti_tsv_path_v1f, sep="\t")
+                _dti_model_col_v1f = "Model ID" if "Model ID" in _dti_all_df_v1f.columns else _dti_all_df_v1f.columns[0]
+                _dti_models_v1f = [str(x) for x in _dti_all_df_v1f[_dti_model_col_v1f].dropna().tolist()]
+                _dti_source_label_v1f = "profile_presets_v606.tsv"
+            else:
+                _dti_models_v1f = [str(x) for x in PRESETS.keys()]
+                _dti_source_label_v1f = "registered PRESETS fallback"
+    
+            _dti_registered_count_v1f = len(list(PRESETS.keys()))
+            _dti_tsv_count_v1f = len(_dti_models_v1f)
+    
+            st.sidebar.caption(
+                f"Full inventory preview: {_dti_tsv_count_v1f} TSV profiles. "
+                f"Registered PRESETS currently visible to the app: {_dti_registered_count_v1f}. "
+                "Preview only; active loader unchanged."
+            )
+    
+            _dti_inventory_rows_v1f = []
+            for _dti_i_v1f, _dti_model_id_v1f in enumerate(_dti_models_v1f, start=1):
+                try:
+                    _dti_cat_v1f = _dti_profile_category_for_model_v1_safe_fixindent(_dti_model_id_v1f)
+                except Exception:
+                    _dti_cat_v1f = "Unclassified"
+                _dti_inventory_rows_v1f.append({
+                    "no": _dti_i_v1f,
+                    "model_id": _dti_model_id_v1f,
+                    "category": _dti_cat_v1f,
+                })
+    
+            _dti_inventory_df_v1f = pd.DataFrame(_dti_inventory_rows_v1f)
+            with st.sidebar.expander("Full profile TSV inventory — table preview only", expanded=False):
+                st.caption(f"Source: {_dti_source_label_v1f}. This table is not an active selection control.")
+                st.dataframe(
+                    _dti_inventory_df_v1f,
+                    width="stretch",
+                    hide_index=True,
+                )
+        except Exception as _dti_show_all_err_v1f:
+            st.sidebar.warning(f"Full TSV inventory preview could not be rendered: {_dti_show_all_err_v1f}")
     st.sidebar.caption(
         "The full preset inventory is grouped for readability. "
         "This guide does not change the underlying TSV or run new cosmology."
@@ -4812,6 +4852,13 @@ def _dti_profile_category_preview_models_v1e(selected_category, grouped_models, 
         return list(presets.keys())
     return list(grouped_models.get(selected_category, []))
 # --- /DTI_SHOW_ALL_PROFILES_PREVIEW_V1E ---
+
+
+# --- DTI_SHOW_ALL_PROFILES_TABLE_V1F ---
+# Replaces JSON-like full inventory preview with a compact table and separate TSV/PRESETS counts.
+_DTI_SHOW_ALL_PROFILES_TABLE_V1F = True
+# --- /DTI_SHOW_ALL_PROFILES_TABLE_V1F ---
+
 
 # --- /DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL ---
 
