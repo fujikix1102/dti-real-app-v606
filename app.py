@@ -1724,7 +1724,12 @@ def _dti_render_parameter_quality_matrix_v1g():
     st.markdown("#### Next-test priority order")
     st.caption("This is the practical test order, not a scientific ranking of truth.")
 
-    priority_rows = sort_df[~sort_df.get("force_gray", False)].head(5)
+    force_gray_mask = sort_df.get("force_gray")
+    if force_gray_mask is None:
+        force_gray_mask = False
+    else:
+        force_gray_mask = force_gray_mask.fillna(False).astype(bool)
+    priority_rows = sort_df[~force_gray_mask].head(5)
 
     for idx, row in enumerate(priority_rows.to_dict("records"), start=1):
         badge = row["quality_badge"]
@@ -4761,9 +4766,6 @@ def _render_local_axiclass_fixed_example_v606():
 
     # DTI_DISCOVERY_SCORE_PANEL_CALL_V1E
     _dti_render_discovery_score_panel_v1e()
-
-    # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1G
-    _dti_render_parameter_quality_matrix_v1g()
 
     # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1G
     _dti_render_parameter_quality_matrix_v1g()
