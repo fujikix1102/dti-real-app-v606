@@ -127,6 +127,147 @@ def _dti_enable_gate_notice_7abc_v1(section_label, purpose):
 
 
 
+
+
+# --- DTI_PUBLIC_API_WARMUP_CACHE_HELPERS_7A7B_V2 ---
+# Public API warm-up and cached POST helpers for Section 7a/7b.
+# This improves UI responsiveness and avoids repeated long fixed-example calls.
+# It does not change physics values, does not run likelihood/posterior checks,
+# does not validate Planck, and does not reopen graph rendering.
+_DTI_PUBLIC_API_WARMUP_CACHE_HELPERS_7A7B_V2 = True
+
+def _dti_endpoint_base_url_v2(endpoint):
+    from urllib.parse import urlparse as _dti_urlparse_v2
+
+    s = "" if endpoint is None else str(endpoint).strip()
+    try:
+        parsed = _dti_urlparse_v2(s)
+        if parsed.scheme and parsed.netloc:
+            return f"{parsed.scheme}://{parsed.netloc}"
+    except Exception:
+        pass
+    return ""
+
+def _dti_warmup_urls_for_endpoint_v2(endpoint):
+    base = _dti_endpoint_base_url_v2(endpoint)
+    if not base:
+        return []
+    return [
+        f"{base}/health",
+        f"{base}/axiclass/status",
+        f"{base}/axiclass/fixed-example-status",
+    ]
+
+def _dti_warmup_public_api_v2(endpoint, timeout_sec=60):
+    import time as _dti_time_v2
+    import requests as _dti_requests_v2
+
+    rows = []
+    for url in _dti_warmup_urls_for_endpoint_v2(endpoint):
+        started = _dti_time_v2.time()
+        row = {
+            "url": url,
+            "status_code": None,
+            "ok": False,
+            "elapsed_sec": None,
+            "error": "",
+        }
+        try:
+            response = _dti_requests_v2.get(url, timeout=timeout_sec)
+            row["status_code"] = int(response.status_code)
+            row["ok"] = bool(response.ok)
+        except Exception as exc:
+            row["error"] = repr(exc)
+        row["elapsed_sec"] = round(_dti_time_v2.time() - started, 3)
+        rows.append(row)
+    return rows
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def _dti_cached_post_json_endpoint_v2(endpoint, payload_json, timeout_sec, cache_label):
+    import json as _dti_json_v2
+    import time as _dti_time_v2
+    import requests as _dti_requests_v2
+
+    payload_text = "" if payload_json is None else str(payload_json)
+    payload = None
+    if payload_text.strip():
+        payload = _dti_json_v2.loads(payload_text)
+
+    started = _dti_time_v2.time()
+    response = _dti_requests_v2.post(endpoint, json=payload, timeout=timeout_sec)
+    elapsed = round(_dti_time_v2.time() - started, 3)
+
+    try:
+        body = response.json()
+    except Exception:
+        body = {
+            "status": "non_json_response",
+            "text": response.text[:4000],
+        }
+
+    return {
+        "status_code": int(response.status_code),
+        "body": body,
+        "elapsed_sec": elapsed,
+        "cache": {
+            "streamlit_cache_data": True,
+            "ttl_seconds": 3600,
+            "cache_label": cache_label,
+            "note": "Cached at Streamlit frontend layer only. This does not change the API source response.",
+        },
+        "boundary": {
+            "frontend_cache_only": True,
+            "not_likelihood_evaluation": True,
+            "not_posterior_comparison": True,
+            "not_Planck_validation": True,
+            "not_physics_value_update": True,
+            "not_manuscript_update": True,
+            "graph_rendering_reopened": False,
+        },
+    }
+
+def _dti_post_json_endpoint_cached_or_uncached_v2(endpoint, payload, timeout_sec, cache_label, use_cache=True):
+    import json as _dti_json_v2
+    import time as _dti_time_v2
+    import requests as _dti_requests_v2
+
+    payload_json = _dti_json_v2.dumps(payload if payload is not None else {}, sort_keys=True)
+
+    if use_cache:
+        return _dti_cached_post_json_endpoint_v2(endpoint, payload_json, timeout_sec, cache_label)
+
+    started = _dti_time_v2.time()
+    response = _dti_requests_v2.post(endpoint, json=payload if payload is not None else {}, timeout=timeout_sec)
+    elapsed = round(_dti_time_v2.time() - started, 3)
+
+    try:
+        body = response.json()
+    except Exception:
+        body = {
+            "status": "non_json_response",
+            "text": response.text[:4000],
+        }
+
+    return {
+        "status_code": int(response.status_code),
+        "body": body,
+        "elapsed_sec": elapsed,
+        "cache": {
+            "streamlit_cache_data": False,
+            "ttl_seconds": 0,
+            "cache_label": cache_label,
+        },
+        "boundary": {
+            "frontend_cache_only": False,
+            "not_likelihood_evaluation": True,
+            "not_posterior_comparison": True,
+            "not_Planck_validation": True,
+            "not_physics_value_update": True,
+            "not_manuscript_update": True,
+            "graph_rendering_reopened": False,
+        },
+    }
+
 # --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7a.
 # Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
@@ -3084,6 +3225,37 @@ def _render_local_axiclass_fixed_example_v606():
         """
     )
 
+
+    # DTI_PUBLIC_API_WARMUP_UI_7A7B_V2
+    st.subheader("7 preflight. Public API warm-up")
+    st.caption(
+        "Use this before 7a/7b when the public Render API may be asleep. "
+        "Warm-up only checks service availability; it is not a likelihood, posterior, Planck, or manuscript calculation."
+    )
+
+    warmup_7a_endpoint = _dti_default_7a_fixed_example_endpoint_public_local_v1()
+    warmup_7b_endpoint = _dti_default_7b_live_endpoint_public_local_v1()
+
+    with st.expander("Warm up configured API endpoints before 7a/7b", expanded=False):
+        st.write("Configured 7a endpoint:")
+        st.code(warmup_7a_endpoint, language="text")
+        st.write("Configured 7b endpoint:")
+        st.code(warmup_7b_endpoint, language="text")
+        st.info(
+            "Warm-up can reduce first-run delay after Render cold start. "
+            "It does not compute new cosmological results."
+        )
+
+        if st.button("Warm up public API", key="dti_warmup_public_api_7a7b_v2", width="stretch"):
+            rows = []
+            rows.extend(_dti_warmup_public_api_v2(warmup_7a_endpoint, timeout_sec=60))
+            if _dti_endpoint_base_url_v2(warmup_7b_endpoint) != _dti_endpoint_base_url_v2(warmup_7a_endpoint):
+                rows.extend(_dti_warmup_public_api_v2(warmup_7b_endpoint, timeout_sec=60))
+            st.session_state["dti_public_api_warmup_rows_7a7b_v2"] = rows
+
+        if "dti_public_api_warmup_rows_7a7b_v2" in st.session_state:
+            st.dataframe(st.session_state["dti_public_api_warmup_rows_7a7b_v2"], use_container_width=True)
+
     st.header("7a. AxiCLASS fixed-example check")
 
     st.markdown("""
@@ -3128,6 +3300,15 @@ It is intended for implementation testing and reproducibility inspection only.<b
         "Please wait for the result and avoid repeated clicks while it is running."
     )
 
+
+    # DTI_7A_FRONTEND_CACHE_CONTROL_V2
+    use_7a_cache = st.checkbox(
+        "Use one-hour frontend cache for fixed-example result",
+        value=True,
+        key="dti_use_7a_frontend_cache_v2",
+        help="Recommended. The fixed-example endpoint is source-locked and may take several minutes after Render cold start.",
+    )
+
     with st.expander("How to use the AxiCLASS API endpoint", expanded=False):
         st.code(
             'cd "/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_AXICLASS_API_SCAFFOLD_LOCAL_20260524_161545/dti-axiclass-api"\n'
@@ -3140,9 +3321,17 @@ It is intended for implementation testing and reproducibility inspection only.<b
             if _dti_is_disabled_endpoint_literal_v1(local_endpoint):
                 _dti_local_endpoint_disabled_notice_v1()
                 st.stop()
-            response = requests.post(local_endpoint, timeout=240)
-            st.session_state["local_axiclass_fixed_result_v606"] = response.json()
-            st.session_state["local_axiclass_fixed_http_status_v606"] = response.status_code
+            cached_result_7a = _dti_post_json_endpoint_cached_or_uncached_v2(
+                local_endpoint,
+                {},
+                240,
+                "7a_fixed_example_compact",
+                use_cache=use_7a_cache,
+            )
+            st.session_state["local_axiclass_fixed_result_v606"] = cached_result_7a["body"]
+            st.session_state["local_axiclass_fixed_http_status_v606"] = cached_result_7a["status_code"]
+            st.session_state["local_axiclass_fixed_elapsed_sec_v606"] = cached_result_7a["elapsed_sec"]
+            st.session_state["local_axiclass_fixed_cache_meta_v606"] = cached_result_7a["cache"]
         except Exception as exc:
             st.session_state["local_axiclass_fixed_result_v606"] = {
                 "status": "failed",
@@ -3342,6 +3531,15 @@ st.info(
     "This remains a bounded plumbing/profile-response check, not a likelihood or posterior calculation."
 )
 
+
+# DTI_7B_FRONTEND_CACHE_CONTROL_V2
+use_7b_cache = st.checkbox(
+    "Use one-hour frontend cache for identical vanilla-profile payload",
+    value=True,
+    key="dti_use_7b_frontend_cache_v2",
+    help="Recommended for repeated identical checks. Cache key changes when endpoint or payload changes.",
+)
+
 selected_live_input_source_8b = st.selectbox(
     "Input source",
     list(_live_presets_8b.keys()),
@@ -3500,15 +3698,28 @@ type="primary",
                 if _dti_is_disabled_endpoint_literal_v1(live_probe_url):
                     _dti_local_endpoint_disabled_notice_v1()
                     st.stop()
-                response = requests.post(live_probe_url, json=live_payload, timeout=240)
-                st.write(f"HTTP status: {response.status_code}")
+                cached_result_7b = _dti_post_json_endpoint_cached_or_uncached_v2(
+                    live_probe_url,
+                    live_payload,
+                    240,
+                    "7b_vanilla_profile_probe",
+                    use_cache=use_7b_cache,
+                )
+                st.session_state["live_vanilla_probe_result_v606_8d"] = cached_result_7b["body"]
+                st.session_state["live_vanilla_probe_http_status_v606_8d"] = cached_result_7b["status_code"]
+                st.session_state["live_vanilla_probe_elapsed_sec_v606_8d"] = cached_result_7b["elapsed_sec"]
+                st.session_state["live_vanilla_probe_cache_meta_v606_8d"] = cached_result_7b["cache"]
 
-                try:
-                    data = response.json()
-                except Exception:
-                    data = {"status": "error", "detail": response.text}
+                data = cached_result_7b["body"]
+                st.write(f"HTTP status: {cached_result_7b['status_code']}")
+                st.caption(
+                    "7b frontend cache: "
+                    + str(cached_result_7b["cache"])
+                    + " | elapsed_sec="
+                    + str(cached_result_7b["elapsed_sec"])
+                )
 
-                st.markdown("##### Local vanilla CLASS live probe result")
+                st.markdown("##### Vanilla-profile API check result")
                 st.json(data)
 
                 if data.get("status") == "ok":
