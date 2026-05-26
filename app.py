@@ -2170,6 +2170,106 @@ def _dti_render_readout_card_detail_guide_v1b():
         )
 # --- /DTI_READOUT_CARD_DETAIL_GUIDE_V1B ---
 
+
+# --- DTI_VISITOR_QUICK_GUIDE_V1 ---
+# First-visitor orientation layer.
+# UI explanation only. This does not enable 7c, graph rendering, likelihood evaluation,
+# posterior comparison, Planck validation, physics-value updates, manuscript updates,
+# Render API changes, or Streamlit Secret changes.
+_DTI_VISITOR_QUICK_GUIDE_V1 = True
+
+def _dti_render_visitor_quick_guide_v1():
+    import streamlit as st
+
+    st.markdown("### Visitor Quick Guide")
+
+    st.info(
+        "Start here if this is your first time reading the app. "
+        "The app is a research-navigation dashboard: it shows locked references, "
+        "promising parameter directions, probe value, and safe next tests. "
+        "It is not a likelihood engine, posterior comparison, Planck validation, or final physics claim."
+    )
+
+    guide_col_1, guide_col_2, guide_col_3 = st.columns(3)
+
+    with guide_col_1:
+        st.markdown(
+            """
+**Recommended reading order**
+
+1. Section 5: locked benchmark values
+2. Parameter Quality Matrix
+3. Probe Result Value Matrix
+4. 7a / 7b live checks
+5. Next controlled test
+            """
+        )
+
+    with guide_col_2:
+        st.markdown(
+            """
+**This app can help answer**
+
+- Which benchmark values are locked
+- Which directions look promising
+- What each probe teaches
+- What remains blocked
+- What to test next
+            """
+        )
+
+    with guide_col_3:
+        st.markdown(
+            """
+**This app cannot claim**
+
+- Final cosmological truth
+- Posterior superiority
+- Planck validation
+- New-physics proof
+- 7c closure
+            """
+        )
+
+    st.markdown("#### Section flow")
+
+    st.code(
+        """Locked benchmark
+        ↓
+Parameter Quality Matrix
+        ↓
+Probe Result Value Matrix
+        ↓
+7a / 7b live checks
+        ↓
+Next controlled test""",
+        language="text",
+    )
+
+    st.markdown("#### Current best next action")
+
+    st.success(
+        "Use Section 5 to anchor the locked benchmark. "
+        "Use Parameter Quality Matrix to identify promising directions. "
+        "Use Probe Result Value Matrix to interpret what 7a / 7b teach. "
+        "Keep 7c deferred unless explicitly approved."
+    )
+
+    with st.expander("Boundary note for reviewers and researchers", expanded=False):
+        st.markdown(
+            """
+This guide is an orientation layer only.
+
+It does not change solver behavior, data values, likelihood interpretation,
+posterior interpretation, Planck validation, graph rendering, 7c state,
+manuscript content, Render API settings, or Streamlit Secrets.
+
+Use it to decide where to look first and how to read the app safely.
+            """
+        )
+# --- /DTI_VISITOR_QUICK_GUIDE_V1 ---
+
+
 # --- DTI_PROBE_RESULT_VALUE_MATRIX_V2 ---
 # Status-linked positive probe evaluation.
 # Reads available 7a / 7b session/API status signals when present.
@@ -5634,6 +5734,9 @@ for i, p in enumerate(["sigma8", "S8", "ln10_10_As", "n_s", "tau_reio"]):
 st.markdown("---")
 # DTI_PRESET_LEARNING_MAIN_PANEL_V1
 _dti_main_candidate_reference_panel_v1()
+
+# DTI_VISITOR_QUICK_GUIDE_CALL_V1
+_dti_render_visitor_quick_guide_v1()
 
 st.header("5. AxiCLASS FIX1 locked benchmark")
 
