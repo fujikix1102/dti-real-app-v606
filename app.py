@@ -393,6 +393,98 @@ What test would move this from unresolved or partial toward a clear answer?""",
 # --- /DTI_POSITIVE_ANSWER_NAVIGATOR_V2 ---
 
 
+
+
+# --- DTI_RESEARCH_MOTIVATION_LAYER_V1 ---
+# Research motivation layer.
+# UI text only. This does not enable 7c, graph rendering, likelihood evaluation,
+# posterior comparison, Planck validation, physics-value updates, manuscript updates,
+# Render API changes, or Streamlit Secret changes.
+_DTI_RESEARCH_MOTIVATION_LAYER_V1 = True
+
+def _dti_render_research_motivation_layer_v1():
+    import streamlit as st
+
+    st.markdown("### Research motivation layer")
+
+    st.success(
+        "Goal: turn each audit result into a constructive research lead. "
+        "The app should not only say what fails; it should show what remains promising, "
+        "what is already stable, and what the next decisive test should be."
+    )
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        st.markdown(
+            """
+**Research lead**
+
+Use the app to find:
+
+- a surviving branch
+- a stable parameter direction
+- a bounded nuisance explanation
+- a promising next comparison
+- a clean unresolved zone worth testing
+            """
+        )
+
+    with c2:
+        st.markdown(
+            """
+**Positive interpretation**
+
+A result is useful when it identifies one of these:
+
+- PASS: a bounded check survives
+- PARTIAL: a signal is informative but incomplete
+- UNRESOLVED: the next test is now clear
+- FAIL: a route can be retired safely
+            """
+        )
+
+    with c3:
+        st.markdown(
+            """
+**Research mindset**
+
+The intended workflow is:
+
+1. keep what survives
+2. isolate what blocks the claim
+3. define the next test
+4. avoid overclaiming
+5. convert uncertainty into a research plan
+            """
+        )
+
+    st.markdown("#### Constructive answer template")
+    st.code(
+        """Research answer:
+What is the most promising surviving result?
+
+Evidence status:
+PASS / PARTIAL / FAIL / UNRESOLVED
+
+Why it matters:
+What did this audit clarify?
+
+Current blocker:
+What still prevents a stronger claim?
+
+Next experiment:
+What should be tested next?""",
+        language="text",
+    )
+
+    st.caption(
+        "Boundary: this layer is explanatory UI only. It does not change solver behavior, "
+        "physics values, likelihood/posterior interpretation, Planck validation, graph rendering, "
+        "7c state, manuscript content, Render API settings, or Streamlit Secrets."
+    )
+# --- /DTI_RESEARCH_MOTIVATION_LAYER_V1 ---
+
 # --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7a.
 # Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
@@ -3379,6 +3471,9 @@ def _render_local_axiclass_fixed_example_v606():
 
     # DTI_POSITIVE_ANSWER_NAVIGATOR_CALL_V2
     _dti_render_positive_answer_navigator_v2()
+
+    # DTI_RESEARCH_MOTIVATION_LAYER_CALL_V1
+    _dti_render_research_motivation_layer_v1()
 
     st.header("7a. AxiCLASS fixed-example check")
 
