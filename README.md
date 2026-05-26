@@ -1,252 +1,189 @@
-# DTI-Core Grand Auditor v6.0.6
+# DTI Research Dashboard
 
-**Public parameter-profile audit interface for cosmological model comparison, benchmark proximity review, and reproducibility-first inspection.**
+This repository hosts the DTI research-facing Streamlit app.
 
-## Public links
+The app is a bounded research-navigation dashboard. It helps readers understand locked benchmark references, promising parameter directions, probe value, and safe next controlled tests.
 
-| Item | URL |
-|---|---|
-| Public Streamlit app | https://dti-real-app-v606.streamlit.app |
-| Frontend GitHub repository | https://github.com/fujikix1102/dti-real-app-v606 |
-| External CLASS API backend | https://dti-class-api.onrender.com |
-| Backend GitHub repository | https://github.com/fujikix1102/dti-class-api |
+It is not a likelihood engine, posterior comparison, Planck validation, final cosmological claim, or proof of new physics.
 
-## One-line repository description
+## Current public UI state
 
-Public Streamlit interface for cosmological parameter-profile auditing, connected to an exploratory Render-hosted CLASS/PyCLASS backend.
+The current app includes the following research-positive workflow:
 
----
+1. Visitor Quick Guide
+2. Current input model safety/readout cards
+3. Readout card detail guide
+4. Section 5: AxiCLASS FIX1 locked benchmark
+5. Parameter Quality Matrix
+6. Probe Result Value Matrix V2
+7. Positive Answer Navigator
+8. Research Motivation Layer
+9. Research Opportunity Engine
+10. Discovery Score and Claim Readiness
+11. Section 7a: AxiCLASS fixed-example check
+12. Section 7b: Vanilla-profile API check
+13. Section 7c: continuity/discontinuity examiner remains deferred and disabled
 
-## 1. What this app is
+## Recommended reading order
 
-This app is a **parameter-profile audit interface**.
+For first-time visitors:
 
-It helps users inspect and compare cosmological parameter blocks such as:
+1. Read the Visitor Quick Guide.
+2. Check Section 5 for locked benchmark references.
+3. Use the Parameter Quality Matrix to identify promising parameter directions.
+4. Use the Probe Result Value Matrix V2 to understand what 7a, 7b, and 7c teach.
+5. Run 7a if you need a source-locked benchmark check.
+6. Run 7b if you need a bounded live-profile probe.
+7. Keep 7c deferred unless explicitly approved.
 
-- H0
-- f_EDE
-- omega_cdm
-- omega_b
-- sigma8
-- S8
-- z_c
-- n_s
-- ln10_10_As
-- tau_reio
+## What this app can help answer
 
-The purpose is to make parameter burden, benchmark proximity, and profile-level comparison easier to inspect.
+The app can help readers identify:
 
-The app includes:
+- which benchmark values are locked
+- which parameter directions are promising
+- which paths are partial but useful
+- which paths are blocked for stronger claims
+- what each probe teaches
+- what remains bounded
+- what next controlled test should be run
 
-- 100 registered parameter-profile presets
-- Candidate / Reference parameter input forms
-- text-to-form and form-to-text conversion
-- profile-nearest search
-- locked AxiCLASS FIX1 benchmark values
-- optional exploratory CLASS / AxiCLASS sandbox output
+## What this app cannot claim
 
----
+The app does not claim:
 
-## 2. What this app does
+- final cosmological truth
+- posterior superiority
+- Planck validation
+- proof of new physics
+- likelihood-level model preference
+- 7c continuity or discontinuity closure
+- manuscript-level scientific conclusion
 
-The app allows users to:
+## Data files
 
-1. Select a registered cosmological parameter profile.
-2. Convert profile text into form fields.
-3. Edit candidate and reference values.
-4. Convert form values back into a parameter text block.
-5. Compare candidate and reference parameter burdens.
-6. Inspect registered profile proximity.
-7. View locked AxiCLASS FIX1 benchmark references.
-8. Run optional exploratory sandbox checks when locally available.
+The locked benchmark and profile preset files are expected under:
 
-This is intended as a lightweight research interface for inspection, comparison, and reproducibility-oriented review.
+    app/data/axiclass_fix1_results.tsv
+    app/data/axiclass_fix1_delta.tsv
+    app/data/profile_presets_v606.tsv
 
----
+The app now uses a robust DATA_DIR resolver that checks:
 
-## 3. What this app does not do
+    APP_DIR / "app" / "data"
+    APP_DIR / "data"
+    Path.cwd() / "app" / "data"
+    Path.cwd() / "data"
 
-This app does **not** perform:
+This prevents public/local path-layout drift from hiding the FIX1 benchmark TSV files.
+
+## Key components
+
+### Visitor Quick Guide
+
+A first-reader orientation layer before Section 5. It explains reading order, what the app can answer, what it cannot claim, section flow, and current best next action.
+
+### Current input model safety/readout cards
+
+A lightweight input readout showing the current model parameters and safety labels.
+
+### Readout card detail guide
+
+A clickable explanation layer for current input model readout cards. It explains research role, why each parameter matters, safe interpretation, what not to claim, and next checks.
+
+### AxiCLASS FIX1 locked benchmark
+
+Section 5 displays locked AxiCLASS FIX1 benchmark TSV values. These are read-only reference values, not live recomputation.
+
+### Parameter Quality Matrix
+
+A compact color-coded research triage table.
+
+Meaning:
+
+- GREEN: strong lead
+- YELLOW: useful partial
+- ORANGE: needs control
+- RED: blocked for claim
+- GRAY: awaiting data, not zero quality
+
+The compact table keeps the main view readable and moves long details into cards/expanders.
+
+### Probe Result Value Matrix V2
+
+A status-linked positive probe evaluation layer.
+
+It interprets:
+
+- 7a as a source-locked benchmark-value probe
+- 7b as a bounded exploratory live-profile probe
+- 7c as a deferred high-value future test
+
+V2 reads available 7a / 7b session or API status signals when present and reflects them into actual_status, value_badge, research_score, claim_readiness, what this teaches, what remains blocked, next experiment, safe wording, and session hits.
+
+### Positive Answer Navigator
+
+Reframes app output as:
+
+- PASS
+- PARTIAL
+- FAIL
+- UNRESOLVED
+
+It emphasizes what survives, what remains blocked, and what next test can move the result toward a clearer answer.
+
+### Research Motivation Layer
+
+A constructive research workflow layer that treats partial or unresolved results as useful evidence for designing the next controlled test.
+
+### Research Opportunity Engine
+
+A research opportunity map, next-test composer, and claim-boundary translator.
+
+### Discovery Score and Claim Readiness
+
+A lightweight UI/meta-scoring layer. It is not a likelihood or posterior statistic.
+
+## Section 7 policy
+
+### 7a
+
+7a is available as a source-locked fixed-example check.
+
+### 7b
+
+7b is available as a bounded live-profile API check.
+
+### 7c
+
+7c remains disabled and deferred. It must not be executed unless explicitly approved.
+
+## Hard boundaries
+
+This app does not perform or claim:
 
 - likelihood evaluation
 - posterior comparison
-- Planck likelihood validation
-- MCMC sampling
-- external chain reanalysis
-- final cosmological validation
-- claim that the H0 tension is resolved
-- claim that the S8 tension is resolved
-- claim of a unique physical mechanism
+- Planck validation
+- graph-based scientific result
+- 7c execution
+- physics-value updates
+- manuscript updates
+- Render API modification
+- Streamlit Secret modification
 
-The app should not be interpreted as a replacement for Cobaya, MontePython, CLASS, AxiCLASS, CAMB, or formal Planck likelihood pipelines.
+## Current implementation identity
 
----
+- Generated docs timestamp: 2026-05-27 07:31:57
+- Source HEAD before docs update: 8466d75f069c3810d56be6ee68c029e59dc4eb56
+- app.py SHA256 before docs update: 2ba00a74f2704053e93c33342b7dc684dcea0c93f94dd279c3e959b30781c347
 
-## 4. Quick Start
+## Notes for contributors
 
-1. Open the public app:
+Use Bash for copy-paste runs on Mac.
 
-   https://dti-real-app-v606.streamlit.app
+Avoid zsh globbing and quoting pitfalls.
 
-2. Select a registered profile from the left sidebar.
+Do not mix app.py changes with docs changes unless explicitly scoped.
 
-3. Inspect the generated parameter block.
-
-4. Use **Text to form** to load the block into the input form.
-
-5. Edit candidate or reference values.
-
-6. Use **Form to text** to regenerate a parameter block.
-
-7. Inspect candidate/reference differences.
-
-8. Check locked AxiCLASS FIX1 benchmark values.
-
-9. Treat live CLASS / AxiCLASS output, if used, as exploratory and non-canonical.
-
----
-
-## 5. Included presets
-
-The app includes 100 registered parameter-profile presets in:
-
-    app/data/profile_presets_v606.tsv
-
-The preset table has the following columns:
-
-    Model ID
-    H0
-    f_EDE
-    omega_cdm
-    omega_b
-    sigma8
-    S8
-    Profile role
-
-The presets include baseline references, EDE-like reference regions, DTI candidate regions, lensing-suppressed regions, high-z growth-stress regions, and extreme-bound stress cases.
-
-These presets are **parameter-profile cartridges**. They are not presented as independent likelihood evaluations.
-
----
-
-## 6. AxiCLASS FIX1 locked benchmark
-
-The AxiCLASS FIX1 section displays fixed benchmark values copied from a successful checkpoint.
-
-These values are read-only benchmark references.
-
-Changing the active preset or form values does **not** recompute the locked AxiCLASS FIX1 values.
-
-This separation is intentional:
-
-- locked benchmark values are fixed references
-- live sandbox calculations are exploratory
-- exploratory results are non-canonical
-- live results do not overwrite locked checkpoints
-
----
-
-## 7. Repository structure
-
-    app.py
-    requirements.txt
-    README.md
-    LICENSE
-    .gitignore
-    .streamlit/config.toml
-    app/data/profile_presets_v606.tsv
-    app/data/axiclass_fix1_results.tsv
-    app/data/axiclass_fix1_delta.tsv
-
----
-
-## 8. Local run
-
-Clone the repository and run:
-
-    pip install -r requirements.txt
-    streamlit run app.py
-
----
-
-## 9. Streamlit deployment
-
-This repository is designed for Streamlit Community Cloud.
-
-Deployment settings:
-
-    Repository: fujikix1102/dti-real-app-v606
-    Branch: main
-    Main file path: app.py
-
----
-
-## 10. Research-use boundary
-
-This app is best understood as a reproducibility-first inspection layer.
-
-It is useful for:
-
-- parameter-profile comparison
-- profile burden inspection
-- benchmark proximity review
-- teaching and exploratory analysis
-- pre-likelihood triage
-- audit-first communication
-
-It is not a formal statistical inference engine.
-
----
-
-## 11. Status
-
-Current public version:
-
-    v6.0.6-presets-expanded-inline
-
-The current public app was exported from the local adopted v6.0.6 line and deployed through GitHub + Streamlit Community Cloud.
-
----
-
-## External CLASS API backend
-
-This public Streamlit app is connected to an external Render-hosted CLASS API backend:
-
-    https://dti-class-api.onrender.com
-
-The compute endpoint is:
-
-    https://dti-class-api.onrender.com/class/compute
-
-The backend repository is:
-
-    https://github.com/fujikix1102/dti-class-api
-
-### What the external backend does
-
-The backend runs exploratory CLASS/PyCLASS propagation outside the Streamlit Community Cloud frontend.
-
-This separation keeps the public Streamlit app lightweight while allowing heavier numerical propagation to run on a dedicated API service.
-
-The current backend returns values such as:
-
-- h
-- Omega_m_computed
-- A_s
-- sigma8_CLASS
-- S8_CLASS
-- rs_drag_Mpc_CLASS
-- age_Gyr_CLASS
-
-### Boundary
-
-The external backend is:
-
-- exploratory
-- non-canonical
-- not a likelihood evaluation
-- not a posterior comparison
-- not a Planck validation pipeline
-- not a manuscript checkpoint updater
-
-The current backend scope is LCDM-like CLASS propagation. Parameters such as f_EDE and z_c are passed for interface compatibility, but they are not used as AxiCLASS EDE microphysics in the minimal public backend.
+Do not commit untracked local artifacts unless the task explicitly says to do so.
