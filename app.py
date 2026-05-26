@@ -27,6 +27,58 @@ def dom_safe_json_box(obj, label="Result"):
 import pandas as pd
 import streamlit as st
 
+# --- DTI_README_DOWNLOAD_AND_8011_GUIDANCE_V3_SAFE ---
+# Local-only documentation UI and softer local 8011 unavailable guidance.
+_DTI_README_DOWNLOAD_AND_8011_GUIDANCE_V3_SAFE = True
+
+def _dti_readme_text_v3_safe():
+    from pathlib import Path
+    p = Path(__file__).resolve().parent / "docs" / "README_DTI_LOCAL_8503.md"
+    try:
+        return p.read_text(encoding="utf-8")
+    except Exception:
+        return (
+            "# DTI local 8503 app README\n\n"
+            "README file was not found on disk.\n\n"
+            "This app is local-only and does not perform likelihood evaluation, "
+            "posterior comparison, Planck validation, manuscript-value update, "
+            "or physics-value update.\n"
+        )
+
+def _dti_render_readme_download_v3_safe():
+    st.download_button(
+        "Download local app README",
+        data=_dti_readme_text_v3_safe(),
+        file_name="README_DTI_LOCAL_8503.md",
+        mime="text/markdown",
+        key="download_dti_local_8503_readme_v3_safe",
+        width="stretch",
+    )
+
+def _dti_is_8011_unavailable_error_v3_safe(exc):
+    s = str(exc)
+    needles = [
+        "Connection refused",
+        "Max retries exceeded",
+        "Failed to establish a new connection",
+        "HTTPConnectionPool",
+        "127.0.0.1",
+        "port=8011",
+        "localhost",
+    ]
+    return any(n in s for n in needles)
+
+def _dti_show_local_probe_error_v3_safe(exc):
+    if _dti_is_8011_unavailable_error_v3_safe(exc):
+        st.warning(
+            "Local 8011 vanilla CLASS endpoint is not running. "
+            "This is a local service availability issue, not a physics result. "
+            "Start the local 8011 API, then run the live probe again."
+        )
+    else:
+        _dti_show_local_probe_error_v3_safe(exc)
+
+
 # --- DTI_HIGHLIGHT_ENABLE_CONTROLS_7ABC_V1 ---
 # Local-only UI aid: make important 7a/7b/7c Enable gates visually hard to miss.
 _DTI_HIGHLIGHT_ENABLE_CONTROLS_7ABC_V1 = True
@@ -2427,6 +2479,8 @@ def ensure_paper_text_state():
 
 st.set_page_config(page_title="DTI-Core Grand Auditor v6.0", layout="wide")
 
+
+
 # --- DTI_RUN_BUTTONS_RED_UI_PATCH_V1 ---
 # Local-only UI styling: make RUN-style action buttons visibly red.
 _DTI_RUN_BUTTONS_RED_UI_PATCH_V1 = True
@@ -2621,6 +2675,9 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
+    # DTI_README_SIDEBAR_BEFORE_CURRENT_PROFILE_STATUS_FIX
+    _dti_render_readme_download_v3_safe()
+
     st.subheader("2. Current profile status")
 
     active_profile_name = st.session_state.get("selected_preset", selected_preset)
@@ -3367,7 +3424,7 @@ type="primary",
                 if "DTI_LOCAL_8011_DISABLED" in msg or "No scheme supplied" in msg or "Invalid URL" in msg:
                     _dti_local_endpoint_disabled_notice_v1()
                 else:
-                    st.error(f"Local vanilla CLASS live probe failed: {exc}")
+                    _dti_show_local_probe_error_v3_safe(exc)
 
 
 # ---------------------------------------------------------------------
