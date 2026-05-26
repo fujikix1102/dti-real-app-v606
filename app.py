@@ -4349,9 +4349,32 @@ except Exception:
 
 APP_VERSION = "v6.0.6-presets-expanded-inline"
 APP_DIR = Path(__file__).resolve().parent
-DATA_DIR = APP_DIR / "data"
+
+# --- DTI_AXICLASS_FIX1_DATA_DIR_RESOLVER_V1 ---
+# Robust data path resolver for local/public Streamlit layouts.
+# The public repo stores benchmark TSV files under app/data, while some local
+# layouts may expose them under data. This resolver only selects a readable
+# source-of-record path. It does not run likelihoods, posteriors, Planck
+# validation, graph rendering, 7c, physics-value updates, or manuscript edits.
+_DTI_AXICLASS_FIX1_DATA_DIR_RESOLVER_V1 = True
+_DTI_FIX1_REQUIRED_TSV_V1 = "axiclass_fix1_results.tsv"
+_DTI_DATA_DIR_CANDIDATES_V1 = [
+    APP_DIR / "app" / "data",
+    APP_DIR / "data",
+    Path.cwd() / "app" / "data",
+    Path.cwd() / "data",
+]
+DATA_DIR = next(
+    (
+        _dti_data_dir
+        for _dti_data_dir in _DTI_DATA_DIR_CANDIDATES_V1
+        if (_dti_data_dir / _DTI_FIX1_REQUIRED_TSV_V1).exists()
+    ),
+    _DTI_DATA_DIR_CANDIDATES_V1[0],
+)
 AXICLASS_RESULTS = DATA_DIR / "axiclass_fix1_results.tsv"
 AXICLASS_DELTA = DATA_DIR / "axiclass_fix1_delta.tsv"
+# --- /DTI_AXICLASS_FIX1_DATA_DIR_RESOLVER_V1 ---
 
 C_LIGHT = 299792458.0
 G_CONST = 6.67430e-11
