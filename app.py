@@ -608,6 +608,218 @@ Do not claim final physics, likelihood dominance, Planck validation, graph-based
     )
 # --- /DTI_RESEARCH_OPPORTUNITY_ENGINE_V1D ---
 
+
+# --- DTI_DISCOVERY_SCORE_PANEL_V1E ---
+# Lightweight positive research scoring panel.
+# UI and meta-scoring only.
+# This does not enable 7c, graph rendering, likelihood evaluation,
+# posterior comparison, Planck validation, physics-value updates,
+# manuscript updates, Render API changes, or Streamlit Secret changes.
+_DTI_DISCOVERY_SCORE_PANEL_V1E = True
+
+def _dti_discovery_score_level_v1e(score):
+    try:
+        value = int(score)
+    except Exception:
+        value = 0
+    if value >= 80:
+        return "Strong research lead"
+    if value >= 60:
+        return "Promising research lead"
+    if value >= 40:
+        return "Partial but useful lead"
+    if value >= 20:
+        return "Early-stage lead"
+    return "Retired or unresolved path"
+
+def _dti_render_discovery_score_panel_v1e():
+    import streamlit as st
+
+    st.markdown("### Discovery Score and Claim Readiness")
+
+    st.info(
+        "This panel converts audit status into a constructive research signal. "
+        "It does not run new cosmology. It does not change physics values. "
+        "It helps decide whether a result is a strong lead, a promising lead, a partial lead, "
+        "an early lead, or a route to retire."
+    )
+
+    st.markdown("#### Lightweight scoring inputs")
+
+    c1, c2, c3, c4, c5 = st.columns(5)
+
+    with c1:
+        stability_score = st.slider(
+            "Stability",
+            min_value=0,
+            max_value=20,
+            value=12,
+            step=1,
+            help="Does the result remain stable under the current bounded audit?",
+            key="dti_discovery_score_stability_v1e",
+        )
+
+    with c2:
+        signal_score = st.slider(
+            "Signal interest",
+            min_value=0,
+            max_value=20,
+            value=14,
+            step=1,
+            help="Is the result informative enough to motivate a focused follow-up test?",
+            key="dti_discovery_score_signal_v1e",
+        )
+
+    with c3:
+        explanation_score = st.slider(
+            "Explainability",
+            min_value=0,
+            max_value=20,
+            value=12,
+            step=1,
+            help="Can the result be explained without overclaiming?",
+            key="dti_discovery_score_explainability_v1e",
+        )
+
+    with c4:
+        next_test_score = st.slider(
+            "Next-test clarity",
+            min_value=0,
+            max_value=20,
+            value=16,
+            step=1,
+            help="Is the next controlled test clear?",
+            key="dti_discovery_score_next_test_v1e",
+        )
+
+    with c5:
+        overclaim_risk = st.slider(
+            "Overclaim risk",
+            min_value=0,
+            max_value=20,
+            value=8,
+            step=1,
+            help="Higher means stronger risk of saying more than the audit supports.",
+            key="dti_discovery_score_overclaim_v1e",
+        )
+
+    raw_score = stability_score + signal_score + explanation_score + next_test_score - overclaim_risk
+    discovery_score = max(0, min(100, int(round(raw_score * 100 / 80))))
+    readiness_score = max(0, min(7, int(round(discovery_score * 7 / 100))))
+    level = _dti_discovery_score_level_v1e(discovery_score)
+
+    m1, m2, m3 = st.columns(3)
+
+    with m1:
+        st.metric(
+            "Discovery Score",
+            f"{discovery_score} / 100",
+            help="Lightweight research-lead score. This is not a likelihood or posterior statistic.",
+        )
+
+    with m2:
+        st.metric(
+            "Claim Readiness",
+            f"{readiness_score} / 7",
+            help="How close the current state is to a claim-ready result.",
+        )
+
+    with m3:
+        st.metric(
+            "Lead Type",
+            level,
+            help="Interpretive class for research planning only.",
+        )
+
+    st.markdown("#### Constructive interpretation")
+
+    if discovery_score >= 80:
+        st.success(
+            "Positive result: this looks like a strong research lead. "
+            "The safe next step is to lock the source data, repeat the bounded comparison, "
+            "and test whether the lead survives independent controls."
+        )
+    elif discovery_score >= 60:
+        st.success(
+            "Positive result: this is promising. "
+            "It is not yet a final scientific claim, but it is strong enough to justify a focused follow-up test."
+        )
+    elif discovery_score >= 40:
+        st.warning(
+            "Partial but useful: this result should not be discarded. "
+            "It clarifies what is missing and helps define the next controlled experiment."
+        )
+    elif discovery_score >= 20:
+        st.warning(
+            "Early-stage lead: useful mainly as a search-direction clue. "
+            "Do not claim a physical conclusion yet."
+        )
+    else:
+        st.info(
+            "Retired or unresolved path: this route is not currently productive. "
+            "The positive value is that it can be safely deprioritized."
+        )
+
+    st.markdown("#### Positive finding box")
+
+    st.code(
+        f"""Positive finding:
+{level}
+
+Discovery Score:
+{discovery_score} / 100
+
+Claim Readiness:
+{readiness_score} / 7
+
+What survives:
+The result is useful as a bounded research lead if it identifies a stable direction, a constrained explanation, or a clear next test.
+
+What remains blocked:
+This panel does not add likelihood-level, posterior-level, Planck-level, or manuscript-level evidence.
+
+Next controlled test:
+Repeat the relevant comparison under fixed audit boundaries and record whether the result moves from unresolved or partial toward pass.""",
+        language="text",
+    )
+
+    st.markdown("#### Safe claim translator")
+
+    safe_col, avoid_col = st.columns(2)
+
+    with safe_col:
+        st.markdown(
+            """
+**Safe positive wording**
+
+- This result identifies a bounded research lead.
+- The current audit narrows the next controlled test.
+- The tested direction remains informative under the present constraints.
+- The result is promising but not yet a final physics claim.
+            """
+        )
+
+    with avoid_col:
+        st.markdown(
+            """
+**Do not claim yet**
+
+- Do not claim a final solution.
+- Do not claim proof of new physics from this panel.
+- Do not claim Planck validation.
+- Do not claim likelihood or posterior superiority.
+- Do not claim 7c continuity or discontinuity closure here.
+            """
+        )
+
+    st.caption(
+        "Boundary: this is a lightweight research-planning layer only. "
+        "It does not perform likelihood evaluation, posterior comparison, Planck validation, graph rendering, "
+        "7c execution, physics-value updates, manuscript updates, Render API modification, or Streamlit Secret modification."
+    )
+# --- /DTI_DISCOVERY_SCORE_PANEL_V1E ---
+
+
 # --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7a.
 # Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
@@ -3600,6 +3812,9 @@ def _render_local_axiclass_fixed_example_v606():
 
     # DTI_RESEARCH_OPPORTUNITY_ENGINE_CALL_V1D
     _dti_render_research_opportunity_engine_v1d()
+
+    # DTI_DISCOVERY_SCORE_PANEL_CALL_V1E
+    _dti_render_discovery_score_panel_v1e()
 
     st.header("7a. AxiCLASS fixed-example check")
 
