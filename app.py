@@ -4709,6 +4709,13 @@ def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
 
     st.sidebar.markdown("### Profile category browser / preview only")
     st.sidebar.caption("SHOW ALL is an audit escape hatch: it previews the complete TSV inventory without changing the active loader.")
+    st.sidebar.caption("When SHOW ALL is selected, the browser preview is intended for full inventory audit. Use ACTIVE loader below to load a model.")
+
+    if st.sidebar.checkbox("Show complete profile TSV inventory", value=False, key="show_complete_profile_tsv_inventory_v1e"):
+        _dti_all_profile_ids_v1e = list(PRESETS.keys())
+        st.sidebar.caption(f"Full TSV inventory preview: {len(_dti_all_profile_ids_v1e)} registered profiles. Preview only; active loader unchanged.")
+        with st.sidebar.expander("Full profile TSV inventory — preview only", expanded=False):
+            st.sidebar.write(_dti_all_profile_ids_v1e)
     st.sidebar.caption(
         "The full preset inventory is grouped for readability. "
         "This guide does not change the underlying TSV or run new cosmology."
@@ -4787,6 +4794,24 @@ _DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL = True
 # This does not replace the active profile loader.
 _DTI_PROFILE_CATEGORY_GUIDE_SHOW_ALL_V1D = True
 # --- /DTI_PROFILE_CATEGORY_GUIDE_SHOW_ALL_V1D ---
+
+# --- DTI_SHOW_ALL_PROFILES_PREVIEW_V1E ---
+# Makes "Show all profiles / full TSV inventory" preview the complete PRESETS inventory.
+# This remains preview-only and does not replace the active loader.
+_DTI_SHOW_ALL_PROFILES_PREVIEW_V1E = True
+
+def _dti_profile_category_preview_models_v1e(selected_category, grouped_models, presets):
+    """Return preview model IDs for the sidebar category browser.
+
+    Boundary:
+    - preview only
+    - does not change the active selected_preset loader
+    - does not mutate profile_presets_v606.tsv
+    """
+    if selected_category == "Show all profiles / full TSV inventory":
+        return list(presets.keys())
+    return list(grouped_models.get(selected_category, []))
+# --- /DTI_SHOW_ALL_PROFILES_PREVIEW_V1E ---
 
 # --- /DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL ---
 
