@@ -1656,11 +1656,7 @@ def _dti_section8_rewrite_text_v1(obj):
 
 def _dti_section8_boundary_notice_v1():
     try:
-        _dti_sec8_orig_info_v1(
-            "Section 8 is restricted to candidate-payload and boundary confirmation only. "
-            "No graph, no 8011 realtime probe, no heuristic distance ranking, no S8 stress review, "
-            "no likelihood evaluation, no posterior comparison, no Planck validation, and no physics-value update."
-        )
+        _dti_section8_top_restricted_notice_once_v3()
     except Exception:
         pass
 
@@ -3807,6 +3803,31 @@ st.divider()
 # These marker comments identify the local graph UI fallback and stable-DOM repair lane.
 # They are audit markers only; they do not change physics values or solver behavior.
 
+
+# --- DTI_SECTION8_TOP_RESTRICTED_NOTICE_ONCE_V3 ---
+# Consolidate repeated Section 8 restricted boundary notices.
+# UI cleanup only: does not enable graph rendering, 7c, likelihood, posterior,
+# Planck validation, physics-value updates, or manuscript updates.
+_DTI_SECTION8_TOP_RESTRICTED_NOTICE_ONCE_V3 = True
+
+def _dti_section8_top_restricted_notice_once_v3():
+    key = "dti_section8_top_restricted_notice_once_v3"
+    try:
+        already = bool(st.session_state.get(key, False))
+    except Exception:
+        already = False
+    if already:
+        return
+    try:
+        st.session_state[key] = True
+    except Exception:
+        pass
+    st.info(
+        "Section 8 boundary: candidate-payload and boundary confirmation only. "
+        "No graph, no 8011 realtime probe, no heuristic distance ranking, no S8 stress review, "
+        "no likelihood evaluation, no posterior comparison, no Planck validation, and no physics-value update."
+    )
+# --- /DTI_SECTION8_TOP_RESTRICTED_NOTICE_ONCE_V3 ---
 
 # --- DTI_SECTION8_NOTICE_PRUNE_HELPER_V1 ---
 # Consolidated Section 8 notice. UI cleanup only.
