@@ -276,6 +276,123 @@ def _dti_post_json_endpoint_cached_or_uncached_v2(endpoint, payload, timeout_sec
         },
     }
 
+
+
+# --- DTI_POSITIVE_ANSWER_NAVIGATOR_V2 ---
+
+# Positive answer-oriented guidance layer.
+
+# UI text only. Does not enable 7c, graph rendering, likelihood, posterior,
+
+# Planck validation, physics-value updates, manuscript updates, Render changes,
+
+# or Streamlit Secret changes.
+
+_DTI_POSITIVE_ANSWER_NAVIGATOR_V2 = True
+
+def _dti_render_positive_answer_navigator_v2():
+
+    import streamlit as st
+
+    st.markdown("### Positive answer navigator")
+
+    st.info(
+
+        "This app is not only a rejection tool. It is designed to identify what already passes, "
+
+        "what remains partial, what fails, and what test is needed next before a clear answer can be claimed."
+
+    )
+
+    col_pass, col_partial, col_next = st.columns(3)
+
+    with col_pass:
+
+        st.markdown(
+
+            """
+
+**Positive output**
+
+- What survives the audit.
+
+- Which branch remains viable.
+
+- Which bounded check passes.
+
+- Which explanation is constrained.
+
+            """
+
+        )
+
+    with col_partial:
+
+        st.markdown(
+
+            """
+
+**Partial output**
+
+Partial is not failure.
+
+It means the signal is informative, but at least one audit layer still blocks a final scientific claim.
+
+            """
+
+        )
+
+    with col_next:
+
+        st.markdown(
+
+            """
+
+**Next test**
+
+The app should always return the next useful test, not only a negative warning.
+
+This keeps the workflow constructive.
+
+            """
+
+        )
+
+    st.markdown("#### Answer format")
+
+    st.code(
+
+        """Answer status:
+
+PASS / PARTIAL / FAIL / UNRESOLVED
+
+Positive content:
+
+What survives the audit?
+
+Blocking content:
+
+What still prevents a final claim?
+
+Next action:
+
+What test would move this from unresolved or partial toward a clear answer?""",
+
+        language="text",
+
+    )
+
+    st.caption(
+
+        "Boundary: this navigator is UI guidance only. It does not perform likelihood evaluation, "
+
+        "posterior comparison, Planck validation, graph rendering, physics-value updates, or manuscript updates."
+
+    )
+
+# --- /DTI_POSITIVE_ANSWER_NAVIGATOR_V2 ---
+
+
 # --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7a.
 # Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
@@ -3259,6 +3376,9 @@ def _render_local_axiclass_fixed_example_v606():
 
         if "dti_public_api_warmup_rows_7a7b_v2" in st.session_state:
             st.dataframe(st.session_state["dti_public_api_warmup_rows_7a7b_v2"], use_container_width=True)
+
+    # DTI_POSITIVE_ANSWER_NAVIGATOR_CALL_V2
+    _dti_render_positive_answer_navigator_v2()
 
     st.header("7a. AxiCLASS fixed-example check")
 
