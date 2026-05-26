@@ -2020,6 +2020,266 @@ What would make this probe more claim-ready?""",
 # --- /DTI_PROBE_RESULT_VALUE_MATRIX_V1 ---
 
 
+# --- DTI_PROBE_RESULT_VALUE_MATRIX_V2 ---
+# Status-linked positive probe evaluation.
+# Reads available 7a / 7b session/API status signals when present.
+# Keeps 7c disabled and deferred.
+# UI/meta-evaluation only. Does not execute 7c, render graphs, evaluate likelihoods,
+# compare posteriors, validate Planck, update physics values, update manuscript,
+# modify Render API, or modify Streamlit Secrets.
+_DTI_PROBE_RESULT_VALUE_MATRIX_V2 = True
+
+def _dti_probe_v2_as_text(obj, limit=900):
+    try:
+        if obj is None:
+            return ""
+        if isinstance(obj, str):
+            return obj[:limit]
+        if isinstance(obj, (int, float, bool)):
+            return str(obj)
+        if isinstance(obj, dict):
+            return " ".join([str(k) + " " + _dti_probe_v2_as_text(v, 180) for k, v in list(obj.items())[:20]])[:limit]
+        if isinstance(obj, (list, tuple)):
+            return " ".join([_dti_probe_v2_as_text(v, 180) for v in list(obj)[:20]])[:limit]
+        return str(obj)[:limit]
+    except Exception:
+        return ""
+
+def _dti_probe_v2_collect_session_hits(probe_key):
+    import streamlit as st
+
+    probe_key = str(probe_key).lower()
+    include_terms = []
+    if probe_key == "7a":
+        include_terms = ["7a", "fixed", "axiclass", "compact"]
+    elif probe_key == "7b":
+        include_terms = ["7b", "vanilla", "profile"]
+    else:
+        include_terms = ["7c", "continuity", "discontinuity"]
+
+    hits = []
+    try:
+        keys = list(st.session_state.keys())
+    except Exception:
+        keys = []
+
+    for k in keys:
+        ks = str(k).lower()
+        if any(term in ks for term in include_terms):
+            try:
+                v = st.session_state.get(k)
+            except Exception:
+                v = None
+            hits.append({"key": str(k), "value_text": _dti_probe_v2_as_text(v)})
+    return hits[:16]
+
+def _dti_probe_v2_status_from_hits(probe_key, hits):
+    joined = " ".join([(h.get("key", "") + " " + h.get("value_text", "")) for h in hits]).lower()
+
+    if probe_key == "7c":
+        return {
+            "actual_status": "deferred / disabled",
+            "value_badge": "ORANGE - deferred high-value test",
+            "research_score": 47,
+            "claim_readiness": 3,
+            "learned": "7c is not executed. The useful result is a protected boundary: continuity/discontinuity is kept as a future test, not a premature claim.",
+            "blocking": "No 7c execution, no continuity closure, no discontinuity proof.",
+            "next_experiment": "Only after explicit approval: design a source-locked continuity test with disabled-state provenance preserved.",
+            "safe_wording": "7c remains a high-value deferred probe with a clear future-test role.",
+        }
+
+    if not joined.strip():
+        if probe_key == "7a":
+            return {
+                "actual_status": "not observed in session",
+                "value_badge": "GRAY - awaiting run/status",
+                "research_score": 40,
+                "claim_readiness": 3,
+                "learned": "No current 7a session result was detected. The probe remains useful as a source-locked benchmark lane once executed.",
+                "blocking": "No live session status was available to promote the probe value.",
+                "next_experiment": "Run or warm 7a, then re-check whether a fixed-example status appears in session state.",
+                "safe_wording": "7a is prepared as a benchmark probe, but current status was not observed.",
+            }
+        return {
+            "actual_status": "not observed in session",
+            "value_badge": "GRAY - awaiting run/status",
+            "research_score": 38,
+            "claim_readiness": 2,
+            "learned": "No current 7b session result was detected. The probe remains useful as an exploratory bounded-profile lane once executed.",
+            "blocking": "No live session status was available to promote the probe value.",
+            "next_experiment": "Run or warm 7b, then re-check whether a bounded-profile status appears in session state.",
+            "safe_wording": "7b is prepared as an exploratory probe, but current status was not observed.",
+        }
+
+    positive_terms = ["ok", "success", "available", "ready", "200", "pass", "completed", "result", "payload", "returned"]
+    warning_terms = ["timeout", "pending", "sleep", "warm", "retry", "partial", "none"]
+    negative_terms = ["error", "failed", "exception", "traceback", "unavailable", "blocked"]
+
+    pos = sum(1 for t in positive_terms if t in joined)
+    warn = sum(1 for t in warning_terms if t in joined)
+    neg = sum(1 for t in negative_terms if t in joined)
+
+    if pos >= 2 and neg == 0:
+        badge = "GREEN - useful returned value"
+        score = 76 if probe_key == "7a" else 68
+        readiness = 5 if probe_key == "7a" else 4
+        status = "available / returned status detected"
+    elif pos >= 1 and neg <= 1:
+        badge = "YELLOW - useful partial value"
+        score = 64 if probe_key == "7a" else 58
+        readiness = 4
+        status = "partial / useful status detected"
+    elif neg >= 1 and pos == 0:
+        badge = "ORANGE - blocked or needs retry"
+        score = 43
+        readiness = 2
+        status = "blocked / retry-needed status detected"
+    else:
+        badge = "YELLOW - informative session signal"
+        score = 55
+        readiness = 3
+        status = "informative session signal detected"
+
+    if probe_key == "7a":
+        learned = "7a can anchor interpretation by checking whether the fixed-example benchmark/API path returns a usable status."
+        blocking = "It is still not a likelihood, posterior, Planck validation, or mechanism proof."
+        next_experiment = "Use 7a as the benchmark anchor, then compare exploratory 7b signals against this locked reference."
+        safe_wording = "7a provides a useful source-locked benchmark signal when available."
+    else:
+        learned = "7b can identify whether the current vanilla/profile lane returns a bounded exploratory signal."
+        blocking = "It is still an exploratory derived-quantity probe, not a posterior or Planck result."
+        next_experiment = "Use 7b to identify promising profile directions, then confirm them with stricter source-locked checks."
+        safe_wording = "7b provides a useful exploratory signal under bounded non-likelihood interpretation."
+
+    return {
+        "actual_status": status,
+        "value_badge": badge,
+        "research_score": score,
+        "claim_readiness": readiness,
+        "learned": learned,
+        "blocking": blocking,
+        "next_experiment": next_experiment,
+        "safe_wording": safe_wording,
+    }
+
+def _dti_probe_v2_badge_color(badge):
+    b = str(badge).upper()
+    if "GREEN" in b:
+        return "#16a34a"
+    if "YELLOW" in b:
+        return "#eab308"
+    if "ORANGE" in b:
+        return "#f97316"
+    if "RED" in b:
+        return "#ef4444"
+    return "#9ca3af"
+
+def _dti_render_probe_result_value_matrix_v2():
+    import streamlit as st
+    import pandas as pd
+
+    st.markdown("### Probe Result Value Matrix V2")
+    st.info(
+        "This matrix reads available 7a / 7b session status signals and converts them into a positive research-value summary. "
+        "7c remains disabled and deferred. This is still UI/meta-evaluation only, not likelihood, posterior, Planck, graph, or physics-value output."
+    )
+
+    rows = []
+    for probe_key, probe_name, research_role in [
+        ("7a", "AxiCLASS fixed-example check", "locked benchmark anchor"),
+        ("7b", "Vanilla-profile API check", "exploratory bounded-profile signal"),
+        ("7c", "Continuity / discontinuity examiner", "deferred high-value future test"),
+    ]:
+        hits = _dti_probe_v2_collect_session_hits(probe_key)
+        status = _dti_probe_v2_status_from_hits(probe_key, hits)
+        rows.append({
+            "probe": probe_key,
+            "probe_name": probe_name,
+            "research_role": research_role,
+            "actual_status": status["actual_status"],
+            "value_badge": status["value_badge"],
+            "research_score": status["research_score"],
+            "claim_readiness": status["claim_readiness"],
+            "what_this_teaches": status["learned"],
+            "what_remains_blocked": status["blocking"],
+            "next_experiment": status["next_experiment"],
+            "safe_wording": status["safe_wording"],
+            "session_hits": len(hits),
+        })
+
+    df = pd.DataFrame(rows)
+
+    st.markdown("#### Probe value summary")
+    compact_cols = [
+        "probe",
+        "probe_name",
+        "research_role",
+        "actual_status",
+        "value_badge",
+        "research_score",
+        "claim_readiness",
+        "session_hits",
+    ]
+    st.dataframe(df[compact_cols], use_container_width=True, hide_index=True)
+
+    st.markdown("#### What each probe teaches")
+
+    for _, row in df.iterrows():
+        color = _dti_probe_v2_badge_color(row["value_badge"])
+        st.markdown(
+            f"""
+<div style="border:1px solid rgba(255,255,255,0.18); border-radius:12px; padding:14px; margin:12px 0;">
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <b>{row['probe']}. {row['probe_name']}</b>
+    <span style="background:{color}; color:white; border-radius:999px; padding:4px 10px; font-weight:700; font-size:12px;">
+      {row['value_badge']}
+    </span>
+    <span>score {row['research_score']}/100 · readiness {row['claim_readiness']}/7 · session hits {row['session_hits']}</span>
+  </div>
+  <div style="margin-top:10px;"><b>Actual status:</b> {row['actual_status']}</div>
+  <div><b>What this teaches:</b> {row['what_this_teaches']}</div>
+  <div><b>What remains blocked:</b> {row['what_remains_blocked']}</div>
+  <div><b>Next experiment:</b> {row['next_experiment']}</div>
+  <div><b>Safe wording:</b> {row['safe_wording']}</div>
+</div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("#### Research-use answer")
+    best = df.sort_values(["research_score", "claim_readiness"], ascending=False).iloc[0]
+    st.success(
+        f"Most useful current probe: {best['probe']} / {best['probe_name']}. "
+        f"It is classified as {best['value_badge']} with score {best['research_score']}/100. "
+        f"The research value is: {best['what_this_teaches']}"
+    )
+
+    st.code(
+        "Probe result answer:\n"
+        "What did we learn from the probe?\n"
+        "- Use 7a as benchmark anchoring when available.\n"
+        "- Use 7b as bounded exploratory signal when available.\n"
+        "- Keep 7c as deferred high-value future test unless explicitly approved.\n\n"
+        "What remains blocked?\n"
+        "- No likelihood evaluation.\n"
+        "- No posterior comparison.\n"
+        "- No Planck validation.\n"
+        "- No graph-based proof.\n"
+        "- No physics-value or manuscript update.\n\n"
+        "Next experiment:\n"
+        "- Re-run or warm 7a/7b, then watch whether their actual status moves from awaiting/partial to useful returned value.",
+        language="text",
+    )
+
+    st.caption(
+        "Boundary: Probe Result Value Matrix V2 reads available session/API status signals only. "
+        "It does not execute 7c, draw graphs, evaluate likelihoods, compare posteriors, validate Planck, "
+        "update physics values, update manuscript text, modify Render API, or modify Streamlit Secrets."
+    )
+# --- /DTI_PROBE_RESULT_VALUE_MATRIX_V2 ---
+
+
+
 # --- DTI_PARAMETER_QUALITY_MATRIX_COMPACT_V1H ---
 # Compact Parameter Quality Matrix.
 # UI and meta-scoring only.
@@ -5363,8 +5623,8 @@ def _render_local_axiclass_fixed_example_v606():
     # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1H
     _dti_render_parameter_quality_matrix_v1h()
 
-    # DTI_PROBE_RESULT_VALUE_MATRIX_CALL_V1
-    _dti_render_probe_result_value_matrix_v1()
+    # DTI_PROBE_RESULT_VALUE_MATRIX_CALL_V2
+    _dti_render_probe_result_value_matrix_v2()
 
     st.header("7a. AxiCLASS fixed-example check")
 
