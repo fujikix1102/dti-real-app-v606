@@ -27,6 +27,904 @@ def dom_safe_json_box(obj, label="Result"):
 import pandas as pd
 import streamlit as st
 
+# --- DTI_HIGHLIGHT_ENABLE_CONTROLS_7ABC_V1 ---
+# Local-only UI aid: make important 7a/7b/7c Enable gates visually hard to miss.
+_DTI_HIGHLIGHT_ENABLE_CONTROLS_7ABC_V1 = True
+
+def _dti_enable_gate_notice_7abc_v1(section_label, purpose):
+    st.markdown(
+        f"""
+        <div style="
+            border: 1px solid rgba(250, 204, 21, 0.95);
+            background: rgba(250, 204, 21, 0.12);
+            border-radius: 10px;
+            padding: 0.75rem 0.9rem;
+            margin: 0.55rem 0 0.45rem 0;
+            color: #facc15;
+            font-weight: 700;
+        ">
+            Enable gate: {section_label}<br>
+            <span style="font-weight: 500; color: #fde68a;">
+                Turn this on before using the related RUN/probe control. {purpose}
+            </span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+# --- DTI_RESTORE_7B_ENDPOINT_WIDGET_ONLY_INDENT_SAFE_V1 ---
+_DTI_RESTORE_7B_ENDPOINT_WIDGET_ONLY_INDENT_SAFE_V1 = True
+
+def _dti_default_7b_live_endpoint_widget_only_v1():
+    return "http://127.0.0.1:8011/axiclass/live-vanilla-probe"
+
+def _dti_normalize_7b_live_endpoint_widget_only_v1(value):
+    s = "" if value is None else str(value).strip()
+    if not s or s.startswith("DTI_LOCAL_8011_DISABLED") or s == "8011_REALTIME_DISABLED":
+        return _dti_default_7b_live_endpoint_widget_only_v1()
+    return s
+
+# --- DTI_GUARD_7B_RUN_BUTTON_MULTILINE_SAFE_V1 ---
+# Local-only UI guard:
+# 7b Run button must not collapse later sections when 8011 realtime is disabled.
+_DTI_GUARD_7B_RUN_BUTTON_MULTILINE_SAFE_V1 = True
+
+def _dti_is_disabled_endpoint_for_7b_run_v1(value):
+    s = "" if value is None else str(value).strip()
+    disabled_values = {
+        "",
+        "DTI_LOCAL_8011_DISABLED",
+        "8011_REALTIME_DISABLED",
+        "DISABLED",
+        "disabled",
+        "None",
+        "none",
+        "null",
+    }
+    return (
+        s in disabled_values
+        or s.startswith("DTI_LOCAL_8011_DISABLED")
+        or s.startswith("8011_REALTIME_DISABLED")
+    )
+
+def _dti_7b_run_disabled_notice_v1():
+    st.info(
+        "Local vanilla CLASS live probe is disabled in this local UI line. "
+        "The payload remains available for inspection, but no 8011 realtime call, "
+        "likelihood evaluation, posterior comparison, Planck validation, graph rendering, "
+        "or physics-value update is executed."
+    )
+
+import contextlib
+
+# --- DTI_FIX_7C_SECTION8_INDENT_SAFE_V1 ---
+# Local-only UI cleanup:
+# - hide obsolete 7c fallback/visual dead block
+# - keep 7c controls visible
+# - replace Section 8 boundary tab buttons with sequential read-only sections
+# - preserve graph/8011 exclusion
+_DTI_FIX_7C_SECTION8_INDENT_SAFE_V1 = True
+
+def _dti_noop_context_v1():
+    return contextlib.nullcontext()
+
+
+
+# --- DTI_SAFE_DEAD_UI_NO_TAB_STRUCTURE_EDIT_V1 ---
+# Local-only UI safety patch:
+# - soften disabled 8011 endpoint notices
+# - avoid red Invalid URL noise for intentionally disabled local probes
+# - rename ineffective Section 8 tab labels without changing st.tabs structure
+# - do not reopen graph rendering
+# - do not reopen 8011 realtime
+_DTI_SAFE_DEAD_UI_NO_TAB_STRUCTURE_EDIT_V1 = True
+
+def _dti_local_endpoint_disabled_notice_v1(label="Local vanilla CLASS live probe"):
+    st.info(
+        f"{label} is disabled in this local UI state. "
+        "No 8011 realtime endpoint is opened, and no likelihood/posterior/Planck/physics-value claim is made."
+    )
+
+def _dti_is_disabled_endpoint_literal_v1(value):
+    try:
+        s = str(value).strip()
+    except Exception:
+        return False
+    return s in {
+        "DTI_LOCAL_8011_DISABLED",
+        "DISABLED",
+        "disabled",
+        "None",
+        "none",
+        "null",
+        "",
+    }
+
+def _dti_boundary_readonly_caption_v1():
+    st.caption(
+        "Read-only boundary material. These labels organize static explanation/table content only; "
+        "they do not trigger likelihood evaluation, posterior comparison, Planck validation, graph rendering, or physics-value updates."
+    )
+
+# --- DTI_TIGHTEN_SIDEBAR_NUMBER_INPUT_SPACING_V1 ---
+# Local-only UI spacing patch:
+# - reduce vertical gaps in Candidate / Reference compact sidebar inputs
+# - preserve direct numeric typing
+# - preserve +/- step buttons
+# - no graph route
+# - no 8011 realtime route
+_DTI_TIGHTEN_SIDEBAR_NUMBER_INPUT_SPACING_V1 = True
+
+st.markdown(
+    """
+    <style>
+    section[data-testid="stSidebar"] div[data-testid="stVerticalBlock"] {
+        gap: 0.22rem !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stHorizontalBlock"] {
+        gap: 0.35rem !important;
+        align-items: center !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stNumberInput"] {
+        margin-top: -0.15rem !important;
+        margin-bottom: -0.35rem !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stNumberInput"] label {
+        display: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stNumberInput"] input {
+        min-height: 1.85rem !important;
+        height: 1.85rem !important;
+        padding-top: 0.15rem !important;
+        padding-bottom: 0.15rem !important;
+        font-size: 0.78rem !important;
+    }
+    section[data-testid="stSidebar"] button[kind="stepDown"],
+    section[data-testid="stSidebar"] button[kind="stepUp"] {
+        min-height: 1.85rem !important;
+        height: 1.85rem !important;
+    }
+    section[data-testid="stSidebar"] details {
+        margin-bottom: 0.45rem !important;
+    }
+    section[data-testid="stSidebar"] details [data-testid="stMarkdownContainer"] p {
+        margin-bottom: 0.18rem !important;
+    }
+    .dti-compact-param-label {
+        padding-top: 0.18rem;
+        font-size: 0.74rem;
+        font-weight: 700;
+        line-height: 1.0;
+        opacity: 0.95;
+        white-space: nowrap;
+    }
+    .dti-compact-param-row-note {
+        font-size: 0.72rem;
+        opacity: 0.68;
+        margin: -0.08rem 0 0.18rem 0;
+        line-height: 1.1;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# --- dti_primary_red_button_style_v2 ---
+st.markdown(
+    """
+    <style>
+    div.stButton > button[kind="primary"] {
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%) !important;
+        border: 1px solid #f87171 !important;
+        color: white !important;
+        font-weight: 800 !important;
+        min-height: 3.05rem !important;
+        border-radius: 0.55rem !important;
+        box-shadow: 0 0 0 1px rgba(248,113,113,0.25), 0 6px 16px rgba(185,28,28,0.25) !important;
+    }
+    div.stButton > button[kind="secondary"] {
+        min-height: 2.25rem;
+        font-weight: 600;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+
+
+
+# --- dti_sidebar_param_table_editor_v1 ---
+def _dti_param_table_rows_v1(prefix, preset_values, preset_name):
+    rows = []
+    for key in _DTI_UI_PARAM_ORDER_V1:
+        fallback = preset_values[preset_name].get(key, 0.0)
+        current = _dti_ui_float_v1(st.session_state.get(prefix + key, fallback), fallback)
+        rows.append({
+            "parameter": key,
+            "value": float(current),
+        })
+    return rows
+
+def _dti_apply_param_table_rows_v1(prefix, edited_rows):
+    if edited_rows is None:
+        return
+    try:
+        records = edited_rows.to_dict("records")
+    except Exception:
+        records = edited_rows
+    if not isinstance(records, list):
+        return
+    for row in records:
+        try:
+            key = str(row.get("parameter", "")).strip()
+            if key not in _DTI_UI_PARAM_ORDER_V1:
+                continue
+            val = float(row.get("value"))
+            st.session_state[prefix + key] = val
+        except Exception:
+            pass
+
+def _dti_render_param_table_editor_v1(prefix, preset_values, preset_name, editor_key):
+    """
+    Compact sidebar editor.
+    One table replaces many number_input widgets.
+    This is UI editing only: no solver, no graph, no 8011 realtime,
+    no likelihood, no posterior comparison, no Planck validation.
+    """
+    import pandas as pd
+
+    df = pd.DataFrame(_dti_param_table_rows_v1(prefix, preset_values, preset_name))
+
+    edited = st.data_editor(
+        df,
+        key=editor_key,
+        hide_index=True,
+        use_container_width=True,
+        height=300,
+        disabled=["parameter"],
+        column_config={
+            "parameter": st.column_config.TextColumn(
+                "parameter",
+                width="small",
+                help="Parameter name.",
+            ),
+            "value": st.column_config.NumberColumn(
+                "value",
+                width="small",
+                format="%.6g",
+                help="Editable value.",
+            ),
+        },
+    )
+    _dti_apply_param_table_rows_v1(prefix, edited)
+
+# --- dti_compact_sidebar_param_rows_v1 ---
+def _dti_compact_number_input_row_v1(prefix, key, fallback):
+    meta = _DTI_UI_PARAM_META_V1[key]
+    label_col, value_col = st.columns([0.34, 0.66], gap="small")
+    with label_col:
+        st.markdown(
+            "<div class='dti-compact-param-label'>"
+            + meta["label"]
+            + "</div>",
+            unsafe_allow_html=True,
+        )
+    with value_col:
+        return st.number_input(
+            label=meta["label"],
+            value=_dti_ui_float_v1(st.session_state.get(prefix + key, fallback), fallback),
+            step=meta["step"],
+            format=meta["format"],
+            key=prefix + key,
+            help=meta["help"],
+            label_visibility="collapsed",
+        )
+
+def _dti_render_compact_param_rows_v1(prefix, preset_values, preset_name):
+    st.markdown(
+        "<div class='dti-compact-param-row-note'>Edit values</div>",
+        unsafe_allow_html=True,
+    )
+    for key in _DTI_UI_PARAM_ORDER_V1:
+        fallback = preset_values[preset_name].get(key, 0.0)
+        _dti_compact_number_input_row_v1(prefix, key, fallback)
+
+
+# --- DTI_ALL_REGISTERED_PRESETS_FOR_SIDEBAR_V1 ---
+# Local-only UI helper:
+# Build Candidate / Reference preset options from the app's registered PRESETS.
+# This is text/form parsing only:
+# - no graph rendering
+# - no 8011 realtime
+# - no likelihood evaluation
+# - no posterior comparison
+# - no Planck validation
+# - no physics-value update
+_DTI_ALL_REGISTERED_PRESETS_FOR_SIDEBAR_V1 = True
+
+def _dti_extract_profile_text_from_preset_obj_v1(obj):
+    """Return a readable text block from many possible PRESETS entry shapes."""
+    try:
+        if isinstance(obj, str):
+            return obj
+        if isinstance(obj, dict):
+            for key in [
+                "paper_text_widget",
+                "paper_text",
+                "profile_text",
+                "text",
+                "body",
+                "content",
+                "TARGET_MODEL",
+                "target_model",
+            ]:
+                val = obj.get(key)
+                if isinstance(val, str) and val.strip():
+                    return val
+            parts = []
+            for k, v in obj.items():
+                if isinstance(v, (int, float, str)):
+                    parts.append(f"{k}={v}")
+            return "\n".join(parts)
+        return str(obj)
+    except Exception:
+        return ""
+
+def _dti_build_sidebar_preset_values_from_PRESETS_v1():
+    """Parse all usable registered PRESETS into numeric Candidate/Reference presets."""
+    base = {}
+    try:
+        base.update(_DTI_UI_PRESET_VALUES_V1)
+    except Exception:
+        pass
+
+    try:
+        registered = PRESETS
+    except Exception:
+        registered = {}
+
+    if isinstance(registered, dict):
+        iterator = registered.items()
+    elif isinstance(registered, (list, tuple)):
+        iterator = []
+        for i, item in enumerate(registered):
+            if isinstance(item, dict):
+                name = (
+                    item.get("name")
+                    or item.get("label")
+                    or item.get("title")
+                    or item.get("id")
+                    or f"registered preset {i+1}"
+                )
+                iterator.append((str(name), item))
+            else:
+                iterator.append((f"registered preset {i+1}", item))
+    else:
+        iterator = []
+
+    parsed_count = 0
+    for name, obj in iterator:
+        try:
+            label = str(name).strip() or f"registered preset {parsed_count+1}"
+            txt = _dti_extract_profile_text_from_preset_obj_v1(obj)
+            parsed = _dti_parse_profile_text_block_v1(txt)
+            row = {}
+            for key in _DTI_UI_PARAM_ORDER_V1:
+                if key in parsed:
+                    row[key] = _dti_ui_float_v1(parsed.get(key), None)
+                elif isinstance(obj, dict) and key in obj:
+                    row[key] = _dti_ui_float_v1(obj.get(key), None)
+                else:
+                    row[key] = None
+
+            if row.get("H0") is None:
+                continue
+
+            fallback_name = "FUJIKI DTI candidate / default"
+            fallback = base.get(fallback_name, next(iter(base.values())) if base else {})
+            complete = {}
+            for key in _DTI_UI_PARAM_ORDER_V1:
+                val = row.get(key)
+                if val is None:
+                    val = fallback.get(key, 0.0)
+                complete[key] = float(val)
+
+            candidate_label = label
+            if candidate_label in base:
+                candidate_label = f"{candidate_label} / registered"
+            base[candidate_label] = complete
+            parsed_count += 1
+        except Exception:
+            continue
+
+    # Stable ordering: original important presets first, then registered additions.
+    preferred = [
+        "FUJIKI DTI candidate / default",
+        "Planck2018 LCDM baseline",
+        "Ivanov-style EDE reference",
+        "High-EDE stress region",
+    ]
+    ordered = {}
+    for key in preferred:
+        if key in base:
+            ordered[key] = base[key]
+    for key in sorted(base.keys()):
+        if key not in ordered:
+            ordered[key] = base[key]
+
+    return ordered
+
+
+# --- dti_dynamic_preset_values_from_app_presets_v1 ---
+def _dti_parse_profile_text_block_v1(profile_text):
+    """
+    Parse simple key=value lines from a registered profile text block.
+    This is UI parsing only. It does not run solvers, likelihoods, posterior comparison,
+    Planck validation, graph rendering, or physics-value updates.
+    """
+    out = {}
+    if not isinstance(profile_text, str):
+        return out
+    aliases = {
+        "H0": "H0",
+        "f_EDE": "f_EDE",
+        "omega_cdm": "omega_cdm",
+        "omega_b": "omega_b",
+        "n_s": "n_s",
+        "sigma8": "sigma8",
+        "S8": "S8",
+        "z_c": "z_c",
+        "ln10_10_As": "ln10_10_As",
+        "ln1010_As": "ln10_10_As",
+        "ln10^10_As": "ln10_10_As",
+        "ln10_10_A_s": "ln10_10_As",
+    }
+    for raw in profile_text.splitlines():
+        line = raw.strip()
+        if not line or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        k = k.strip()
+        v = v.strip()
+        if k not in aliases:
+            continue
+        try:
+            out[aliases[k]] = float(v)
+        except Exception:
+            pass
+    return out
+
+def _dti_dynamic_preset_values_v1():
+    """
+    Build UI preset values from existing PRESETS.
+    Falls back to the local fixed list only when PRESETS is unavailable or incomplete.
+    """
+    fallback = dict(_DTI_UI_PRESET_VALUES_V1)
+    merged = dict(fallback)
+
+    try:
+        preset_obj = PRESETS
+    except Exception:
+        return merged
+
+    try:
+        items = preset_obj.items()
+    except Exception:
+        return merged
+
+    for name, data in items:
+        values = {}
+        if isinstance(data, dict):
+            if "text" in data:
+                values.update(_dti_parse_profile_text_block_v1(data.get("text", "")))
+            for k in _DTI_UI_PARAM_ORDER_V1:
+                if k in data:
+                    try:
+                        values[k] = float(data[k])
+                    except Exception:
+                        pass
+        elif isinstance(data, str):
+            values.update(_dti_parse_profile_text_block_v1(data))
+
+        if values:
+            base = dict(fallback.get("FUJIKI DTI candidate / default", {}))
+            base.update(values)
+            merged[str(name)] = base
+
+    return merged
+
+def _dti_ui_preset_values_current_v1():
+    try:
+        vals = _dti_dynamic_preset_values_v1()
+        if isinstance(vals, dict) and len(vals) > 0:
+            return vals
+    except Exception:
+        pass
+    return dict(_DTI_UI_PRESET_VALUES_V1)
+
+def _dti_safe_preset_name_v1(name, preset_values):
+    if name in preset_values:
+        return name
+    if "FUJIKI DTI candidate / default" in preset_values:
+        return "FUJIKI DTI candidate / default"
+    return list(preset_values.keys())[0]
+
+def _dti_sidebar_candidate_reference_form_v2():
+    st.markdown("### Candidate / Reference input")
+    st.caption(
+        "ここは常時操作する比較パネルです。まずプリセットを選び、必要なら数値を手で微調整します。"
+        "左で編集し、本文側で差分を読みます。"
+    )
+
+    preset_values = _dti_build_sidebar_preset_values_from_PRESETS_v1()
+    preset_names = list(preset_values.keys())
+    if not preset_names:
+        st.error("No usable preset profiles were found. Check PRESETS/profile text registration.")
+        return
+
+    ccol, rcol = st.columns(2)
+    with ccol:
+        candidate_preset = st.selectbox(
+            "Candidate",
+            preset_names,
+            index=preset_names.index(_dti_safe_preset_name_v1(st.session_state.get("dti_ui_candidate_preset_v1", preset_names[0]), preset_values)),
+            key="dti_ui_candidate_preset_v2",
+            help="調べたい候補プロファイルです。まずここを選びます。",
+        )
+    with rcol:
+        default_ref = "Planck2018 LCDM baseline" if "Planck2018 LCDM baseline" in preset_values else preset_names[0]
+        reference_preset = st.selectbox(
+            "Reference",
+            preset_names,
+            index=preset_names.index(_dti_safe_preset_name_v1(st.session_state.get("dti_ui_reference_preset_v1", default_ref), preset_values)),
+            key="dti_ui_reference_preset_v2",
+            help="比較対象の基準プロファイルです。",
+        )
+
+    st.caption(
+        f"Preset choices available: {len(preset_names)}. "
+        "Both Candidate and Reference can use the registered preset list."
+    )
+
+    if st.button("Load selected presets", key="dti_ui_load_presets_v2", type="primary"):
+        for key, val in preset_values[candidate_preset].items():
+            st.session_state["dti_ui_candidate_" + key] = val
+        for key, val in preset_values[reference_preset].items():
+            st.session_state["dti_ui_reference_" + key] = val
+        st.success("Candidate / Reference の入力欄へプリセット値を反映しました。")
+
+    tab_candidate, tab_reference = st.tabs(["Candidate", "Reference"])
+
+    with tab_candidate:
+        st.caption("Candidate values.")
+        # DTI_TABLE_EDITOR_COMPACT_NOTE_V1
+        st.caption("Edit the value column directly. Parameter names stay fixed.")
+        _dti_render_param_table_editor_v1("dti_ui_candidate_", preset_values, candidate_preset, "dti_ui_candidate_table_editor_v1")
+
+    with tab_reference:
+        st.caption("Reference values.")
+        _dti_render_param_table_editor_v1("dti_ui_reference_", preset_values, reference_preset, "dti_ui_reference_table_editor_v1")
+
+    candidate = _dti_ui_get_profile_values_v1("dti_ui_candidate_", candidate_preset)
+    reference = _dti_ui_get_profile_values_v1("dti_ui_reference_", reference_preset)
+    _dti_ui_sync_existing_keys_v1(candidate, reference)
+
+    rows = _dti_ui_profile_diff_rows_v1(candidate, reference)
+
+    st.markdown("### Current difference")
+    diff_lines = []
+    for key in ["H0", "omega_cdm", "S8"]:
+        row = next((r for r in rows if r["parameter"] == key), None)
+        if row:
+            diff_lines.append(f"{key}: {row['delta']:+.5g}")
+    st.caption(" / ".join(diff_lines))
+
+    st.session_state["dti_ui_candidate_reference_rows_v1"] = rows
+    st.session_state["dti_ui_candidate_profile_v1"] = candidate
+    st.session_state["dti_ui_reference_profile_v1"] = reference
+    st.session_state["dti_ui_candidate_preset_name_v1"] = candidate_preset
+    st.session_state["dti_ui_reference_preset_name_v1"] = reference_preset
+
+# --- dti_sidebar_candidate_reference_form_v1 ---
+# Local-only UI learning layer.
+# Purpose:
+# - Give users a persistent left-sidebar operation panel.
+# - Let users compare Candidate and Reference parameter profiles.
+# - Text/table only.
+# - No 8011 realtime.
+# - No graph rendering.
+# - No likelihood/posterior/Planck claim.
+_DTI_UI_PARAM_META_V1 = {
+    "H0": {
+        "label": "H0",
+        "help": "Present-day expansion rate. Larger H0 usually means a faster late-time expansion scale in this comparison panel.",
+        "format": "%.3f",
+        "step": 0.100,
+    },
+    "f_EDE": {
+        "label": "f_EDE",
+        "help": "Early Dark Energy fraction used as a profile descriptor. Here it is an input label for comparison, not a validation result.",
+        "format": "%.4f",
+        "step": 0.0010,
+    },
+    "omega_cdm": {
+        "label": "omega_cdm",
+        "help": "Physical cold-dark-matter density. Useful for seeing how matter-sector burden differs between profiles.",
+        "format": "%.5f",
+        "step": 0.0010,
+    },
+    "omega_b": {
+        "label": "omega_b",
+        "help": "Physical baryon density. Usually changes more narrowly than H0 or omega_cdm in these profile comparisons.",
+        "format": "%.5f",
+        "step": 0.0001,
+    },
+    "n_s": {
+        "label": "n_s",
+        "help": "Scalar spectral index. It describes the tilt of the primordial spectrum in this parameter cartridge.",
+        "format": "%.5f",
+        "step": 0.0010,
+    },
+    "ln10_10_As": {
+        "label": "ln10_10_As",
+        "help": "Log-amplitude notation for primordial scalar amplitude. Kept here as a profile descriptor.",
+        "format": "%.4f",
+        "step": 0.0010,
+    },
+    "sigma8": {
+        "label": "sigma8",
+        "help": "Amplitude of matter clustering on 8 Mpc/h scales. Here it is compared as a recorded/profile value, not recomputed.",
+        "format": "%.4f",
+        "step": 0.0010,
+    },
+    "S8": {
+        "label": "S8",
+        "help": "Common clustering combination. Useful for seeing whether a profile is high-S8 or low-S8 relative to reference.",
+        "format": "%.4f",
+        "step": 0.0010,
+    },
+}
+
+_DTI_UI_PRESET_VALUES_V1 = {
+    "FUJIKI DTI candidate / default": {
+        "H0": 72.90,
+        "f_EDE": 0.082,
+        "omega_cdm": 0.12700,
+        "omega_b": 0.02440,
+        "n_s": 0.9847,
+        "ln10_10_As": 3.058,
+        "sigma8": 0.8229,
+        "S8": 0.8019,
+    },
+    "Planck2018 LCDM baseline": {
+        "H0": 67.36,
+        "f_EDE": 0.000,
+        "omega_cdm": 0.12000,
+        "omega_b": 0.02237,
+        "n_s": 0.9649,
+        "ln10_10_As": 3.044,
+        "sigma8": 0.8226,
+        "S8": 0.8413,
+    },
+    "Ivanov-style EDE reference": {
+        "H0": 71.15,
+        "f_EDE": 0.105,
+        "omega_cdm": 0.12999,
+        "omega_b": 0.02240,
+        "n_s": 0.9850,
+        "ln10_10_As": 3.050,
+        "sigma8": 0.8314,
+        "S8": 0.8340,
+    },
+}
+
+_DTI_UI_PARAM_ORDER_V1 = [
+    "H0",
+    "f_EDE",
+    "omega_cdm",
+    "omega_b",
+    "n_s",
+    "ln10_10_As",
+    "sigma8",
+    "S8",
+]
+
+def _dti_ui_float_v1(x, default=0.0):
+    try:
+        if x is None:
+            return float(default)
+        return float(x)
+    except Exception:
+        return float(default)
+
+def _dti_ui_get_profile_values_v1(prefix, fallback_name):
+    fallback = _DTI_UI_PRESET_VALUES_V1.get(fallback_name, _DTI_UI_PRESET_VALUES_V1["FUJIKI DTI candidate / default"])
+    out = {}
+    for key in _DTI_UI_PARAM_ORDER_V1:
+        out[key] = _dti_ui_float_v1(st.session_state.get(prefix + key, fallback.get(key, 0.0)), fallback.get(key, 0.0))
+    return out
+
+def _dti_ui_profile_diff_rows_v1(candidate, reference):
+    rows = []
+    for key in _DTI_UI_PARAM_ORDER_V1:
+        c = _dti_ui_float_v1(candidate.get(key))
+        r = _dti_ui_float_v1(reference.get(key))
+        d = c - r
+        pct = None
+        if abs(r) > 1.0e-12:
+            pct = 100.0 * d / r
+        rows.append({
+            "parameter": key,
+            "candidate": c,
+            "reference": r,
+            "delta": d,
+            "delta_percent": pct,
+        })
+    return rows
+
+def _dti_ui_sync_existing_keys_v1(candidate, reference):
+    # Keep existing downstream text/table panels aligned with the sidebar values.
+    # These assignments only set local UI state. They do not compute likelihoods, posteriors, Planck validation, or physics updates.
+    mapping_candidate = {
+        "H0": "target_H0",
+        "f_EDE": "target_f_EDE",
+        "omega_cdm": "target_omega_cdm",
+        "omega_b": "target_omega_b",
+        "n_s": "target_n_s",
+        "ln10_10_As": "target_ln10_10_As",
+        "sigma8": "target_sigma8",
+        "S8": "target_S8",
+    }
+    mapping_reference = {
+        "H0": "lcdm_H0",
+        "omega_cdm": "lcdm_omega_cdm",
+        "omega_b": "lcdm_omega_b",
+        "n_s": "lcdm_n_s",
+        "ln10_10_As": "lcdm_ln10_10_As",
+        "sigma8": "lcdm_sigma8",
+        "S8": "lcdm_S8",
+    }
+    for src, dst in mapping_candidate.items():
+        try:
+            st.session_state[dst] = candidate[src]
+        except Exception:
+            pass
+    for src, dst in mapping_reference.items():
+        try:
+            st.session_state[dst] = reference[src]
+        except Exception:
+            pass
+
+def _dti_sidebar_candidate_reference_form_v2():
+    st.markdown("### Candidate / Reference input")
+    st.caption("Use all registered presets as Candidate / Reference starting points. Edit values below as needed.")
+    preset_values = _dti_build_sidebar_preset_values_from_PRESETS_v1()
+    preset_names = list(preset_values.keys())
+
+    candidate_preset = st.selectbox(
+        "Candidate preset",
+        preset_names,
+        index=0 if preset_names else 0,
+        key="dti_ui_candidate_preset_v1",
+        help="Candidate 側の初期値を選びます。手入力で上書きできます。",
+    )
+    reference_preset = st.selectbox(
+        "Reference preset",
+        preset_names,
+        index=1 if len(preset_names) > 1 else 0,
+        key="dti_ui_reference_preset_v1",
+        help="Reference 側の初期値を選びます。比較対象の基準値です。",
+    )
+
+    st.caption(f"Preset choices available: {len(preset_names)}")
+
+    if st.button("Load selected presets into inputs", key="dti_ui_load_presets_v1"):
+        for key, val in preset_values[candidate_preset].items():
+            st.session_state["dti_ui_candidate_" + key] = val
+        for key, val in preset_values[reference_preset].items():
+            st.session_state["dti_ui_reference_" + key] = val
+
+    with st.expander("Candidate profile inputs", expanded=True):
+        st.caption("Candidate values: type directly or use +/- buttons.")
+        _dti_render_compact_param_rows_v1(
+            "dti_ui_candidate_",
+            preset_values,
+            candidate_preset,
+        )
+
+    with st.expander("Reference profile inputs", expanded=True):
+        st.caption("Reference values: type directly or use +/- buttons.")
+        _dti_render_compact_param_rows_v1(
+            "dti_ui_reference_",
+            preset_values,
+            reference_preset,
+        )
+
+    candidate = _dti_ui_get_profile_values_v1("dti_ui_candidate_", candidate_preset)
+    reference = _dti_ui_get_profile_values_v1("dti_ui_reference_", reference_preset)
+    _dti_ui_sync_existing_keys_v1(candidate, reference)
+
+    rows = _dti_ui_profile_diff_rows_v1(candidate, reference)
+    st.markdown("### Current difference")
+    for key in ["H0", "omega_cdm", "S8"]:
+        row = next((r for r in rows if r["parameter"] == key), None)
+        if row:
+            st.caption(f"{key}: {row['delta']:+.5g}")
+
+    st.session_state["dti_ui_candidate_reference_rows_v1"] = rows
+    st.session_state["dti_ui_candidate_profile_v1"] = candidate
+    st.session_state["dti_ui_reference_profile_v1"] = reference
+
+def _dti_main_candidate_reference_panel_v1():
+    import pandas as pd
+
+    st.markdown("## Candidate / Reference comparison guide")
+    st.markdown(
+        "This panel helps users understand how the selected Candidate profile differs from the Reference profile. "
+        "It is a text/table learning aid only. It does not run 8011 realtime, does not draw graphs, "
+        "and does not compute likelihood, posterior, Planck validation, or physics-value updates."
+    )
+
+    candidate = st.session_state.get("dti_ui_candidate_profile_v1")
+    reference = st.session_state.get("dti_ui_reference_profile_v1")
+    rows = st.session_state.get("dti_ui_candidate_reference_rows_v1")
+
+    if not candidate or not reference or not rows:
+        st.info("Use the left sidebar Candidate / Reference input form to populate this comparison.")
+        return
+
+    df = pd.DataFrame(rows)
+    show_df = df.copy()
+    for col in ["candidate", "reference", "delta", "delta_percent"]:
+        if col in show_df.columns:
+            show_df[col] = show_df[col].map(lambda x: "" if x is None else f"{x:.6g}")
+    st.markdown("### Candidate vs Reference")
+    st.dataframe(show_df, use_container_width=True, hide_index=True)
+
+    st.markdown("### What changed from the reference?")
+    notes = []
+    h0_delta = float(candidate["H0"]) - float(reference["H0"])
+    om_delta = float(candidate["omega_cdm"]) - float(reference["omega_cdm"])
+    s8_delta = float(candidate["S8"]) - float(reference["S8"])
+
+    if abs(h0_delta) > 1.0:
+        notes.append(f"- H0 is higher by {h0_delta:+.3f}. This marks a higher-H0 candidate profile relative to the reference.")
+    else:
+        notes.append(f"- H0 is close to the reference, with delta {h0_delta:+.3f}.")
+
+    if abs(om_delta) > 0.002:
+        notes.append(f"- omega_cdm differs by {om_delta:+.5f}. This is the main matter-density comparison lever in this panel.")
+    else:
+        notes.append(f"- omega_cdm is close to the reference, with delta {om_delta:+.5f}.")
+
+    if abs(s8_delta) > 0.02:
+        notes.append(f"- S8 differs by {s8_delta:+.4f}. This helps users see whether the profile is higher- or lower-clustering relative to reference.")
+    else:
+        notes.append(f"- S8 is close to the reference, with delta {s8_delta:+.4f}.")
+
+    st.markdown("\n".join(notes))
+
+    st.markdown("### Parameter guide")
+    guide_rows = []
+    for key in _DTI_UI_PARAM_ORDER_V1:
+        guide_rows.append({
+            "parameter": key,
+            "how to read it": _DTI_UI_PARAM_META_V1[key]["help"],
+        })
+    st.dataframe(pd.DataFrame(guide_rows), use_container_width=True, hide_index=True)
+
+    st.caption(
+        "Boundary: comparison guide only. No graph, no 8011 realtime, no likelihood result, "
+        "no posterior comparison, no Planck validation, and no physics-value update."
+    )
+
+
 
 
 # --- DTI_SAFE_PURGE_GRAPH_VISUAL_ROUTES_NO_INDENT_BREAK_V1 ---
@@ -1529,6 +2427,42 @@ def ensure_paper_text_state():
 
 st.set_page_config(page_title="DTI-Core Grand Auditor v6.0", layout="wide")
 
+# --- DTI_RUN_BUTTONS_RED_UI_PATCH_V1 ---
+# Local-only UI styling: make RUN-style action buttons visibly red.
+_DTI_RUN_BUTTONS_RED_UI_PATCH_V1 = True
+
+st.markdown(
+    """
+    <style>
+    div.stButton > button[kind="primary"] {
+        background-color: #d92d20 !important;
+        border-color: #d92d20 !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+    }
+    div.stButton > button[kind="primary"]:hover {
+        background-color: #b42318 !important;
+        border-color: #b42318 !important;
+        color: #ffffff !important;
+    }
+    div.stButton > button[kind="primary"]:active {
+        background-color: #912018 !important;
+        border-color: #912018 !important;
+        color: #ffffff !important;
+    }
+    div.stButton > button[kind="primary"]:disabled {
+        background-color: #f2b8b5 !important;
+        border-color: #f2b8b5 !important;
+        color: #ffffff !important;
+        opacity: 0.75 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+# --- end DTI_RUN_BUTTONS_RED_UI_PATCH_V1 ---
+
+
 ensure_paper_text_state()
 
 st.markdown(
@@ -1657,6 +2591,8 @@ with st.sidebar:
 
     # Keep the visible text box populated on first load and after reruns.
     active_profile_for_text = st.session_state.get("selected_preset", selected_preset)
+    # DTI_SIDEBAR_CANDIDATE_REFERENCE_FORM_CALL_V1
+    _dti_sidebar_candidate_reference_form_v2()
     fallback_text = PRESETS.get(active_profile_for_text, {}).get("text", "")
     if not st.session_state.get("paper_text_widget") and fallback_text:
         st.session_state["paper_text_widget"] = fallback_text
@@ -1671,7 +2607,12 @@ with st.sidebar:
 
     col_sidebar_1, col_sidebar_2 = st.columns(2)
     with col_sidebar_1:
-        if st.button("Text to form", width="stretch", key="sidebar_text_to_form_v606"):
+        # DTI_PRIMARY_FLOW_TOP_NOTICE_V1
+        st.markdown("#### Step 1: apply text to form")
+        st.caption("After editing the TARGET_MODEL block, use this button to load the values into the form.")
+        # DTI_TEXT_TO_FORM_COMPACT_EN_GUIDE_V1
+        st.caption("Step 1: edit the TARGET_MODEL block, then apply it to the form.")
+        if st.button("Apply text to form", width="stretch", key="sidebar_text_to_form_v606", type="primary"):
             sync_form_from_text()
             st.rerun()
     with col_sidebar_2:
@@ -1841,6 +2782,9 @@ for i, p in enumerate(["sigma8", "S8", "ln10_10_As", "n_s", "tau_reio"]):
         st.markdown(card(p, value, note, color), unsafe_allow_html=True)
 
 st.markdown("---")
+# DTI_PRESET_LEARNING_MAIN_PANEL_V1
+_dti_main_candidate_reference_panel_v1()
+
 st.header("5. AxiCLASS FIX1 locked benchmark")
 
 st.markdown("""
@@ -1923,7 +2867,7 @@ st.markdown(
     "This is a lightweight background proxy. It is not a substitute for AxiCLASS FIX1 or formal likelihood evaluation. Use it only for quick intuition about the current input model."
 )
 
-if st.button("Run RK45 background proxy for current input model", width="stretch"):
+if st.button("Run RK45 background proxy for current input model", width="stretch", type="primary"):
     try:
         h = target_model.get("h", target_model.get("H0", np.nan) / 100.0)
         ob = target_model.get("omega_b", np.nan)
@@ -1976,6 +2920,8 @@ It is intended for implementation testing and reproducibility inspection only.<b
         "The public app and Render CLASS API are not modified by this local check."
     )
 
+    # DTI_ENABLE_GATE_NOTICE_INSERTED_FOR: Enable local-only AxiCLASS fixed-example check
+    _dti_enable_gate_notice_7abc_v1("7a local-only AxiCLASS fixed-example check", "This prevents the fixed-example check from being skipped by accident.")
     enable_local_axiclass = st.checkbox(
         "Enable local-only AxiCLASS fixed-example check",
         value=False,
@@ -1999,8 +2945,11 @@ It is intended for implementation testing and reproducibility inspection only.<b
             language="bash",
         )
 
-    if st.button("Run local fixed-example check", key="run_local_axiclass_fixed_example_v606", width="stretch"):
+    if st.button("Run local fixed-example check", key="run_local_axiclass_fixed_example_v606", width="stretch", type="primary"):
         try:
+            if _dti_is_disabled_endpoint_literal_v1(local_endpoint):
+                _dti_local_endpoint_disabled_notice_v1()
+                st.stop()
             response = requests.post(local_endpoint, timeout=30)
             st.session_state["local_axiclass_fixed_result_v606"] = response.json()
             st.session_state["local_axiclass_fixed_http_status_v606"] = response.status_code
@@ -2179,6 +3128,8 @@ _live_presets_8b = {
     "Custom": None,
 }
 
+# DTI_ENABLE_GATE_NOTICE_INSERTED_FOR: Enable local-only vanilla CLASS live probe
+_dti_enable_gate_notice_7abc_v1("7b local-only vanilla CLASS live probe", "This prevents the live probe RUN button from being mistaken for an active control while disabled.")
 enable_live_vanilla_probe = st.checkbox(
     "Enable local-only vanilla CLASS live probe",
     value=False,
@@ -2187,9 +3138,11 @@ enable_live_vanilla_probe = st.checkbox(
 
 live_probe_url = st.text_input(
     "Local vanilla CLASS live probe endpoint",
-    value="8011_REALTIME_DISABLED",
+    value=_dti_default_7b_live_endpoint_widget_only_v1(),
     key="live_vanilla_probe_url_v606_8d",
 )
+# DTI_RESTORE_7B_ENDPOINT_WIDGET_ONLY_NORMALIZE_AFTER_WIDGET
+live_probe_url = _dti_normalize_7b_live_endpoint_widget_only_v1(live_probe_url)
 
 selected_live_input_source_8b = st.selectbox(
     "Input source",
@@ -2333,74 +3286,88 @@ if st.button(
     "Run local vanilla CLASS live probe",
     key="run_live_vanilla_probe_v606_8d",
     width="stretch",
+type="primary",
 ):
-    if not enable_live_vanilla_probe:
-        st.warning("Enable the local-only vanilla CLASS live probe before running.")
+    # DTI_GUARD_7B_RUN_BUTTON_MULTILINE_SAFE_INSERTED
+    _dti_7b_endpoint_for_guard_v1 = locals().get('local_endpoint', locals().get('live_probe_url', locals().get('endpoint', None)))
+    if _dti_is_disabled_endpoint_for_7b_run_v1(_dti_7b_endpoint_for_guard_v1):
+        _dti_7b_run_disabled_notice_v1()
     else:
-        try:
-            import requests
-
-            response = requests.post(live_probe_url, json=live_payload, timeout=240)
-            st.write(f"HTTP status: {response.status_code}")
-
+        if not enable_live_vanilla_probe:
+            st.warning("Enable the local-only vanilla CLASS live probe before running.")
+        else:
             try:
-                data = response.json()
-            except Exception:
-                data = {"status": "error", "detail": response.text}
+                import requests
 
-            st.markdown("##### Local vanilla CLASS live probe result")
-            st.json(data)
+                if _dti_is_disabled_endpoint_literal_v1(live_probe_url):
+                    _dti_local_endpoint_disabled_notice_v1()
+                    st.stop()
+                response = requests.post(live_probe_url, json=live_payload, timeout=240)
+                st.write(f"HTTP status: {response.status_code}")
 
-            if data.get("status") == "ok":
-                st.success("Local vanilla CLASS live probe returned status: ok")
+                try:
+                    data = response.json()
+                except Exception:
+                    data = {"status": "error", "detail": response.text}
 
-                derived = data.get("derived_parameters", {})
-                if isinstance(derived, dict) and derived:
-                    rows = []
-                    for key in [
-                        "h",
-                        "Omega0_m",
-                        "Omega_Lambda",
-                        "age",
-                        "rs_drag",
-                        "sigma8",
-                        "S8",
-                    ]:
-                        if key in derived:
-                            rows.append({"quantity": key, "value": derived[key]})
-                    if rows:
-                        st.table(rows)
+                st.markdown("##### Local vanilla CLASS live probe result")
+                st.json(data)
 
-                    result_json = _json_section8b.dumps(data, indent=2, sort_keys=True)
-                    st.download_button(
-                        "Download live probe result JSON",
-                        data=result_json,
-                        file_name="section8b_live_vanilla_result.json",
-                        mime="application/json",
-                        key="download_section8b_live_result_json_v606",
+                if data.get("status") == "ok":
+                    st.success("Local vanilla CLASS live probe returned status: ok")
+
+                    derived = data.get("derived_parameters", {})
+                    if isinstance(derived, dict) and derived:
+                        rows = []
+                        for key in [
+                            "h",
+                            "Omega0_m",
+                            "Omega_Lambda",
+                            "age",
+                            "rs_drag",
+                            "sigma8",
+                            "S8",
+                        ]:
+                            if key in derived:
+                                rows.append({"quantity": key, "value": derived[key]})
+                        if rows:
+                            st.table(rows)
+
+                        result_json = _json_section8b.dumps(data, indent=2, sort_keys=True)
+                        st.download_button(
+                            "Download live probe result JSON",
+                            data=result_json,
+                            file_name="section8b_live_vanilla_result.json",
+                            mime="application/json",
+                            key="download_section8b_live_result_json_v606",
+                        )
+
+                        result_tsv_buf = _io_section8b.StringIO()
+                        result_tsv_writer = _csv_section8b.writer(result_tsv_buf, delimiter="\t")
+                        result_tsv_writer.writerow(["quantity", "value"])
+                        for row in rows:
+                            result_tsv_writer.writerow([row["quantity"], row["value"]])
+                        st.download_button(
+                            "Download live probe result TSV",
+                            data=result_tsv_buf.getvalue(),
+                            file_name="section8b_live_vanilla_result.tsv",
+                            mime="text/tab-separated-values",
+                            key="download_section8b_live_result_tsv_v606",
+                        )
+
+                    st.info(
+                        "Interpretation boundary: derived-parameter probe only; f_EDE is not used by vanilla CLASS here; sigma8/S8 from the sidebar are reference values, not inputs; this is not likelihood, posterior, Planck validation, or manuscript values."
                     )
+                else:
+                    st.warning("Local vanilla CLASS live probe did not return ok. Check that the 8011 API is running.")
 
-                    result_tsv_buf = _io_section8b.StringIO()
-                    result_tsv_writer = _csv_section8b.writer(result_tsv_buf, delimiter="\t")
-                    result_tsv_writer.writerow(["quantity", "value"])
-                    for row in rows:
-                        result_tsv_writer.writerow([row["quantity"], row["value"]])
-                    st.download_button(
-                        "Download live probe result TSV",
-                        data=result_tsv_buf.getvalue(),
-                        file_name="section8b_live_vanilla_result.tsv",
-                        mime="text/tab-separated-values",
-                        key="download_section8b_live_result_tsv_v606",
-                    )
-
-                st.info(
-                    "Interpretation boundary: derived-parameter probe only; f_EDE is not used by vanilla CLASS here; sigma8/S8 from the sidebar are reference values, not inputs; this is not likelihood, posterior, Planck validation, or manuscript values."
-                )
-            else:
-                st.warning("Local vanilla CLASS live probe did not return ok. Check that the 8011 API is running.")
-
-        except Exception as exc:
-            st.error(f"Local vanilla CLASS live probe failed: {exc}")
+            except Exception as exc:
+                # DTI_FIX_MSG_DIRECT_BEFORE_USE_V1
+                msg = str(exc)
+                if "DTI_LOCAL_8011_DISABLED" in msg or "No scheme supplied" in msg or "Invalid URL" in msg:
+                    _dti_local_endpoint_disabled_notice_v1()
+                else:
+                    st.error(f"Local vanilla CLASS live probe failed: {exc}")
 
 
 # ---------------------------------------------------------------------
@@ -2549,7 +3516,7 @@ def _dti_graph_ui_v607_fallback_distance_frame():
 
 def _dti_graph_ui_v607_altair_line_with_band(data, xcol, ycol):
     import altair as alt
-    base = alt.Chart(data).mark_line(point=True).encode(
+    base = alt.Chart(data).mark_circle(size=60, opacity=0.7).encode(
         x=alt.X(f"{xcol}:Q", title=xcol),
         y=alt.Y(f"{ycol}:Q", title=ycol),
         tooltip=list(data.columns),
@@ -2640,7 +3607,7 @@ def _dti_render_section7c_visuals_v607():
 
         chart = (
             alt.Chart(plot_df)
-            .mark_line(point=True)
+            .mark_circle(size=60, opacity=0.7)
             .encode(
                 x=alt.X(f"{xcol}:Q", title=str(xcol)),
                 y=alt.Y("adjacent_abs_delta:Q", title="adjacent absolute difference"),
@@ -2651,7 +3618,7 @@ def _dti_render_section7c_visuals_v607():
         )
         _DTI_DISABLED_GRAPH_CALL(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_02")
         st.caption(
-            "Large spikes indicate numerical non-smoothness candidates within the available diagnostic table. "
+            "Scatter distributions and vertical outliers indicate numerical non-smoothness candidates within the available diagnostic table. "
             "This is not evidence establishing physical discontinuity."
         )
 
@@ -2752,7 +3719,7 @@ def _dti_render_section8_visuals_v607():
                         "ymax": [0.79],
                         "label": ["illustrative S8 reference band"],
                     })
-                    base = alt.Chart(work).mark_line(point=True).encode(
+                    base = alt.Chart(work).mark_circle(size=60, opacity=0.7).encode(
                         x=alt.X(f"{xcol}:Q", title=str(xcol)),
                         y=alt.Y(f"{ycol}:Q", title="S8"),
                         tooltip=[str(xcol), str(ycol)],
@@ -2857,35 +3824,9 @@ def _dti_render_section9_visuals_v607():
 
 st.header("7c. Continuity / discontinuity examiner")
 
-
-# --- dti_graph_ui_v607_section7c_visible_fallback_deck_v3 ---
-try:
-    _fallback_7c_v3 = _dti_graph_ui_v607_fallback_sweep_frame()
-    _dti_graph_ui_v607_fallback_notice("Section 7c disabled visual material")
-    _fallback_7c_v3 = _fallback_7c_v3.copy()
-    _fallback_7c_v3["delta_sigma8_adjacent"] = _fallback_7c_v3["sigma8"].diff().abs().fillna(0.0)
-    _DTI_DISABLED_GRAPH_CALL(
-        _dti_graph_ui_v607_altair_line_with_band(_fallback_7c_v3, "sweep_value", "delta_sigma8_adjacent").properties(height=260),
-        use_container_width=True,
-    )
-except Exception as _graph_7c_v3_exc:
-    st.info(f"Section 7c graph fallback unavailable: {_graph_7c_v3_exc}")
-
-
-st.markdown("""
-<div class="card">
-<b>Audit visualization layer active.</b><br>
-Graph panels below are diagnostic UI aids. When compatible live/sweep data are absent,
-clearly labelled fallback reference charts are shown for layout and readability only.
-They are not solver output, not physics-value updates, not likelihood results,
-not posterior comparisons, and not Planck validation.
-</div>
-""", unsafe_allow_html=True)
-
-try:
-    _dti_render_section7c_visuals_v607()
-except Exception as _dti_graph_exc_7c_v607:
-    st.caption(f"Section 7c audit visualization unavailable: {_dti_graph_exc_7c_v607}")
+# DTI_HIDE_7C_OBSOLETE_VISUAL_FALLBACK_BLOCK_V2
+# Hidden: obsolete 7c visual/fallback block in this no-graph local UI line.
+# This does not reopen graph rendering or realtime 8011.
 
 st.markdown(
     """
@@ -2912,18 +3853,18 @@ It is an **examiner panel**, not a physics-claim engine.
     """
 )
 
+# DTI_ENABLE_GATE_NOTICE_INSERTED_FOR: Enable local-only continuity / discontinuity examiner
+_dti_enable_gate_notice_7abc_v1("7c continuity / discontinuity examiner", "This prevents the continuity examiner RUN control from being used without enabling the local-only gate.")
 enable_continuity_examiner = st.checkbox(
     "Enable local-only continuity / discontinuity examiner",
     value=False,
     key="enable_section7c_continuity_examiner_v606",
 )
 
-continuity_endpoint = st.text_input(
-    "Local vanilla CLASS probe endpoint for examiner",
-    value="8011_REALTIME_DISABLED",
-    key="section7c_continuity_endpoint_v606",
-)
-
+# DTI_HIDE_7C_BLANK_ENDPOINT_INPUT_V1
+# The endpoint text box was visually blank/confusing in Section 7c.
+# Keep the examiner local-readonly and do not reopen 8011 realtime.
+continuity_endpoint = "DTI_LOCAL_8011_DISABLED"
 st.markdown("##### Base profile")
 
 _base_profile_7c = {
@@ -3180,6 +4121,7 @@ if st.button(
     "Run continuity / discontinuity examiner",
     key="run_section7c_continuity_examiner_v606",
     width="stretch",
+type="primary",
 ):
     if not enable_continuity_examiner:
         st.warning("Enable the local-only continuity / discontinuity examiner before running.")
@@ -3420,7 +4362,11 @@ try:
     import altair as _alt_graph_v3
     _fallback_v3 = _dti_graph_ui_v607_fallback_sweep_frame()
     _dti_graph_ui_v607_fallback_notice("Section 8 disabled visual material")
-    _tab_s8_v3, _tab_trade_v3 = st.tabs(["Boundary table", "Boundary confirmation"])
+    _dti_boundary_readonly_caption_v1()
+    # DTI_SECTION8_REMOVE_INEFFECTIVE_BOUNDARY_TABS_INDENT_SAFE_V2
+    _dti_boundary_readonly_caption_v1()
+    _tab_s8_v3 = _dti_noop_context_v1()
+    _tab_trade_v3 = _dti_noop_context_v1()
     with _tab_s8_v3:
         _DTI_DISABLED_GRAPH_CALL(
             _dti_graph_ui_v607_altair_line_with_band(_fallback_v3, "sweep_value", "S8").properties(height=280),
@@ -3647,8 +4593,11 @@ external_api_payload = extract_external_class_api_payload_v606(external_api_text
 st.markdown("##### Payload sent to external API")
 st.dataframe(pd.DataFrame([external_api_payload]), hide_index=True, width="stretch")
 
-if st.button("Run external CLASS API for current input model", key="run_external_class_api_v606", width="stretch"):
+if st.button("Run external CLASS API for current input model", key="run_external_class_api_v606", width="stretch", type="primary"):
     try:
+        if _dti_is_disabled_endpoint_literal_v1(external_api_url):
+            _dti_local_endpoint_disabled_notice_v1()
+            st.stop()
         response = requests.post(external_api_url, json=external_api_payload, timeout=90)
         st.session_state["external_class_api_result_v606"] = response.json()
         st.session_state["external_class_api_http_status_v606"] = response.status_code
