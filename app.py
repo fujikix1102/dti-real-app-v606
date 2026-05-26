@@ -31,6 +31,7 @@ import streamlit as st
 # Keep a stable reference to Streamlit's original markdown function before any wrappers.
 _DTI_ORIGINAL_STREAMLIT_MARKDOWN_NO_RECURSION = st.markdown
 _DTI_MARKDOWN_RECURSION_FIX_V1 = True
+_DTI_DISABLE_MARKDOWN_MONKEYPATCH_PASS_GLOBAL_V1 = True
 
 # --- DTI_README_DOWNLOAD_AND_8011_GUIDANCE_V3_SAFE ---
 # Local-only documentation UI and softer local 8011 unavailable guidance.
@@ -1321,7 +1322,7 @@ def _DTI_BUTTON_FILTER_V1(x, *args, **kwargs):
     return False
 
 try:
-    st.markdown = _DTI_MARKDOWN_FILTER_V1
+    pass  # DTI_DISABLE_MARKDOWN_MONKEYPATCH_PASS_V1: disabled recursive markdown monkey patch; was markdown = _DTI_MARKDOWN_FILTER_V1
     st.info = _DTI_INFO_FILTER_V1
     st.caption = _DTI_CAPTION_FILTER_V1
     st.button = _DTI_BUTTON_FILTER_V1
@@ -1447,7 +1448,7 @@ try:
     st.map = _dti_silent_chart_v1
     st.button = _dti_safe_button_v1
     st.text_input = _dti_safe_text_input_v1
-    st.markdown = _dti_safe_markdown_v1
+    pass  # DTI_DISABLE_MARKDOWN_MONKEYPATCH_PASS_V1: disabled recursive markdown monkey patch; was markdown = _dti_safe_markdown_v1
     st.info = _dti_safe_info_v1
     st.caption = _dti_safe_caption_v1
     st.write = _dti_safe_write_v1
@@ -1557,7 +1558,7 @@ if _dti_st_final is not None:
         return _dti_original_button_final(label, *args, **kwargs)
 
     try:
-        _dti_st_final.markdown = _dti_markdown_filter_final
+        pass  # DTI_DISABLE_MARKDOWN_MONKEYPATCH_PASS_V1: disabled recursive markdown monkey patch; was markdown = _dti_markdown_filter_final
         _dti_st_final.info = _dti_info_filter_final
         _dti_st_final.caption = _dti_caption_filter_final
         _dti_st_final.button = _dti_button_filter_final
@@ -1703,7 +1704,7 @@ try:
     if _dti_sec8_orig_subheader_v1 is not None:
         st.subheader = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_subheader_v1)
     if _dti_sec8_orig_markdown_v1 is not None:
-        st.markdown = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_markdown_v1)
+        pass  # DTI_DISABLE_MARKDOWN_MONKEYPATCH_PASS_V1: disabled recursive markdown monkey patch; was markdown = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_markdown_v1)
     if _dti_sec8_orig_info_v1 is not None:
         st.info = _dti_section8_text_wrapper_factory_v1(_dti_sec8_orig_info_v1)
     if _dti_sec8_orig_caption_v1 is not None:
@@ -3369,7 +3370,9 @@ bash run_local.sh
     http_status = st.session_state.get("local_axiclass_fixed_http_status_v606")
 
     if not result:
-        return _DTI_ORIGINAL_STREAMLIT_MARKDOWN_NO_RECURSION("##### Local fixed-example result")
+        return
+
+    st.markdown("##### Local fixed-example result")
     st.caption(f"HTTP status: {http_status}")
 
     if result.get("status") == "ok":
