@@ -3807,6 +3807,50 @@ st.divider()
 # These marker comments identify the local graph UI fallback and stable-DOM repair lane.
 # They are audit markers only; they do not change physics values or solver behavior.
 
+
+# --- DTI_SECTION8_NOTICE_PRUNE_HELPER_V1 ---
+# Consolidated Section 8 notice. UI cleanup only.
+# Does not enable graph rendering, likelihood evaluation, posterior comparison,
+# Planck validation, physics-value updates, or manuscript updates.
+_DTI_SECTION8_NOTICE_PRUNE_HELPER_V1 = True
+
+def _dti_section8_boundary_notice_once_v1():
+    key = "dti_section8_boundary_notice_once_v1"
+    try:
+        already = bool(st.session_state.get(key, False))
+    except Exception:
+        already = False
+    if already:
+        return
+    try:
+        st.session_state[key] = True
+    except Exception:
+        pass
+    st.info(
+        "Section 8 boundary: candidate-payload and boundary confirmation only. "
+        "Graphs remain disabled unless compatible source-of-record diagnostic data are present. "
+        "This section does not perform likelihood evaluation, posterior comparison, Planck validation, "
+        "physics-value updates, or manuscript updates."
+    )
+
+def _dti_section8_no_source_data_notice_v1():
+    key = "dti_section8_no_source_data_notice_v1"
+    try:
+        already = bool(st.session_state.get(key, False))
+    except Exception:
+        already = False
+    if already:
+        return
+    try:
+        st.session_state[key] = True
+    except Exception:
+        pass
+    st.info(
+        "No source-of-record Section 8 diagnostic table is available in session memory. "
+        "Graphs remain disabled until compatible audited data are loaded."
+    )
+# --- /DTI_SECTION8_NOTICE_PRUNE_HELPER_V1 ---
+
 # --- dti_graph_ui_v607_audit_visualizations: local-only audit visualization helpers ---
 # dti_graph_ui_stable_container_dom_repair_v1: graph UI expanders converted to stable containers where possible.
 def _dti_graph_ui_v607_available_frames():
@@ -3912,6 +3956,14 @@ def _dti_graph_ui_v607_boundary_notice(section_label):
 
 # --- dti_graph_ui_v607_always_visible_fallback_v2 ---
 def _dti_graph_ui_v607_fallback_notice(label):
+    # DTI_SECTION8_NOTICE_PRUNE_ROUTE_V1
+    try:
+        _label_text = "" if label is None else str(label)
+    except Exception:
+        _label_text = ""
+    if "Section 8" in _label_text or "reference-distance" in _label_text or "S8" in _label_text:
+        _dti_section8_boundary_notice_once_v1()
+        return
     import streamlit as st
     st.caption(
         f"{label}: graph output is intentionally unavailable until source-of-record data are present. "
@@ -4109,7 +4161,7 @@ def _dti_render_section8_visuals_v607():
                 "parameter-profile space. This is heuristic triage only."
             )
         else:
-            st.info("No compatible reference-distance table found in session memory. No graph is drawn until source-of-record data are present.")
+            _dti_section8_no_source_data_notice_v1()
             _dti_graph_ui_v607_fallback_notice("Section 8 distance fallback")
             distance_frame = _dti_graph_ui_v607_fallback_distance_frame()
             dist_chart = alt.Chart(distance_frame).mark_bar().encode(
@@ -4217,7 +4269,7 @@ def _dti_render_section8_visuals_v607():
             else:
                 st.info("rs_drag/S8 table found, but no numeric rows are available.")
         else:
-            st.info("No rs_drag + S8 table found in session memory.")
+            _dti_section8_no_source_data_notice_v1()
 
 
 def _dti_render_section9_visuals_v607():
@@ -4787,7 +4839,7 @@ st.header("8. Candidate payload / boundary confirmation")
 try:
     import altair as _alt_graph_v3
     _fallback_v3 = _dti_graph_ui_v607_fallback_sweep_frame()
-    _dti_graph_ui_v607_fallback_notice("Section 8 disabled visual material")
+    _dti_section8_boundary_notice_once_v1()
     _dti_boundary_readonly_caption_v1()
     # DTI_SECTION8_REMOVE_INEFFECTIVE_BOUNDARY_TABS_INDENT_SAFE_V2
     _dti_boundary_readonly_caption_v1()
