@@ -45,6 +45,26 @@ def _dti_readme_text_v3_safe():
             "or physics-value update.\n"
         )
 
+
+# --- DTI_MANUAL_PDF_DOWNLOAD_BUTTON_V1 ---
+_DTI_MANUAL_PDF_DOWNLOAD_BUTTON_V1 = True
+
+def _dti_manual_pdf_bytes_v1():
+    p = Path(__file__).resolve().parent / "docs" / "DTI_LOCAL_8503_MANUAL_EN.pdf"
+    if p.exists():
+        return p.read_bytes()
+    return b"Manual PDF was not found. Generate docs/DTI_LOCAL_8503_MANUAL_EN.pdf first.\n"
+
+def _dti_render_manual_pdf_download_v1():
+    st.download_button(
+        "Download English Manual PDF",
+        data=_dti_manual_pdf_bytes_v1(),
+        file_name="DTI_LOCAL_8503_MANUAL_EN.pdf",
+        mime="application/pdf",
+        key="download_dti_local_8503_manual_pdf_v1",
+        width="stretch",
+    )
+
 def _dti_render_readme_download_v3_safe():
     st.download_button(
         "Download local app README",
@@ -2677,6 +2697,8 @@ with st.sidebar:
     st.markdown("---")
     # DTI_README_SIDEBAR_BEFORE_CURRENT_PROFILE_STATUS_FIX
     _dti_render_readme_download_v3_safe()
+    # DTI_MANUAL_PDF_DOWNLOAD_BUTTON_RENDER_CALL_V1
+    _dti_render_manual_pdf_download_v1()
 
     st.subheader("2. Current profile status")
 
@@ -3545,7 +3567,7 @@ def _dti_graph_ui_v607_boundary_notice(section_label):
 def _dti_graph_ui_v607_fallback_notice(label):
     import streamlit as st
     st.caption(
-        f"{label}: fallback UI reference chart. "
+        f"{label}: graph output is intentionally unavailable until source-of-record data are present. "
         "This is for readability and layout inspection only; it is not solver output, "
         "not a physics-value update, not a likelihood result, not a posterior comparison, "
         "and not Planck validation."
@@ -3614,7 +3636,7 @@ def _dti_render_section7c_visuals_v607():
         )
 
         if df is None:
-            st.info("No compatible sweep table is currently available in session memory; showing a labelled fallback UI reference chart.")
+            st.info("No compatible sweep table is currently available in session memory. No graph is drawn until source-of-record data are present.")
             _dti_graph_ui_v607_fallback_notice("Section 7c fallback")
             df = _dti_graph_ui_v607_fallback_sweep_frame()
             _DTI_DISABLED_GRAPH_CALL(_dti_graph_ui_v607_altair_line_with_band(df, "sweep_value", "sigma8").properties(height=260), use_container_width=True, key="dti_graph_ui_dom_stable_chart_01")
@@ -3740,7 +3762,7 @@ def _dti_render_section8_visuals_v607():
                 "parameter-profile space. This is heuristic triage only."
             )
         else:
-            st.info("No compatible reference-distance table found in session memory; showing a labelled fallback UI reference chart.")
+            st.info("No compatible reference-distance table found in session memory. No graph is drawn until source-of-record data are present.")
             _dti_graph_ui_v607_fallback_notice("Section 8 distance fallback")
             distance_frame = _dti_graph_ui_v607_fallback_distance_frame()
             dist_chart = alt.Chart(distance_frame).mark_bar().encode(
@@ -3774,7 +3796,7 @@ def _dti_render_section8_visuals_v607():
                     band = pd.DataFrame({
                         "ymin": [0.75],
                         "ymax": [0.79],
-                        "label": ["illustrative S8 reference band"],
+                        "label": ["S8 reference band disabled until source-of-record data are present"],
                     })
                     base = alt.Chart(work).mark_circle(size=60, opacity=0.7).encode(
                         x=alt.X(f"{xcol}:Q", title=str(xcol)),
@@ -3787,7 +3809,7 @@ def _dti_render_section8_visuals_v607():
                     )
                     _DTI_DISABLED_GRAPH_CALL((band_chart + base).properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_05")
                     st.caption(
-                        "The shaded band is an illustrative S8 reference range for visual orientation only. "
+                        "The S8 band display is disabled until source-of-record data are present. "
                         "Crossing it is a diagnostic stress indicator only; it is not a likelihood-based exclusion."
                     )
                 else:
@@ -3795,7 +3817,7 @@ def _dti_render_section8_visuals_v607():
             else:
                 st.info("S8 table found, but no recognized sweep axis was found.")
         else:
-            st.info("No compatible S8 response table found in session memory; showing a labelled fallback UI reference chart.")
+            st.info("No compatible S8 response table found in session memory. No graph is drawn until source-of-record data are present.")
             _dti_graph_ui_v607_fallback_notice("Section 8 S8 fallback")
             fallback_s8 = _dti_graph_ui_v607_fallback_sweep_frame()
             chart_s8 = _dti_graph_ui_v607_altair_line_with_band(fallback_s8, "sweep_value", "S8")

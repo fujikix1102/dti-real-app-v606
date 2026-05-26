@@ -1,0 +1,1890 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R] /Count 16 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 1817 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 1) Tj
+T*
+T*
+() Tj
+T*
+(DTI LOCAL 8503 APP MANUAL) Tj
+T*
+(=========================) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(0. What this Manual is for) Tj
+T*
+(--------------------------) Tj
+T*
+() Tj
+T*
+(This Manual explains how to operate the local DTI 8503 app safely.) Tj
+T*
+() Tj
+T*
+(The app is a local helper interface for:) Tj
+T*
+() Tj
+T*
+(- inspecting parameter profiles) Tj
+T*
+(- comparing Candidate and Reference inputs) Tj
+T*
+(- running local AxiCLASS / vanilla CLASS helper checks) Tj
+T*
+(- checking local response behavior in the continuity examiner) Tj
+T*
+(- preserving clear interpretation boundaries) Tj
+T*
+() Tj
+T*
+(The app is not a likelihood engine.) Tj
+T*
+(The app is not a posterior comparison tool.) Tj
+T*
+(The app is not a Planck validation tool.) Tj
+T*
+(The app does not update manuscript values.) Tj
+T*
+(The app does not prove physical discontinuity, physical continuity, or an operator-phase) Tj
+T*
+(transition.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If the app shows a local probe output, read it as:) Tj
+T*
+() Tj
+T*
+("These are local derived quantities from the current input payload.") Tj
+T*
+() Tj
+T*
+(Do not read it as:) Tj
+T*
+() Tj
+T*
+("This model is statistically preferred by Planck.") Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(1. Current accepted app state) Tj
+T*
+(-----------------------------) Tj
+T*
+() Tj
+T*
+(The current local app state includes:) Tj
+T*
+() Tj
+T*
+(- README download button) Tj
+T*
+(- English Manual PDF download button) Tj
+T*
+(- README and Manual controls before "2. Current profile status" in the left sidebar) Tj
+T*
+(- red RUN / probe buttons) Tj
+T*
+(- highlighted 7a / 7b / 7c Enable controls) Tj
+T*
+(- local 8011 endpoint for the 7b vanilla CLASS live probe) Tj
+T*
+(- softened 8011 unavailable guidance) Tj
+T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 1509 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 2) Tj
+T*
+T*
+(- visible 7c continuity / discontinuity examiner) Tj
+T*
+(- visible Section 8 boundary confirmation) Tj
+T*
+(- graph rendering disabled) Tj
+T*
+() Tj
+T*
+(Current fixed GitHub commit used as the base line:) Tj
+T*
+() Tj
+T*
+(af1a7fcc4d823bb73692138e12323c8a83c20369) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If you see a red RUN button, treat it as an execution button.) Tj
+T*
+(If you see a yellow Enable notice, turn it on only when you intentionally want to run that) Tj
+T*
+(section.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(2. Starting the local 8503 app) Tj
+T*
+(------------------------------) Tj
+T*
+() Tj
+T*
+(Use Bash.) Tj
+T*
+() Tj
+T*
+(Command:) Tj
+T*
+() Tj
+T*
+(cd) Tj
+T*
+("/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_SECTION7C_CONTINUITY_EXAMINER_CLONE_20260525_124307/dti-) Tj
+T*
+(real-app-v606-section7c-continuity-examiner") Tj
+T*
+() Tj
+T*
+(python3 -m streamlit run app.py --server.port 8503 --server.address 127.0.0.1) Tj
+T*
+() Tj
+T*
+(Open:) Tj
+T*
+() Tj
+T*
+(http://localhost:8503) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If the browser does not open automatically, copy this URL into Safari or Chrome:) Tj
+T*
+() Tj
+T*
+(http://localhost:8503) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(3. Main safety boundaries) Tj
+T*
+(-------------------------) Tj
+T*
+() Tj
+T*
+(This app does not provide:) Tj
+T*
+() Tj
+T*
+(- likelihood evaluation) Tj
+T*
+(- posterior comparison) Tj
+T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 1564 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 3) Tj
+T*
+T*
+(- Planck validation) Tj
+T*
+(- MCMC sampling) Tj
+T*
+(- evidence calculation) Tj
+T*
+(- manuscript-value update) Tj
+T*
+(- physical-discontinuity proof) Tj
+T*
+(- operator-phase transition proof) Tj
+T*
+() Tj
+T*
+(Use this interpretation rule:) Tj
+T*
+() Tj
+T*
+(Local app output = local diagnostic output.) Tj
+T*
+(Audited likelihood claim = only from a proper audited likelihood pipeline.) Tj
+T*
+() Tj
+T*
+(Example of safe wording:) Tj
+T*
+() Tj
+T*
+("The local probe returned a derived parameter payload for the current input.") Tj
+T*
+() Tj
+T*
+(Example of unsafe wording:) Tj
+T*
+() Tj
+T*
+("The local probe proves this branch is preferred by Planck.") Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(4. Screen overview) Tj
+T*
+(------------------) Tj
+T*
+() Tj
+T*
+(The left sidebar is the operation entrance.) Tj
+T*
+() Tj
+T*
+(It contains:) Tj
+T*
+() Tj
+T*
+(- profile selection) Tj
+T*
+(- README / Manual downloads) Tj
+T*
+(- current profile status) Tj
+T*
+(- Candidate / Reference controls) Tj
+T*
+(- profile text) Tj
+T*
+(- Apply text to form controls) Tj
+T*
+() Tj
+T*
+(The main area contains:) Tj
+T*
+() Tj
+T*
+(- DTI-Core Grand Auditor title) Tj
+T*
+(- Candidate / Reference input form) Tj
+T*
+(- 7a local fixed-example check) Tj
+T*
+(- 7b local vanilla CLASS live probe) Tj
+T*
+(- 7c continuity / discontinuity examiner) Tj
+T*
+(- Section 8 boundary confirmation) Tj
+T*
+() Tj
+T*
+(Example workflow:) Tj
+T*
+() Tj
+T*
+(1. Select a registered profile in the sidebar.) Tj
+T*
+(2. Check "2. Current profile status".) Tj
+T*
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 1502 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 4) Tj
+T*
+T*
+(3. Confirm Candidate / Reference values.) Tj
+T*
+(4. Enable only the section you want to run.) Tj
+T*
+(5. Press the relevant red RUN / probe button.) Tj
+T*
+(6. Read the output inside the stated boundary.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(5. Before pressing a red RUN / probe button) Tj
+T*
+(-------------------------------------------) Tj
+T*
+() Tj
+T*
+(Check these five items:) Tj
+T*
+() Tj
+T*
+(1. intended profile) Tj
+T*
+(2. current input values) Tj
+T*
+(3. relevant Enable checkbox) Tj
+T*
+(4. local 8011 status, if using 7b) Tj
+T*
+(5. interpretation boundary) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Before running 7b, check:) Tj
+T*
+() Tj
+T*
+(- Did I select the intended profile?) Tj
+T*
+(- Did I load or type the intended values?) Tj
+T*
+(- Is the 7b Enable checkbox active?) Tj
+T*
+(- Is local 8011 running?) Tj
+T*
+(- Am I interpreting the output as local diagnostic output only?) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(6. Left sidebar usage) Tj
+T*
+(---------------------) Tj
+T*
+() Tj
+T*
+(Use the sidebar to choose and inspect the current profile.) Tj
+T*
+() Tj
+T*
+(The sidebar is for:) Tj
+T*
+() Tj
+T*
+(- choosing the profile) Tj
+T*
+(- loading presets) Tj
+T*
+(- checking current profile status) Tj
+T*
+(- downloading README / Manual) Tj
+T*
+(- confirming profile text) Tj
+T*
+(- applying profile text to form inputs) Tj
+T*
+() Tj
+T*
+(The sidebar is not a likelihood interface.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 1409 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 5) Tj
+T*
+T*
+(If the sidebar says Active profile = FUJIKI DTI working reference, it means the app is) Tj
+T*
+(currently inspecting that profile.) Tj
+T*
+() Tj
+T*
+(It does not mean the profile is validated or preferred.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(7. Parameter profile cartridge) Tj
+T*
+(------------------------------) Tj
+T*
+() Tj
+T*
+(A profile is a parameter cartridge.) Tj
+T*
+() Tj
+T*
+(It can contain values such as:) Tj
+T*
+() Tj
+T*
+(- H0) Tj
+T*
+(- omega_cdm) Tj
+T*
+(- omega_b) Tj
+T*
+(- fEDE) Tj
+T*
+(- S8) Tj
+T*
+(- rs_drag) Tj
+T*
+() Tj
+T*
+(A profile does not automatically mean:) Tj
+T*
+() Tj
+T*
+(- true model) Tj
+T*
+(- preferred model) Tj
+T*
+(- validated model) Tj
+T*
+(- accepted manuscript value) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(A profile can be useful for testing input behavior even if it is not a final physics claim.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(8. README / Manual download area) Tj
+T*
+(--------------------------------) Tj
+T*
+() Tj
+T*
+(README is the short guide.) Tj
+T*
+(Manual is the full guide.) Tj
+T*
+() Tj
+T*
+(Markdown Manual is the documentation source-of-record.) Tj
+T*
+(PDF Manual is a generated distribution copy.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Use README when you only need startup reminders.) Tj
+T*
+(Use Manual when you need operational boundaries and examples.) Tj
+T*
+() Tj
+T*
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 1439 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 6) Tj
+T*
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(9. Current profile status) Tj
+T*
+(-------------------------) Tj
+T*
+() Tj
+T*
+(Current profile status is only a display of the current selection.) Tj
+T*
+() Tj
+T*
+(It should not be read as validation.) Tj
+T*
+() Tj
+T*
+(Active profile means the selected or loaded profile.) Tj
+T*
+(Reference means the comparison baseline.) Tj
+T*
+(Displayed difference is descriptive, not likelihood preference.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Safe reading:) Tj
+T*
+() Tj
+T*
+("The current profile has a higher H0 than the reference.") Tj
+T*
+() Tj
+T*
+(Unsafe reading:) Tj
+T*
+() Tj
+T*
+("The current profile is statistically better than the reference.") Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(10. Candidate / Reference input) Tj
+T*
+(-------------------------------) Tj
+T*
+() Tj
+T*
+(Candidate is the profile being inspected.) Tj
+T*
+(Reference is the comparison baseline.) Tj
+T*
+() Tj
+T*
+(Neither label implies correctness.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Candidate:) Tj
+T*
+(A DTI working-reference region.) Tj
+T*
+() Tj
+T*
+(Reference:) Tj
+T*
+(A Planck-like baseline or registered comparison profile.) Tj
+T*
+() Tj
+T*
+(Safe interpretation:) Tj
+T*
+() Tj
+T*
+("The app compares the input values as a local profile comparison.") Tj
+T*
+() Tj
+T*
+(Unsafe interpretation:) Tj
+T*
+() Tj
+T*
+("The app has performed posterior model comparison.") Tj
+T*
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 1269 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 7) Tj
+T*
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(11. +/- buttons and direct numeric input) Tj
+T*
+(----------------------------------------) Tj
+T*
+() Tj
+T*
+(Use direct numeric typing when exact values matter.) Tj
+T*
+(Use +/- buttons for small exploratory adjustments.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(For a recorded check, type:) Tj
+T*
+() Tj
+T*
+(H0 = 72.0) Tj
+T*
+() Tj
+T*
+(For a quick sensitivity check, use +/-.) Tj
+T*
+() Tj
+T*
+(Rule:) Tj
+T*
+() Tj
+T*
+(If the value will be cited, recorded, or compared later, type it directly.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(12. 7a Enable and Run) Tj
+T*
+(---------------------) Tj
+T*
+() Tj
+T*
+(7a is the local-only AxiCLASS fixed-example check.) Tj
+T*
+() Tj
+T*
+(It is disabled by default.) Tj
+T*
+(Enable 7a intentionally.) Tj
+T*
+(Then press the red Run button.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Use 7a when you want to confirm that a fixed local example still runs.) Tj
+T*
+() Tj
+T*
+(Do not use 7a output as a Planck validation result.) Tj
+T*
+() Tj
+T*
+(Safe wording:) Tj
+T*
+() Tj
+T*
+("7a fixed-example check completed.") Tj
+T*
+() Tj
+T*
+(Unsafe wording:) Tj
+T*
+() Tj
+T*
+("7a proves this model is preferred.") Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 1410 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 8) Tj
+T*
+T*
+() Tj
+T*
+(13. 7b Enable and local vanilla CLASS live probe) Tj
+T*
+(------------------------------------------------) Tj
+T*
+() Tj
+T*
+(7b sends current input parameters to the local vanilla CLASS live derived-parameter) Tj
+T*
+(endpoint.) Tj
+T*
+() Tj
+T*
+(Endpoint:) Tj
+T*
+() Tj
+T*
+(http://127.0.0.1:8011/axiclass/live-vanilla-probe) Tj
+T*
+() Tj
+T*
+(7b does not compute:) Tj
+T*
+() Tj
+T*
+(- likelihood) Tj
+T*
+(- posterior) Tj
+T*
+(- Planck validation) Tj
+T*
+(- manuscript values) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If 7b returns derived quantities, read them as local derived quantities from the current) Tj
+T*
+(input payload.) Tj
+T*
+() Tj
+T*
+(Do not read them as statistical preference.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(14. 8011 unavailable notice) Tj
+T*
+(---------------------------) Tj
+T*
+() Tj
+T*
+(If local 8011 is not running, the app shows a softened unavailable notice.) Tj
+T*
+() Tj
+T*
+(This is not a physics failure.) Tj
+T*
+(It only means the local endpoint is unavailable.) Tj
+T*
+() Tj
+T*
+(Check 8011 with:) Tj
+T*
+() Tj
+T*
+(lsof -tiTCP:8011 -sTCP:LISTEN) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(No output from lsof means local 8011 is not listening.) Tj
+T*
+() Tj
+T*
+(Correct response:) Tj
+T*
+() Tj
+T*
+(Start or restart the local 8011 API, then try 7b again.) Tj
+T*
+() Tj
+T*
+(Incorrect response:) Tj
+T*
+() Tj
+T*
+ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 1330 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 9) Tj
+T*
+T*
+(Changing physics values because the endpoint was unavailable.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(15. 7c continuity / discontinuity examiner) Tj
+T*
+(------------------------------------------) Tj
+T*
+() Tj
+T*
+(7c inspects local numerical response behavior across a sweep.) Tj
+T*
+() Tj
+T*
+(It does not prove:) Tj
+T*
+() Tj
+T*
+(- physical continuity) Tj
+T*
+(- physical discontinuity) Tj
+T*
+(- operator-phase transition) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Safe wording:) Tj
+T*
+() Tj
+T*
+("7c shows a local numerical response pattern under this sweep.") Tj
+T*
+() Tj
+T*
+(Unsafe wording:) Tj
+T*
+() Tj
+T*
+("7c proves a physical phase transition.") Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(16. Section 8 usage) Tj
+T*
+(-------------------) Tj
+T*
+() Tj
+T*
+(Section 8 is a candidate payload and boundary-confirmation area.) Tj
+T*
+() Tj
+T*
+(It is not a result-claim section.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Use Section 8 to confirm what the app did and did not do.) Tj
+T*
+() Tj
+T*
+(Do not use Section 8 as a substitute for an audited likelihood table.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(17. Boundary table reading) Tj
+T*
+(--------------------------) Tj
+T*
+() Tj
+T*
+(Boundary tables explain what the app did not do.) Tj
+T*
+() Tj
+T*
+ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 20 0 R >>
+endobj
+22 0 obj
+<< /Length 1538 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 10) Tj
+T*
+T*
+(Important boundaries:) Tj
+T*
+() Tj
+T*
+(- likelihood evaluation = NO) Tj
+T*
+(- posterior comparison = NO) Tj
+T*
+(- Planck validation = NO) Tj
+T*
+(- physics-value update = NO) Tj
+T*
+(- manuscript update = NO) Tj
+T*
+(- graph rendering reopened = NO) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If likelihood evaluation = NO, the app did not compute likelihood.) Tj
+T*
+(If Planck validation = NO, the app did not validate against Planck.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(18. Boundary confirmation reading) Tj
+T*
+(---------------------------------) Tj
+T*
+() Tj
+T*
+(Boundary confirmation prevents over-interpretation.) Tj
+T*
+() Tj
+T*
+(If the app says local-only, exploratory, not likelihood, not posterior, not Planck) Tj
+T*
+(validation, and not manuscript value, keep the interpretation inside that boundary.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Safe:) Tj
+T*
+() Tj
+T*
+("This is a local diagnostic result.") Tj
+T*
+() Tj
+T*
+(Unsafe:) Tj
+T*
+() Tj
+T*
+("This is a final cosmological inference.") Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(19. Graph rendering disabled) Tj
+T*
+(----------------------------) Tj
+T*
+() Tj
+T*
+(Graph rendering is intentionally disabled in the current freeze.) Tj
+T*
+() Tj
+T*
+(No fake graph is allowed.) Tj
+T*
+(No fallback graph is allowed.) Tj
+T*
+(No illustrative graph is allowed.) Tj
+T*
+(No synthetic graph is allowed.) Tj
+T*
+(No fixed-reference substitute graph is allowed.) Tj
+T*
+() Tj
+T*
+(Any graph must come from:) Tj
+T*
+ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 22 0 R >>
+endobj
+24 0 obj
+<< /Length 1232 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 11) Tj
+T*
+T*
+() Tj
+T*
+(- real measured output, or) Tj
+T*
+(- an explicit audited source TSV) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If no compatible real output exists, show no graph.) Tj
+T*
+() Tj
+T*
+(Do not draw a placeholder curve.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(20. README / Manual / source-of-record management) Tj
+T*
+(-------------------------------------------------) Tj
+T*
+() Tj
+T*
+(README is the short practical guide.) Tj
+T*
+(Manual is the full operating guide.) Tj
+T*
+() Tj
+T*
+(Markdown Manual is the source-of-record.) Tj
+T*
+(PDF Manual is generated from Markdown.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Edit the Markdown first.) Tj
+T*
+(Generate the PDF second.) Tj
+T*
+(Commit both only after checking SHA and display.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(21. Common failures and responses) Tj
+T*
+(---------------------------------) Tj
+T*
+() Tj
+T*
+(Problem:) Tj
+T*
+() Tj
+T*
+(PDF shows square boxes.) Tj
+T*
+() Tj
+T*
+(Response:) Tj
+T*
+() Tj
+T*
+(Use English-only Manual PDF.) Tj
+T*
+() Tj
+T*
+(Problem:) Tj
+T*
+() Tj
+T*
+(8011 connection refused.) Tj
+T*
+() Tj
+T*
+(Response:) Tj
+T*
+() Tj
+T*
+(Local 8011 API is not running.) Tj
+T*
+() Tj
+T*
+ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 24 0 R >>
+endobj
+26 0 obj
+<< /Length 1183 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 12) Tj
+T*
+T*
+(Problem:) Tj
+T*
+() Tj
+T*
+(RUN appears to do nothing useful.) Tj
+T*
+() Tj
+T*
+(Response:) Tj
+T*
+() Tj
+T*
+(Check the relevant Enable checkbox.) Tj
+T*
+() Tj
+T*
+(Problem:) Tj
+T*
+() Tj
+T*
+(A graph is expected but does not appear.) Tj
+T*
+() Tj
+T*
+(Response:) Tj
+T*
+() Tj
+T*
+(Graph rendering is intentionally disabled in this freeze.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(22. Checking whether 8011 is running) Tj
+T*
+(------------------------------------) Tj
+T*
+() Tj
+T*
+(Use:) Tj
+T*
+() Tj
+T*
+(lsof -tiTCP:8011 -sTCP:LISTEN) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If the command returns a process ID, 8011 is listening.) Tj
+T*
+(If the command returns nothing, 8011 is not listening.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(23. GitHub reflection checklist) Tj
+T*
+(-------------------------------) Tj
+T*
+() Tj
+T*
+(Before committing or pushing, run:) Tj
+T*
+() Tj
+T*
+(python3 -m py_compile app.py) Tj
+T*
+(git status --short) Tj
+T*
+(git diff --stat) Tj
+T*
+(git diff --name-only) Tj
+T*
+() Tj
+T*
+(Stage exact files only.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If only these are intended:) Tj
+T*
+() Tj
+T*
+ET
+endstream
+endobj
+27 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 26 0 R >>
+endobj
+28 0 obj
+<< /Length 1516 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 13) Tj
+T*
+T*
+(app.py) Tj
+T*
+(docs/README_DTI_LOCAL_8503.md) Tj
+T*
+(docs/DTI_LOCAL_8503_MANUAL_EN.md) Tj
+T*
+(docs/DTI_LOCAL_8503_MANUAL_EN.pdf) Tj
+T*
+() Tj
+T*
+(then do not stage unrelated audit folders or output ZIPs.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(24. Freeze / pointer / handoff concept) Tj
+T*
+(--------------------------------------) Tj
+T*
+() Tj
+T*
+(A freeze is an accepted state.) Tj
+T*
+(A pointer records the identity of that state.) Tj
+T*
+(A handoff package preserves the route back to that state.) Tj
+T*
+() Tj
+T*
+(A pointer should include:) Tj
+T*
+() Tj
+T*
+(- SHA256 values) Tj
+T*
+(- Git commit) Tj
+T*
+(- branch) Tj
+T*
+(- remote) Tj
+T*
+(- boundary status) Tj
+T*
+(- handoff ZIP, if present) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(If app.py SHA changes, it is a new app state.) Tj
+T*
+(If Manual PDF SHA changes, it is a new documentation distribution state.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(25. Future graph Strategy A / B safety rules) Tj
+T*
+(--------------------------------------------) Tj
+T*
+() Tj
+T*
+(Strategy A reduces multidimensional variation to a single theoretical path parameter.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Define t from 0 to 1.) Tj
+T*
+(Move H0 and omega_cdm together along a predefined path.) Tj
+T*
+(Plot output against t.) Tj
+T*
+() Tj
+T*
+(Strategy B uses scatter plots and color maps for multidimensional points.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Plot rs_drag vs S8 as points.) Tj
+T*
+ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 28 0 R >>
+endobj
+30 0 obj
+<< /Length 1498 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 14) Tj
+T*
+T*
+(Use color to represent stress or distance.) Tj
+T*
+() Tj
+T*
+(Both strategies require real measured output or explicit audited source TSV.) Tj
+T*
+() Tj
+T*
+(No fake, fallback, illustrative, synthetic, or invented graph is allowed.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(26. Markdown Manual and PDF Manual) Tj
+T*
+(----------------------------------) Tj
+T*
+() Tj
+T*
+(Use Markdown for editing.) Tj
+T*
+(Use PDF for distribution.) Tj
+T*
+() Tj
+T*
+(Current decision:) Tj
+T*
+() Tj
+T*
+(Use English-only PDF Manual for reliable rendering.) Tj
+T*
+() Tj
+T*
+(Example:) Tj
+T*
+() Tj
+T*
+(Do not edit the PDF directly.) Tj
+T*
+(Edit DTI_LOCAL_8503_MANUAL_EN.md.) Tj
+T*
+(Then regenerate DTI_LOCAL_8503_MANUAL_EN.pdf.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(27. Final operating rule) Tj
+T*
+(------------------------) Tj
+T*
+() Tj
+T*
+(This app is useful only if its boundaries remain visible.) Tj
+T*
+() Tj
+T*
+(Every local probe, profile comparison, and continuity check must preserve:) Tj
+T*
+() Tj
+T*
+(- source-of-record awareness) Tj
+T*
+(- local-only boundary) Tj
+T*
+(- no likelihood claim) Tj
+T*
+(- no posterior claim) Tj
+T*
+(- no Planck-validation claim) Tj
+T*
+(- no manuscript-value update) Tj
+T*
+(- no fake graph) Tj
+T*
+() Tj
+T*
+(If a future change weakens these boundaries, do not promote it.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(Safe / Unsafe examples quick reference) Tj
+T*
+(--------------------------------------) Tj
+T*
+ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 30 0 R >>
+endobj
+32 0 obj
+<< /Length 1721 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 15) Tj
+T*
+T*
+() Tj
+T*
+(This section makes the operating boundary explicit before GitHub reflection.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(Safe example: local documentation download) Tj
+T*
+() Tj
+T*
+(Safe example:) Tj
+T*
+() Tj
+T*
+(    Open the local 8503 app.) Tj
+T*
+(    Click Download English Manual PDF.) Tj
+T*
+(    Use the PDF as an operating guide.) Tj
+T*
+(    Do not treat the PDF as a physics result.) Tj
+T*
+() Tj
+T*
+(Why this is safe:) Tj
+T*
+() Tj
+T*
+(    It is documentation only.) Tj
+T*
+(    It does not run a likelihood evaluation.) Tj
+T*
+(    It does not compare posteriors.) Tj
+T*
+(    It does not validate against Planck.) Tj
+T*
+(    It does not update manuscript values.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(Safe example: local 8011 probe availability check) Tj
+T*
+() Tj
+T*
+(Safe example:) Tj
+T*
+() Tj
+T*
+(    Enable local-only vanilla CLASS live probe.) Tj
+T*
+(    Run the local 8011 probe only when the local API server is running.) Tj
+T*
+(    Read the returned payload as a local diagnostic.) Tj
+T*
+(    Keep the result outside manuscript claims.) Tj
+T*
+() Tj
+T*
+(Allowed interpretation:) Tj
+T*
+() Tj
+T*
+(    The endpoint responded.) Tj
+T*
+(    The payload was produced by the local 8011 route.) Tj
+T*
+(    The output may be inspected as a local implementation check.) Tj
+T*
+() Tj
+T*
+(Not allowed interpretation:) Tj
+T*
+() Tj
+T*
+(    The model is validated by Planck.) Tj
+T*
+(    The posterior is preferred.) Tj
+T*
+(    The likelihood has been evaluated.) Tj
+T*
+(    The manuscript value is updated.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(Unsafe example: treating the app as a likelihood engine) Tj
+T*
+() Tj
+T*
+(Unsafe example:) Tj
+T*
+() Tj
+T*
+(    Run the local probe.) Tj
+T*
+ET
+endstream
+endobj
+33 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 32 0 R >>
+endobj
+34 0 obj
+<< /Length 1463 >>
+stream
+BT
+/F1 9 Tf
+36 806 Td
+12 TL
+(DTI local 8503 app Manual - page 16) Tj
+T*
+T*
+(    Then claim that the result proves posterior preference.) Tj
+T*
+() Tj
+T*
+(Why this is unsafe:) Tj
+T*
+() Tj
+T*
+(    The app is not a likelihood engine.) Tj
+T*
+(    The app is not a posterior-comparison tool.) Tj
+T*
+(    The app is not a Planck-validation tool.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(Unsafe example: drawing or implying fallback graphs) Tj
+T*
+() Tj
+T*
+(Unsafe example:) Tj
+T*
+() Tj
+T*
+(    No source-of-record table is available.) Tj
+T*
+(    Draw a fallback graph anyway.) Tj
+T*
+(    Use it as a scientific figure.) Tj
+T*
+() Tj
+T*
+(Why this is unsafe:) Tj
+T*
+() Tj
+T*
+(    No fake graph is allowed.) Tj
+T*
+(    No fallback graph is allowed.) Tj
+T*
+(    No illustrative scientific-looking graph is allowed.) Tj
+T*
+(    If compatible source-of-record data are absent, the app must show a no-graph notice.) Tj
+T*
+() Tj
+T*
+() Tj
+T*
+(Unsafe example: overstating 7c continuity output) Tj
+T*
+() Tj
+T*
+(Unsafe example:) Tj
+T*
+() Tj
+T*
+(    Run the 7c continuity examiner.) Tj
+T*
+(    Then claim that it proves physical discontinuity or an operator-phase transition.) Tj
+T*
+() Tj
+T*
+(Why this is unsafe:) Tj
+T*
+() Tj
+T*
+(    7c is a local numerical examiner.) Tj
+T*
+(    It may provide a bounded diagnostic.) Tj
+T*
+(    It does not prove physical continuity.) Tj
+T*
+(    It does not prove physical discontinuity.) Tj
+T*
+(    It does not prove an operator-phase transition.) Tj
+T*
+() Tj
+T*
+ET
+endstream
+endobj
+35 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 34 0 R >>
+endobj
+xref
+0 36
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000225 00000 n 
+0000000295 00000 n 
+0000002164 00000 n 
+0000002290 00000 n 
+0000003851 00000 n 
+0000003977 00000 n 
+0000005593 00000 n 
+0000005719 00000 n 
+0000007274 00000 n 
+0000007402 00000 n 
+0000008864 00000 n 
+0000008992 00000 n 
+0000010484 00000 n 
+0000010612 00000 n 
+0000011934 00000 n 
+0000012062 00000 n 
+0000013525 00000 n 
+0000013653 00000 n 
+0000015036 00000 n 
+0000015164 00000 n 
+0000016755 00000 n 
+0000016883 00000 n 
+0000018168 00000 n 
+0000018296 00000 n 
+0000019532 00000 n 
+0000019660 00000 n 
+0000021229 00000 n 
+0000021357 00000 n 
+0000022908 00000 n 
+0000023036 00000 n 
+0000024810 00000 n 
+0000024938 00000 n 
+0000026454 00000 n 
+trailer
+<< /Size 36 /Root 1 0 R >>
+startxref
+26582
+%%EOF
