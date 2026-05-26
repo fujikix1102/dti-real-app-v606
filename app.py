@@ -3134,7 +3134,7 @@ It is intended for implementation testing and reproducibility inspection only.<b
             if _dti_is_disabled_endpoint_literal_v1(local_endpoint):
                 _dti_local_endpoint_disabled_notice_v1()
                 st.stop()
-            response = requests.post(local_endpoint, timeout=30)
+            response = requests.post(local_endpoint, timeout=240)
             st.session_state["local_axiclass_fixed_result_v606"] = response.json()
             st.session_state["local_axiclass_fixed_http_status_v606"] = response.status_code
         except Exception as exc:
