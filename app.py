@@ -125,6 +125,58 @@ def _dti_enable_gate_notice_7abc_v1(section_label, purpose):
     )
 
 
+
+
+# --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
+# Public/local endpoint resolver for Section 7a.
+# Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
+# Public Streamlit Cloud must not assume that 127.0.0.1 points to the user's Mac.
+# Public endpoint should be provided through Streamlit secrets or environment variable:
+#   DTI_PUBLIC_FIXED_EXAMPLE_API_URL
+_DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 = True
+
+def _dti_get_public_fixed_example_endpoint_v1():
+    import os as _dti_os_7a_v1
+
+    env_value = _dti_os_7a_v1.environ.get("DTI_PUBLIC_FIXED_EXAMPLE_API_URL", "")
+    env_value = "" if env_value is None else str(env_value).strip()
+    if env_value:
+        return env_value
+
+    try:
+        secret_value = st.secrets.get("DTI_PUBLIC_FIXED_EXAMPLE_API_URL", "")
+        secret_value = "" if secret_value is None else str(secret_value).strip()
+        if secret_value:
+            return secret_value
+    except Exception:
+        pass
+
+    return ""
+
+def _dti_default_7a_fixed_example_endpoint_public_local_v1():
+    public_endpoint = _dti_get_public_fixed_example_endpoint_v1()
+    if public_endpoint:
+        return public_endpoint
+    return "http://127.0.0.1:8010/axiclass/fixed-example-compact"
+
+def _dti_is_public_7a_endpoint_configured_v1():
+    return bool(_dti_get_public_fixed_example_endpoint_v1())
+
+def _dti_7a_endpoint_mode_notice_v1():
+    if _dti_is_public_7a_endpoint_configured_v1():
+        st.info(
+            "7a endpoint mode: public AxiCLASS fixed-example API endpoint is configured. "
+            "This remains bounded: fixed-example only, not likelihood, not posterior, "
+            "not Planck validation, and not a manuscript value update."
+        )
+    else:
+        st.info(
+            "7a endpoint mode: local fallback endpoint is active. "
+            "On Streamlit Cloud, 127.0.0.1 means the cloud container, not the user's Mac. "
+            "Configure DTI_PUBLIC_FIXED_EXAMPLE_API_URL for public operation."
+        )
+
+
 # --- DTI_7B_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7b.
 # Local app may use http://127.0.0.1:8011/axiclass/live-vanilla-probe.
@@ -3062,9 +3114,11 @@ It is intended for implementation testing and reproducibility inspection only.<b
         st.info("Disabled by default. Enable only for local implementation testing.")
         return
 
+    _dti_7a_endpoint_mode_notice_v1()
+
     local_endpoint = st.text_input(
         "Local compact endpoint",
-        value="http://127.0.0.1:8010/axiclass/fixed-example-compact",
+        value=_dti_default_7a_fixed_example_endpoint_public_local_v1(),
         key="local_axiclass_fixed_endpoint_v606",
     )
 
