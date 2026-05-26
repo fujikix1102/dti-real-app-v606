@@ -215,7 +215,7 @@ def _dti_is_public_7b_endpoint_configured_v1():
 def _dti_7b_endpoint_mode_notice_v1():
     if _dti_is_public_7b_endpoint_configured_v1():
         st.info(
-            "7b endpoint mode: public API endpoint is configured. "
+            "7b endpoint mode: public vanilla-profile API endpoint is configured. "
             "This public endpoint must still remain bounded: not likelihood, not posterior, "
             "not Planck validation, and not a manuscript value update."
         )
@@ -3073,23 +3073,23 @@ def _render_local_axiclass_fixed_example_v606():
     st.header("7. Local experimental probes")
     st.markdown(
         """
-    This section groups local-only experimental probes that run on this computer.
+    This section groups bounded implementation probes. In the public app, configured endpoints use public Render APIs; in local testing, they may fall back to localhost endpoints.
 
     These probes are useful for implementation checks, reproducibility inspection, and immediate derived-quantity inspection. They are intentionally separated from the public deployed app, Render services, manuscript checkpoints, and likelihood/posterior analysis.
 
     **Subsections**
 
-    - **7a. Local-only AxiCLASS fixed-example check**: source-locked fixed example, no arbitrary input.
-    - **7b. Local-only vanilla CLASS live probe**: manual real-valued local inputs, derived CLASS quantities only.
+    - **7a. AxiCLASS fixed-example check**: source-locked fixed example, no arbitrary input.
+    - **7b. Vanilla-profile API check**: bounded profile payload check, derived proxy quantities only.
         """
     )
 
-    st.header("7a. Local-only AxiCLASS fixed-example check")
+    st.header("7a. AxiCLASS fixed-example check")
 
     st.markdown("""
 <div class="boundary-card">
-<b>Local-only experimental check.</b><br>
-This section can query a local AxiCLASS fixed-example API running on this computer.<br>
+<b>Bounded implementation check.</b><br>
+This section queries the configured AxiCLASS fixed-example API endpoint.<br>
 It is intended for implementation testing and reproducibility inspection only.<br><br>
 <b>Scope:</b> one source-locked fixed example only. It does not accept arbitrary user input.<br>
 <b>Not included:</b> likelihood evaluation, posterior comparison, Planck validation, MCMC sampling, or manuscript checkpoint updates.<br>
@@ -3098,38 +3098,44 @@ It is intended for implementation testing and reproducibility inspection only.<b
 """, unsafe_allow_html=True)
 
     st.caption(
-        "Use this section only when the local dti-axiclass-api server is already running. "
-        "The public app and Render CLASS API are not modified by this local check."
+        "Use this section only for bounded implementation testing. "
+        "In Streamlit Cloud, this should use the configured public Render API; in local testing, it may fall back to a local endpoint."
     )
 
     # DTI_ENABLE_GATE_NOTICE_INSERTED_FOR: Enable local-only AxiCLASS fixed-example check
-    _dti_enable_gate_notice_7abc_v1("7a local-only AxiCLASS fixed-example check", "This prevents the fixed-example check from being skipped by accident.")
+    _dti_enable_gate_notice_7abc_v1("7a AxiCLASS fixed-example check", "This prevents the fixed-example check from being skipped by accident.")
     enable_local_axiclass = st.checkbox(
-        "Enable local-only AxiCLASS fixed-example check",
+        "Enable AxiCLASS fixed-example check",
         value=False,
         key="enable_local_axiclass_fixed_example_v606",
     )
 
     if not enable_local_axiclass:
-        st.info("Disabled by default. Enable only for local implementation testing.")
+        st.info("Disabled by default. Enable only for bounded implementation testing.")
         return
 
     _dti_7a_endpoint_mode_notice_v1()
 
     local_endpoint = st.text_input(
-        "Local compact endpoint",
+        "Fixed-example API endpoint",
         value=_dti_default_7a_fixed_example_endpoint_public_local_v1(),
         key="local_axiclass_fixed_endpoint_v606",
     )
 
-    with st.expander("How to start the local AxiCLASS API", expanded=False):
+    # DTI_7A_WAIT_TIME_NOTICE_PUBLIC_UI_V1
+    st.info(
+        "This fixed-example check may take several minutes, especially after Render cold start. "
+        "Please wait for the result and avoid repeated clicks while it is running."
+    )
+
+    with st.expander("How to use the AxiCLASS API endpoint", expanded=False):
         st.code(
             'cd "/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_AXICLASS_API_SCAFFOLD_LOCAL_20260524_161545/dti-axiclass-api"\n'
             'bash run_local.sh',
             language="bash",
         )
 
-    if st.button("Run local fixed-example check", key="run_local_axiclass_fixed_example_v606", width="stretch", type="primary"):
+    if st.button("Run fixed-example check", key="run_local_axiclass_fixed_example_v606", width="stretch", type="primary"):
         try:
             if _dti_is_disabled_endpoint_literal_v1(local_endpoint):
                 _dti_local_endpoint_disabled_notice_v1()
@@ -3211,10 +3217,10 @@ It is intended for implementation testing and reproducibility inspection only.<b
 _render_local_axiclass_fixed_example_v606()
 
 # ---------------------------------------------------------------------
-# Section 7b: Local-only vanilla CLASS live probe
+# Section 7b: Vanilla-profile API check
 # ---------------------------------------------------------------------
 st.divider()
-st.header("7b. Local-only vanilla CLASS live probe")
+st.header("7b. Vanilla-profile API check")
 
 st.markdown(
     """
@@ -3313,9 +3319,9 @@ _live_presets_8b = {
 }
 
 # DTI_ENABLE_GATE_NOTICE_INSERTED_FOR: Enable local-only vanilla CLASS live probe
-_dti_enable_gate_notice_7abc_v1("7b local-only vanilla CLASS live probe", "This prevents the live probe RUN button from being mistaken for an active control while disabled.")
+_dti_enable_gate_notice_7abc_v1("7b vanilla-profile API check", "This prevents the probe RUN button from being mistaken for an active control while disabled.")
 enable_live_vanilla_probe = st.checkbox(
-    "Enable local-only vanilla CLASS live probe",
+    "Enable vanilla-profile API check",
     value=False,
     key="enable_live_vanilla_probe_v606_8d",
 )
@@ -3323,12 +3329,18 @@ enable_live_vanilla_probe = st.checkbox(
 _dti_7b_endpoint_mode_notice_v1()
 
 live_probe_url = st.text_input(
-    "Local vanilla CLASS live probe endpoint",
+    "Vanilla-profile API endpoint",
     value=_dti_default_7b_live_endpoint_widget_only_v1(),
     key="live_vanilla_probe_url_v606_8d",
 )
 # DTI_RESTORE_7B_ENDPOINT_WIDGET_ONLY_NORMALIZE_AFTER_WIDGET
 live_probe_url = _dti_normalize_7b_live_endpoint_widget_only_v1(live_probe_url)
+
+# DTI_7B_PUBLIC_API_TRANSIENT_NOTICE_V1
+st.info(
+    "This API check is usually quick, but a public Render endpoint may take longer after cold start. "
+    "This remains a bounded plumbing/profile-response check, not a likelihood or posterior calculation."
+)
 
 selected_live_input_source_8b = st.selectbox(
     "Input source",
@@ -3436,7 +3448,7 @@ live_payload = {
 }
 
 st.caption(
-    "The JSON below is the actual payload sent to the local vanilla CLASS live probe. It should match the compatible current sidebar profile values unless Custom is selected."
+    "The JSON below is the actual payload sent to the configured vanilla-profile API endpoint. It should match the compatible current sidebar profile values unless Custom is selected."
 )
 
 st.json(live_payload)
@@ -3469,7 +3481,7 @@ st.download_button(
 )
 
 if st.button(
-    "Run local vanilla CLASS live probe",
+    "Run vanilla-profile API check",
     key="run_live_vanilla_probe_v606_8d",
     width="stretch",
 type="primary",
@@ -3480,7 +3492,7 @@ type="primary",
         _dti_7b_run_disabled_notice_v1()
     else:
         if not enable_live_vanilla_probe:
-            st.warning("Enable the local-only vanilla CLASS live probe before running.")
+            st.warning("Enable the vanilla-profile API check before running.")
         else:
             try:
                 import requests
