@@ -3310,10 +3310,19 @@ It is intended for implementation testing and reproducibility inspection only.<b
     )
 
     with st.expander("How to use the AxiCLASS API endpoint", expanded=False):
-        st.code(
-            'cd "/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_AXICLASS_API_SCAFFOLD_LOCAL_20260524_161545/dti-axiclass-api"\n'
-            'bash run_local.sh',
-            language="bash",
+        st.markdown(
+            """
+For public Streamlit use, configure the endpoint through Streamlit Secrets.
+
+DTI_PUBLIC_FIXED_EXAMPLE_API_URL = "https://dti-axiclass-api.onrender.com/axiclass/fixed-example-compact"
+
+For local development, run the AxiCLASS API separately and set the endpoint manually.
+
+Example local command:
+
+cd dti-axiclass-api
+bash run_local.sh
+            """
         )
 
     if st.button("Run fixed-example check", key="run_local_axiclass_fixed_example_v606", width="stretch", type="primary"):
@@ -3347,7 +3356,7 @@ It is intended for implementation testing and reproducibility inspection only.<b
                     "canonical_checkpoint_update": False,
                     "streamlit_frontend_update": False,
                 },
-                "local_server_start": "cd /Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_AXICLASS_API_SCAFFOLD_LOCAL_20260524_161545/dti-axiclass-api && bash run_local.sh",
+                "local_server_start": "For local development: cd dti-axiclass-api && bash run_local.sh",
             }
             st.session_state["local_axiclass_fixed_http_status_v606"] = None
 
@@ -3400,7 +3409,7 @@ It is intended for implementation testing and reproducibility inspection only.<b
             st.markdown("##### Boundary flags")
             st.dataframe(pd.DataFrame(boundary_rows), hide_index=True, width="stretch")
 
-    with st.expander("Raw local compact response", expanded=False):
+    with st.expander("Raw fixed-example API response", expanded=False):
         st.code(json.dumps(result, indent=2, sort_keys=True), language="json")
 
 _render_local_axiclass_fixed_example_v606()
