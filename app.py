@@ -4507,6 +4507,9 @@ _DTI_PROFILE_CATEGORY_NOTES_V1_SAFE_FIXINDENT = {
     "DTI 5H Framework": "5H triage, inference, canonical, and stress profiles.",
     "Fujiki DTI Historical Archive": "Earlier FUJIKI DTI development versions; hidden from first-pass focus.",
     "Misfit Calibration References": "Calibration and audit-reference profiles.",
+    "Show all profiles / full TSV inventory": [
+        "Full unfiltered TSV inventory. Use this when auditing coverage or searching for a specific model ID.",
+    ],
     "Other / Review queue": "Profiles not yet mapped into a front-facing category.",
 }
 
@@ -4705,6 +4708,7 @@ def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
     grouped = _dti_build_profile_category_map_v1_safe_fixindent(presets)
 
     st.sidebar.markdown("### Profile category browser / preview only")
+    st.sidebar.caption("SHOW ALL is an audit escape hatch: it previews the complete TSV inventory without changing the active loader.")
     st.sidebar.caption(
         "The full preset inventory is grouped for readability. "
         "This guide does not change the underlying TSV or run new cosmology."
@@ -4778,6 +4782,12 @@ def _dti_render_profile_category_guide_v1_safe_fixindent(presets):
 # - registered/profile and Candidate/Reference selectors are active controls
 # - no selector replacement
 _DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL = True
+# --- DTI_PROFILE_CATEGORY_GUIDE_SHOW_ALL_V1D ---
+# Adds preview-only "Show all profiles / full TSV inventory".
+# This does not replace the active profile loader.
+_DTI_PROFILE_CATEGORY_GUIDE_SHOW_ALL_V1D = True
+# --- /DTI_PROFILE_CATEGORY_GUIDE_SHOW_ALL_V1D ---
+
 # --- /DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL ---
 
 
