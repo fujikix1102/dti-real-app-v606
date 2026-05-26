@@ -1772,6 +1772,254 @@ def _dti_render_parameter_quality_matrix_v1g():
 
 
 
+
+# --- DTI_PROBE_RESULT_VALUE_MATRIX_V1 ---
+# Positive probe-result value matrix for 7a / 7b / 7c.
+# UI and meta-scoring only.
+# This does not execute 7c, enable graph rendering, run likelihood evaluation,
+# posterior comparison, Planck validation, physics-value updates, manuscript updates,
+# Render API changes, or Streamlit Secret changes.
+_DTI_PROBE_RESULT_VALUE_MATRIX_V1 = True
+
+def _dti_probe_value_label_v1(score):
+    try:
+        value = int(score)
+    except Exception:
+        value = 0
+    if value >= 80:
+        return "GREEN - strong research value"
+    if value >= 60:
+        return "YELLOW - useful research value"
+    if value >= 40:
+        return "ORANGE - control needed"
+    if value >= 20:
+        return "RED - blocked for claim"
+    return "GRAY - awaiting result"
+
+def _dti_probe_score_v1(positive_value, confidence, next_clarity, boundary_risk):
+    try:
+        raw = int(positive_value) + int(confidence) + int(next_clarity) - int(boundary_risk)
+    except Exception:
+        raw = 0
+    return max(0, min(100, int(round(raw * 100 / 60))))
+
+def _dti_render_probe_result_value_matrix_v1():
+    import streamlit as st
+    import pandas as pd
+
+    st.markdown("### Probe Result Value Matrix")
+
+    st.info(
+        "This matrix turns 7a / 7b / 7c probe states into a positive research-value summary. "
+        "It helps separate what is already useful, what is partial, what is blocked, and what should be tested next. "
+        "It is not a likelihood result, posterior comparison, Planck validation, graph result, or physics-value update."
+    )
+
+    st.markdown("#### Color meaning")
+
+    color_cols = st.columns(5)
+
+    with color_cols[0]:
+        st.markdown(
+            "<div style='background:#16a34a;color:white;padding:9px 12px;border-radius:999px;"
+            "font-weight:800;text-align:center;'>GREEN - strong value</div>"
+            "<div style='font-size:0.85rem;margin-top:6px;'>Reusable result or benchmark. Prioritize source-lock and follow-up.</div>",
+            unsafe_allow_html=True,
+        )
+
+    with color_cols[1]:
+        st.markdown(
+            "<div style='background:#facc15;color:#111827;padding:9px 12px;border-radius:999px;"
+            "font-weight:800;text-align:center;'>YELLOW - useful value</div>"
+            "<div style='font-size:0.85rem;margin-top:6px;'>Constructive partial result. Good for exploratory planning.</div>",
+            unsafe_allow_html=True,
+        )
+
+    with color_cols[2]:
+        st.markdown(
+            "<div style='background:#f97316;color:white;padding:9px 12px;border-radius:999px;"
+            "font-weight:800;text-align:center;'>ORANGE - control needed</div>"
+            "<div style='font-size:0.85rem;margin-top:6px;'>Useful, but needs stricter checks before stronger wording.</div>",
+            unsafe_allow_html=True,
+        )
+
+    with color_cols[3]:
+        st.markdown(
+            "<div style='background:#ef4444;color:white;padding:9px 12px;border-radius:999px;"
+            "font-weight:800;text-align:center;'>RED - blocked</div>"
+            "<div style='font-size:0.85rem;margin-top:6px;'>Blocked for claim-making, but useful as a boundary.</div>",
+            unsafe_allow_html=True,
+        )
+
+    with color_cols[4]:
+        st.markdown(
+            "<div style='background:#9ca3af;color:white;padding:9px 12px;border-radius:999px;"
+            "font-weight:800;text-align:center;'>GRAY - awaiting</div>"
+            "<div style='font-size:0.85rem;margin-top:6px;'>No result yet. This is not a zero score.</div>",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("#### Probe value summary")
+
+    rows = [
+        {
+            "probe": "7a",
+            "probe_name": "AxiCLASS fixed-example check",
+            "research_role": "locked benchmark",
+            "probe_state": "available / source-locked example",
+            "positive_value": 18,
+            "confidence": 17,
+            "next_clarity": 15,
+            "boundary_risk": 5,
+            "what_it_gives": "A stable reference point for checking that the app and API path can return the expected fixed-example result.",
+            "what_it_does_not_give": "It does not prove likelihood preference, posterior dominance, Planck validation, or a new physics mechanism.",
+            "best_use": "Use as a confidence anchor before interpreting more exploratory probes.",
+            "next_action": "Keep the fixed example source-locked and compare later changes against this benchmark.",
+            "safe_positive_wording": "7a provides a useful source-locked benchmark result.",
+        },
+        {
+            "probe": "7b",
+            "probe_name": "Vanilla-profile API check",
+            "research_role": "live exploratory probe",
+            "probe_state": "available / bounded derived quantities",
+            "positive_value": 15,
+            "confidence": 12,
+            "next_clarity": 16,
+            "boundary_risk": 8,
+            "what_it_gives": "A quick derived-quantity response for the selected profile, useful for intuition and implementation checks.",
+            "what_it_does_not_give": "It is not a likelihood evaluation, posterior comparison, Planck validation, or manuscript checkpoint.",
+            "best_use": "Use as a fast research-direction clue before deciding whether a stricter audited run is worth doing.",
+            "next_action": "Compare whether the selected profile suggests a stable direction worth source-locking.",
+            "safe_positive_wording": "7b provides a useful exploratory signal, bounded by non-likelihood interpretation.",
+        },
+        {
+            "probe": "7c",
+            "probe_name": "Continuity / discontinuity examiner",
+            "research_role": "deferred high-value test",
+            "probe_state": "disabled / intentionally bounded",
+            "positive_value": 12,
+            "confidence": 8,
+            "next_clarity": 18,
+            "boundary_risk": 10,
+            "what_it_gives": "A clearly defined future test target. Disabled status is useful boundary control, not a failure.",
+            "what_it_does_not_give": "It does not currently establish continuity, discontinuity, physical transition, or graph-based proof.",
+            "best_use": "Use as a future design lane after source-of-record rules and execution boundary are fixed.",
+            "next_action": "Design 7c as a controlled local-only or source-locked test before allowing public execution.",
+            "safe_positive_wording": "7c is a high-value deferred probe with a clear future-test role.",
+        },
+    ]
+
+    for row in rows:
+        score = _dti_probe_score_v1(
+            row["positive_value"],
+            row["confidence"],
+            row["next_clarity"],
+            row["boundary_risk"],
+        )
+        row["research_score"] = score
+        row["value_badge"] = _dti_probe_value_label_v1(score)
+        row["claim_readiness"] = max(0, min(7, int(round(score * 7 / 100))))
+
+    df = pd.DataFrame(rows)
+
+    compact_cols = [
+        "probe",
+        "probe_name",
+        "research_role",
+        "probe_state",
+        "value_badge",
+        "research_score",
+        "claim_readiness",
+    ]
+
+    def style_probe_value_matrix_v1(dataframe):
+        def cell_style(value):
+            s = "" if value is None else str(value)
+            if "GREEN" in s:
+                return "background-color:#16a34a;color:white;font-weight:800"
+            if "YELLOW" in s:
+                return "background-color:#facc15;color:#111827;font-weight:800"
+            if "ORANGE" in s:
+                return "background-color:#f97316;color:white;font-weight:800"
+            if "RED" in s:
+                return "background-color:#ef4444;color:white;font-weight:800"
+            if "GRAY" in s:
+                return "background-color:#9ca3af;color:white;font-weight:800"
+            return ""
+        return dataframe.style.map(cell_style, subset=["value_badge"])
+
+    st.dataframe(
+        style_probe_value_matrix_v1(df[compact_cols]),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    st.markdown("#### Positive probe interpretation")
+
+    sorted_df = df.sort_values(["research_score", "claim_readiness"], ascending=False)
+
+    for index, row in sorted_df.iterrows():
+        badge = str(row["value_badge"])
+        badge_color = "#9ca3af"
+        text_color = "white"
+        if "GREEN" in badge:
+            badge_color = "#16a34a"
+        elif "YELLOW" in badge:
+            badge_color = "#facc15"
+            text_color = "#111827"
+        elif "ORANGE" in badge:
+            badge_color = "#f97316"
+        elif "RED" in badge:
+            badge_color = "#ef4444"
+
+        st.markdown(
+            "<div style='border:1px solid #374151;border-radius:12px;padding:12px 14px;margin:10px 0;'>"
+            f"<div style='font-weight:800;font-size:1.02rem;'>{row['probe']}. {row['probe_name']} "
+            f"<span style='background:{badge_color};color:{text_color};padding:4px 9px;border-radius:999px;"
+            f"font-size:0.78rem;margin-left:6px;'>{badge}</span> "
+            f"<span style='font-size:0.88rem;'>score {row['research_score']}/100 · readiness {row['claim_readiness']}/7</span></div>"
+            f"<div style='margin-top:7px;'><b>Research role:</b> {row['research_role']}</div>"
+            f"<div><b>Current state:</b> {row['probe_state']}</div>"
+            f"<div><b>Positive value:</b> {row['what_it_gives']}</div>"
+            f"<div><b>Boundary:</b> {row['what_it_does_not_give']}</div>"
+            f"<div><b>Best use:</b> {row['best_use']}</div>"
+            f"<div><b>Next action:</b> {row['next_action']}</div>"
+            f"<div><b>Safe wording:</b> {row['safe_positive_wording']}</div>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("#### Research-fun summary")
+
+    st.success(
+        "Use this section as a research dashboard: 7a anchors confidence, 7b generates exploratory clues, "
+        "and 7c marks a high-value future test. A disabled or partial probe is not automatically negative; "
+        "it can clarify the next experiment."
+    )
+
+    st.code(
+        """Probe result answer:
+Which probe is useful now?
+
+Positive value:
+What did this probe clarify?
+
+Boundary:
+What should not be claimed from this probe?
+
+Next experiment:
+What would make this probe more claim-ready?""",
+        language="text",
+    )
+
+    st.caption(
+        "Boundary: this Probe Result Value Matrix is UI/meta-evaluation only. "
+        "It does not execute 7c, draw graphs, run likelihood evaluation, compare posteriors, validate Planck, "
+        "update physics values, update manuscript content, modify Render API settings, or modify Streamlit Secrets."
+    )
+# --- /DTI_PROBE_RESULT_VALUE_MATRIX_V1 ---
+
+
 # --- DTI_PARAMETER_QUALITY_MATRIX_COMPACT_V1H ---
 # Compact Parameter Quality Matrix.
 # UI and meta-scoring only.
@@ -5114,6 +5362,9 @@ def _render_local_axiclass_fixed_example_v606():
 
     # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1H
     _dti_render_parameter_quality_matrix_v1h()
+
+    # DTI_PROBE_RESULT_VALUE_MATRIX_CALL_V1
+    _dti_render_probe_result_value_matrix_v1()
 
     st.header("7a. AxiCLASS fixed-example check")
 
