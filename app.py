@@ -485,6 +485,129 @@ What should be tested next?""",
     )
 # --- /DTI_RESEARCH_MOTIVATION_LAYER_V1 ---
 
+
+# --- DTI_RESEARCH_OPPORTUNITY_ENGINE_V1D ---
+# Positive research-navigation UI only.
+# This does not enable 7c, graph rendering, likelihood evaluation, posterior comparison,
+# Planck validation, physics-value updates, manuscript updates, Render API changes,
+# or Streamlit Secret changes.
+_DTI_RESEARCH_OPPORTUNITY_ENGINE_V1D = True
+
+def _dti_render_research_opportunity_engine_v1d():
+    import streamlit as st
+
+    st.markdown("### Research Opportunity Engine")
+    st.info(
+        "Purpose: convert each audit result into a research opportunity. "
+        "The useful output is not only whether something fails, but which direction survives, "
+        "which uncertainty is scientifically productive, and what controlled test should be run next."
+    )
+
+    st.markdown("#### Research Opportunity Map")
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        st.markdown("""
+**Stable lead**
+
+Use when:
+
+- a bounded check passes
+- a candidate remains internally consistent
+- nuisance drift is not the dominant explanation
+- the result is suitable for a stricter follow-up
+        """)
+
+    with c2:
+        st.markdown("""
+**Tension lead**
+
+Use when:
+
+- a mismatch is structured
+- the stress has a recognizable direction
+- the result exposes a load-bearing parameter
+- the tension defines a useful next comparison
+        """)
+
+    with c3:
+        st.markdown("""
+**Missing evidence**
+
+Use when:
+
+- the answer is not yet claimable
+- a source-of-record table is absent
+- a graph or diagnostic is intentionally disabled
+- the next evidence object is clear
+        """)
+
+    with c4:
+        st.markdown("""
+**Retired path**
+
+Use when:
+
+- a route fails under the bounded check
+- the failure is reproducible
+- pursuing it would add noise
+- the result safely narrows the search space
+        """)
+
+    st.markdown("#### Next Test Composer")
+    st.code(
+        """Possible research use:
+This result may support a follow-up test of a surviving direction, tension direction, or missing evidence zone.
+
+What to compare next:
+Run a controlled comparison while holding the audit boundary, nuisance condition, or source-of-record rule fixed.
+
+What would strengthen the claim:
+Show that the same pattern persists under a stricter setting, independent source, or seed-stability check.
+
+What should not be claimed yet:
+Do not claim final physics, likelihood dominance, Planck validation, graph-based proof, or a cosmological mechanism unless the required audit layer is present.""",
+        language="text",
+    )
+
+    st.markdown("#### Claim Boundary Translator")
+    safe_col, limit_col = st.columns(2)
+
+    with safe_col:
+        st.markdown("""
+**Safe positive wording**
+
+- This identifies a bounded research lead.
+- This result survives the current audit layer.
+- This comparison defines the next controlled test.
+- This narrows the viable search space.
+- This is a constructive unresolved zone, not a dead end.
+        """)
+
+    with limit_col:
+        st.markdown("""
+**Do not overclaim**
+
+- Do not claim new physics from this UI layer.
+- Do not claim likelihood or posterior evidence here.
+- Do not claim Planck validation here.
+- Do not claim graph-based proof while graphs are disabled.
+- Do not turn a useful lead into a final mechanism claim.
+        """)
+
+    st.success(
+        "Research-positive reading: a strong app does not only reject. "
+        "It preserves stable leads, names productive tensions, identifies missing evidence, "
+        "and retires weak paths so the next experiment becomes clearer."
+    )
+
+    st.caption(
+        "Boundary: this engine is explanatory UI only. It does not change solver behavior, "
+        "physics values, likelihood/posterior interpretation, Planck validation, graph rendering, "
+        "7c state, manuscript content, Render API settings, or Streamlit Secrets."
+    )
+# --- /DTI_RESEARCH_OPPORTUNITY_ENGINE_V1D ---
+
 # --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7a.
 # Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
@@ -3474,6 +3597,9 @@ def _render_local_axiclass_fixed_example_v606():
 
     # DTI_RESEARCH_MOTIVATION_LAYER_CALL_V1
     _dti_render_research_motivation_layer_v1()
+
+    # DTI_RESEARCH_OPPORTUNITY_ENGINE_CALL_V1D
+    _dti_render_research_opportunity_engine_v1d()
 
     st.header("7a. AxiCLASS fixed-example check")
 
