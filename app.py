@@ -1043,6 +1043,371 @@ def _dti_render_parameter_quality_matrix_v1f():
 
 
 
+
+# --- DTI_PARAMETER_QUALITY_MATRIX_V1G ---
+# Improved color-badge parameter quality / research triage table.
+# UI and meta-scoring only.
+# This does not enable 7c, graph rendering, likelihood evaluation,
+# posterior comparison, Planck validation, physics-value updates,
+# manuscript updates, Render API changes, or Streamlit Secret changes.
+_DTI_PARAMETER_QUALITY_MATRIX_V1G = True
+
+def _dti_pqm_v1g_session_value(name, fallback):
+    try:
+        import streamlit as st
+        keys = [
+            name,
+            name.lower(),
+            name.upper(),
+            "dti_" + name,
+            "dti_" + name.lower(),
+            "candidate_" + name,
+            "candidate_" + name.lower(),
+            "current_" + name,
+            "current_" + name.lower(),
+            "profile_" + name,
+            "profile_" + name.lower(),
+        ]
+        alias = {
+            "H0": ["H0", "h0", "H_0", "h"],
+            "f_EDE": ["f_EDE", "fede", "f_ede", "fde"],
+            "omega_cdm": ["omega_cdm", "omch2", "omega_cdm_h2"],
+            "omega_b": ["omega_b", "ombh2", "omega_b_h2"],
+            "n_s": ["n_s", "ns"],
+            "sigma8 / S8": ["sigma8", "S8", "s8"],
+            "A_planck / calibration": ["A_planck", "a_planck", "calibration", "calib_100T"],
+        }
+        for k in alias.get(name, []):
+            keys.append(k)
+            keys.append("dti_" + k)
+            keys.append("candidate_" + k)
+            keys.append("current_" + k)
+        for k in keys:
+            if k in st.session_state:
+                value = st.session_state.get(k)
+                if value is not None and str(value).strip() != "":
+                    return value
+    except Exception:
+        pass
+    return fallback
+
+def _dti_pqm_v1g_quality_label(score):
+    try:
+        value = int(score)
+    except Exception:
+        value = 0
+    if value >= 80:
+        return "GREEN"
+    if value >= 60:
+        return "YELLOW"
+    if value >= 40:
+        return "ORANGE"
+    if value >= 20:
+        return "RED"
+    return "GRAY"
+
+def _dti_pqm_v1g_badge_text(label):
+    mapping = {
+        "GREEN": "GREEN - promising",
+        "YELLOW": "YELLOW - partial but useful",
+        "ORANGE": "ORANGE - needs control",
+        "RED": "RED - blocked for claim",
+        "GRAY": "GRAY - not evaluated",
+    }
+    return mapping.get(label, "GRAY - not evaluated")
+
+def _dti_pqm_v1g_badge_html(label):
+    mapping = {
+        "GREEN": ("#064e3b", "#a7f3d0", "GREEN - promising"),
+        "YELLOW": ("#713f12", "#fde68a", "YELLOW - partial but useful"),
+        "ORANGE": ("#7c2d12", "#fed7aa", "ORANGE - needs control"),
+        "RED": ("#7f1d1d", "#fecaca", "RED - blocked for claim"),
+        "GRAY": ("#374151", "#e5e7eb", "GRAY - not evaluated"),
+    }
+    bg, fg, text = mapping.get(label, mapping["GRAY"])
+    return (
+        "<span style='display:inline-block; padding:4px 10px; border-radius:999px; "
+        "font-weight:700; font-size:0.86rem; background:" + bg + "; color:" + fg + ";'>"
+        + text +
+        "</span>"
+    )
+
+def _dti_pqm_v1g_score(stability, signal, control, risk):
+    try:
+        raw = int(stability) + int(signal) + int(control) - int(risk)
+    except Exception:
+        raw = 0
+    return max(0, min(100, int(round(raw * 100 / 60))))
+
+def _dti_pqm_v1g_styler(df):
+    def style_row(row):
+        label = str(row.get("quality_group", "GRAY"))
+        bg = {
+            "GREEN": "#064e3b",
+            "YELLOW": "#713f12",
+            "ORANGE": "#7c2d12",
+            "RED": "#7f1d1d",
+            "GRAY": "#374151",
+        }.get(label, "#374151")
+        fg = {
+            "GREEN": "#d1fae5",
+            "YELLOW": "#fef3c7",
+            "ORANGE": "#ffedd5",
+            "RED": "#fee2e2",
+            "GRAY": "#f3f4f6",
+        }.get(label, "#f3f4f6")
+        cells = []
+        for col in row.index:
+            if col in ["quality_badge", "quality_score", "claim_readiness", "research_role"]:
+                cells.append("background-color: " + bg + "; color: " + fg + "; font-weight: 700;")
+            else:
+                cells.append("")
+        return cells
+    try:
+        return df.style.apply(style_row, axis=1)
+    except Exception:
+        return df
+
+def _dti_render_parameter_quality_matrix_v1g():
+    import streamlit as st
+    import pandas as pd
+
+    st.markdown("### Parameter Quality Matrix")
+
+    st.info(
+        "This matrix color-codes promising parameter directions and blocked regions. "
+        "It is a research triage board, not a likelihood result, posterior comparison, Planck validation, "
+        "or final physics claim."
+    )
+
+    st.markdown("#### Color meaning")
+
+    l1, l2, l3, l4, l5 = st.columns(5)
+    with l1:
+        st.markdown(_dti_pqm_v1g_badge_html("GREEN"), unsafe_allow_html=True)
+        st.caption("Strong lead. Prioritize source-lock and strict follow-up.")
+    with l2:
+        st.markdown(_dti_pqm_v1g_badge_html("YELLOW"), unsafe_allow_html=True)
+        st.caption("Useful partial result. Needs one or more controls.")
+    with l3:
+        st.markdown(_dti_pqm_v1g_badge_html("ORANGE"), unsafe_allow_html=True)
+        st.caption("Control-needed direction. Do not claim yet.")
+    with l4:
+        st.markdown(_dti_pqm_v1g_badge_html("RED"), unsafe_allow_html=True)
+        st.caption("Blocked for claim-making, but useful as a boundary.")
+    with l5:
+        st.markdown(_dti_pqm_v1g_badge_html("GRAY"), unsafe_allow_html=True)
+        st.caption("No evaluation available yet.")
+
+    base_rows = [
+        {
+            "parameter": "H0",
+            "research_role": "branch coordinate",
+            "role_group": "Branch geometry",
+            "current_value": _dti_pqm_v1g_session_value("H0", "selected profile"),
+            "positive_signal": "Can expose branch-level response direction.",
+            "risk_blocker": "Not sufficient alone for a cosmological claim.",
+            "stability": 12,
+            "signal": 16,
+            "control": 12,
+            "risk": 8,
+            "next_test": "Compare fixed-H0 branches under the same audit boundary.",
+            "safe_interpretation": "Useful branch label and response coordinate.",
+        },
+        {
+            "parameter": "f_EDE",
+            "research_role": "early-time scan coordinate",
+            "role_group": "Early-time modification",
+            "current_value": _dti_pqm_v1g_session_value("f_EDE", "selected profile"),
+            "positive_signal": "Can mark a controlled early-time modification direction.",
+            "risk_blocker": "Requires source-locked comparison before mechanism language.",
+            "stability": 10,
+            "signal": 15,
+            "control": 10,
+            "risk": 9,
+            "next_test": "Check whether the same pattern persists across adjacent f_EDE values.",
+            "safe_interpretation": "Promising controlled scan coordinate.",
+        },
+        {
+            "parameter": "omega_cdm",
+            "research_role": "compensating direction",
+            "role_group": "Matter-sector compensation",
+            "current_value": _dti_pqm_v1g_session_value("omega_cdm", "selected profile"),
+            "positive_signal": "Can identify a narrow compensating parameter direction.",
+            "risk_blocker": "Needs companion-variable and seed-stability checks.",
+            "stability": 13,
+            "signal": 15,
+            "control": 13,
+            "risk": 7,
+            "next_test": "Audit whether the compensating direction remains narrow and sign-stable.",
+            "safe_interpretation": "Candidate compensating parameter direction.",
+        },
+        {
+            "parameter": "omega_b",
+            "research_role": "baryon-sector control",
+            "role_group": "Control parameter",
+            "current_value": _dti_pqm_v1g_session_value("omega_b", "selected profile"),
+            "positive_signal": "Can help separate baryon-sector load from dark-sector load.",
+            "risk_blocker": "Usually not sufficient as the main driver.",
+            "stability": 10,
+            "signal": 9,
+            "control": 11,
+            "risk": 8,
+            "next_test": "Hold other parameters fixed and inspect whether the response is load-bearing.",
+            "safe_interpretation": "Useful control parameter.",
+        },
+        {
+            "parameter": "n_s",
+            "research_role": "spectral-tilt companion",
+            "role_group": "Shape compensation",
+            "current_value": _dti_pqm_v1g_session_value("n_s", "selected profile"),
+            "positive_signal": "Can expose spectral-tilt compensation.",
+            "risk_blocker": "Needs CMB-shape and residual checks before stronger wording.",
+            "stability": 9,
+            "signal": 10,
+            "control": 10,
+            "risk": 8,
+            "next_test": "Check whether tilt movement is a driver or a companion response.",
+            "safe_interpretation": "Companion-shift diagnostic.",
+        },
+        {
+            "parameter": "sigma8 / S8",
+            "research_role": "stress indicator",
+            "role_group": "Growth-stress diagnostic",
+            "current_value": _dti_pqm_v1g_session_value("sigma8 / S8", "selected profile"),
+            "positive_signal": "Can reveal growth-stress burden and residual tension.",
+            "risk_blocker": "A stress indicator is not a likelihood exclusion by itself.",
+            "stability": 10,
+            "signal": 14,
+            "control": 10,
+            "risk": 9,
+            "next_test": "Use as a diagnostic stress readout, not as final exclusion.",
+            "safe_interpretation": "Bounded stress indicator.",
+        },
+        {
+            "parameter": "A_planck / calibration",
+            "research_role": "nuisance-control boundary",
+            "role_group": "Calibration and nuisance control",
+            "current_value": _dti_pqm_v1g_session_value("A_planck / calibration", "selected profile"),
+            "positive_signal": "Can test whether a result survives nuisance-control restrictions.",
+            "risk_blocker": "Must not become the hidden main explanation without audit.",
+            "stability": 13,
+            "signal": 13,
+            "control": 15,
+            "risk": 8,
+            "next_test": "Repeat under FIX or TIGHT nuisance boundaries before stronger wording.",
+            "safe_interpretation": "Nuisance-boundedness check.",
+        },
+    ]
+
+    rows = []
+    for row in base_rows:
+        score = _dti_pqm_v1g_score(
+            row["stability"],
+            row["signal"],
+            row["control"],
+            row["risk"],
+        )
+        readiness = max(0, min(7, int(round(score * 7 / 100))))
+        group = _dti_pqm_v1g_quality_label(score)
+        row["quality_group"] = group
+        row["quality_badge"] = _dti_pqm_v1g_badge_text(group)
+        row["quality_score"] = score
+        row["claim_readiness"] = readiness
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+
+    st.markdown("#### Total evaluation table")
+    st.caption(
+        "Sorted by quality score, claim readiness, and control score. "
+        "Scores are UI meta-scores only; they are not likelihood or posterior values."
+    )
+
+    display_cols = [
+        "parameter",
+        "research_role",
+        "role_group",
+        "current_value",
+        "quality_badge",
+        "quality_score",
+        "claim_readiness",
+        "positive_signal",
+        "risk_blocker",
+        "next_test",
+        "safe_interpretation",
+    ]
+
+    sorted_df = df.sort_values(
+        ["quality_score", "claim_readiness", "control"],
+        ascending=False,
+    ).reset_index(drop=True)
+
+    try:
+        st.dataframe(
+            _dti_pqm_v1g_styler(sorted_df[display_cols]),
+            use_container_width=True,
+            hide_index=True,
+        )
+    except Exception:
+        st.dataframe(sorted_df[display_cols], use_container_width=True, hide_index=True)
+
+    st.markdown("#### Next-test priority order")
+    st.caption("This section shows the next practical test order, not a scientific ranking of truth.")
+
+    top_rows = sorted_df.head(5).to_dict("records")
+    for index, row in enumerate(top_rows, start=1):
+        label = row["quality_group"]
+        st.markdown(
+            "<div style='border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px; margin:8px 0;'>"
+            "<div style='font-weight:800;'>"
+            + str(index) + ". " + str(row["parameter"]) + " — "
+            + _dti_pqm_v1g_badge_html(label)
+            + "</div>"
+            "<div style='margin-top:6px;'>"
+            "<b>Role:</b> " + str(row["research_role"]) + " / " + str(row["role_group"]) + "<br>"
+            "<b>Current value:</b> " + str(row["current_value"]) + "<br>"
+            "<b>Why it matters:</b> " + str(row["positive_signal"]) + "<br>"
+            "<b>Next test:</b> " + str(row["next_test"]) + "<br>"
+            "<b>Safe wording:</b> " + str(row["safe_interpretation"])
+            + "</div></div>",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("#### Research-role grouping")
+
+    role_summary = (
+        sorted_df.groupby("role_group", as_index=False)
+        .agg(
+            parameters=("parameter", lambda s: ", ".join(map(str, s))),
+            best_score=("quality_score", "max"),
+            best_readiness=("claim_readiness", "max"),
+        )
+        .sort_values(["best_score", "best_readiness"], ascending=False)
+    )
+
+    st.dataframe(role_summary, use_container_width=True, hide_index=True)
+
+    st.markdown("#### How to use this table")
+    st.code(
+        """Use rule:
+1. Start with GREEN or YELLOW rows as research leads.
+2. Treat ORANGE rows as control-needed directions.
+3. Treat RED rows as blocked for claim-making, not necessarily useless.
+4. Read current_value as best-effort UI/session value; if unavailable, it falls back to selected profile.
+5. Use role_group to see whether a parameter is acting as branch geometry, compensation, control, stress, or nuisance boundary.
+6. Use Next-test priority order to decide what to run next.
+7. Do not convert this table into likelihood, posterior, Planck, or final physics evidence.""",
+        language="text",
+    )
+
+    st.caption(
+        "Boundary: Parameter Quality Matrix V1G is a color-coded research triage layer only. "
+        "It does not perform likelihood evaluation, posterior comparison, Planck validation, graph rendering, "
+        "7c execution, physics-value updates, manuscript updates, Render API modification, or Streamlit Secret modification."
+    )
+# --- /DTI_PARAMETER_QUALITY_MATRIX_V1G ---
+
 # --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7a.
 # Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
@@ -4039,8 +4404,8 @@ def _render_local_axiclass_fixed_example_v606():
     # DTI_DISCOVERY_SCORE_PANEL_CALL_V1E
     _dti_render_discovery_score_panel_v1e()
 
-    # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1F
-    _dti_render_parameter_quality_matrix_v1f()
+    # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1G
+    _dti_render_parameter_quality_matrix_v1g()
 
     st.header("7a. AxiCLASS fixed-example check")
 
