@@ -27,6 +27,11 @@ def dom_safe_json_box(obj, label="Result"):
 import pandas as pd
 import streamlit as st
 
+# --- DTI_ORIGINAL_STREAMLIT_MARKDOWN_NO_RECURSION ---
+# Keep a stable reference to Streamlit's original markdown function before any wrappers.
+_DTI_ORIGINAL_STREAMLIT_MARKDOWN_NO_RECURSION = st.markdown
+_DTI_MARKDOWN_RECURSION_FIX_V1 = True
+
 # --- DTI_README_DOWNLOAD_AND_8011_GUIDANCE_V3_SAFE ---
 # Local-only documentation UI and softer local 8011 unavailable guidance.
 _DTI_README_DOWNLOAD_AND_8011_GUIDANCE_V3_SAFE = True
@@ -3364,9 +3369,7 @@ bash run_local.sh
     http_status = st.session_state.get("local_axiclass_fixed_http_status_v606")
 
     if not result:
-        return
-
-    st.markdown("##### Local fixed-example result")
+        return _DTI_ORIGINAL_STREAMLIT_MARKDOWN_NO_RECURSION("##### Local fixed-example result")
     st.caption(f"HTTP status: {http_status}")
 
     if result.get("status") == "ok":
