@@ -820,6 +820,229 @@ Repeat the relevant comparison under fixed audit boundaries and record whether t
 # --- /DTI_DISCOVERY_SCORE_PANEL_V1E ---
 
 
+# --- DTI_PARAMETER_QUALITY_MATRIX_V1F ---
+# Color-coded parameter quality / research triage table.
+# UI and meta-scoring only.
+# This does not enable 7c, graph rendering, likelihood evaluation,
+# posterior comparison, Planck validation, physics-value updates,
+# manuscript updates, Render API changes, or Streamlit Secret changes.
+_DTI_PARAMETER_QUALITY_MATRIX_V1F = True
+
+def _dti_parameter_quality_label_v1f(score):
+    try:
+        value = int(score)
+    except Exception:
+        value = 0
+    if value >= 80:
+        return "GREEN - promising"
+    if value >= 60:
+        return "YELLOW - partial but useful"
+    if value >= 40:
+        return "ORANGE - needs control"
+    if value >= 20:
+        return "RED - blocked for claim"
+    return "GRAY - not evaluated"
+
+def _dti_parameter_quality_score_v1f(stability, signal, control, risk):
+    try:
+        raw = int(stability) + int(signal) + int(control) - int(risk)
+    except Exception:
+        raw = 0
+    return max(0, min(100, int(round(raw * 100 / 60))))
+
+def _dti_parameter_quality_style_v1f(row):
+    score = int(row.get("quality_score", 0))
+    if score >= 80:
+        color = "background-color: #0f5132; color: #d1e7dd"
+    elif score >= 60:
+        color = "background-color: #664d03; color: #fff3cd"
+    elif score >= 40:
+        color = "background-color: #7c2d12; color: #ffedd5"
+    elif score >= 20:
+        color = "background-color: #842029; color: #f8d7da"
+    else:
+        color = "background-color: #343a40; color: #dee2e6"
+    return [color if col in ["quality_label", "quality_score", "claim_readiness"] else "" for col in row.index]
+
+def _dti_render_parameter_quality_matrix_v1f():
+    import streamlit as st
+    import pandas as pd
+
+    st.markdown("### Parameter Quality Matrix")
+
+    st.info(
+        "This matrix color-codes parameter directions so a researcher can see which points look promising, "
+        "which are partial, which need controls, and which are blocked for claim-making. "
+        "It is a research triage table only, not a likelihood result, posterior comparison, Planck validation, "
+        "graph-based proof, or final physics claim."
+    )
+
+    st.markdown("#### Parameter direction presets")
+
+    rows = [
+        {
+            "parameter": "H0",
+            "current_value": "sidebar / selected profile",
+            "research_role": "branch coordinate",
+            "positive_signal": "Can expose branch-level response direction.",
+            "risk_blocker": "Not sufficient alone for a cosmological claim.",
+            "stability": 12,
+            "signal_interest": 16,
+            "control_strength": 12,
+            "overclaim_risk": 8,
+            "next_test": "Compare fixed-H0 branches under the same audit boundary.",
+            "safe_interpretation": "Useful branch label and response coordinate.",
+        },
+        {
+            "parameter": "f_EDE",
+            "current_value": "sidebar / selected profile",
+            "research_role": "early-time scan coordinate",
+            "positive_signal": "Can mark a controlled early-time modification direction.",
+            "risk_blocker": "Requires source-locked comparison before mechanism language.",
+            "stability": 10,
+            "signal_interest": 15,
+            "control_strength": 10,
+            "overclaim_risk": 9,
+            "next_test": "Check whether the same pattern persists across adjacent f_EDE values.",
+            "safe_interpretation": "Promising controlled scan coordinate.",
+        },
+        {
+            "parameter": "omega_cdm",
+            "current_value": "sidebar / selected profile",
+            "research_role": "compensating direction",
+            "positive_signal": "Can identify a narrow compensating parameter direction.",
+            "risk_blocker": "Needs companion-variable and seed-stability checks.",
+            "stability": 13,
+            "signal_interest": 15,
+            "control_strength": 13,
+            "overclaim_risk": 7,
+            "next_test": "Audit whether the compensating direction remains narrow and sign-stable.",
+            "safe_interpretation": "Candidate compensating direction.",
+        },
+        {
+            "parameter": "omega_b",
+            "current_value": "sidebar / selected profile",
+            "research_role": "baryon-sector control",
+            "positive_signal": "Can help separate baryon-sector load from dark-sector load.",
+            "risk_blocker": "Usually not sufficient as the main driver.",
+            "stability": 10,
+            "signal_interest": 9,
+            "control_strength": 11,
+            "overclaim_risk": 8,
+            "next_test": "Hold other parameters fixed and inspect whether the response is load-bearing.",
+            "safe_interpretation": "Useful control parameter.",
+        },
+        {
+            "parameter": "n_s",
+            "current_value": "sidebar / selected profile",
+            "research_role": "spectral-tilt companion",
+            "positive_signal": "Can expose spectral-tilt compensation.",
+            "risk_blocker": "Needs CMB-shape and companion-variable checks.",
+            "stability": 9,
+            "signal_interest": 10,
+            "control_strength": 10,
+            "overclaim_risk": 8,
+            "next_test": "Check whether tilt movement is primary or merely a companion shift.",
+            "safe_interpretation": "Companion diagnostic.",
+        },
+        {
+            "parameter": "sigma8 / S8",
+            "current_value": "derived / reference",
+            "research_role": "stress indicator",
+            "positive_signal": "Can reveal growth-stress burden and residual tension.",
+            "risk_blocker": "A stress indicator is not itself a likelihood exclusion.",
+            "stability": 11,
+            "signal_interest": 16,
+            "control_strength": 9,
+            "overclaim_risk": 10,
+            "next_test": "Check whether growth stress is reduced without nuisance-driven escape.",
+            "safe_interpretation": "Useful diagnostic stress coordinate.",
+        },
+        {
+            "parameter": "A_planck / calibration",
+            "current_value": "nuisance / control",
+            "research_role": "nuisance-control boundary",
+            "positive_signal": "Can test whether a result survives nuisance-control restrictions.",
+            "risk_blocker": "Must not be used as a hidden explanation without explicit control.",
+            "stability": 12,
+            "signal_interest": 12,
+            "control_strength": 16,
+            "overclaim_risk": 7,
+            "next_test": "Repeat under FIX/TIGHT-style nuisance boundaries before stronger wording.",
+            "safe_interpretation": "Calibration-control check.",
+        },
+    ]
+
+    for row in rows:
+        score = _dti_parameter_quality_score_v1f(
+            row["stability"],
+            row["signal_interest"],
+            row["control_strength"],
+            row["overclaim_risk"],
+        )
+        row["quality_score"] = score
+        row["quality_label"] = _dti_parameter_quality_label_v1f(score)
+        row["claim_readiness"] = max(0, min(7, int(round(score * 7 / 100))))
+
+    df = pd.DataFrame(rows)
+
+    st.markdown("#### Total evaluation table")
+    st.caption(
+        "Color meaning: GREEN is promising, YELLOW is partial but useful, ORANGE needs control, "
+        "RED is blocked for claim-making, and GRAY is not evaluated. Scores are UI meta-scores only."
+    )
+
+    display_cols = [
+        "parameter",
+        "research_role",
+        "quality_label",
+        "quality_score",
+        "claim_readiness",
+        "positive_signal",
+        "risk_blocker",
+        "next_test",
+        "safe_interpretation",
+    ]
+
+    try:
+        styled = df[display_cols].style.apply(_dti_parameter_quality_style_v1f, axis=1)
+        st.dataframe(styled, use_container_width=True, hide_index=True)
+    except Exception:
+        st.dataframe(df[display_cols], use_container_width=True, hide_index=True)
+
+    st.markdown("#### Best current leads")
+
+    sorted_df = df.sort_values(["quality_score", "claim_readiness"], ascending=False)
+    best = sorted_df.head(3)
+
+    for _, row in best.iterrows():
+        st.success(
+            f"{row['parameter']}: {row['quality_label']} "
+            f"(score {row['quality_score']}/100, readiness {row['claim_readiness']}/7). "
+            f"Next test: {row['next_test']}"
+        )
+
+    st.markdown("#### How to use this table")
+
+    st.code(
+        """Use rule:
+1. Prefer GREEN/YELLOW rows as research leads.
+2. Treat ORANGE rows as control-needed directions.
+3. Treat RED rows as blocked for claim-making, not necessarily useless.
+4. Never convert this table into a likelihood, posterior, Planck, or final-physics claim.
+5. Use the next_test column to design the next bounded comparison.""",
+        language="text",
+    )
+
+    st.caption(
+        "Boundary: this matrix is a research-planning UI layer only. It does not compute likelihoods, "
+        "posterior probabilities, Planck validation, graph outputs, 7c continuity closure, physics values, "
+        "manuscript values, Render API changes, or Streamlit Secret changes."
+    )
+# --- /DTI_PARAMETER_QUALITY_MATRIX_V1F ---
+
+
+
 # --- DTI_7A_PUBLIC_LOCAL_ENDPOINT_RESOLVER_V1 ---
 # Public/local endpoint resolver for Section 7a.
 # Local app may use http://127.0.0.1:8010/axiclass/fixed-example-compact.
@@ -3815,6 +4038,9 @@ def _render_local_axiclass_fixed_example_v606():
 
     # DTI_DISCOVERY_SCORE_PANEL_CALL_V1E
     _dti_render_discovery_score_panel_v1e()
+
+    # DTI_PARAMETER_QUALITY_MATRIX_CALL_V1F
+    _dti_render_parameter_quality_matrix_v1f()
 
     st.header("7a. AxiCLASS fixed-example check")
 
