@@ -2020,6 +2020,156 @@ What would make this probe more claim-ready?""",
 # --- /DTI_PROBE_RESULT_VALUE_MATRIX_V1 ---
 
 
+
+# --- DTI_READOUT_CARD_DETAIL_GUIDE_V1B ---
+# Independent explanation layer for Current input model safety/readout cards.
+# Safe insertion policy:
+# - Do not modify the existing readout card columns.
+# - Do not enter existing button / if / with blocks.
+# - Use a separate guide immediately after the readout-card section header.
+# - UI explanation only; no likelihood, posterior, Planck validation, graph rendering, 7c execution, physics update, or manuscript update.
+_DTI_READOUT_CARD_DETAIL_GUIDE_V1B = True
+
+def _dti_readout_card_detail_rows_v1b():
+    return [
+        {
+            "name": "H0",
+            "role": "branch coordinate / fixed-H0 label",
+            "why": "H0 identifies which branch-like basin or fixed-H0 representative the current input is probing.",
+            "safe": "Treat it as a scenario label or branch coordinate inside the app, not as a standalone cosmological conclusion.",
+            "not_claim": "Do not claim that this card alone validates, excludes, or solves a cosmological model.",
+            "next": "Compare the same probe under controlled neighboring settings and check whether the response direction is stable.",
+        },
+        {
+            "name": "f_EDE",
+            "role": "early-time modification scan coordinate",
+            "why": "f_EDE marks the controlled deformation direction used to explore whether the response pattern changes across the scan.",
+            "safe": "Useful as a bounded scan coordinate and triage variable.",
+            "not_claim": "Do not claim mechanism proof or model validation from this single readout.",
+            "next": "Check adjacent f_EDE values and preserve the same source-lock / audit boundary.",
+        },
+        {
+            "name": "omega_cdm",
+            "role": "dark-sector compensation direction",
+            "why": "omega_cdm can indicate how much compensating burden shifts into the cold-dark-matter sector.",
+            "safe": "Use it as a candidate companion direction when interpreting branch response.",
+            "not_claim": "Do not claim posterior preference from the card alone.",
+            "next": "Inspect sign stability and whether the shift survives fixed nuisance controls.",
+        },
+        {
+            "name": "omega_b",
+            "role": "baryon-sector control coordinate",
+            "why": "omega_b helps separate baryon-load changes from dark-sector or H0-linked compensation.",
+            "safe": "Useful as a control or diagnostic coordinate.",
+            "not_claim": "Do not overread it as the main driver unless an audited run supports that.",
+            "next": "Compare it against omega_cdm and H0 response under the same profile settings.",
+        },
+        {
+            "name": "n_s",
+            "role": "spectral-tilt compensation coordinate",
+            "why": "n_s can show whether the current input is relying on tilt-like compensation.",
+            "safe": "Read as a compensation indicator, not as a final physical explanation.",
+            "not_claim": "Do not claim a validated tilt mechanism from the UI card.",
+            "next": "Check whether the same compensation appears in source-locked or run-derived outputs.",
+        },
+        {
+            "name": "z_c",
+            "role": "transition / timing coordinate",
+            "why": "z_c marks where the early-time feature is placed in the model input.",
+            "safe": "Use it to understand timing sensitivity in the current input profile.",
+            "not_claim": "Do not infer a detected physical transition from this card.",
+            "next": "Test neighboring timing choices only through explicit controlled probes.",
+        },
+        {
+            "name": "theta_i",
+            "role": "initial-condition / model-shape coordinate",
+            "why": "theta_i affects the model shape and can change the qualitative profile behavior.",
+            "safe": "Useful for checking whether the input is exploring the intended family region.",
+            "not_claim": "Do not treat it as evidence for a preferred physical initial condition.",
+            "next": "Keep it source-locked when comparing profiles.",
+        },
+        {
+            "name": "A_s / ln10^10 A_s",
+            "role": "amplitude-side companion coordinate",
+            "why": "Amplitude-side movement can matter when interpreting whether the response is broad or narrow.",
+            "safe": "Use as a companion readout when checking whether the current profile is internally plausible.",
+            "not_claim": "Do not claim Planck validation or likelihood improvement from the card.",
+            "next": "Compare only against real run-derived or live API outputs when available.",
+        },
+        {
+            "name": "tau_reio",
+            "role": "reionization / amplitude-degeneracy control",
+            "why": "tau_reio can signal whether the current profile is relying on a known degeneracy direction.",
+            "safe": "Use as a caution flag and control readout.",
+            "not_claim": "Do not interpret it as posterior evidence.",
+            "next": "Keep the interpretation bounded unless a formal likelihood run is performed.",
+        },
+        {
+            "name": "readout status",
+            "role": "safety and usability state",
+            "why": "The card labels help decide whether the current input is usable for intuition, needs control, or should be treated as awaiting data.",
+            "safe": "Use it for research navigation and next-test design.",
+            "not_claim": "Do not convert the label into a model claim.",
+            "next": "Use 7a / 7b status-linked probe output and the Parameter Quality Matrix before making any stronger statement.",
+        },
+    ]
+
+def _dti_render_one_readout_detail_v1b(row):
+    import streamlit as st
+
+    label = f"{row['name']} — {row['role']}"
+
+    if hasattr(st, "popover"):
+        with st.popover(label, use_container_width=True):
+            st.markdown(f"**Research role:** {row['role']}")
+            st.markdown(f"**Why it matters:** {row['why']}")
+            st.markdown(f"**Safe interpretation:** {row['safe']}")
+            st.markdown(f"**Do not claim:** {row['not_claim']}")
+            st.markdown(f"**Next check:** {row['next']}")
+    else:
+        with st.expander(label, expanded=False):
+            st.markdown(f"**Research role:** {row['role']}")
+            st.markdown(f"**Why it matters:** {row['why']}")
+            st.markdown(f"**Safe interpretation:** {row['safe']}")
+            st.markdown(f"**Do not claim:** {row['not_claim']}")
+            st.markdown(f"**Next check:** {row['next']}")
+
+def _dti_render_readout_card_detail_guide_v1b():
+    import streamlit as st
+
+    st.markdown("#### Readout card detail guide")
+    st.caption(
+        "Open a detail item to see what each current-input card means, what it can teach, "
+        "what remains bounded, and what the next safe check should be. "
+        "This is explanation only, not likelihood evaluation, posterior comparison, Planck validation, "
+        "graph rendering, 7c execution, or a physics-value update."
+    )
+
+    rows = _dti_readout_card_detail_rows_v1b()
+
+    tabs = st.tabs(["Core branch", "Companion parameters", "Safety / next checks"])
+
+    with tabs[0]:
+        for row in rows:
+            if row["name"] in ["H0", "f_EDE", "z_c", "theta_i"]:
+                _dti_render_one_readout_detail_v1b(row)
+
+    with tabs[1]:
+        for row in rows:
+            if row["name"] in ["omega_cdm", "omega_b", "n_s", "A_s / ln10^10 A_s", "tau_reio"]:
+                _dti_render_one_readout_detail_v1b(row)
+
+    with tabs[2]:
+        for row in rows:
+            if row["name"] == "readout status":
+                _dti_render_one_readout_detail_v1b(row)
+
+        st.info(
+            "Reading rule: these cards are navigation aids. They can make the current input easier to understand, "
+            "but they do not create a likelihood result, posterior comparison, Planck validation, or model exclusion."
+        )
+# --- /DTI_READOUT_CARD_DETAIL_GUIDE_V1B ---
+
 # --- DTI_PROBE_RESULT_VALUE_MATRIX_V2 ---
 # Status-linked positive probe evaluation.
 # Reads available 7a / 7b session/API status signals when present.
@@ -5440,6 +5590,8 @@ else:
     st.dataframe(search_df, width="stretch", hide_index=True)
 
 st.subheader("Current input model safety/readout cards")
+# DTI_READOUT_CARD_DETAIL_GUIDE_CALL_V1B
+_dti_render_readout_card_detail_guide_v1b()
 card_cols = st.columns(5)
 for i, p in enumerate(["H0", "omega_b", "omega_cdm", "f_EDE", "z_c"]):
     v = target_model.get(p, np.nan)
