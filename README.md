@@ -259,3 +259,31 @@ Interpretation:
 
 The panel is useful for checking fixed benchmark-difference structure already present in the repository. It is not a solver, not an emulator, and not a posterior or likelihood object. The earlier read-only interpolation audit found that `axiclass_fix1_delta.tsv` does not contain a clear numeric interpolation axis, so the app presents it as a static audit table rather than an interpolation engine.
 
+
+## Vanilla-profile API input/result display V1
+
+The vanilla-profile API area now uses a reader-facing display.
+
+The input section shows the configured API payload as a compact table first. Raw input JSON is preserved under an audit-view expander.
+
+The result section shows:
+
+1. PASS / REVIEW summary,
+2. HTTP status and endpoint summary,
+3. input and derived values in a compact table,
+4. raw API response JSON under an audit-view expander.
+
+Missing lightweight endpoint fields such as `sigma8` or `S8` are displayed as `not returned by this lightweight endpoint`.
+
+Boundary:
+
+- display-only UI polish
+- no CLASS execution
+- no Render API modification
+- no 7c execution
+- no likelihood evaluation
+- no posterior comparison
+- no Planck validation
+- no physics-value update
+- no manuscript update
+

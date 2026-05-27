@@ -302,5 +302,20 @@ Recommended maintenance rules:
 <p>The panel is useful for checking fixed benchmark-difference structure already present in the repository. It is not a solver, not an emulator, and not a posterior or likelihood object. The earlier read-only interpolation audit found that <code>axiclass_fix1_delta.tsv</code> does not contain a clear numeric interpolation axis, so the app presents it as a static audit table rather than an interpolation engine.</p>
 </section>
 
+
+<section>
+<h2>Vanilla-profile API input/result display V1</h2>
+<p>The vanilla-profile API area now uses a reader-facing display.</p>
+<p>The input section shows the configured API payload as a compact table first. Raw input JSON is preserved under an audit-view expander.</p>
+<ol>
+<li>PASS / REVIEW summary</li>
+<li>HTTP status and endpoint summary</li>
+<li>input and derived values in a compact table</li>
+<li>raw API response JSON under an audit-view expander</li>
+</ol>
+<p>Missing lightweight endpoint fields such as <code>sigma8</code> or <code>S8</code> are displayed as <code>not returned by this lightweight endpoint</code>.</p>
+<p><strong>Boundary:</strong> display-only UI polish; no CLASS execution; no Render API modification; no 7c execution; no likelihood evaluation; no posterior comparison; no Planck validation; no physics-value update; no manuscript update.</p>
+</section>
+
 </body>
 </html>

@@ -5424,6 +5424,108 @@ def _dti_static_delta_table_compact_v1b(df):
 
 # --- /DTI_STATIC_DELTA_AUDIT_TABLE_V1 ---
 
+# --- DTI_VANILLA_INPUT_RESULT_DISPLAY_POLISH_V1 ---
+# Reader-facing display helpers for vanilla-profile API input/result.
+# Boundary: UI display only; no CLASS execution, no Render API modification,
+# no likelihood evaluation, no posterior comparison, no Planck validation.
+
+_DTI_VANILLA_INPUT_RESULT_DISPLAY_POLISH_V1 = True
+
+def _dti_vanilla_display_value_v1(value):
+    if value is None:
+        return "not returned by this lightweight endpoint"
+    try:
+        if pd.isna(value):
+            return "not returned by this lightweight endpoint"
+    except Exception:
+        pass
+    if isinstance(value, float):
+        return round(value, 6)
+    return value
+
+def _dti_vanilla_payload_rows_v1(payload):
+    rows = []
+    if isinstance(payload, dict):
+        for key in ["H0", "omega_cdm", "omega_b", "n_s", "ln10_10_As", "tau_reio", "sigma8", "S8", "f_EDE", "z_c"]:
+            if key in payload:
+                rows.append({"field": key, "value": _dti_vanilla_display_value_v1(payload.get(key))})
+    return rows
+
+def _dti_vanilla_result_rows_v1(result):
+    rows = []
+    if not isinstance(result, dict):
+        return rows
+
+    for key in ["ok", "status", "endpoint", "version"]:
+        if key in result:
+            rows.append({"field": key, "value": _dti_vanilla_display_value_v1(result.get(key))})
+
+    inp = result.get("input", {})
+    if isinstance(inp, dict):
+        for key in ["H0", "omega_cdm", "omega_b", "n_s", "ln10_10_As", "tau_reio", "sigma8", "S8", "f_EDE", "z_c"]:
+            if key in inp:
+                rows.append({"field": f"input.{key}", "value": _dti_vanilla_display_value_v1(inp.get(key))})
+
+    drv = result.get("derived", {})
+    if isinstance(drv, dict):
+        for key in ["h", "omega_m_proxy", "sigma8_reference", "S8_proxy_from_reference", "S8_proxy"]:
+            if key in drv:
+                rows.append({"field": f"derived.{key}", "value": _dti_vanilla_display_value_v1(drv.get(key))})
+
+    return rows
+
+def _dti_render_vanilla_probe_input_display_v1(payload):
+    st.caption(
+        "Payload preview for the configured vanilla-profile API endpoint. "
+        "Shown as a compact table first; raw JSON is preserved below for audit."
+    )
+    rows = _dti_vanilla_payload_rows_v1(payload)
+    if rows:
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    else:
+        st.info("No vanilla-profile payload values are available yet.")
+    with st.expander("Raw live probe input JSON — audit view", expanded=False):
+        st.json(payload)
+
+def _dti_render_vanilla_api_result_display_v1(result, http_status=None, cache_note=None):
+    # st.markdown("### Vanilla-profile API check result")  # rendered by DTI_VANILLA_INPUT_RESULT_DISPLAY_POLISH_V1
+
+    ok = bool(result.get("ok")) if isinstance(result, dict) else False
+    status = result.get("status", "unknown") if isinstance(result, dict) else "unknown"
+    endpoint = result.get("endpoint", "unknown") if isinstance(result, dict) else "unknown"
+
+    if ok and str(status).lower() == "ok":
+        st.success(f"Vanilla-profile API check: PASS / HTTP {http_status if http_status is not None else 'unknown'}")
+    else:
+        st.warning(f"Vanilla-profile API check: REVIEW / HTTP {http_status if http_status is not None else 'unknown'}")
+
+    summary_rows = [
+        {"field": "HTTP status", "value": http_status if http_status is not None else "unknown"},
+        {"field": "API status", "value": status},
+        {"field": "endpoint", "value": endpoint},
+        {"field": "boundary", "value": "exploratory API check only; not likelihood, posterior, or Planck validation"},
+    ]
+    if cache_note:
+        summary_rows.append({"field": "frontend cache", "value": cache_note})
+
+    st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+
+    rows = _dti_vanilla_result_rows_v1(result)
+    if rows:
+        st.markdown("#### Input and derived summary")
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    with st.expander("Raw API response JSON — audit view", expanded=False):
+        st.json(result)
+
+# DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B
+# Raw API response expander must render st.json(result), not call the result renderer recursively.
+_DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B = True
+# /DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B
+
+# --- /DTI_VANILLA_INPUT_RESULT_DISPLAY_POLISH_V1 ---
+
+
 
 
 
@@ -7283,10 +7385,10 @@ live_payload = {
 }
 
 st.caption(
-    "The JSON below is the actual payload sent to the configured vanilla-profile API endpoint. It should match the compatible current sidebar profile values unless Custom is selected."
+    "The compact table below is the payload sent to the configured vanilla-profile API endpoint. Raw JSON is folded below for audit."
 )
 
-st.json(live_payload)
+_dti_render_vanilla_probe_input_display_v1(live_payload)
 
 import json as _json_section8b
 import io as _io_section8b
