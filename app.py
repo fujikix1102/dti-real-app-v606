@@ -5516,7 +5516,9 @@ def _dti_render_vanilla_api_result_display_v1(result, http_status=None, cache_no
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
     with st.expander("Raw API response JSON — audit view", expanded=False):
-        st.json(result)
+        # DTI_7C_EXAMINER_PAYLOAD_DISPLAY_CALL_V1
+        _dti_render_7c_examiner_payload_display_v1(result)
+        # /DTI_7C_EXAMINER_PAYLOAD_DISPLAY_CALL_V1
 
 # DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B
 # Raw API response expander must render st.json(result), not call the result renderer recursively.
@@ -5524,6 +5526,114 @@ _DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B = True
 # /DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B
 
 # --- /DTI_VANILLA_INPUT_RESULT_DISPLAY_POLISH_V1 ---
+
+
+# --- DTI_7C_EXAMINER_PAYLOAD_DISPLAY_POLISH_V1 ---
+# Reader-facing display helper for 7c continuity/discontinuity examiner payloads.
+# Boundary: UI display only. No CLASS execution, no Render API modification,
+# no 7c execution, no likelihood evaluation, no posterior comparison,
+# no Planck validation, no physics-value update, and no graph rendering.
+
+_DTI_7C_EXAMINER_PAYLOAD_DISPLAY_POLISH_V1 = True
+
+def _dti_7c_display_value_v1(value):
+    if value is None:
+        return "not provided"
+    try:
+        if pd.isna(value):
+            return "not provided"
+    except Exception:
+        pass
+    if isinstance(value, float):
+        return round(value, 6)
+    return value
+
+def _dti_7c_dict_rows_v1(obj, prefix=""):
+    rows = []
+    if not isinstance(obj, dict):
+        return rows
+    for key, value in obj.items():
+        label = f"{prefix}{key}" if prefix else str(key)
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                rows.append({
+                    "field": f"{label}.{sub_key}",
+                    "value": _dti_7c_display_value_v1(sub_value),
+                })
+        else:
+            rows.append({
+                "field": label,
+                "value": _dti_7c_display_value_v1(value),
+            })
+    return rows
+
+def _dti_render_7c_examiner_payload_display_v1(payload):
+    st.caption(
+        "7c examiner payload preview. Compact audit tables are shown first; raw JSON is preserved below. "
+        "This is local exploratory triage input only, not a physical-discontinuity proof."
+    )
+
+    if not isinstance(payload, dict):
+        st.info("7c examiner payload is not available yet.")
+        with st.expander("Raw 7c examiner payload JSON — audit view", expanded=False):
+            st.json(payload)
+        return
+
+    boundary = payload.get("boundary", {})
+    sweep = payload.get("sweep", {})
+    base_payload = payload.get("base_payload", {})
+
+    boundary_rows = []
+    if isinstance(boundary, dict):
+        for key in [
+            "local_only",
+            "experimental",
+            "non_canonical",
+            "likelihood_evaluation",
+            "posterior_comparison",
+            "planck_validation",
+            "physical_discontinuity_proof",
+        ]:
+            if key in boundary:
+                boundary_rows.append({"field": key, "value": _dti_7c_display_value_v1(boundary.get(key))})
+
+    sweep_rows = []
+    if isinstance(sweep, dict):
+        for key in ["parameter", "start", "end", "grid_points", "repeat_count", "relative_jump_threshold"]:
+            if key in sweep:
+                sweep_rows.append({"field": key, "value": _dti_7c_display_value_v1(sweep.get(key))})
+
+    input_rows = []
+    if isinstance(base_payload, dict):
+        for key in ["H0", "omega_cdm", "omega_b", "n_s", "ln10_10_As", "tau_reio", "sigma8", "S8", "f_EDE", "z_c"]:
+            if key in base_payload:
+                input_rows.append({"field": key, "value": _dti_7c_display_value_v1(base_payload.get(key))})
+
+    summary_rows = [
+        {"field": "panel", "value": "7c continuity/discontinuity examiner"},
+        {"field": "display mode", "value": "compact payload preview"},
+        {"field": "interpretation", "value": "exploratory local triage input only"},
+        {"field": "claim boundary", "value": "not likelihood, posterior, Planck validation, or physical-discontinuity proof"},
+    ]
+    st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+
+    if sweep_rows:
+        st.markdown("#### Sweep summary")
+        st.dataframe(pd.DataFrame(sweep_rows), use_container_width=True, hide_index=True)
+
+    if input_rows:
+        st.markdown("#### Base payload summary")
+        st.dataframe(pd.DataFrame(input_rows), use_container_width=True, hide_index=True)
+
+    if boundary_rows:
+        st.markdown("#### Boundary flags")
+        st.dataframe(pd.DataFrame(boundary_rows), use_container_width=True, hide_index=True)
+
+    with st.expander("Raw 7c examiner payload JSON — audit view", expanded=False):
+        st.json(payload)
+
+# --- /DTI_7C_EXAMINER_PAYLOAD_DISPLAY_POLISH_V1 ---
+
 
 
 
