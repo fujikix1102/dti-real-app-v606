@@ -8065,17 +8065,17 @@ def _dti_render_one_cmb_svg_curve_v1(label, ell, y, y_label):
 
     svg = f"""
 <svg viewBox="0 0 {width} {height}" width="100%" height="{height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{label}">
-  <rect x="0" y="0" width="{width}" height="{height}" fill="white" stroke="#ddd"/>
-  <line x1="{pad}" y1="{height-pad}" x2="{width-pad}" y2="{height-pad}" stroke="#999" stroke-width="1"/>
-  <line x1="{pad}" y1="{pad}" x2="{pad}" y2="{height-pad}" stroke="#999" stroke-width="1"/>
-  <text x="{width/2}" y="24" text-anchor="middle" font-size="16" fill="#222">{label}</text>
-  <text x="{width/2}" y="{height-10}" text-anchor="middle" font-size="12" fill="#444">ell</text>
-  <text x="15" y="{height/2}" text-anchor="middle" font-size="12" fill="#444" transform="rotate(-90 15 {height/2})">{y_label}</text>
-  <text x="{pad}" y="{height-pad+18}" text-anchor="middle" font-size="10" fill="#555">{meta['x_min']:.0f}</text>
-  <text x="{width-pad}" y="{height-pad+18}" text-anchor="middle" font-size="10" fill="#555">{meta['x_max']:.0f}</text>
-  <text x="{pad-8}" y="{height-pad}" text-anchor="end" font-size="10" fill="#555">{meta['y_min']:.3g}</text>
-  <text x="{pad-8}" y="{pad+4}" text-anchor="end" font-size="10" fill="#555">{meta['y_max']:.3g}</text>
-  <polyline fill="none" stroke="#222" stroke-width="1.4" points="{points}"/>
+  <rect x="0" y="0" width="{width}" height="{height}" fill="#0f172a" stroke="#334155"/>
+  <line x1="{pad}" y1="{height-pad}" x2="{width-pad}" y2="{height-pad}" stroke="#64748b" stroke-width="1"/>
+  <line x1="{pad}" y1="{pad}" x2="{pad}" y2="{height-pad}" stroke="#64748b" stroke-width="1"/>
+  <text x="{width/2}" y="24" text-anchor="middle" font-size="16" fill="#e5e7eb">{label}</text>
+  <text x="{width/2}" y="{height-10}" text-anchor="middle" font-size="12" fill="#cbd5e1">ell</text>
+  <text x="15" y="{height/2}" text-anchor="middle" font-size="12" fill="#cbd5e1" transform="rotate(-90 15 {height/2})">{y_label}</text>
+  <text x="{pad}" y="{height-pad+18}" text-anchor="middle" font-size="10" fill="#cbd5e1">{meta['x_min']:.0f}</text>
+  <text x="{width-pad}" y="{height-pad+18}" text-anchor="middle" font-size="10" fill="#cbd5e1">{meta['x_max']:.0f}</text>
+  <text x="{pad-8}" y="{height-pad}" text-anchor="end" font-size="10" fill="#cbd5e1">{meta['y_min']:.3g}</text>
+  <text x="{pad-8}" y="{pad+4}" text-anchor="end" font-size="10" fill="#cbd5e1">{meta['y_max']:.3g}</text>
+  <polyline fill="none" stroke="#f8fafc" stroke-width="1.8" points="{points}"/>
 </svg>
 """
     st.markdown(svg, unsafe_allow_html=True)
