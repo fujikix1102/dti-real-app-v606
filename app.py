@@ -10664,6 +10664,11 @@ if external_api_result:
         st.caption("Large arrays are summarized here to keep the UI readable. The CMB graph still uses the full real API arrays.")
         _dti_render_summarized_raw_api_payload_v1(external_api_result)
 
+    # === DTI EXTERNAL RESULT DIRECT CMB GRAPH V1 ===
+    with st.expander("CMB spectra graph — real API arrays only", expanded=True):
+        _dti_render_real_api_cmb_svg_graph_v1(external_api_result)
+    # === END DTI EXTERNAL RESULT DIRECT CMB GRAPH V1 ===
+
 
 st.header("10. Interpretation boundary")
 
