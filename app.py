@@ -5766,7 +5766,7 @@ def _dti_render_background_geometry_anchor_v1():
             bg_z = st.number_input(
                 "Geometry redshift z",
                 min_value=0.0,
-                max_value=20.0,
+                max_value=1500.0,
                 value=3.0,
                 step=0.1,
                 format="%.3f",
