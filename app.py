@@ -5201,6 +5201,7 @@ def _dti_correlated_boundary_score_v1(h0, s8, omega_cdm=None, f_ede=None):
 
 def _dti_render_correlated_boundary_triage_v1():
     st.markdown("### Correlated-boundary triage proxy")
+    _dti_panel_note_v1("Summary → compact table → raw audit view. Proxy-only; detailed limits are in Global claim limits / audit boundary.")
     st.caption(
         "Lightweight geometric audit proxy. No CLASS run, no Render API call, no likelihood evaluation, "
         "no posterior comparison, no Planck validation, and no physics-value update."
@@ -5294,6 +5295,7 @@ def _dti_read_static_delta_table_v1():
 
 def _dti_render_static_delta_audit_table_v1():
     st.markdown("### AxiCLASS FIX1 static delta audit table")
+    _dti_panel_note_v1("Summary → compact table → raw audit view. Static TSV display only; detailed limits are centralized above.")
     st.caption(
         "Local static TSV checkpoint display only. No interpolation, no CLASS run, no Render API call, "
         "no likelihood evaluation, no posterior comparison, no Planck validation, and no physics-value update."
@@ -5484,7 +5486,7 @@ def _dti_render_vanilla_probe_input_display_v1(payload):
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
     else:
         st.info("No vanilla-profile payload values are available yet.")
-    with st.expander("Raw live probe input JSON — audit view", expanded=False):
+    with st.expander("Raw data — audit view", expanded=False):
         st.json(payload)
 
 def _dti_render_vanilla_api_result_display_v1(result, http_status=None, cache_note=None):
@@ -5515,7 +5517,7 @@ def _dti_render_vanilla_api_result_display_v1(result, http_status=None, cache_no
         st.markdown("#### Input and derived summary")
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
-    with st.expander("Raw API response JSON — audit view", expanded=False):
+    with st.expander("Raw data — audit view", expanded=False):
         # DTI_VANILLA_RAW_RESULT_JSON_FIX_AFTER_7C_MISPATCH_V1D
         st.json(result)
         # /DTI_VANILLA_RAW_RESULT_JSON_FIX_AFTER_7C_MISPATCH_V1D
@@ -5527,6 +5529,41 @@ _DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B = True
 
 # --- /DTI_VANILLA_INPUT_RESULT_DISPLAY_POLISH_V1 ---
 
+
+
+# --- DTI_UI_CONSOLIDATION_V1 ---
+# Display-only consolidation layer.
+# Purpose: reduce repeated boundary text while keeping audit safeguards visible.
+# Boundary: no CLASS execution, no Render API modification, no 7c execution,
+# no likelihood evaluation, no posterior comparison, no Planck validation,
+# no physics-value update, no graph rendering, and no manuscript update.
+
+_DTI_UI_CONSOLIDATION_V1 = True
+
+def _dti_render_global_claim_limits_audit_boundary_v1():
+    st.markdown("### Global claim limits / audit boundary")
+    st.caption(
+        "Applies to all panels unless a panel explicitly states otherwise. "
+        "Panel-local notes are intentionally short; detailed limits are centralized here."
+    )
+    with st.expander("Global claim limits / audit boundary", expanded=False):
+        rows = [
+            {"scope": "CLASS / solver", "limit": "No CLASS execution is performed by display-only panels."},
+            {"scope": "Render API", "limit": "No Render API modification and no Streamlit Secret modification."},
+            {"scope": "7c", "limit": "7c remains gated; display polish is not 7c execution or 7c logic modification."},
+            {"scope": "Statistics", "limit": "No likelihood evaluation and no posterior comparison."},
+            {"scope": "Validation", "limit": "No Planck validation and no model validation claim."},
+            {"scope": "Physics values", "limit": "No physics-value update."},
+            {"scope": "Graphs", "limit": "No graph rendering is reopened."},
+            {"scope": "Manuscript", "limit": "No manuscript update or manuscript conclusion."},
+            {"scope": "Raw data", "limit": "Raw payloads remain available under Raw data — audit view expanders."},
+        ]
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+def _dti_panel_note_v1(text):
+    st.caption(text)
+
+# --- /DTI_UI_CONSOLIDATION_V1 ---
 
 # --- DTI_7C_EXAMINER_PAYLOAD_DISPLAY_POLISH_V1 ---
 # Reader-facing display helper for 7c continuity/discontinuity examiner payloads.
@@ -5575,7 +5612,7 @@ def _dti_render_7c_examiner_payload_display_v1(payload):
 
     if not isinstance(payload, dict):
         st.info("7c examiner payload is not available yet.")
-        with st.expander("Raw 7c examiner payload JSON — audit view", expanded=False):
+        with st.expander("Raw data — audit view", expanded=False):
             st.json(payload)
         return
 
@@ -5629,7 +5666,7 @@ def _dti_render_7c_examiner_payload_display_v1(payload):
         st.markdown("#### Boundary flags")
         st.dataframe(pd.DataFrame(boundary_rows), use_container_width=True, hide_index=True)
 
-    with st.expander("Raw 7c examiner payload JSON — audit view", expanded=False):
+    with st.expander("Raw data — audit view", expanded=False):
         st.json(payload)
 
 # --- /DTI_7C_EXAMINER_PAYLOAD_DISPLAY_POLISH_V1 ---
@@ -6907,6 +6944,10 @@ _dti_main_candidate_reference_panel_v1()
 
 # DTI_VISITOR_QUICK_GUIDE_CALL_V1
 _dti_render_visitor_quick_guide_v1()
+
+# DTI_GLOBAL_CLAIM_LIMITS_AUDIT_BOUNDARY_CALL_V1
+_dti_render_global_claim_limits_audit_boundary_v1()
+# /DTI_GLOBAL_CLAIM_LIMITS_AUDIT_BOUNDARY_CALL_V1
 
 
 # DTI_CANDIDATE_TEXT_SAFE_FALLBACK_V1B
