@@ -6095,12 +6095,20 @@ with st.sidebar:
         preset_names,
         current_default="FUJIKI_DTI_Candidate_v6" if "FUJIKI_DTI_Candidate_v6" in preset_names else (preset_names[0] if preset_names else None),
     )
+    # DTI_CURRENT_SELECTED_SAFE_FALLBACK_V2C
+    if 'current_selected' not in globals() and 'current_selected' not in locals():
+        current_selected = selected_preset if selected_preset in preset_names else None
+        if current_selected is None and "FUJIKI_DTI_Candidate_v6" in preset_names:
+            current_selected = "FUJIKI_DTI_Candidate_v6"
+        if current_selected is None and preset_names:
+            current_selected = preset_names[0]
+    # /DTI_CURRENT_SELECTED_SAFE_FALLBACK_V2C
     with st.sidebar.expander("Fallback: legacy registered profile loader", expanded=False):
         st.caption("Fallback only. Normal use should use Profile category → ACTIVE loader above.")
         _dti_fallback_selected_preset_v2b = st.selectbox(
             "Load registered profile — ACTIVE loader",
             preset_names,
-            index=preset_names.index(current_selected) if current_selected in preset_names else 0,
+            index=preset_names.index(current_selected) if ('current_selected' in locals() and current_selected in preset_names) else 0,
             key="selected_preset_selector_v606",
         )
         if _dti_fallback_selected_preset_v2b and _dti_fallback_selected_preset_v2b != selected_preset:
