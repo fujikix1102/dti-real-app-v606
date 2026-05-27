@@ -6025,7 +6025,7 @@ def _dti_render_background_geometry_jump_toy_v1b(H0, omega_m, omega_vac, z):
                 min_value=0.1,
                 max_value=10.0,
                 value=1.05,
-                step=0.01,
+                step=0.0001,
                 format="%.4f",
                 key="dti_bggeom_jump_factor_v1b",
             )
