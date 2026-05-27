@@ -5062,6 +5062,158 @@ def _dti_profile_category_preview_models_v1e(selected_category, grouped_models, 
 _DTI_SHOW_ALL_PROFILES_TABLE_V1F = True
 # --- /DTI_SHOW_ALL_PROFILES_TABLE_V1F ---
 
+# --- DTI_CORRELATED_BOUNDARY_TRIAGE_V1 ---
+# Lightweight geometric proxy for correlated-boundary triage.
+# Boundary: proxy only; not likelihood evaluation, not posterior comparison,
+# not Planck validation, not model validation, not physics-value update.
+
+_DTI_CORRELATED_BOUNDARY_TRIAGE_V1 = True
+
+def _dti_float_v1(value, default=None):
+    try:
+        if value is None:
+            return default
+        return float(value)
+    except Exception:
+        return default
+
+def _dti_correlated_boundary_score_v1(h0, s8, omega_cdm=None, f_ede=None):
+    """
+    Lightweight correlated-boundary proxy.
+
+    This is an analytic triage surface, not a likelihood surface.
+    It uses bounded geometric rules to refine GREEN / ORANGE / RED
+    triage sensitivity without running CLASS, MCMC, or external APIs.
+    """
+    h0 = _dti_float_v1(h0, None)
+    s8 = _dti_float_v1(s8, None)
+    omega_cdm = _dti_float_v1(omega_cdm, None)
+    f_ede = _dti_float_v1(f_ede, 0.0)
+
+    if h0 is None or s8 is None:
+        return {
+            "status": "GRAY",
+            "score": None,
+            "reason": "insufficient H0 / S8 inputs",
+            "boundary": "proxy only",
+            "safe_interpretation": "No correlated-boundary proxy was evaluated because required fields are missing.",
+            "not_claim": "not likelihood evaluation; not posterior comparison; not Planck validation",
+        }
+
+    # Baseline geometric proxy:
+    # High H0 with high S8 is penalized more strongly than either variable alone.
+    # These constants are deliberately conservative UI-triage constants, not fitted posterior values.
+    h0_center = 67.4
+    s8_center = 0.811
+    h0_scale = 4.2
+    s8_scale = 0.035
+    rho = 0.58
+
+    x = (h0 - h0_center) / h0_scale
+    y = (s8 - s8_center) / s8_scale
+    denom = max(1e-9, 1.0 - rho * rho)
+    ellipse_score = (x * x - 2.0 * rho * x * y + y * y) / denom
+
+    # Additional burden terms.
+    ede_burden = max(0.0, f_ede - 0.03) / 0.04
+    omega_burden = 0.0
+    if omega_cdm is not None:
+        omega_burden = max(0.0, omega_cdm - 0.125) / 0.012
+
+    composite_score = float(ellipse_score + 0.35 * ede_burden * ede_burden + 0.20 * omega_burden * omega_burden)
+
+    if composite_score < 2.30:
+        status = "GREEN"
+        reason = "inside conservative correlated proxy boundary"
+        safe = "The input sits inside the lightweight correlated-boundary proxy."
+    elif composite_score < 5.99:
+        status = "ORANGE"
+        reason = "near correlated proxy caution boundary"
+        safe = "The input is near a correlated-boundary caution region and should be checked before stronger interpretation."
+    else:
+        status = "RED"
+        reason = "outside correlated proxy caution boundary"
+        safe = "The input is outside the lightweight correlated-boundary proxy and should not be promoted without stronger audited support."
+
+    return {
+        "status": status,
+        "score": round(composite_score, 3),
+        "ellipse_score": round(float(ellipse_score), 3),
+        "ede_burden": round(float(ede_burden), 3),
+        "omega_burden": round(float(omega_burden), 3),
+        "reason": reason,
+        "boundary": "correlated-boundary proxy only",
+        "safe_interpretation": safe,
+        "not_claim": "not likelihood evaluation; not posterior comparison; not Planck validation; not physical-discontinuity proof",
+    }
+
+def _dti_render_correlated_boundary_triage_v1():
+    st.markdown("### Correlated-boundary triage proxy")
+    st.caption(
+        "Lightweight geometric audit proxy. No CLASS run, no Render API call, no likelihood evaluation, "
+        "no posterior comparison, no Planck validation, and no physics-value update."
+    )
+
+    candidate_text = st.session_state.get("paper_text", "") or st.session_state.get("paper_text_widget", "")
+    parsed = parse_target_model(candidate_text) if candidate_text else {}
+
+    h0 = parsed.get("H0", st.session_state.get("H0", None))
+    s8 = parsed.get("S8", st.session_state.get("S8", None))
+    omega_cdm = parsed.get("omega_cdm", parsed.get("omega_c", st.session_state.get("omega_cdm", None)))
+    f_ede = parsed.get("f_EDE", parsed.get("fede", st.session_state.get("f_EDE", 0.0)))
+
+    result = _dti_correlated_boundary_score_v1(h0, s8, omega_cdm=omega_cdm, f_ede=f_ede)
+
+    status = result.get("status", "GRAY")
+    score = result.get("score")
+
+    if status == "GREEN":
+        st.success(f"Correlated-boundary proxy: GREEN / score={score}")
+    elif status == "ORANGE":
+        st.warning(f"Correlated-boundary proxy: ORANGE / score={score}")
+    elif status == "RED":
+        st.error(f"Correlated-boundary proxy: RED / score={score}")
+    else:
+        st.info("Correlated-boundary proxy: GRAY / insufficient inputs")
+
+    rows = [
+        {"field": "H0", "value": h0},
+        {"field": "S8", "value": s8},
+        {"field": "omega_cdm", "value": omega_cdm},
+        {"field": "f_EDE", "value": f_ede},
+        {"field": "status", "value": result.get("status")},
+        {"field": "score", "value": result.get("score")},
+        {"field": "ellipse_score", "value": result.get("ellipse_score")},
+        {"field": "ede_burden", "value": result.get("ede_burden")},
+        {"field": "omega_burden", "value": result.get("omega_burden")},
+        {"field": "reason", "value": result.get("reason")},
+    ]
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    with st.expander("Boundary and claim limits", expanded=False):
+        st.markdown(
+            """
+This panel is a **triage proxy only**.
+
+It is designed to improve audit sensitivity by using a correlated geometric boundary rather than a single fixed threshold.
+
+It is **not**:
+
+- a likelihood evaluation
+- a posterior comparison
+- a Planck validation
+- a model validation
+- a physical-discontinuity proof
+- a physics-value update
+- a manuscript conclusion
+"""
+        )
+        st.caption(result.get("safe_interpretation", ""))
+        st.caption(result.get("not_claim", ""))
+
+# --- /DTI_CORRELATED_BOUNDARY_TRIAGE_V1 ---
+
+
 
 # --- /DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL ---
 
@@ -6331,6 +6483,11 @@ _dti_main_candidate_reference_panel_v1()
 
 # DTI_VISITOR_QUICK_GUIDE_CALL_V1
 _dti_render_visitor_quick_guide_v1()
+
+
+# DTI_CORRELATED_BOUNDARY_TRIAGE_CALL_V1
+_dti_render_correlated_boundary_triage_v1()
+# /DTI_CORRELATED_BOUNDARY_TRIAGE_CALL_V1
 
 st.header("5. AxiCLASS FIX1 locked benchmark")
 
