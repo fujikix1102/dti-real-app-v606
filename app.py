@@ -5797,6 +5797,320 @@ def _dti_render_background_geometry_anchor_v1():
         
         # DTI_BACKGROUND_GEOMETRY_GRAPH_CALL_V1
         _dti_render_background_geometry_graph_v1(bg_H0, bg_om, bg_ov, bg_z)
+
+        # DTI_BACKGROUND_GEOMETRY_JUMP_TOY_CALL_V1B
+        _dti_render_background_geometry_jump_toy_v1b(bg_H0, bg_om, bg_ov, bg_z)
+        # /DTI_BACKGROUND_GEOMETRY_JUMP_TOY_CALL_V1B
+
+
+# --- DTI_BACKGROUND_GEOMETRY_JUMP_TOY_COMPARATOR_V1B ---
+# Local toy comparator: continuous FLRW baseline vs a piecewise jump in E(z).
+# Boundary: background-geometry diagnostic only. No CLASS, no Render API,
+# no likelihood evaluation, no posterior comparison, no Planck/JWST validation.
+_DTI_BACKGROUND_GEOMETRY_JUMP_TOY_COMPARATOR_V1B = True
+
+def _dti_bggeom_E_jump_toy_v1b(z, omega_m, omega_vac, z_jump, jump_factor):
+    base = _dti_bggeom_E_v1(z, omega_m, omega_vac)
+    try:
+        zf = float(z)
+        zj = float(z_jump)
+        jf = float(jump_factor)
+    except Exception:
+        return None
+    if base is None:
+        return None
+    if zf > zj:
+        return jf * float(base)
+    return float(base)
+
+def _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor):
+    import math as _math_jump_v1b
+
+    try:
+        H0 = float(H0)
+        omega_m = float(omega_m)
+        omega_vac = float(omega_vac)
+        z = float(z)
+        z_jump = float(z_jump)
+        jump_factor = float(jump_factor)
+    except Exception:
+        return {"status": "invalid_input", "boundary": "jump toy background geometry only"}
+
+    if H0 <= 0 or omega_m < 0 or omega_vac < 0 or z < 0 or z_jump < 0 or jump_factor <= 0:
+        return {"status": "invalid_support", "boundary": "jump toy background geometry only"}
+
+    c_km_s = 299792.458
+    dh_mpc = c_km_s / H0
+    hubble_time_gyr = 9.778131 / (H0 / 100.0)
+
+    def E_jump(zz):
+        return _dti_bggeom_E_jump_toy_v1b(zz, omega_m, omega_vac, z_jump, jump_factor)
+
+    def inv_E(zz):
+        E = E_jump(zz)
+        if E is None or E <= 0:
+            return 0.0
+        return 1.0 / E
+
+    def inv_age_y(y):
+        zz = _math_jump_v1b.exp(y) - 1.0
+        E = E_jump(zz)
+        if E is None or E <= 0:
+            return 0.0
+        return 1.0 / E
+
+    y_max_age = _math_jump_v1b.log(1.0 + 100000.0)
+    y_z = _math_jump_v1b.log(1.0 + z)
+
+    age_now_int = _dti_bggeom_integrate_simpson_v1(inv_age_y, 0.0, y_max_age, n=12000)
+    age_at_z_int = _dti_bggeom_integrate_simpson_v1(inv_age_y, y_z, y_max_age, n=12000)
+    lookback_int = _dti_bggeom_integrate_simpson_v1(inv_age_y, 0.0, y_z, n=2400)
+    dc_int = _dti_bggeom_integrate_simpson_v1(inv_E, 0.0, z, n=2400)
+
+    if age_now_int is None or age_at_z_int is None or lookback_int is None or dc_int is None:
+        return {"status": "integration_failed", "boundary": "jump toy background geometry only"}
+
+    omega_k = 1.0 - omega_m - omega_vac
+    dc_mpc = dh_mpc * dc_int
+    dm_mpc = dc_mpc
+    da_mpc = dm_mpc / (1.0 + z) if z >= 0 else None
+    dl_mpc = dm_mpc * (1.0 + z)
+
+    scale_kpc_per_arcsec = None
+    if da_mpc is not None and da_mpc > 0:
+        scale_kpc_per_arcsec = da_mpc * 1000.0 / 206265.0
+
+    return {
+        "status": "ok",
+        "boundary": {
+            "local_background_geometry_toy": True,
+            "jump_model": "piecewise multiply E(z) above z_jump",
+            "class_run": False,
+            "render_api_call": False,
+            "likelihood_evaluation": False,
+            "posterior_comparison": False,
+            "planck_validation": False,
+            "jwst_validation": False,
+            "physics_value_update": False,
+            "manuscript_update": False,
+        },
+        "input": {
+            "H0": H0,
+            "Omega_M": omega_m,
+            "Omega_vac": omega_vac,
+            "Omega_k": omega_k,
+            "z": z,
+            "z_jump": z_jump,
+            "jump_factor_E_above_zjump": jump_factor,
+        },
+        "time": {
+            "hubble_time_Gyr": hubble_time_gyr,
+            "age_now_Gyr": hubble_time_gyr * age_now_int,
+            "age_at_z_Gyr": hubble_time_gyr * age_at_z_int,
+            "light_travel_time_Gyr": hubble_time_gyr * lookback_int,
+        },
+        "distance": {
+            "hubble_distance_Mpc": dh_mpc,
+            "comoving_radial_distance_Mpc": dc_mpc,
+            "transverse_comoving_distance_Mpc": dm_mpc,
+            "angular_diameter_distance_Mpc": da_mpc,
+            "luminosity_distance_Mpc": dl_mpc,
+            "scale_kpc_per_arcsec": scale_kpc_per_arcsec,
+        },
+    }
+
+def _dti_bggeom_jump_delta_rows_v1b(vanilla, jump):
+    rows = []
+    pairs = [
+        ("age_now_Gyr", "time", "age_now_Gyr"),
+        ("age_at_z_Gyr", "time", "age_at_z_Gyr"),
+        ("light_travel_time_Gyr", "time", "light_travel_time_Gyr"),
+        ("comoving_radial_distance_Mpc", "distance", "comoving_radial_distance_Mpc"),
+        ("angular_diameter_distance_Mpc", "distance", "angular_diameter_distance_Mpc"),
+        ("luminosity_distance_Mpc", "distance", "luminosity_distance_Mpc"),
+        ("scale_kpc_per_arcsec", "distance", "scale_kpc_per_arcsec"),
+    ]
+
+    if not isinstance(vanilla, dict) or not isinstance(jump, dict):
+        return rows
+
+    for label, group, key in pairs:
+        v = vanilla.get(group, {}).get(key)
+        j = jump.get(group, {}).get(key)
+        try:
+            vf = float(v)
+            jf = float(j)
+            delta = jf - vf
+            pct = (delta / vf * 100.0) if vf != 0 else None
+            rows.append({
+                "quantity": label,
+                "vanilla_FLRW": round(vf, 6),
+                "jump_toy": round(jf, 6),
+                "delta_jump_minus_vanilla": round(delta, 6),
+                "delta_percent": None if pct is None else round(pct, 6),
+            })
+        except Exception:
+            rows.append({
+                "quantity": label,
+                "vanilla_FLRW": v,
+                "jump_toy": j,
+                "delta_jump_minus_vanilla": None,
+                "delta_percent": None,
+            })
+    return rows
+
+def _dti_bggeom_jump_graph_rows_v1b(H0, omega_m, omega_vac, zmax, z_jump, jump_factor):
+    rows = []
+    try:
+        zmax = float(zmax)
+    except Exception:
+        zmax = 3.0
+    if zmax < 0:
+        zmax = 0.0
+
+    n = 80
+    grid = [0.0] if zmax == 0 else [round(zmax * (i / n) * (i / n), 6) for i in range(n + 1)]
+
+    for zz in grid:
+        vanilla = _dti_bggeom_compute_v1(H0, omega_m, omega_vac, zz)
+        jump = _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, zz, z_jump, jump_factor)
+        if vanilla.get("status") != "ok" or jump.get("status") != "ok":
+            continue
+
+        row = {"z": zz}
+        for group, keys in {
+            "time": ["age_at_z_Gyr", "light_travel_time_Gyr"],
+            "distance": [
+                "comoving_radial_distance_Mpc",
+                "luminosity_distance_Mpc",
+                "angular_diameter_distance_Mpc",
+                "scale_kpc_per_arcsec",
+            ],
+        }.items():
+            for key in keys:
+                v = vanilla.get(group, {}).get(key)
+                j = jump.get(group, {}).get(key)
+                row[f"vanilla_{key}"] = v
+                row[f"jump_{key}"] = j
+                try:
+                    row[f"delta_{key}"] = float(j) - float(v)
+                except Exception:
+                    row[f"delta_{key}"] = None
+        rows.append(row)
+    return rows
+
+def _dti_render_background_geometry_jump_toy_v1b(H0, omega_m, omega_vac, z):
+    # DTI_BACKGROUND_GEOMETRY_JUMP_TOY_RENDERER_V1B
+    with st.expander("Jump toy comparator — piecewise background geometry", expanded=False):
+        st.caption(
+            "Summary → compact table → Raw data — audit view. Toy background-geometry comparator only; not CLASS, likelihood, posterior, Planck, or JWST validation."
+        )
+
+        jc1, jc2 = st.columns(2)
+        with jc1:
+            z_jump = st.number_input(
+                "Jump redshift z_jump",
+                min_value=0.0,
+                max_value=50.0,
+                value=3.5,
+                step=0.1,
+                format="%.3f",
+                key="dti_bggeom_jump_z_v1b",
+            )
+        with jc2:
+            jump_factor = st.number_input(
+                "Jump factor for E(z) above z_jump",
+                min_value=0.1,
+                max_value=10.0,
+                value=1.05,
+                step=0.01,
+                format="%.4f",
+                key="dti_bggeom_jump_factor_v1b",
+            )
+
+        vanilla = _dti_bggeom_compute_v1(H0, omega_m, omega_vac, z)
+        jump = _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor)
+
+        summary_rows = [
+            {"field": "mode", "value": "Vanilla FLRW vs piecewise jump toy geometry"},
+            {"field": "jump_definition", "value": "E_jump(z) = jump_factor × E_vanilla(z) for z > z_jump"},
+            {"field": "z_jump", "value": z_jump},
+            {"field": "jump_factor", "value": jump_factor},
+            {"field": "boundary", "value": "local background-geometry toy only; not validation of DTI, Planck, JWST, likelihood, or posterior"},
+        ]
+        st.markdown("#### Summary")
+        st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+
+        st.markdown("#### Compact table")
+        delta_rows = _dti_bggeom_jump_delta_rows_v1b(vanilla, jump)
+        if delta_rows:
+            st.dataframe(pd.DataFrame(delta_rows), use_container_width=True, hide_index=True)
+        else:
+            st.info("Jump comparator table is unavailable for the selected parameters.")
+
+        graph_rows = _dti_bggeom_jump_graph_rows_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor)
+        if graph_rows:
+            st.markdown("#### Jump toy curves")
+            ttab, dtab, deltab = st.tabs(["Time baseline", "Distance baseline", "Delta"])
+
+            with ttab:
+                _dti_bggeom_svg_chart_v6i2(
+                    graph_rows,
+                    "z",
+                    [
+                        ("vanilla_age_at_z_Gyr", "vanilla age at z [Gyr]"),
+                        ("jump_age_at_z_Gyr", "jump toy age at z [Gyr]"),
+                        ("vanilla_light_travel_time_Gyr", "vanilla light-travel time [Gyr]"),
+                        ("jump_light_travel_time_Gyr", "jump toy light-travel time [Gyr]"),
+                    ],
+                    "Time baseline: vanilla vs jump toy",
+                )
+
+            with dtab:
+                _dti_bggeom_svg_chart_v6i2(
+                    graph_rows,
+                    "z",
+                    [
+                        ("vanilla_comoving_radial_distance_Mpc", "vanilla comoving [Mpc]"),
+                        ("jump_comoving_radial_distance_Mpc", "jump toy comoving [Mpc]"),
+                        ("vanilla_luminosity_distance_Mpc", "vanilla luminosity [Mpc]"),
+                        ("jump_luminosity_distance_Mpc", "jump toy luminosity [Mpc]"),
+                    ],
+                    "Distance baseline: vanilla vs jump toy",
+                )
+
+            with deltab:
+                _dti_bggeom_svg_chart_v6i2(
+                    graph_rows,
+                    "z",
+                    [
+                        ("delta_age_at_z_Gyr", "delta age at z [Gyr]"),
+                        ("delta_comoving_radial_distance_Mpc", "delta comoving [Mpc]"),
+                        ("delta_luminosity_distance_Mpc", "delta luminosity [Mpc]"),
+                    ],
+                    "Delta: jump toy minus vanilla",
+                )
+
+        with st.expander("Raw data — audit view", expanded=False):
+            _dti_bggeom_render_raw_data_v6e({
+                "vanilla": vanilla,
+                "jump_toy": jump,
+                "delta_rows": delta_rows,
+                "graph_rows": graph_rows,
+                "boundary": {
+                    "local_background_geometry_toy": True,
+                    "class_run": False,
+                    "render_api_call": False,
+                    "likelihood_evaluation": False,
+                    "posterior_comparison": False,
+                    "planck_validation": False,
+                    "jwst_validation": False,
+                    "physics_value_update": False,
+                    "manuscript_update": False,
+                },
+            })
+
+# --- /DTI_BACKGROUND_GEOMETRY_JUMP_TOY_COMPARATOR_V1B ---
         # /DTI_BACKGROUND_GEOMETRY_GRAPH_CALL_V1
 
 
