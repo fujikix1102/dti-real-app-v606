@@ -5532,6 +5532,48 @@ _DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B = True
 
 
 
+
+# --- DTI_BGGEOM_RAW_RENDERER_EARLY_DEFINE_V6G ---
+# Early safe raw renderer for Background Geometry.
+# Reason: Streamlit may execute the Background Geometry raw audit call before
+# the later V6E/V6F renderer block is reached. Keep this definition above the
+# Background Geometry Anchor. Display-only; no CLASS, no API, no likelihood.
+_DTI_BGGEOM_RAW_RENDERER_EARLY_DEFINE_V6G = True
+
+def _dti_bggeom_json_safe_v6e(obj):
+    import math as _math_v6g
+    if obj is None or isinstance(obj, (str, bool, int)):
+        return obj
+    if isinstance(obj, float):
+        if _math_v6g.isfinite(obj):
+            return obj
+        return None
+    if isinstance(obj, dict):
+        return {str(k): _dti_bggeom_json_safe_v6e(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_dti_bggeom_json_safe_v6e(v) for v in obj]
+    try:
+        if hasattr(obj, "item"):
+            return _dti_bggeom_json_safe_v6e(obj.item())
+    except Exception:
+        pass
+    return str(obj)
+
+def _dti_bggeom_render_raw_data_v6e(obj):
+    # DTI_BGGEOM_RAW_RENDERER_TEXTONLY_V6G_EARLY
+    import json as _json_v6g
+    safe = _dti_bggeom_json_safe_v6e(obj)
+    text = _json_v6g.dumps(safe, indent=2, sort_keys=True, ensure_ascii=False)
+    st.text_area(
+        "Raw data — audit view",
+        value=text,
+        height=260,
+        key="background_geometry_raw_textonly_v6g_early",
+    )
+    # /DTI_BGGEOM_RAW_RENDERER_TEXTONLY_V6G_EARLY
+
+# --- /DTI_BGGEOM_RAW_RENDERER_EARLY_DEFINE_V6G ---
+
 # --- DTI_BACKGROUND_GEOMETRY_ANCHOR_V1 ---
 # Local FLRW background-geometry calculator inspired by the public Ned Wright
 # style of distance/time baseline checking. This is a lightweight background
