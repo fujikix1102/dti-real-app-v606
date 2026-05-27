@@ -10661,7 +10661,8 @@ if external_api_result:
             st.dataframe(pd.DataFrame(derived_rows), hide_index=True, width="stretch")
 
     with st.expander("Raw external API response", expanded=False):
-        st.code(json.dumps(external_api_result, indent=2, sort_keys=True), language="json")
+        st.caption("Large arrays are summarized here to keep the UI readable. The CMB graph still uses the full real API arrays.")
+        _dti_render_summarized_raw_api_payload_v1(external_api_result)
 
 
 st.header("10. Interpretation boundary")
