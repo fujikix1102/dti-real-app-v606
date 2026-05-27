@@ -5062,6 +5062,58 @@ def _dti_profile_category_preview_models_v1e(selected_category, grouped_models, 
 _DTI_SHOW_ALL_PROFILES_TABLE_V1F = True
 # --- /DTI_SHOW_ALL_PROFILES_TABLE_V1F ---
 
+
+# DTI_PARSE_TARGET_MODEL_FOR_CORRELATED_BOUNDARY_V1B
+# Minimal local parser for TARGET_MODEL-style text used by the proxy triage panel.
+# Boundary: parser only; no CLASS run, no API request, no likelihood evaluation.
+def _dti_parse_target_model_for_correlated_boundary_v1b(text):
+    parsed = {}
+    if not text:
+        return parsed
+    alias = {
+        "H0": "H0",
+        "h0": "H0",
+        "H_0": "H0",
+        "f_EDE": "f_EDE",
+        "fede": "f_EDE",
+        "fEDE": "f_EDE",
+        "omega_cdm": "omega_cdm",
+        "omega_c": "omega_cdm",
+        "omch2": "omega_cdm",
+        "omega_b": "omega_b",
+        "ombh2": "omega_b",
+        "sigma8": "sigma8",
+        "S8": "S8",
+        "s8": "S8",
+        "ln10_10_As": "ln10_10_As",
+        "n_s": "n_s",
+        "ns": "n_s",
+        "tau_reio": "tau_reio",
+        "z_c": "z_c",
+        "zc": "z_c",
+    }
+    for raw_line in str(text).replace("：", ":").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" in line:
+            key, value = line.split("=", 1)
+        elif ":" in line:
+            key, value = line.split(":", 1)
+        else:
+            continue
+        key = key.strip().strip("*`- ").replace(" ", "_")
+        value = value.strip().strip(",;")
+        if not key:
+            continue
+        canonical = alias.get(key, alias.get(key.replace("-", "_"), key))
+        try:
+            parsed[canonical] = float(value)
+        except Exception:
+            continue
+    return parsed
+# /DTI_PARSE_TARGET_MODEL_FOR_CORRELATED_BOUNDARY_V1B
+
 # --- DTI_CORRELATED_BOUNDARY_TRIAGE_V1 ---
 # Lightweight geometric proxy for correlated-boundary triage.
 # Boundary: proxy only; not likelihood evaluation, not posterior comparison,
@@ -5155,7 +5207,7 @@ def _dti_render_correlated_boundary_triage_v1():
     )
 
     candidate_text = st.session_state.get("paper_text", "") or st.session_state.get("paper_text_widget", "")
-    parsed = parse_target_model(candidate_text) if candidate_text else {}
+    parsed = _dti_parse_target_model_for_correlated_boundary_v1b(candidate_text) if candidate_text else {}
 
     h0 = parsed.get("H0", st.session_state.get("H0", None))
     s8 = parsed.get("S8", st.session_state.get("S8", None))
