@@ -5682,6 +5682,91 @@ def _dti_render_7c_examiner_payload_display_v1(payload):
     with st.expander("Raw data — audit view", expanded=False):
         st.json(payload)
 
+
+# --- DTI_7C_EXAMINER_VERDICT_RECORD_DISPLAY_V1 ---
+# Reader-facing display helper for 7c examiner verdict records.
+# Boundary: display-only. No CLASS execution, no Render API modification,
+# no 7c logic modification, no likelihood evaluation, no posterior comparison,
+# no Planck validation, no physics-value update, and no graph rendering.
+
+_DTI_7C_EXAMINER_VERDICT_RECORD_DISPLAY_V1 = True
+
+def _dti_7c_verdict_display_value_v1(value):
+    if value is None:
+        return "not provided"
+    try:
+        if pd.isna(value):
+            return "not provided"
+    except Exception:
+        pass
+    if isinstance(value, float):
+        return round(value, 6)
+    return value
+
+def _dti_7c_dict_rows_v1(prefix, data):
+    rows = []
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, (dict, list, tuple)):
+                continue
+            rows.append({"field": f"{prefix}.{key}" if prefix else str(key), "value": _dti_7c_verdict_display_value_v1(value)})
+    return rows
+
+def _dti_render_7c_examiner_verdict_record_v1(record):
+    st.markdown("##### Examiner verdict record")
+    _dti_panel_note_v1("Summary → compact tables → raw audit view. Display-only; detailed limits are in Global claim limits / audit boundary.")
+
+    if not isinstance(record, dict):
+        st.warning("7c examiner verdict record is not available in table form.")
+        with st.expander("Raw data — audit view", expanded=False):
+            st.json(record)
+        return
+
+    status = record.get("status", "unknown")
+    verdict = record.get("overall_bounded_verdict", "unknown")
+    examiner = record.get("examiner", "7c examiner")
+    if str(status).lower() == "ok":
+        st.success(f"7c examiner verdict: {verdict}")
+    else:
+        st.warning(f"7c examiner verdict requires review: {verdict}")
+
+    summary_rows = [
+        {"field": "status", "value": _dti_7c_verdict_display_value_v1(status)},
+        {"field": "examiner", "value": _dti_7c_verdict_display_value_v1(examiner)},
+        {"field": "overall_bounded_verdict", "value": _dti_7c_verdict_display_value_v1(verdict)},
+        {"field": "boundary", "value": "local numerical examiner only; not likelihood, posterior, Planck validation, or physical-discontinuity proof"},
+    ]
+    st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+
+    base_rows = _dti_7c_dict_rows_v1("", record.get("base_payload", {}))
+    if base_rows:
+        st.markdown("###### Base payload summary")
+        st.dataframe(pd.DataFrame(base_rows), use_container_width=True, hide_index=True)
+
+    sweep_rows = _dti_7c_dict_rows_v1("", record.get("sweep", {}))
+    if sweep_rows:
+        st.markdown("###### Sweep summary")
+        st.dataframe(pd.DataFrame(sweep_rows), use_container_width=True, hide_index=True)
+
+    result_rows = _dti_7c_dict_rows_v1("", record.get("result", {}))
+    if result_rows:
+        st.markdown("###### Result summary")
+        st.dataframe(pd.DataFrame(result_rows), use_container_width=True, hide_index=True)
+
+    boundary_rows = _dti_7c_dict_rows_v1("", record.get("boundary", {}))
+    if boundary_rows:
+        st.markdown("###### Boundary flags")
+        st.dataframe(pd.DataFrame(boundary_rows), use_container_width=True, hide_index=True)
+
+    warning = record.get("interpretation_warning")
+    if warning:
+        st.caption(str(warning))
+
+    with st.expander("Raw data — audit view", expanded=False):
+        st.json(record)
+
+# --- /DTI_7C_EXAMINER_VERDICT_RECORD_DISPLAY_V1 ---
+
 # --- /DTI_7C_EXAMINER_PAYLOAD_DISPLAY_POLISH_V1 ---
 
 
@@ -8687,7 +8772,9 @@ type="primary",
             }
 
             st.markdown("##### Examiner verdict record")
-            st.json(examiner_record_7c)
+            # DTI_7C_EXAMINER_VERDICT_RECORD_DISPLAY_CALL_V1
+            _dti_render_7c_examiner_verdict_record_v1(examiner_record_7c)
+            # /DTI_7C_EXAMINER_VERDICT_RECORD_DISPLAY_CALL_V1
 
             grid_tsv_buf_7c = _io_section7c.StringIO()
             grid_fields_7c = list(result_rows_7c[0].keys()) if result_rows_7c else []
