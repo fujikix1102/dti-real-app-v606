@@ -1550,7 +1550,7 @@ def _dti_render_parameter_quality_matrix_v1g():
     import streamlit as st
     import pandas as pd
 
-    st.markdown("### Parameter Quality Matrix")
+    st.markdown("### Legacy/detail Parameter Quality Matrix 3 — audit view")
     st.info(
         "This matrix highlights promising parameter directions, control-needed zones, and blocked claim paths. "
         "Scores are UI meta-scores for research triage only; they are not likelihood, posterior, Planck, or physics-value results."
@@ -1709,7 +1709,7 @@ def _dti_render_parameter_quality_matrix_v1g():
     sort_df["readiness_sort"] = sort_df["claim_readiness"].fillna(-1)
     sort_df = sort_df.sort_values(["quality_sort", "readiness_sort"], ascending=False)
 
-    st.markdown("#### Total evaluation table")
+    st.markdown("#### Legacy total evaluation table")
     st.caption(
         "Sorted by quality score, claim readiness, and control score. "
         "GRAY means awaiting data, not zero quality."
@@ -1721,7 +1721,7 @@ def _dti_render_parameter_quality_matrix_v1g():
     except Exception:
         st.dataframe(df_view, use_container_width=True, hide_index=True)
 
-    st.markdown("#### Next-test priority order")
+    st.markdown("#### Legacy next-test priority order")
     st.caption("This is the practical test order, not a scientific ranking of truth.")
 
     force_gray_mask = sort_df.get("force_gray")
@@ -1815,7 +1815,7 @@ def _dti_render_probe_result_value_matrix_v1():
         "It is not a likelihood result, posterior comparison, Planck validation, graph result, or physics-value update."
     )
 
-    st.markdown("#### Color meaning")
+    st.markdown("#### Legacy color meaning")
 
     color_cols = st.columns(5)
 
