@@ -5516,9 +5516,9 @@ def _dti_render_vanilla_api_result_display_v1(result, http_status=None, cache_no
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
     with st.expander("Raw API response JSON — audit view", expanded=False):
-        # DTI_7C_EXAMINER_PAYLOAD_DISPLAY_CALL_V1
-        _dti_render_7c_examiner_payload_display_v1(result)
-        # /DTI_7C_EXAMINER_PAYLOAD_DISPLAY_CALL_V1
+        # DTI_VANILLA_RAW_RESULT_JSON_FIX_AFTER_7C_MISPATCH_V1D
+        st.json(result)
+        # /DTI_VANILLA_RAW_RESULT_JSON_FIX_AFTER_7C_MISPATCH_V1D
 
 # DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B
 # Raw API response expander must render st.json(result), not call the result renderer recursively.
@@ -8348,28 +8348,30 @@ st.caption(
     "Relative jump score is a simple local diagnostic: max adjacent finite-difference jump divided by median adjacent finite-difference scale. The default threshold is 5.0 to avoid classifying ordinary smooth finite-difference variation as a jump. It is not a physical-discontinuity proof."
 )
 
-st.json(
-    {
-        "base_payload": _base_payload_7c,
-        "sweep": {
-            "parameter": sweep_param_7c,
-            "start": float(sweep_start_7c),
-            "end": float(sweep_end_7c),
-            "grid_points": int(grid_n_7c),
-            "repeat_count": int(repeat_count_7c),
-            "relative_jump_threshold": float(jump_threshold_7c),
-        },
-        "boundary": {
-            "local_only": True,
-            "experimental": True,
-            "non_canonical": True,
-            "likelihood_evaluation": False,
-            "posterior_comparison": False,
-            "planck_validation": False,
-            "physical_discontinuity_proof": False,
-        },
-    }
-)
+# DTI_7C_EXAMINER_PAYLOAD_PREVIEW_OBJECT_V1D
+_dti_7c_examiner_payload_preview_v1d = {
+    "base_payload": _base_payload_7c,
+    "sweep": {
+        "parameter": sweep_param_7c,
+        "start": float(sweep_start_7c),
+        "end": float(sweep_end_7c),
+        "grid_points": int(grid_n_7c),
+        "repeat_count": int(repeat_count_7c),
+        "relative_jump_threshold": float(jump_threshold_7c),
+    },
+    "boundary": {
+        "local_only": True,
+        "experimental": True,
+        "non_canonical": True,
+        "likelihood_evaluation": False,
+        "posterior_comparison": False,
+        "planck_validation": False,
+        "physical_discontinuity_proof": False,
+    },
+}
+# DTI_7C_EXAMINER_PAYLOAD_DISPLAY_CALL_V1D
+_dti_render_7c_examiner_payload_display_v1(_dti_7c_examiner_payload_preview_v1d)
+# /DTI_7C_EXAMINER_PAYLOAD_DISPLAY_CALL_V1D
 
 def _section7c_median(values):
     vals = sorted([float(v) for v in values if v is not None])
