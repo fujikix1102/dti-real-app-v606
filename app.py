@@ -4477,6 +4477,209 @@ AXICLASS_DELTA = DATA_DIR / "axiclass_fix1_delta.tsv"
 # --- /DTI_AXICLASS_FIX1_DATA_DIR_RESOLVER_V1 ---
 
 
+
+# --- DTI_CATEGORIZED_ACTIVE_PROFILE_LOADER_V2B_LINEPATCH ---
+# Category-linked ACTIVE profile loader.
+# This avoids huge regex patching and keeps the legacy loader as fallback.
+_DTI_CATEGORIZED_ACTIVE_PROFILE_LOADER_V2B_LINEPATCH = True
+
+_DTI_ACTIVE_PROFILE_CATEGORY_ORDER_V2B = [
+    "Fujiki DTI Current",
+    "DTI 5H Framework",
+    "Baseline Anchors",
+    "Local H0 & Lensed Catalogs",
+    "LSS & Cosmic Shear",
+    "Competing EDE / New Physics",
+    "Fujiki DTI Historical Archive",
+    "Misfit Calibration References",
+    "Show all profiles / full TSV inventory",
+    "Other / Review queue",
+]
+
+_DTI_ACTIVE_PROFILE_CATEGORY_NOTES_V2B = {
+    "Fujiki DTI Current": "Current Fujiki DTI working profiles. Recommended default entry point.",
+    "DTI 5H Framework": "Five-level DTI triage / inference / stress-test framework profiles.",
+    "Baseline Anchors": "CMB and baseline reference profiles.",
+    "Local H0 & Lensed Catalogs": "Local-H0 and strong-lensing anchor profiles.",
+    "LSS & Cosmic Shear": "Large-scale-structure and S8-sensitive constraint profiles.",
+    "Competing EDE / New Physics": "Mainstream EDE and adjacent new-physics comparison profiles.",
+    "Fujiki DTI Historical Archive": "Earlier Fujiki DTI development snapshots.",
+    "Misfit Calibration References": "Calibration and audit-reference profiles.",
+    "Show all profiles / full TSV inventory": "Audit escape hatch: all registered profiles are selectable.",
+    "Other / Review queue": "Profiles not yet mapped into a front-facing category.",
+}
+
+def _dti_profile_category_for_model_v2b(model_id):
+    s = str(model_id)
+
+    if s in {
+        "FUJIKI_DTI_Candidate_v6",
+        "DTI_AxiCLASS_HighH0",
+        "Empirical_Misfit_Bounds",
+        "Theoretical_Horizon_Lim",
+    }:
+        return "Fujiki DTI Current"
+
+    if s.startswith("DTI_5H_"):
+        return "DTI 5H Framework"
+
+    if s.startswith("FUJIKI_DTI_v6_0_"):
+        return "Fujiki DTI Historical Archive"
+
+    if s.startswith("Misfit_Calibration_Ref"):
+        return "Misfit Calibration References"
+
+    if s.startswith((
+        "Planck_",
+        "ACT_DR4",
+        "SPT_3G_2024",
+        "SPT_3G_2022",
+        "SPT_Pol",
+        "WMAP",
+        "Combined_CMB",
+        "BICEP",
+    )):
+        return "Baseline Anchors"
+
+    if s.startswith((
+        "Riess",
+        "CCHP",
+        "Megamaser",
+        "Pantheon",
+        "Agnello",
+        "H0LiCOW",
+        "TDCOSMO",
+        "STRIDES",
+        "Mortsell",
+    )):
+        return "Local H0 & Lensed Catalogs"
+
+    if s.startswith((
+        "Hill_",
+        "DES_",
+        "KiDS",
+        "HSC_",
+        "ACT_DR6_Cosmic",
+        "SPT_3G_Y3_Cosmic",
+        "SDSS",
+        "BOSS",
+        "DESI_DR",
+        "Euclid",
+        "Vera_Rubin",
+        "Roman",
+    )):
+        return "LSS & Cosmic Shear"
+
+    if any(token in s for token in [
+        "EDE",
+        "Axi",
+        "Niedermann",
+        "Poulin",
+        "Ivanov",
+        "Smith",
+        "Lin_",
+        "Gomez",
+        "Allali",
+        "Ye_Piao",
+        "Braglia",
+        "Abellan",
+        "Seto",
+        "He_Piao",
+        "Wang_Piao",
+        "Freese",
+        "Kamionkowski",
+        "Knox",
+        "Vagnozzi",
+        "Efstathiou",
+        "Spergel",
+        "Silk",
+        "Verde",
+        "Di_Valentino",
+        "JWST",
+        "Karwal",
+        "Moss",
+        "K_essence",
+        "High_EDE",
+    ]):
+        return "Competing EDE / New Physics"
+
+    return "Other / Review queue"
+
+def _dti_group_profile_presets_v2b(preset_names):
+    grouped = {cat: [] for cat in _DTI_ACTIVE_PROFILE_CATEGORY_ORDER_V2B}
+    for name in preset_names:
+        cat = _dti_profile_category_for_model_v2b(name)
+        grouped.setdefault(cat, []).append(name)
+    grouped["Show all profiles / full TSV inventory"] = list(preset_names)
+    return grouped
+
+def _dti_render_categorized_active_profile_loader_v2b(preset_names, current_default=None):
+    st.sidebar.markdown("### Profile category → ACTIVE loader")
+    st.sidebar.caption(
+        "Use this two-step loader for normal use. The selected model becomes the active profile. "
+        "The older loader below is retained only as fallback."
+    )
+
+    if not preset_names:
+        st.sidebar.warning("No registered profile presets are available.")
+        return None
+
+    grouped = _dti_group_profile_presets_v2b(preset_names)
+    available_categories = [
+        cat for cat in _DTI_ACTIVE_PROFILE_CATEGORY_ORDER_V2B
+        if grouped.get(cat)
+    ]
+
+    default_category = "Fujiki DTI Current"
+    if current_default and current_default in preset_names:
+        default_category = _dti_profile_category_for_model_v2b(current_default)
+    if default_category not in available_categories:
+        default_category = available_categories[0]
+
+    category_index = available_categories.index(default_category)
+
+    selected_category = st.sidebar.selectbox(
+        "Profile category — ACTIVE",
+        available_categories,
+        index=category_index,
+        key="dti_active_profile_category_v2b",
+    )
+
+    st.sidebar.caption(_DTI_ACTIVE_PROFILE_CATEGORY_NOTES_V2B.get(selected_category, ""))
+
+    model_options = grouped.get(selected_category, [])
+    if not model_options:
+        st.sidebar.warning("No profiles found in this category.")
+        return current_default if current_default in preset_names else preset_names[0]
+
+    default_model = current_default if current_default in model_options else None
+    if default_model is None and "FUJIKI_DTI_Candidate_v6" in model_options:
+        default_model = "FUJIKI_DTI_Candidate_v6"
+    if default_model is None:
+        default_model = model_options[0]
+
+    selected_model = st.sidebar.selectbox(
+        "Model profile — ACTIVE",
+        model_options,
+        index=model_options.index(default_model),
+        key="dti_active_model_profile_v2b",
+    )
+
+    st.sidebar.success(f"ACTIVE profile selected: {selected_model}")
+
+    if selected_category == "Show all profiles / full TSV inventory":
+        st.sidebar.caption("SHOW ALL is for audit and full inventory access. It still loads only the selected model.")
+
+    with st.sidebar.expander("Active loader category counts", expanded=False):
+        rows = [{"category": cat, "count": len(grouped.get(cat, []))} for cat in available_categories]
+        try:
+            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        except Exception:
+            st.write(rows)
+
+    return selected_model
+# --- /DTI_CATEGORIZED_ACTIVE_PROFILE_LOADER_V2B_LINEPATCH ---
+
 # --- DTI_PROFILE_CATEGORY_GUIDE_V1_SAFE_FIXINDENT ---
 # Sidebar profile category guide.
 # UI organization only. It does not modify profile_presets_v606.tsv.
@@ -5887,28 +6090,21 @@ with st.sidebar:
     st.header("1. Parameter profile cartridge")
 
     preset_names = list(PRESETS.keys())
-    current_selected = st.session_state.get("selected_preset", preset_names[0] if preset_names else "")
-    if current_selected not in preset_names and preset_names:
-        current_selected = preset_names[0]
-        st.session_state["selected_preset"] = current_selected
-
-    # Hard initial sync: the first visible sidebar text box must contain the active preset text.
-    active_preset_text = PRESETS.get(current_selected, {}).get("text", "")
-    if active_preset_text:
-        if not st.session_state.get("paper_text") or not st.session_state.get("paper_text_widget"):
-            st.session_state["paper_text"] = active_preset_text
-            st.session_state["paper_text_widget"] = active_preset_text
-            st.session_state["pending_paper_text"] = active_preset_text
-
-    # DTI_PROFILE_CATEGORY_GUIDE_CALL_V1_SAFE_FIXINDENT
-    _dti_render_profile_category_guide_v1_safe_fixindent(PRESETS)
-
-    selected_preset = st.selectbox(
-        "Load registered profile — ACTIVE loader",
+    # DTI_CATEGORIZED_ACTIVE_PROFILE_LOADER_CALL_V2B
+    selected_preset = _dti_render_categorized_active_profile_loader_v2b(
         preset_names,
-        index=preset_names.index(current_selected) if current_selected in preset_names else 0,
-        key="selected_preset_selector_v606",
+        current_default="FUJIKI_DTI_Candidate_v6" if "FUJIKI_DTI_Candidate_v6" in preset_names else (preset_names[0] if preset_names else None),
     )
+    with st.sidebar.expander("Fallback: legacy registered profile loader", expanded=False):
+        st.caption("Fallback only. Normal use should use Profile category → ACTIVE loader above.")
+        _dti_fallback_selected_preset_v2b = st.selectbox(
+            "Load registered profile — ACTIVE loader",
+            preset_names,
+            index=preset_names.index(current_selected) if current_selected in preset_names else 0,
+            key="selected_preset_selector_v606",
+        )
+        if _dti_fallback_selected_preset_v2b and _dti_fallback_selected_preset_v2b != selected_preset:
+            st.caption("Fallback selection is visible for compatibility; categorized ACTIVE loader remains primary.")
 
     if selected_preset and selected_preset != st.session_state.get("selected_preset"):
         selected_text = PRESETS.get(selected_preset, {}).get("text", "")
