@@ -7885,11 +7885,8 @@ def _dti_render_cmb_likelihood_capability_matrix_v1(payload=None):
     )
 
     st.markdown("#### Raw data — audit view")
-    try:
-        import json
-        st.text(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True))
-    except Exception:
-        st.text(str(payload))
+    st.caption("Large arrays are summarized here to keep the UI readable. The graph renderer still uses the full real API arrays.")
+    _dti_render_summarized_raw_api_payload_v1(payload)
 
     # === DTI REAL API CMB SVG GRAPH V1 render call ===
     with st.expander("CMB spectra graph — real API arrays only", expanded=False):
@@ -7901,6 +7898,58 @@ def _dti_render_cmb_likelihood_capability_matrix_v1_no_payload():
     """Safe fallback renderer when no live API payload object is in local scope."""
     _dti_render_cmb_likelihood_capability_matrix_v1({})
 # === END DTI CMB / Likelihood Capability Matrix V1 ===
+
+
+
+# === DTI RAW API ARRAY SUMMARY V1 ===
+# Display-only JSON summarizer for large API arrays.
+# Does not alter payload used by graph renderers.
+# Does not create fake arrays, does not call APIs, and does not evaluate likelihoods.
+
+def _dti_summarize_large_api_arrays_v1(obj, max_preview=3):
+    try:
+        if isinstance(obj, dict):
+            out = {}
+            for k, v in obj.items():
+                if isinstance(v, list) and len(v) > 20:
+                    first = v[:max_preview]
+                    last = v[-max_preview:] if len(v) >= max_preview else v
+                    out[k] = {
+                        "__array_summary__": True,
+                        "length": len(v),
+                        "first": first,
+                        "last": last,
+                        "note": "Full array hidden in raw audit view only. Graph renderer still uses the real payload arrays.",
+                    }
+                else:
+                    out[k] = _dti_summarize_large_api_arrays_v1(v, max_preview=max_preview)
+            return out
+        if isinstance(obj, list):
+            if len(obj) > 20:
+                first = obj[:max_preview]
+                last = obj[-max_preview:] if len(obj) >= max_preview else obj
+                return {
+                    "__array_summary__": True,
+                    "length": len(obj),
+                    "first": first,
+                    "last": last,
+                    "note": "Full array hidden in raw audit view only.",
+                }
+            return [_dti_summarize_large_api_arrays_v1(v, max_preview=max_preview) for v in obj]
+        return obj
+    except Exception:
+        return obj
+
+
+def _dti_render_summarized_raw_api_payload_v1(payload):
+    try:
+        import json
+        summarized = _dti_summarize_large_api_arrays_v1(payload)
+        st.text(json.dumps(summarized, indent=2, ensure_ascii=False, sort_keys=True))
+    except Exception:
+        st.text(str(payload))
+# === END DTI RAW API ARRAY SUMMARY V1 ===
+
 
 # === DTI REAL API CMB SVG GRAPH V1 ===
 # Front-end renderer only. Uses real arrays returned by the external API.
