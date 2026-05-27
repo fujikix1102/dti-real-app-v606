@@ -5531,6 +5531,233 @@ _DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B = True
 
 
 
+
+# --- DTI_BACKGROUND_GEOMETRY_ANCHOR_V1 ---
+# Local FLRW background-geometry calculator inspired by the public Ned Wright
+# style of distance/time baseline checking. This is a lightweight background
+# geometry anchor only: no CLASS run, no Render API call, no likelihood
+# evaluation, no posterior comparison, no Planck validation, no physics-value
+# update, and no manuscript update.
+
+_DTI_BACKGROUND_GEOMETRY_ANCHOR_V1 = True
+
+def _dti_bggeom_E_v1(z, omega_m, omega_vac):
+    omega_k = 1.0 - float(omega_m) - float(omega_vac)
+    zp1 = 1.0 + float(z)
+    val = float(omega_m) * zp1**3 + omega_k * zp1**2 + float(omega_vac)
+    if val <= 0:
+        return None
+    return val ** 0.5
+
+def _dti_bggeom_integrate_simpson_v1(func, a, b, n=4096):
+    a = float(a)
+    b = float(b)
+    n = int(n)
+    if b <= a:
+        return 0.0
+    if n < 64:
+        n = 64
+    if n % 2:
+        n += 1
+    h = (b - a) / n
+    total = func(a) + func(b)
+    odd = 0.0
+    even = 0.0
+    for i in range(1, n):
+        x = a + h * i
+        fx = func(x)
+        if fx is None:
+            return None
+        if i % 2:
+            odd += fx
+        else:
+            even += fx
+    return h * (total + 4.0 * odd + 2.0 * even) / 3.0
+
+def _dti_bggeom_compute_v1(H0, omega_m, omega_vac, z):
+    H0 = float(H0)
+    omega_m = float(omega_m)
+    omega_vac = float(omega_vac)
+    z = float(z)
+    c_km_s = 299792.458
+    mpc_km = 3.0856775814913673e19
+    sec_per_gyr = 31557600.0 * 1.0e9
+    hubble_time_gyr = (mpc_km / H0) / sec_per_gyr
+    omega_k = 1.0 - omega_m - omega_vac
+
+    def inv_E(x):
+        e = _dti_bggeom_E_v1(x, omega_m, omega_vac)
+        return None if e is None else 1.0 / e
+
+    # DTI_BACKGROUND_GEOMETRY_AGE_LOG_INTEGRAL_FIX_V1B
+    # For age integrals, integrate over y = log(1+z), not over z directly.
+    # Since dz / ((1+z) E(z)) = dy / E(exp(y)-1), this avoids numerical
+    # over-weighting of the very wide high-redshift interval.
+    def inv_age_integrand_y(y):
+        zz = math.exp(float(y)) - 1.0
+        e = _dti_bggeom_E_v1(zz, omega_m, omega_vac)
+        return None if e is None else 1.0 / e
+
+    zmax_age = 100000.0
+    ymax_age = math.log1p(zmax_age)
+    yz = math.log1p(z)
+    age_now_int = _dti_bggeom_integrate_simpson_v1(inv_age_integrand_y, 0.0, ymax_age, n=12000)
+    lookback_int = _dti_bggeom_integrate_simpson_v1(inv_age_integrand_y, 0.0, yz, n=4096)
+    dc_int = _dti_bggeom_integrate_simpson_v1(inv_E, 0.0, z, n=4096)
+
+    if age_now_int is None or lookback_int is None or dc_int is None:
+        return {"status": "invalid", "reason": "E(z) became non-positive within the integration interval"}
+
+    age_now_gyr = hubble_time_gyr * age_now_int
+    lookback_gyr = hubble_time_gyr * lookback_int
+    age_at_z_gyr = age_now_gyr - lookback_gyr
+
+    dh_mpc = c_km_s / H0
+    dc_mpc = dh_mpc * dc_int
+
+    if abs(omega_k) < 1e-10:
+        dm_mpc = dc_mpc
+        curvature = "flat"
+    elif omega_k > 0:
+        sqrt_ok = omega_k ** 0.5
+        dm_mpc = dh_mpc / sqrt_ok * math.sinh(sqrt_ok * dc_int)
+        curvature = "open"
+    else:
+        sqrt_abs_ok = (-omega_k) ** 0.5
+        dm_mpc = dh_mpc / sqrt_abs_ok * math.sin(sqrt_abs_ok * dc_int)
+        curvature = "closed"
+
+    da_mpc = dm_mpc / (1.0 + z)
+    dl_mpc = dm_mpc * (1.0 + z)
+    scale_kpc_per_arcsec = da_mpc * 1000.0 / 206265.0
+
+    return {
+        "status": "ok",
+        "boundary": {
+            "local_background_geometry_only": True,
+            "class_run": False,
+            "render_api_call": False,
+            "likelihood_evaluation": False,
+            "posterior_comparison": False,
+            "planck_validation": False,
+            "physics_value_update": False,
+            "manuscript_update": False,
+        },
+        "input": {
+            "H0": H0,
+            "Omega_M": omega_m,
+            "Omega_vac": omega_vac,
+            "Omega_k": omega_k,
+            "z": z,
+            "curvature": curvature,
+        },
+        "time": {
+            "hubble_time_Gyr": hubble_time_gyr,
+            "age_now_Gyr": age_now_gyr,
+            "age_at_z_Gyr": age_at_z_gyr,
+            "light_travel_time_Gyr": lookback_gyr,
+        },
+        "distance": {
+            "hubble_distance_Mpc": dh_mpc,
+            "comoving_radial_distance_Mpc": dc_mpc,
+            "transverse_comoving_distance_Mpc": dm_mpc,
+            "angular_diameter_distance_Mpc": da_mpc,
+            "luminosity_distance_Mpc": dl_mpc,
+            "scale_kpc_per_arcsec": scale_kpc_per_arcsec,
+        },
+    }
+
+def _dti_bggeom_rows_v1(result, group):
+    rows = []
+    if not isinstance(result, dict) or result.get("status") != "ok":
+        return rows
+    src = result.get(group, {})
+    if not isinstance(src, dict):
+        return rows
+    for k, v in src.items():
+        if isinstance(v, float):
+            rows.append({"quantity": k, "value": round(v, 6)})
+        else:
+            rows.append({"quantity": k, "value": v})
+    return rows
+
+def _dti_render_background_geometry_anchor_v1():
+    with st.expander("Background geometry anchor — local FLRW calculator", expanded=False):
+        st.caption(
+            "Summary → compact table → raw audit view. Local background-geometry baseline only; detailed limits are in Global claim limits / audit boundary."
+        )
+
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            bg_H0 = st.number_input(
+                "Geometry H0",
+                min_value=40.0,
+                max_value=100.0,
+                value=69.6,
+                step=0.1,
+                format="%.3f",
+                key="dti_bggeom_H0_v1",
+            )
+        with c2:
+            bg_om = st.number_input(
+                "Geometry Omega_M",
+                min_value=0.01,
+                max_value=1.50,
+                value=0.286,
+                step=0.001,
+                format="%.4f",
+                key="dti_bggeom_omega_m_v1",
+            )
+        with c3:
+            bg_ov = st.number_input(
+                "Geometry Omega_vac",
+                min_value=0.0,
+                max_value=1.50,
+                value=0.714,
+                step=0.001,
+                format="%.4f",
+                key="dti_bggeom_omega_vac_v1",
+            )
+        with c4:
+            bg_z = st.number_input(
+                "Geometry redshift z",
+                min_value=0.0,
+                max_value=20.0,
+                value=3.0,
+                step=0.1,
+                format="%.3f",
+                key="dti_bggeom_z_v1",
+            )
+
+        result = _dti_bggeom_compute_v1(bg_H0, bg_om, bg_ov, bg_z)
+
+        if result.get("status") != "ok":
+            st.warning("Background geometry calculation returned invalid support for the selected parameters.")
+            with st.expander("Raw data — audit view", expanded=False):
+                st.json(result)
+            return
+
+        summary_rows = [
+            {"field": "status", "value": result["status"]},
+            {"field": "curvature", "value": result["input"]["curvature"]},
+            {"field": "Omega_k", "value": round(result["input"]["Omega_k"], 8)},
+            {"field": "boundary", "value": "local FLRW background geometry only; not CLASS, likelihood, posterior, or Planck validation"},
+        ]
+        st.markdown("#### Summary")
+        st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+
+        st.markdown("#### Time baseline")
+        st.dataframe(pd.DataFrame(_dti_bggeom_rows_v1(result, "time")), use_container_width=True, hide_index=True)
+
+        st.markdown("#### Distance baseline")
+        st.dataframe(pd.DataFrame(_dti_bggeom_rows_v1(result, "distance")), use_container_width=True, hide_index=True)
+
+        with st.expander("Raw data — audit view", expanded=False):
+            st.json(result)
+
+# --- /DTI_BACKGROUND_GEOMETRY_ANCHOR_V1 ---
+
+
 # --- DTI_UI_CONSOLIDATION_V1 ---
 # Display-only consolidation layer.
 # Purpose: reduce repeated boundary text while keeping audit safeguards visible.
@@ -7046,6 +7273,12 @@ _dti_render_visitor_quick_guide_v1()
 # DTI_GLOBAL_CLAIM_LIMITS_AUDIT_BOUNDARY_CALL_V1
 _dti_render_global_claim_limits_audit_boundary_v1()
 # /DTI_GLOBAL_CLAIM_LIMITS_AUDIT_BOUNDARY_CALL_V1
+
+
+# DTI_BACKGROUND_GEOMETRY_ANCHOR_CALL_V1
+_dti_render_background_geometry_anchor_v1()
+# /DTI_BACKGROUND_GEOMETRY_ANCHOR_CALL_V1
+
 
 
 # DTI_CANDIDATE_TEXT_SAFE_FALLBACK_V1B
