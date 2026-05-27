@@ -7891,11 +7891,257 @@ def _dti_render_cmb_likelihood_capability_matrix_v1(payload=None):
     except Exception:
         st.text(str(payload))
 
+    # === DTI REAL API CMB SVG GRAPH V1 render call ===
+    with st.expander("CMB spectra graph — real API arrays only", expanded=False):
+        _dti_render_real_api_cmb_svg_graph_v1(payload)
+    # === END DTI REAL API CMB SVG GRAPH V1 render call ===
+
 
 def _dti_render_cmb_likelihood_capability_matrix_v1_no_payload():
     """Safe fallback renderer when no live API payload object is in local scope."""
     _dti_render_cmb_likelihood_capability_matrix_v1({})
 # === END DTI CMB / Likelihood Capability Matrix V1 ===
+
+# === DTI REAL API CMB SVG GRAPH V1 ===
+# Front-end renderer only. Uses real arrays returned by the external API.
+# No fake arrays, no API calls, no CLASS execution, no Planck likelihood,
+# no posterior comparison, and no physics-value update.
+
+def _dti_real_cmb_array_v1(payload, key):
+    try:
+        if not isinstance(payload, dict):
+            return []
+        derived = payload.get("derived", {})
+        if not isinstance(derived, dict):
+            return []
+        value = derived.get(key, [])
+        if not isinstance(value, (list, tuple)):
+            return []
+        out = []
+        for x in value:
+            try:
+                out.append(float(x))
+            except Exception:
+                out.append(None)
+        return out
+    except Exception:
+        return []
+
+
+def _dti_real_cmb_arrays_ready_v1(payload):
+    ell = _dti_real_cmb_array_v1(payload, "ell")
+    dl_tt = _dti_real_cmb_array_v1(payload, "dl_tt")
+    cl_tt = _dti_real_cmb_array_v1(payload, "cl_tt")
+
+    if len(ell) < 3:
+        return False
+
+    if len(dl_tt) >= 3:
+        return True
+
+    if len(cl_tt) >= 3:
+        return True
+
+    return False
+
+
+def _dti_svg_polyline_from_xy_v1(xs, ys, width=760, height=320, pad=44):
+    pts = []
+    clean = []
+
+    for x, y in zip(xs, ys):
+        if x is None or y is None:
+            continue
+        try:
+            xf = float(x)
+            yf = float(y)
+        except Exception:
+            continue
+        if xf <= 0:
+            continue
+        clean.append((xf, yf))
+
+    if len(clean) < 3:
+        return "", None
+
+    # Drop ell < 2 for visual stability.
+    clean = [(x, y) for x, y in clean if x >= 2]
+    if len(clean) < 3:
+        return "", None
+
+    x_vals = [p[0] for p in clean]
+    y_vals = [p[1] for p in clean]
+
+    x_min = min(x_vals)
+    x_max = max(x_vals)
+    y_min = min(y_vals)
+    y_max = max(y_vals)
+
+    if x_max <= x_min:
+        return "", None
+
+    if y_max == y_min:
+        y_max = y_min + 1.0
+
+    # Use linear x-axis. This is intentionally simple and auditable.
+    def sx(x):
+        return pad + (float(x) - x_min) / (x_max - x_min) * (width - 2 * pad)
+
+    def sy(y):
+        return height - pad - (float(y) - y_min) / (y_max - y_min) * (height - 2 * pad)
+
+    for x, y in clean:
+        pts.append(f"{sx(x):.2f},{sy(y):.2f}")
+
+    meta = {
+        "x_min": x_min,
+        "x_max": x_max,
+        "y_min": y_min,
+        "y_max": y_max,
+        "n": len(clean),
+    }
+
+    return " ".join(pts), meta
+
+
+def _dti_render_one_cmb_svg_curve_v1(label, ell, y, y_label):
+    points, meta = _dti_svg_polyline_from_xy_v1(ell, y)
+    if not points or not meta:
+        st.info(f"{label}: no valid real array available for plotting.")
+        return
+
+    width = 760
+    height = 320
+    pad = 44
+
+    svg = f"""
+<svg viewBox="0 0 {width} {height}" width="100%" height="{height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{label}">
+  <rect x="0" y="0" width="{width}" height="{height}" fill="white" stroke="#ddd"/>
+  <line x1="{pad}" y1="{height-pad}" x2="{width-pad}" y2="{height-pad}" stroke="#999" stroke-width="1"/>
+  <line x1="{pad}" y1="{pad}" x2="{pad}" y2="{height-pad}" stroke="#999" stroke-width="1"/>
+  <text x="{width/2}" y="24" text-anchor="middle" font-size="16" fill="#222">{label}</text>
+  <text x="{width/2}" y="{height-10}" text-anchor="middle" font-size="12" fill="#444">ell</text>
+  <text x="15" y="{height/2}" text-anchor="middle" font-size="12" fill="#444" transform="rotate(-90 15 {height/2})">{y_label}</text>
+  <text x="{pad}" y="{height-pad+18}" text-anchor="middle" font-size="10" fill="#555">{meta['x_min']:.0f}</text>
+  <text x="{width-pad}" y="{height-pad+18}" text-anchor="middle" font-size="10" fill="#555">{meta['x_max']:.0f}</text>
+  <text x="{pad-8}" y="{height-pad}" text-anchor="end" font-size="10" fill="#555">{meta['y_min']:.3g}</text>
+  <text x="{pad-8}" y="{pad+4}" text-anchor="end" font-size="10" fill="#555">{meta['y_max']:.3g}</text>
+  <polyline fill="none" stroke="#222" stroke-width="1.4" points="{points}"/>
+</svg>
+"""
+    st.markdown(svg, unsafe_allow_html=True)
+    st.caption(
+        f"Source: external API derived arrays only. n={meta['n']}; "
+        f"ell range: {meta['x_min']:.0f} to {meta['x_max']:.0f}. "
+        "This is not a Planck likelihood evaluation."
+    )
+
+
+def _dti_render_real_api_cmb_svg_graph_v1(payload=None):
+    st.markdown("### CMB spectra graph — real API arrays only")
+
+    if payload is None or not isinstance(payload, dict):
+        st.info("No API payload available. CMB graph is not rendered.")
+        return
+
+    derived = payload.get("derived", {})
+    boundary = payload.get("boundary", {})
+
+    if not isinstance(derived, dict):
+        st.info("No derived payload available. CMB graph is not rendered.")
+        return
+
+    ell = _dti_real_cmb_array_v1(payload, "ell")
+    dl_tt = _dti_real_cmb_array_v1(payload, "dl_tt")
+    dl_te = _dti_real_cmb_array_v1(payload, "dl_te")
+    dl_ee = _dti_real_cmb_array_v1(payload, "dl_ee")
+    cl_tt = _dti_real_cmb_array_v1(payload, "cl_tt")
+    cl_te = _dti_real_cmb_array_v1(payload, "cl_te")
+    cl_ee = _dti_real_cmb_array_v1(payload, "cl_ee")
+    cl_pp = _dti_real_cmb_array_v1(payload, "cl_pp")
+
+    if not _dti_real_cmb_arrays_ready_v1(payload):
+        st.warning(
+            "CMB graph readiness = NO. Real API arrays ell and TT spectrum are not present in this payload. "
+            "No fallback or fake curve is drawn."
+        )
+        return
+
+    st.success("CMB graph readiness = YES. Rendering only real arrays returned by the external API.")
+
+    source = derived.get("cmb_array_source", "unknown")
+    status = derived.get("cmb_array_export_status", "unknown")
+    lmax = derived.get("cmb_array_lmax_requested", "unknown")
+
+    st.text(
+        "API CMB array status: {status}\n"
+        "array source: {source}\n"
+        "lmax requested: {lmax}\n"
+        "ell length: {ell_len}\n"
+        "Planck likelihood readiness: NO".format(
+            status=status,
+            source=source,
+            lmax=lmax,
+            ell_len=len(ell),
+        )
+    )
+
+    st.warning(
+        "Boundary: this graph displays CLASS/PyCLASS spectra arrays returned by the API. "
+        "It does not compute Planck chi2, does not evaluate likelihoods, does not compare posteriors, "
+        "does not validate Planck or JWST, and does not activate AxiCLASS/EDE microphysics."
+    )
+
+    with st.expander("CMB array availability audit", expanded=False):
+        rows = [
+            {"array": "ell", "present": bool(ell), "length": len(ell)},
+            {"array": "dl_tt", "present": bool(dl_tt), "length": len(dl_tt)},
+            {"array": "dl_te", "present": bool(dl_te), "length": len(dl_te)},
+            {"array": "dl_ee", "present": bool(dl_ee), "length": len(dl_ee)},
+            {"array": "cl_tt", "present": bool(cl_tt), "length": len(cl_tt)},
+            {"array": "cl_te", "present": bool(cl_te), "length": len(cl_te)},
+            {"array": "cl_ee", "present": bool(cl_ee), "length": len(cl_ee)},
+            {"array": "cl_pp", "present": bool(cl_pp), "length": len(cl_pp)},
+        ]
+        try:
+            st.table(rows)
+        except Exception:
+            st.text("\\n".join([str(r) for r in rows]))
+
+    tab1, tab2, tab3, tab4 = st.tabs(["TT", "TE", "EE", "Lensing"])
+
+    with tab1:
+        if dl_tt:
+            _dti_render_one_cmb_svg_curve_v1("TT spectrum: D_l^TT from API", ell, dl_tt, "D_l^TT")
+        elif cl_tt:
+            _dti_render_one_cmb_svg_curve_v1("TT spectrum: C_l^TT from API", ell, cl_tt, "C_l^TT")
+        else:
+            st.info("TT array not available.")
+
+    with tab2:
+        if dl_te:
+            _dti_render_one_cmb_svg_curve_v1("TE spectrum: D_l^TE from API", ell, dl_te, "D_l^TE")
+        elif cl_te:
+            _dti_render_one_cmb_svg_curve_v1("TE spectrum: C_l^TE from API", ell, cl_te, "C_l^TE")
+        else:
+            st.info("TE array not available.")
+
+    with tab3:
+        if dl_ee:
+            _dti_render_one_cmb_svg_curve_v1("EE spectrum: D_l^EE from API", ell, dl_ee, "D_l^EE")
+        elif cl_ee:
+            _dti_render_one_cmb_svg_curve_v1("EE spectrum: C_l^EE from API", ell, cl_ee, "C_l^EE")
+        else:
+            st.info("EE array not available.")
+
+    with tab4:
+        if cl_pp:
+            _dti_render_one_cmb_svg_curve_v1("Lensing spectrum: raw cl_pp from API", ell, cl_pp, "cl_pp")
+        else:
+            st.info("Lensing array cl_pp not available.")
+# === END DTI REAL API CMB SVG GRAPH V1 ===
+
+
 
 st.set_page_config(page_title="DTI-Core Grand Auditor v6.0", layout="wide")
 
