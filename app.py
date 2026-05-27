@@ -5791,12 +5791,42 @@ def _dti_bggeom_json_safe_v6e(obj):
     return str(obj)
 
 def _dti_bggeom_render_raw_data_v6e(obj):
-    import json as _json_v6e
-    safe = _dti_bggeom_json_safe_v6e(obj)
-    st.code(
-        _json_v6e.dumps(safe, indent=2, sort_keys=True, ensure_ascii=False),
-        language="json",
+    # DTI_BGGEOM_RAW_RENDERER_TEXTONLY_V6F_DIRECT
+    # Streamlit Cloud safety:
+    # Avoid st.json, st.dataframe, and st.code for this raw audit object.
+    # Use plain text_area with pre-serialized JSON to avoid Arrow conversion.
+    import json as _json_bggeom_v6f
+    import math as _math_bggeom_v6f
+
+    def _clean_v6f(x):
+        if x is None:
+            return None
+        if isinstance(x, (str, bool, int)):
+            return x
+        if isinstance(x, float):
+            if _math_bggeom_v6f.isfinite(x):
+                return x
+            return str(x)
+        if isinstance(x, dict):
+            return {str(k): _clean_v6f(v) for k, v in x.items()}
+        if isinstance(x, (list, tuple)):
+            return [_clean_v6f(v) for v in x]
+        try:
+            return float(x)
+        except Exception:
+            return str(x)
+
+    cleaned = _clean_v6f(obj)
+    text = _json_bggeom_v6f.dumps(cleaned, indent=2, sort_keys=True, ensure_ascii=False)
+    st.text_area(
+        "Raw data — audit view",
+        value=text,
+        height=320,
+        disabled=True,
+        key="background_geometry_raw_textonly_v6f_direct",
     )
+    # /DTI_BGGEOM_RAW_RENDERER_TEXTONLY_V6F_DIRECT
+
 # --- /DTI_BGGEOM_SAFE_RAW_JSON_RENDERER_V6E ---
 
 # --- DTI_BACKGROUND_GEOMETRY_GRAPH_V1 ---
