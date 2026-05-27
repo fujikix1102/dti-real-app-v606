@@ -237,5 +237,34 @@ Recommended maintenance rules:
 - preserve no-graph-reopening rule
 - preserve no-likelihood/posterior/Planck-claim boundary
 </pre>
+<!-- DTI_SHOW_ALL_PROFILES_TABLE_V1F_DOC_START -->
+<section id="show-all-profiles-table-v1f">
+  <h2>Show all profiles table V1F</h2>
+  <p>The sidebar profile-category browser includes a preview-only route called <strong>Show all profiles / full TSV inventory</strong>.</p>
+  <p>When <strong>Show complete profile TSV inventory</strong> is checked, the app displays the complete TSV inventory as a compact table instead of a raw Python/list-style object.</p>
+  <p>The table is preview-only and has these columns:</p>
+  <ul>
+    <li><code>no</code></li>
+    <li><code>model_id</code></li>
+    <li><code>category</code></li>
+  </ul>
+  <p>The app separates two counts:</p>
+  <ul>
+    <li><strong>TSV profile count:</strong> 100 profiles from <code>app/data/profile_presets_v606.tsv</code></li>
+    <li><strong>Registered PRESETS count:</strong> all profiles currently visible to the app, including default/manual presets and TSV-loaded presets</li>
+  </ul>
+  <p>This distinction is intentional. The TSV is the curated 100-profile source inventory. Registered PRESETS can be larger because the app may include built-in manual/default profiles in addition to the TSV entries.</p>
+  <h3>Boundary</h3>
+  <p>Show all profiles table V1F does not change the active loader.</p>
+  <p>It does not replace:</p>
+  <ul>
+    <li><strong>Load registered profile — ACTIVE loader</strong></li>
+    <li><strong>Candidate preset — ACTIVE comparison input</strong></li>
+    <li><strong>Reference preset — ACTIVE comparison input</strong></li>
+  </ul>
+  <p>It is a navigation and audit-preview layer only. It does not perform likelihood evaluation, posterior comparison, Planck validation, graph rendering, physics-value updates, 7c execution, or manuscript updates.</p>
+</section>
+<!-- DTI_SHOW_ALL_PROFILES_TABLE_V1F_DOC_END -->
+
 </body>
 </html>
