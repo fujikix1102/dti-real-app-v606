@@ -5799,8 +5799,6 @@ def _dti_render_background_geometry_anchor_v1():
         _dti_render_background_geometry_graph_v1(bg_H0, bg_om, bg_ov, bg_z)
         # /DTI_BACKGROUND_GEOMETRY_GRAPH_CALL_V1
 
-with st.expander("Raw data — audit view", expanded=False):
-            _dti_bggeom_render_raw_data_v6e(result)
 
 # --- /DTI_BACKGROUND_GEOMETRY_ANCHOR_V1 ---
 
