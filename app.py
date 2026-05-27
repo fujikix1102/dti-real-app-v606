@@ -7459,7 +7459,13 @@ type="primary",
                 )
 
                 st.markdown("##### Vanilla-profile API check result")
-                st.json(data)
+                # DTI_VANILLA_RESULT_RENDERER_CALL_V1B
+                _dti_render_vanilla_api_result_display_v1(
+                    data,
+                    http_status=cached_result_7b.get('status_code') if isinstance(cached_result_7b, dict) else None,
+                    cache_note=str(cached_result_7b.get('cache', '')) if isinstance(cached_result_7b, dict) and cached_result_7b.get('cache') is not None else None,
+                )
+                # /DTI_VANILLA_RESULT_RENDERER_CALL_V1B
 
                 if data.get("status") == "ok":
                     st.success("Local vanilla CLASS live probe returned status: ok")
