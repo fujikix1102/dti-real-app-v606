@@ -6485,6 +6485,18 @@ _dti_main_candidate_reference_panel_v1()
 _dti_render_visitor_quick_guide_v1()
 
 
+# DTI_CANDIDATE_TEXT_SAFE_FALLBACK_V1B
+# Safe text source for correlated-boundary proxy; no CLASS run and no API request.
+candidate_text = st.session_state.get("paper_text_widget", "")
+if not candidate_text:
+    candidate_text = st.session_state.get("paper_text", "")
+if not candidate_text:
+    _dti_candidate_profile_name_v1b = st.session_state.get("selected_preset", "")
+    candidate_text = PRESETS.get(_dti_candidate_profile_name_v1b, {}).get("text", "")
+if not candidate_text and "FUJIKI_DTI_Candidate_v6" in PRESETS:
+    candidate_text = PRESETS.get("FUJIKI_DTI_Candidate_v6", {}).get("text", "")
+# /DTI_CANDIDATE_TEXT_SAFE_FALLBACK_V1B
+
 # DTI_CORRELATED_BOUNDARY_TRIAGE_CALL_V1
 _dti_render_correlated_boundary_triage_v1()
 # /DTI_CORRELATED_BOUNDARY_TRIAGE_CALL_V1
