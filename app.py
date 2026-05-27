@@ -5734,7 +5734,7 @@ def _dti_render_background_geometry_anchor_v1():
         if result.get("status") != "ok":
             st.warning("Background geometry calculation returned invalid support for the selected parameters.")
             with st.expander("Raw data — audit view", expanded=False):
-                st.json(result)
+                _dti_bggeom_render_raw_data_v6e(result)
             return
 
         summary_rows = [
@@ -5758,11 +5758,46 @@ def _dti_render_background_geometry_anchor_v1():
         # /DTI_BACKGROUND_GEOMETRY_GRAPH_CALL_V1
 
 with st.expander("Raw data — audit view", expanded=False):
-            st.json(result)
+            _dti_bggeom_render_raw_data_v6e(result)
 
 # --- /DTI_BACKGROUND_GEOMETRY_ANCHOR_V1 ---
 
 
+
+
+# --- DTI_BGGEOM_SAFE_RAW_JSON_RENDERER_V6E ---
+# Streamlit Cloud can fail when st.json receives nested numeric objects that
+# are internally routed through PyArrow. Keep raw audit visibility but render
+# through sanitized json.dumps + st.code.
+_DTI_BGGEOM_SAFE_RAW_JSON_RENDERER_V6E = True
+
+def _dti_bggeom_json_safe_v6e(obj):
+    import math as _math_v6e
+    if obj is None or isinstance(obj, (str, bool, int)):
+        return obj
+    if isinstance(obj, float):
+        if _math_v6e.isfinite(obj):
+            return obj
+        return None
+    if isinstance(obj, dict):
+        return {str(k): _dti_bggeom_json_safe_v6e(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_dti_bggeom_json_safe_v6e(v) for v in obj]
+    try:
+        if hasattr(obj, "item"):
+            return _dti_bggeom_json_safe_v6e(obj.item())
+    except Exception:
+        pass
+    return str(obj)
+
+def _dti_bggeom_render_raw_data_v6e(obj):
+    import json as _json_v6e
+    safe = _dti_bggeom_json_safe_v6e(obj)
+    st.code(
+        _json_v6e.dumps(safe, indent=2, sort_keys=True, ensure_ascii=False),
+        language="json",
+    )
+# --- /DTI_BGGEOM_SAFE_RAW_JSON_RENDERER_V6E ---
 
 # --- DTI_BACKGROUND_GEOMETRY_GRAPH_V1 ---
 # Lightweight FLRW-only graph for the Background Geometry Anchor.
