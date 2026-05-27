@@ -5869,6 +5869,150 @@ def _dti_bggeom_render_raw_data_v6e(obj):
 
 # --- /DTI_BGGEOM_SAFE_RAW_JSON_RENDERER_V6E ---
 
+
+# --- DTI_BACKGROUND_GEOMETRY_SVG_CHART_V6I2 ---
+# Local SVG renderer for Background Geometry only.
+# Reason: st.line_chart may be globally silenced elsewhere in the app.
+_DTI_BACKGROUND_GEOMETRY_SVG_CHART_V6I2 = True
+
+def _dti_bggeom_svg_chart_v6i2(rows, x_key, series_specs, title):
+    import math as _math_v6i2
+    import html as _html_v6i2
+
+    if not isinstance(rows, list):
+        st.info("Graph data is unavailable.")
+        return
+
+    clean = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        try:
+            x = float(row.get(x_key))
+        except Exception:
+            continue
+
+        vals = {}
+        ok_any = False
+        for key, label in series_specs:
+            val = row.get(key)
+            if val is None:
+                vals[key] = None
+                continue
+            try:
+                f = float(val)
+            except Exception:
+                vals[key] = None
+                continue
+            if _math_v6i2.isfinite(f):
+                vals[key] = f
+                ok_any = True
+            else:
+                vals[key] = None
+
+        if ok_any:
+            vals["x"] = x
+            clean.append(vals)
+
+    if len(clean) < 2:
+        st.info("Not enough numeric graph rows for this panel.")
+        return
+
+    xs = [r["x"] for r in clean]
+    ys = []
+    for key, label in series_specs:
+        ys.extend([r[key] for r in clean if r.get(key) is not None])
+
+    if not xs or not ys:
+        st.info("No numeric graph values for this panel.")
+        return
+
+    xmin = min(xs)
+    xmax = max(xs)
+    ymin = min(ys)
+    ymax = max(ys)
+
+    if xmax == xmin:
+        xmax = xmin + 1.0
+    if ymax == ymin:
+        ymax = ymin + 1.0
+
+    width = 760
+    height = 320
+    left = 56
+    right = 18
+    top = 28
+    bottom = 42
+    plot_w = width - left - right
+    plot_h = height - top - bottom
+
+    def sx(x):
+        return left + (float(x) - xmin) / (xmax - xmin) * plot_w
+
+    def sy(y):
+        return top + (1.0 - (float(y) - ymin) / (ymax - ymin)) * plot_h
+
+    palette = ["#7dd3fc", "#fda4af", "#86efac", "#facc15", "#c4b5fd"]
+
+    polylines = []
+    legend_items = []
+
+    for idx, spec in enumerate(series_specs):
+        key, label = spec
+        pts = []
+        for r in clean:
+            y = r.get(key)
+            if y is None:
+                continue
+            pts.append(f"{sx(r['x']):.2f},{sy(y):.2f}")
+
+        if len(pts) < 2:
+            continue
+
+        color = palette[idx % len(palette)]
+        safe_label = _html_v6i2.escape(str(label))
+        polyline = (
+            '<polyline points="' + " ".join(pts) + '" '
+            'fill="none" stroke="' + color + '" '
+            'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />'
+        )
+        polylines.append(polyline)
+
+        legend_items.append(
+            '<span style="display:inline-flex;align-items:center;margin-right:14px;">'
+            '<span style="display:inline-block;width:18px;height:3px;background:' + color + ';margin-right:6px;"></span>'
+            + safe_label +
+            '</span>'
+        )
+
+    if not polylines:
+        st.info("No drawable numeric graph series for this panel.")
+        return
+
+    safe_title = _html_v6i2.escape(str(title))
+    legend_html = "".join(legend_items)
+
+    svg_parts = []
+    svg_parts.append('<div style="border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:12px;margin:8px 0 14px 0;">')
+    svg_parts.append('<div style="font-weight:650;margin-bottom:4px;">' + safe_title + '</div>')
+    svg_parts.append('<div style="font-size:12px;opacity:0.78;margin-bottom:8px;">x-axis: redshift z. Local FLRW background geometry only.</div>')
+    svg_parts.append(f'<svg viewBox="0 0 {width} {height}" width="100%" height="{height}" role="img" aria-label="{safe_title}">')
+    svg_parts.append(f'<rect x="0" y="0" width="{width}" height="{height}" fill="rgba(255,255,255,0.02)" />')
+    svg_parts.append(f'<line x1="{left}" y1="{top}" x2="{left}" y2="{height-bottom}" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>')
+    svg_parts.append(f'<line x1="{left}" y1="{height-bottom}" x2="{width-right}" y2="{height-bottom}" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>')
+    svg_parts.append(f'<text x="{left}" y="{height-12}" fill="rgba(255,255,255,0.70)" font-size="11">z={xmin:.3g}</text>')
+    svg_parts.append(f'<text x="{width-right-58}" y="{height-12}" fill="rgba(255,255,255,0.70)" font-size="11">z={xmax:.3g}</text>')
+    svg_parts.append(f'<text x="8" y="{top+4}" fill="rgba(255,255,255,0.70)" font-size="11">{ymax:.4g}</text>')
+    svg_parts.append(f'<text x="8" y="{height-bottom}" fill="rgba(255,255,255,0.70)" font-size="11">{ymin:.4g}</text>')
+    svg_parts.extend(polylines)
+    svg_parts.append('</svg>')
+    svg_parts.append('<div style="font-size:12px;margin-top:4px;">' + legend_html + '</div>')
+    svg_parts.append('</div>')
+
+    st.markdown("\n".join(svg_parts), unsafe_allow_html=True)
+
+# --- /DTI_BACKGROUND_GEOMETRY_SVG_CHART_V6I2 ---
+
 # --- DTI_BACKGROUND_GEOMETRY_GRAPH_V1 ---
 # Lightweight FLRW-only graph for the Background Geometry Anchor.
 # Boundary: local background geometry only. No CLASS execution, no Render API,
@@ -5918,65 +6062,58 @@ def _dti_bggeom_graph_grid_v1(H0, omega_m, omega_vac, zmax):
         return []
 
 def _dti_render_background_geometry_graph_v1(H0, omega_m, omega_vac, zmax):
-    # DTI_BACKGROUND_GEOMETRY_GRAPH_RENDERER_V6C
-    # Background-geometry FLRW-only graph renderer.
-    # Boundary: no CLASS, no API, no likelihood/posterior/Planck validation.
-    st.markdown("#### Background geometry curves")
-    _dti_panel_note_v1("Summary → compact table → Raw data — audit view. FLRW background geometry only; not CLASS or likelihood output.")
+    # DTI_BACKGROUND_GEOMETRY_GRAPH_RENDERER_SVG_V6I2
+    _dti_panel_note_v1("Summary → compact table → Raw data — audit view. FLRW background geometry only; SVG renderer avoids the globally silenced st.line_chart path.")
 
-    rows = _dti_bggeom_graph_grid_v1(H0, omega_m, omega_vac, zmax)
+    try:
+        rows = _dti_bggeom_graph_grid_v1(H0, omega_m, omega_vac, zmax)
+    except Exception as exc:
+        st.info(f"Background geometry graph data could not be prepared: {exc}")
+        rows = []
+
     if not rows:
-        st.info("No background-geometry graph rows are available.")
+        st.info("Background geometry graph rows are unavailable.")
         return
 
-    df = pd.DataFrame(rows)
-    if "z" in df.columns:
-        df = df.set_index("z")
+    st.markdown("#### Background geometry curves")
 
     tab_time, tab_distance, tab_scale = st.tabs(["Time baseline", "Distance baseline", "Angular scale"])
 
     with tab_time:
-        time_cols = [c for c in ["age_at_z_Gyr", "light_travel_time_Gyr"] if c in df.columns]
-        if time_cols:
-            time_df = df[time_cols].dropna(how="any")
-            if not time_df.empty:
-                st.line_chart(time_df, use_container_width=True)
-            else:
-                st.info("No numeric time-baseline rows are available for this graph range.")
-        else:
-            st.info("Time-baseline columns are not available.")
+        _dti_bggeom_svg_chart_v6i2(
+            rows,
+            "z",
+            [
+                ("age_at_z_Gyr", "age at z [Gyr]"),
+                ("light_travel_time_Gyr", "light-travel time [Gyr]"),
+            ],
+            "Time baseline",
+        )
 
     with tab_distance:
-        distance_cols = [
-            c for c in [
-                "comoving_radial_distance_Mpc",
-                "luminosity_distance_Mpc",
-                "angular_diameter_distance_Mpc",
-            ]
-            if c in df.columns
-        ]
-        if distance_cols:
-            distance_df = df[distance_cols].dropna(how="all")
-            if not distance_df.empty:
-                st.line_chart(distance_df, use_container_width=True)
-            else:
-                st.info("No numeric distance-baseline rows are available for this graph range.")
-        else:
-            st.info("Distance-baseline columns are not available.")
+        _dti_bggeom_svg_chart_v6i2(
+            rows,
+            "z",
+            [
+                ("comoving_radial_distance_Mpc", "comoving radial distance [Mpc]"),
+                ("luminosity_distance_Mpc", "luminosity distance [Mpc]"),
+                ("angular_diameter_distance_Mpc", "angular-diameter distance [Mpc]"),
+            ],
+            "Distance baseline",
+        )
 
     with tab_scale:
-        scale_cols = [c for c in ["scale_kpc_per_arcsec"] if c in df.columns]
-        if scale_cols:
-            scale_df = df[scale_cols].dropna(how="any")
-            if not scale_df.empty:
-                st.line_chart(scale_df, use_container_width=True)
-            else:
-                st.info("Angular scale is undefined for the available graph rows.")
-        else:
-            st.info("Angular-scale column is not available.")
+        _dti_bggeom_svg_chart_v6i2(
+            rows,
+            "z",
+            [
+                ("scale_kpc_per_arcsec", "scale [kpc/arcsec]"),
+            ],
+            "Angular scale",
+        )
 
     with st.expander("Raw data — audit view", expanded=False):
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        _dti_bggeom_render_raw_data_v6e(rows)
 
 
 # DTI_BACKGROUND_GEOMETRY_GRAPH_DROPNA_FIX_V6
