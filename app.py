@@ -7578,6 +7578,325 @@ def ensure_paper_text_state():
         st.session_state["paper_text"] = st.session_state.pop("pending_paper_text")
         st.session_state["paper_text_widget"] = st.session_state["paper_text"]
 
+
+# === DTI CMB / Likelihood Capability Matrix V1 ===
+# Front-end capability audit only.
+# This block does not compute CMB spectra, does not compute Planck likelihoods,
+# does not compare posteriors, does not call external APIs, and does not modify backend state.
+
+def _dti_find_nested_key_v1(payload, candidates):
+    """Return (found, value, matched_path) for dot-path candidates in nested dict payload."""
+    if not isinstance(payload, dict):
+        return False, None, ""
+
+    for path in candidates:
+        cur = payload
+        ok = True
+        for part in str(path).split("."):
+            if isinstance(cur, dict) and part in cur:
+                cur = cur[part]
+            else:
+                ok = False
+                break
+        if ok:
+            return True, cur, path
+
+    return False, None, ""
+
+
+def _dti_value_is_array_like_v1(value):
+    """Conservative array-like check without importing numpy or pandas."""
+    if isinstance(value, (list, tuple)):
+        return len(value) > 0
+    return False
+
+
+def _dti_cmb_likelihood_capability_matrix_v1(payload):
+    """Build capability rows from the current API payload.
+
+    This is intentionally conservative. Missing CMB/Planck fields are readiness NO.
+    Existing scalar CLASS-like derived values are allowed as scalar diagnostics only.
+    """
+    if not isinstance(payload, dict):
+        payload = {}
+
+    boundary = payload.get("boundary", {})
+    derived = payload.get("derived", {})
+    if not isinstance(boundary, dict):
+        boundary = {}
+    if not isinstance(derived, dict):
+        derived = {}
+
+    boundary_note = str(boundary.get("note", ""))
+    note_lower = boundary_note.lower()
+
+    scalar_candidates = [
+        "derived.age_Gyr_CLASS",
+        "derived.rs_drag_Mpc_CLASS",
+        "derived.sigma8_CLASS",
+        "derived.S8_CLASS",
+        "age_Gyr_CLASS",
+        "rs_drag_Mpc_CLASS",
+        "sigma8_CLASS",
+        "S8_CLASS",
+    ]
+
+    ell_candidates = [
+        "derived.ell",
+        "ell",
+        "cmb.ell",
+        "cls.ell",
+    ]
+
+    tt_candidates = [
+        "derived.cl_tt",
+        "cl_tt",
+        "cmb.cl_tt",
+        "cls.tt",
+        "cls.cl_tt",
+    ]
+
+    te_candidates = [
+        "derived.cl_te",
+        "cl_te",
+        "cmb.cl_te",
+        "cls.te",
+        "cls.cl_te",
+    ]
+
+    ee_candidates = [
+        "derived.cl_ee",
+        "cl_ee",
+        "cmb.cl_ee",
+        "cls.ee",
+        "cls.cl_ee",
+    ]
+
+    pp_candidates = [
+        "derived.cl_pp",
+        "derived.cl_phiphi",
+        "cl_pp",
+        "cl_phiphi",
+        "cmb.cl_pp",
+        "cmb.cl_phiphi",
+        "cls.pp",
+        "cls.cl_pp",
+        "cls.phiphi",
+    ]
+
+    planck_candidates = [
+        "chi2_planck_highl",
+        "chi2_planck_lowl",
+        "chi2_planck_lensing",
+        "chi2.planck_highl",
+        "chi2.planck_lowl",
+        "chi2.planck_lensing",
+        "likelihood.planck",
+        "likelihood.planck_highl",
+        "likelihood.planck_lowl",
+        "likelihood.planck_lensing",
+        "derived.chi2_planck_highl",
+        "derived.chi2_planck_lowl",
+        "derived.chi2_planck_lensing",
+    ]
+
+    posterior_candidates = [
+        "posterior",
+        "logposterior",
+        "minuslogpost",
+        "derived.posterior",
+        "derived.logposterior",
+        "derived.minuslogpost",
+    ]
+
+    scalar_found = False
+    scalar_paths = []
+    for p in scalar_candidates:
+        found, value, matched = _dti_find_nested_key_v1(payload, [p])
+        if found:
+            scalar_found = True
+            scalar_paths.append(matched)
+
+    ell_found, ell_value, ell_path = _dti_find_nested_key_v1(payload, ell_candidates)
+    tt_found, tt_value, tt_path = _dti_find_nested_key_v1(payload, tt_candidates)
+    te_found, te_value, te_path = _dti_find_nested_key_v1(payload, te_candidates)
+    ee_found, ee_value, ee_path = _dti_find_nested_key_v1(payload, ee_candidates)
+    pp_found, pp_value, pp_path = _dti_find_nested_key_v1(payload, pp_candidates)
+
+    planck_found, planck_value, planck_path = _dti_find_nested_key_v1(payload, planck_candidates)
+    posterior_found, posterior_value, posterior_path = _dti_find_nested_key_v1(payload, posterior_candidates)
+
+    interface_only = False
+    if "interface compatibility" in note_lower:
+        interface_only = True
+    if "not used as axiclass ede microphysics" in note_lower:
+        interface_only = True
+    if "minimal backend" in note_lower and "f_ede" in note_lower and "z_c" in note_lower:
+        interface_only = True
+
+    rows = []
+
+    def add_row(capability, readiness, evidence, boundary):
+        rows.append({
+            "capability": capability,
+            "readiness": readiness,
+            "evidence": evidence,
+            "boundary": boundary,
+        })
+
+    add_row(
+        "Scalar derived values",
+        "YES" if scalar_found else "NO",
+        ", ".join(scalar_paths) if scalar_paths else "No representative scalar derived keys found",
+        "Scalar diagnostics only; not CMB spectra and not likelihood."
+    )
+
+    add_row(
+        "CMB ell array",
+        "YES" if (ell_found and _dti_value_is_array_like_v1(ell_value)) else "NO",
+        ell_path if ell_found else "Missing keys: derived.ell, ell, cmb.ell, cls.ell",
+        "Required before real CMB graph can be rendered."
+    )
+
+    add_row(
+        "CMB TT spectrum",
+        "YES" if (tt_found and _dti_value_is_array_like_v1(tt_value)) else "NO",
+        tt_path if tt_found else "Missing keys: derived.cl_tt, cl_tt, cmb.cl_tt, cls.tt",
+        "Do not fake TT curve in front-end."
+    )
+
+    add_row(
+        "CMB TE spectrum",
+        "YES" if (te_found and _dti_value_is_array_like_v1(te_value)) else "NO",
+        te_path if te_found else "Missing keys: derived.cl_te, cl_te, cmb.cl_te, cls.te",
+        "Do not fake TE curve in front-end."
+    )
+
+    add_row(
+        "CMB EE spectrum",
+        "YES" if (ee_found and _dti_value_is_array_like_v1(ee_value)) else "NO",
+        ee_path if ee_found else "Missing keys: derived.cl_ee, cl_ee, cmb.cl_ee, cls.ee",
+        "Do not fake EE curve in front-end."
+    )
+
+    add_row(
+        "CMB lensing / phi-phi",
+        "YES" if (pp_found and _dti_value_is_array_like_v1(pp_value)) else "NO",
+        pp_path if pp_found else "Missing keys: derived.cl_pp, derived.cl_phiphi, cl_pp, cl_phiphi, cmb.cl_pp, cls.pp",
+        "Do not fake lensing curve in front-end."
+    )
+
+    add_row(
+        "Planck likelihood components",
+        "YES" if planck_found else "NO",
+        planck_path if planck_found else "Missing Planck chi2 / likelihood fields",
+        "CLASS spectra alone are not Planck likelihood evaluation."
+    )
+
+    add_row(
+        "Posterior comparison",
+        "YES" if posterior_found else "NO",
+        posterior_path if posterior_found else "Missing posterior / logposterior / minuslogpost fields",
+        "This app panel must not compare posteriors."
+    )
+
+    add_row(
+        "AxiCLASS/EDE microphysics",
+        "NO" if interface_only else "UNKNOWN",
+        boundary_note if boundary_note else "No backend boundary note available",
+        "Current backend note indicates f_EDE/z_c are interface-only when stated."
+    )
+
+    add_row(
+        "Backend extension required",
+        "YES",
+        "CMB arrays and Planck likelihood fields are absent unless backend adds them.",
+        "Required before real CMB Cl graph or Planck chi2 matrix."
+    )
+
+    add_row(
+        "Current response can support scalar diagnostics only",
+        "YES" if scalar_found and not (ell_found or tt_found or te_found or ee_found or pp_found or planck_found) else "CHECK",
+        "Derived scalar values present; CMB/Planck arrays not confirmed.",
+        "Safe front-end output is capability audit, not scientific graph/matrix."
+    )
+
+    summary = {
+        "api_status": payload.get("status", "NO_PAYLOAD" if not payload else "UNKNOWN"),
+        "engine": payload.get("engine", "UNKNOWN"),
+        "runtime_sec": payload.get("runtime_sec", "UNKNOWN"),
+        "boundary_note": boundary_note if boundary_note else "No boundary note available",
+        "cmb_graph_readiness": "NO" if not (ell_found and tt_found) else "CHECK",
+        "planck_likelihood_readiness": "NO" if not planck_found else "CHECK",
+        "backend_extension_required": "YES",
+        "scalar_only_api_response": "YES" if scalar_found and not (ell_found or tt_found or te_found or ee_found or pp_found or planck_found) else "CHECK",
+    }
+
+    return summary, rows
+
+
+def _dti_render_cmb_likelihood_capability_matrix_v1(payload=None):
+    """Render display-only CMB / Likelihood capability audit panel."""
+    st.markdown("### CMB / Likelihood capability matrix — API readiness audit")
+
+    if payload is None:
+        payload = {}
+
+    if not isinstance(payload, dict) or not payload:
+        st.info("No API payload available in this session. Showing required fields and readiness boundaries.")
+        payload = {}
+
+    summary, rows = _dti_cmb_likelihood_capability_matrix_v1(payload)
+
+    st.markdown("#### Summary")
+    st.text(
+        "API status: {api_status}\n"
+        "engine: {engine}\n"
+        "runtime_sec: {runtime_sec}\n"
+        "CMB graph readiness = {cmb_graph_readiness}\n"
+        "Planck likelihood readiness = {planck_likelihood_readiness}\n"
+        "backend extension required = {backend_extension_required}\n"
+        "scalar-only API response = {scalar_only_api_response}\n"
+        "boundary note: {boundary_note}".format(**summary)
+    )
+
+    st.markdown("#### Capability matrix")
+    try:
+        st.table(rows)
+    except Exception:
+        lines = []
+        for row in rows:
+            lines.append(
+                f"{row.get('capability', '')}\t"
+                f"readiness={row.get('readiness', '')}\t"
+                f"evidence={row.get('evidence', '')}\t"
+                f"boundary={row.get('boundary', '')}"
+            )
+        st.text("\n".join(lines))
+
+    st.warning(
+        "This panel is a capability audit only. "
+        "It does not compute CMB spectra. "
+        "It does not compute Planck likelihoods. "
+        "It does not compare posteriors. "
+        "It does not validate Planck or JWST. "
+        "It does not update physics values. "
+        "Backend extension is required before real CMB Cl graph or Planck χ² matrix can be shown."
+    )
+
+    st.markdown("#### Raw data — audit view")
+    try:
+        import json
+        st.text(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True))
+    except Exception:
+        st.text(str(payload))
+
+
+def _dti_render_cmb_likelihood_capability_matrix_v1_no_payload():
+    """Safe fallback renderer when no live API payload object is in local scope."""
+    _dti_render_cmb_likelihood_capability_matrix_v1({})
+# === END DTI CMB / Likelihood Capability Matrix V1 ===
+
 st.set_page_config(page_title="DTI-Core Grand Auditor v6.0", layout="wide")
 
 
@@ -10097,3 +10416,10 @@ st.markdown(
 - This app is not a likelihood evaluation, posterior comparison, Planck likelihood validation, or S8-claim validation.
 """
 )
+
+
+# === DTI CMB / Likelihood Capability Matrix V1 standalone fallback ===
+# This fallback does not execute by itself unless called from an existing UI flow.
+# To render without a payload, call:
+# _dti_render_cmb_likelihood_capability_matrix_v1_no_payload()
+# === END DTI CMB / Likelihood Capability Matrix V1 standalone fallback ===
