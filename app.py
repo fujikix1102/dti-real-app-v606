@@ -5265,6 +5265,109 @@ It is **not**:
 
 # --- /DTI_CORRELATED_BOUNDARY_TRIAGE_V1 ---
 
+# --- DTI_STATIC_DELTA_AUDIT_TABLE_V1 ---
+# Static local TSV audit display for axiclass_fix1_delta.tsv.
+# Boundary: table display only; not interpolation, not CLASS execution,
+# not likelihood evaluation, not posterior comparison, not Planck validation.
+_DTI_STATIC_DELTA_AUDIT_TABLE_V1 = True
+
+def _dti_read_static_delta_table_v1():
+    """Read local static AxiCLASS FIX1 delta TSV for audit display only."""
+    try:
+        delta_path = AXICLASS_DELTA
+    except Exception:
+        try:
+            delta_path = DATA_DIR / "axiclass_fix1_delta.tsv"
+        except Exception:
+            delta_path = None
+
+    if delta_path is None:
+        return None, "AXICLASS_DELTA path is unavailable."
+
+    try:
+        if not delta_path.exists():
+            return None, f"Static delta TSV not found: {delta_path}"
+        df = pd.read_csv(delta_path, sep="\t")
+        return df, ""
+    except Exception as exc:
+        return None, f"Could not read static delta TSV: {type(exc).__name__}"
+
+def _dti_render_static_delta_audit_table_v1():
+    st.markdown("### AxiCLASS FIX1 static delta audit table")
+    st.caption(
+        "Local static TSV checkpoint display only. No interpolation, no CLASS run, no Render API call, "
+        "no likelihood evaluation, no posterior comparison, no Planck validation, and no physics-value update."
+    )
+
+    df, err = _dti_read_static_delta_table_v1()
+    if df is None:
+        st.info(f"Static delta audit table unavailable. {err}")
+        return
+
+    expected_cols = ["pair", "model_A", "model_B", "metric", "A", "B", "delta_A_minus_B", "pct_delta_vs_B", "direction"]
+    available_cols = [c for c in expected_cols if c in df.columns]
+    display_df = df[available_cols].copy() if available_cols else df.copy()
+
+    row_count = int(len(display_df))
+    metric_count = int(display_df["metric"].nunique()) if "metric" in display_df.columns else None
+    pair_count = int(display_df["pair"].nunique()) if "pair" in display_df.columns else None
+
+    st.info(
+        f"Static delta audit table loaded: {row_count} rows"
+        + (f", {metric_count} metrics" if metric_count is not None else "")
+        + (f", {pair_count} comparison pairs" if pair_count is not None else "")
+        + "."
+    )
+
+    if "direction" in display_df.columns:
+        with st.expander("Direction summary — static TSV only", expanded=False):
+            try:
+                summary_df = (
+                    display_df["direction"]
+                    .fillna("unknown")
+                    .astype(str)
+                    .value_counts()
+                    .rename_axis("direction")
+                    .reset_index(name="count")
+                )
+                st.dataframe(summary_df, use_container_width=True, hide_index=True)
+            except Exception:
+                st.caption("Direction summary unavailable.")
+
+    with st.expander("Full static delta table — audit display only", expanded=False):
+        st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+    with st.expander("Boundary and safe interpretation", expanded=False):
+        st.markdown(
+            """
+This panel displays the local `app/data/axiclass_fix1_delta.tsv` checkpoint table.
+
+It is useful for:
+
+- comparing fixed benchmark differences already present in the repository
+- checking pair / metric / direction structure
+- preserving static provenance for reader-facing audit
+
+It is **not**:
+
+- an interpolation engine
+- a recomputation
+- a CLASS run
+- a Render API request
+- a likelihood evaluation
+- a posterior comparison
+- a Planck validation
+- a physics-value update
+- a manuscript conclusion
+"""
+        )
+        st.caption(
+            "The previous read-only audit found this TSV is not ready for interpolation because it has no clear numeric interpolation axis. "
+            "Therefore this panel intentionally uses it as a static delta audit table only."
+        )
+# --- /DTI_STATIC_DELTA_AUDIT_TABLE_V1 ---
+
+
 
 
 # --- /DTI_PROFILE_CATEGORY_GUIDE_LABEL_POLISH_V1C_MINIMAL ---
@@ -6552,6 +6655,11 @@ if not candidate_text and "FUJIKI_DTI_Candidate_v6" in PRESETS:
 # DTI_CORRELATED_BOUNDARY_TRIAGE_CALL_V1
 _dti_render_correlated_boundary_triage_v1()
 # /DTI_CORRELATED_BOUNDARY_TRIAGE_CALL_V1
+
+
+# DTI_STATIC_DELTA_AUDIT_TABLE_CALL_V1
+_dti_render_static_delta_audit_table_v1()
+# /DTI_STATIC_DELTA_AUDIT_TABLE_CALL_V1
 
 st.header("5. AxiCLASS FIX1 locked benchmark")
 
