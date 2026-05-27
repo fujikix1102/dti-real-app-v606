@@ -868,7 +868,7 @@ def _dti_render_parameter_quality_matrix_v1f():
     import streamlit as st
     import pandas as pd
 
-    st.markdown("### Parameter Quality Matrix")
+    st.markdown("### Legacy/detail Parameter Quality Matrix 1 — audit view")
 
     st.info(
         "This matrix color-codes parameter directions so a researcher can see which points look promising, "
@@ -1172,7 +1172,7 @@ def _dti_render_parameter_quality_matrix_v1g():
     import streamlit as st
     import pandas as pd
 
-    st.markdown("### Parameter Quality Matrix")
+    st.markdown("### Legacy/detail Parameter Quality Matrix 2 — audit view")
 
     st.info(
         "This matrix color-codes promising parameter directions and blocked regions. "
@@ -5564,6 +5564,19 @@ def _dti_panel_note_v1(text):
     st.caption(text)
 
 # --- /DTI_UI_CONSOLIDATION_V1 ---
+
+# --- DTI_UI_CONSOLIDATION_V2B_SAFE_CALL_WRAP ---
+# Display-only consolidation. Legacy/detail-heavy duplicate panels are folded by
+# wrapping their existing render calls, not by reindenting function bodies.
+# Boundary: no solver execution, no API modification, no data mutation.
+
+_DTI_UI_CONSOLIDATION_V2B_SAFE_CALL_WRAP = True
+
+def _dti_legacy_detail_expander_v2b(title):
+    return st.expander(title, expanded=False)
+
+# --- /DTI_UI_CONSOLIDATION_V2B_SAFE_CALL_WRAP ---
+
 
 # --- DTI_7C_EXAMINER_PAYLOAD_DISPLAY_POLISH_V1 ---
 # Reader-facing display helper for 7c continuity/discontinuity examiner payloads.
