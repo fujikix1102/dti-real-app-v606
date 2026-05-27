@@ -10724,3 +10724,159 @@ st.markdown(
 # To render without a payload, call:
 # _dti_render_cmb_likelihood_capability_matrix_v1_no_payload()
 # === END DTI CMB / Likelihood Capability Matrix V1 standalone fallback ===
+
+
+# === DTI_FRONTEND_TRANSLATOR_INTEGRATION_LOCAL_PATCH_V1 ===
+# Frontend-only translator integration panel.
+# This panel calls the public backend translator endpoint only when the user presses the button.
+# It does not modify backend code, does not run CLASS/AxiCLASS, does not generate CMB spectra,
+# does not evaluate Planck likelihoods, and does not compare posteriors.
+
+def _dti_render_jump_translator_boundary_badges_v1(response_obj):
+    boundary = response_obj.get("boundary", {}) if isinstance(response_obj, dict) else {}
+    impl = response_obj.get("implementation_status", {}) if isinstance(response_obj, dict) else {}
+
+    st.markdown("##### Boundary confirmation")
+
+    rows = [
+        ("No CLASS run", boundary.get("class_run") is False),
+        ("No AxiCLASS run", boundary.get("axiclass_run") is False),
+        ("No CMB spectra generation", boundary.get("cmb_spectra_generated") is False),
+        ("No Planck chi2", boundary.get("planck_chi2") is False),
+        ("No likelihood evaluation", boundary.get("likelihood_evaluation") is False),
+        ("No posterior comparison", boundary.get("posterior_comparison") is False),
+        ("Jump model active: false", impl.get("jump_model_active") is False),
+        ("Jump background active: false", impl.get("jump_background_active") is False),
+        ("Jump perturbations active: false", impl.get("jump_perturbations_active") is False),
+    ]
+
+    for label, ok in rows:
+        if ok:
+            st.success(label)
+        else:
+            st.warning(f"{label} — not confirmed in response")
+
+
+def _dti_call_jump_translator_v1(payload, timeout_sec=30):
+    import requests as _dti_requests_v1
+
+    endpoint = "https://dti-class-api.onrender.com/class/translate-jump-params"
+    response = _dti_requests_v1.post(endpoint, json=payload, timeout=timeout_sec)
+    try:
+        data = response.json()
+    except Exception:
+        data = {
+            "accepted": False,
+            "errors": ["response_json_parse_failed"],
+            "raw_text": response.text,
+        }
+
+    return {
+        "endpoint": endpoint,
+        "http_code": response.status_code,
+        "ok": response.ok,
+        "data": data,
+    }
+
+
+def _dti_render_jump_translator_panel_v1():
+    st.markdown("---")
+    with st.expander("Jump parameter translator — backend boundary check", expanded=False):
+        st.markdown(
+            "Translator-only panel. This sends jump parameters to the backend translator endpoint "
+            "and displays normalized values plus explicit boundary fields. It does not run CLASS, "
+            "does not run AxiCLASS, does not generate CMB spectra, does not evaluate Planck chi2, "
+            "does not evaluate likelihood, and does not compare posteriors."
+        )
+
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            h0 = st.number_input("H0", min_value=1.0, max_value=150.0, value=72.6, step=0.1, key="dti_jump_tr_h0_v1")
+            omega_b = st.number_input("omega_b", min_value=0.0001, max_value=0.2, value=0.02237, step=0.00001, format="%.5f", key="dti_jump_tr_omega_b_v1")
+            omega_cdm = st.number_input("omega_cdm", min_value=0.0001, max_value=1.0, value=0.1200, step=0.0001, format="%.4f", key="dti_jump_tr_omega_cdm_v1")
+        with c2:
+            ln10_10_as = st.number_input("ln10_10_As", min_value=0.1, max_value=10.0, value=3.044, step=0.001, format="%.3f", key="dti_jump_tr_ln10as_v1")
+            n_s = st.number_input("n_s", min_value=0.1, max_value=2.0, value=0.965, step=0.001, format="%.3f", key="dti_jump_tr_ns_v1")
+            tau_reio = st.number_input("tau_reio", min_value=0.0, max_value=1.0, value=0.054, step=0.001, format="%.3f", key="dti_jump_tr_tau_v1")
+        with c3:
+            a_j = st.number_input("A_J", min_value=-1.0, max_value=1.0, value=-0.00022, step=0.00001, format="%.5f", key="dti_jump_tr_aj_v1")
+            z_j = st.number_input("z_J", min_value=0.0001, max_value=5000.0, value=1100.0, step=1.0, key="dti_jump_tr_zj_v1")
+            delta_z = st.number_input("Delta_z", min_value=0.0001, max_value=2000.0, value=30.0, step=1.0, key="dti_jump_tr_dz_v1")
+
+        regime = st.selectbox(
+            "jump_regime_label",
+            ["low_z_geometry", "recombination_scale", "early_time_ede_like"],
+            index=1,
+            key="dti_jump_tr_regime_v1",
+        )
+
+        payload = {
+            "backend_mode": "jump_parameter_translation_only",
+            "H0": float(h0),
+            "omega_b": float(omega_b),
+            "omega_cdm": float(omega_cdm),
+            "ln10_10_As": float(ln10_10_as),
+            "n_s": float(n_s),
+            "tau_reio": float(tau_reio),
+            "jump_model_enabled": True,
+            "jump_target": "E_z",
+            "transition_form": "smoothed_tanh_step",
+            "A_J": float(a_j),
+            "z_J": float(z_j),
+            "Delta_z": float(delta_z),
+            "jump_regime_label": str(regime),
+            "request_claim_level": "translation_only",
+        }
+
+        st.caption("Fixed request fields: backend_mode=jump_parameter_translation_only, jump_target=E_z, transition_form=smoothed_tanh_step, request_claim_level=translation_only.")
+
+        with st.expander("Request payload preview", expanded=False):
+            st.json(payload)
+
+        if st.button("Run translator boundary check", key="dti_jump_translator_run_v1"):
+            with st.spinner("Calling backend translator endpoint..."):
+                try:
+                    result = _dti_call_jump_translator_v1(payload)
+                except Exception as exc:
+                    st.error(f"Translator request failed: {exc!r}")
+                    return
+
+            st.write(f"HTTP status: {result.get('http_code')}")
+            data = result.get("data", {})
+
+            if result.get("ok") and isinstance(data, dict) and data.get("accepted") is True:
+                st.success("Translator response accepted. Boundary-only response received.")
+            else:
+                st.warning("Translator response was not accepted or returned a non-OK HTTP status.")
+
+            if isinstance(data, dict):
+                warnings = data.get("warnings", [])
+                errors = data.get("errors", [])
+                if errors:
+                    st.error("Errors")
+                    st.json(errors)
+                if warnings:
+                    st.warning("Warnings")
+                    st.json(warnings)
+
+                st.markdown("##### Normalized values")
+                st.json(data.get("normalized", {}))
+
+                st.markdown("##### Formula")
+                st.json(data.get("formula", {}))
+
+                st.markdown("##### Implementation status")
+                st.json(data.get("implementation_status", {}))
+
+                _dti_render_jump_translator_boundary_badges_v1(data)
+
+                with st.expander("Full translator response", expanded=False):
+                    st.json(data)
+            else:
+                st.json(result)
+
+
+_dti_render_jump_translator_panel_v1()
+
+# === END DTI_FRONTEND_TRANSLATOR_INTEGRATION_LOCAL_PATCH_V1 ===
+
