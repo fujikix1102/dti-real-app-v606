@@ -220,3 +220,42 @@ It does not replace:
 
 It is a navigation and audit-preview layer only. It does not perform likelihood evaluation, posterior comparison, Planck validation, graph rendering, physics-value updates, 7c execution, or manuscript updates.
 <!-- DTI_SHOW_ALL_PROFILES_TABLE_V1F_DOC_END -->
+
+
+## Static Delta Audit Table V1
+
+The public dashboard includes **AxiCLASS FIX1 static delta audit table**.
+
+This panel reads the local checkpoint file:
+
+- `app/data/axiclass_fix1_delta.tsv`
+
+It displays a bounded audit view of already-recorded static differences:
+
+- row count
+- metric count
+- comparison-pair count
+- direction summary
+- compact reader-facing static delta table
+
+The panel is intentionally **display-only**. It does not infer a new model result and does not perform interpolation.
+
+Boundary:
+
+- no interpolation
+- no recomputation
+- no CLASS execution
+- no Render API request
+- no 7c execution
+- no likelihood evaluation
+- no posterior comparison
+- no Planck validation
+- no model validation
+- no physics-value update
+- no graph rendering
+- no manuscript conclusion
+
+Interpretation:
+
+The panel is useful for checking fixed benchmark-difference structure already present in the repository. It is not a solver, not an emulator, and not a posterior or likelihood object. The earlier read-only interpolation audit found that `axiclass_fix1_delta.tsv` does not contain a clear numeric interpolation axis, so the app presents it as a static audit table rather than an interpolation engine.
+

@@ -5334,8 +5334,18 @@ def _dti_render_static_delta_audit_table_v1():
             except Exception:
                 st.caption("Direction summary unavailable.")
 
-    with st.expander("Full static delta table — audit display only", expanded=False):
+    with st.expander("Compact static delta table — audit display only", expanded=False):
         st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+    
+    st.caption("Compact reader-facing view: wide model names are shortened into columns; source TSV remains unchanged.")
+    try:
+        _dti_delta_compact_v1b = _dti_static_delta_table_compact_v1b(df)
+        if not _dti_delta_compact_v1b.empty:
+            with st.expander("Compact static delta table — reader view", expanded=True):
+                st.dataframe(_dti_delta_compact_v1b, use_container_width=True, hide_index=True)
+    except Exception:
+        st.caption("Compact static delta reader view unavailable; source TSV display remains bounded.")
 
     with st.expander("Boundary and safe interpretation", expanded=False):
         st.markdown(
@@ -5365,6 +5375,53 @@ It is **not**:
             "The previous read-only audit found this TSV is not ready for interpolation because it has no clear numeric interpolation axis. "
             "Therefore this panel intentionally uses it as a static delta audit table only."
         )
+
+# --- DTI_STATIC_DELTA_TABLE_READABILITY_V1B ---
+# Readability-only helpers for the static delta table.
+# Boundary: no interpolation, no recomputation, no CLASS run, no API call.
+
+_DTI_STATIC_DELTA_TABLE_READABILITY_V1B = True
+
+def _dti_static_delta_table_compact_v1b(df):
+    """Return compact static-delta table columns for reader-facing display."""
+    try:
+        if df is None or df.empty:
+            return pd.DataFrame()
+        display_cols = [
+            c for c in [
+                "pair",
+                "metric",
+                "model_A",
+                "model_B",
+                "A",
+                "B",
+                "delta_A_minus_B",
+                "pct_delta_vs_B",
+                "direction",
+            ] if c in df.columns
+        ]
+        compact = df[display_cols].copy()
+        rename = {
+            "pair": "pair",
+            "metric": "metric",
+            "model_A": "A model",
+            "model_B": "B model",
+            "A": "A",
+            "B": "B",
+            "delta_A_minus_B": "Δ A−B",
+            "pct_delta_vs_B": "%Δ vs B",
+            "direction": "dir",
+        }
+        compact = compact.rename(columns=rename)
+        for col in ["A", "B", "Δ A−B", "%Δ vs B"]:
+            if col in compact.columns:
+                compact[col] = pd.to_numeric(compact[col], errors="coerce").round(5)
+        return compact
+    except Exception:
+        return df
+
+# --- /DTI_STATIC_DELTA_TABLE_READABILITY_V1B ---
+
 # --- /DTI_STATIC_DELTA_AUDIT_TABLE_V1 ---
 
 
