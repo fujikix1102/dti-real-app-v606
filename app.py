@@ -5752,10 +5752,142 @@ def _dti_render_background_geometry_anchor_v1():
         st.markdown("#### Distance baseline")
         st.dataframe(pd.DataFrame(_dti_bggeom_rows_v1(result, "distance")), use_container_width=True, hide_index=True)
 
-        with st.expander("Raw data — audit view", expanded=False):
+        
+        # DTI_BACKGROUND_GEOMETRY_GRAPH_CALL_V1
+        _dti_render_background_geometry_graph_v1(bg_H0, bg_om, bg_ov, bg_z)
+        # /DTI_BACKGROUND_GEOMETRY_GRAPH_CALL_V1
+
+with st.expander("Raw data — audit view", expanded=False):
             st.json(result)
 
 # --- /DTI_BACKGROUND_GEOMETRY_ANCHOR_V1 ---
+
+
+
+# --- DTI_BACKGROUND_GEOMETRY_GRAPH_V1 ---
+# Lightweight FLRW-only graph for the Background Geometry Anchor.
+# Boundary: local background geometry only. No CLASS execution, no Render API,
+# no likelihood evaluation, no posterior comparison, no Planck validation.
+
+_DTI_BACKGROUND_GEOMETRY_GRAPH_V1 = True
+
+def _dti_bggeom_graph_grid_v1(H0, omega_m, omega_vac, zmax):
+    # DTI_BACKGROUND_GEOMETRY_GRAPH_GRID_FLATTEN_V6D
+    # Flatten nested _dti_bggeom_compute_v1 output into chart-ready rows.
+    try:
+        zmax = float(zmax)
+        if zmax <= 0:
+            zmax = 0.1
+        n = 81
+        rows = []
+        for i in range(n):
+            t = i / float(n - 1)
+            z = zmax * (t ** 2)
+            result = _dti_bggeom_compute_v1(H0, omega_m, omega_vac, z)
+            if not isinstance(result, dict) or result.get("status") != "ok":
+                rows.append({
+                    "z": round(z, 6),
+                    "age_at_z_Gyr": None,
+                    "light_travel_time_Gyr": None,
+                    "comoving_radial_distance_Mpc": None,
+                    "luminosity_distance_Mpc": None,
+                    "angular_diameter_distance_Mpc": None,
+                    "scale_kpc_per_arcsec": None,
+                })
+                continue
+
+            time_part = result.get("time", {}) if isinstance(result.get("time", {}), dict) else {}
+            dist_part = result.get("distance", {}) if isinstance(result.get("distance", {}), dict) else {}
+
+            rows.append({
+                "z": round(z, 6),
+                "age_at_z_Gyr": time_part.get("age_at_z_Gyr"),
+                "light_travel_time_Gyr": time_part.get("light_travel_time_Gyr"),
+                "comoving_radial_distance_Mpc": dist_part.get("comoving_radial_distance_Mpc"),
+                "luminosity_distance_Mpc": dist_part.get("luminosity_distance_Mpc"),
+                "angular_diameter_distance_Mpc": dist_part.get("angular_diameter_distance_Mpc"),
+                "scale_kpc_per_arcsec": dist_part.get("scale_kpc_per_arcsec"),
+            })
+        return rows
+    except Exception:
+        return []
+
+def _dti_render_background_geometry_graph_v1(H0, omega_m, omega_vac, zmax):
+    # DTI_BACKGROUND_GEOMETRY_GRAPH_RENDERER_V6C
+    # Background-geometry FLRW-only graph renderer.
+    # Boundary: no CLASS, no API, no likelihood/posterior/Planck validation.
+    st.markdown("#### Background geometry curves")
+    _dti_panel_note_v1("Summary → compact table → Raw data — audit view. FLRW background geometry only; not CLASS or likelihood output.")
+
+    rows = _dti_bggeom_graph_grid_v1(H0, omega_m, omega_vac, zmax)
+    if not rows:
+        st.info("No background-geometry graph rows are available.")
+        return
+
+    df = pd.DataFrame(rows)
+    if "z" in df.columns:
+        df = df.set_index("z")
+
+    tab_time, tab_distance, tab_scale = st.tabs(["Time baseline", "Distance baseline", "Angular scale"])
+
+    with tab_time:
+        time_cols = [c for c in ["age_at_z_Gyr", "light_travel_time_Gyr"] if c in df.columns]
+        if time_cols:
+            time_df = df[time_cols].dropna(how="any")
+            if not time_df.empty:
+                st.line_chart(time_df, use_container_width=True)
+            else:
+                st.info("No numeric time-baseline rows are available for this graph range.")
+        else:
+            st.info("Time-baseline columns are not available.")
+
+    with tab_distance:
+        distance_cols = [
+            c for c in [
+                "comoving_radial_distance_Mpc",
+                "luminosity_distance_Mpc",
+                "angular_diameter_distance_Mpc",
+            ]
+            if c in df.columns
+        ]
+        if distance_cols:
+            distance_df = df[distance_cols].dropna(how="all")
+            if not distance_df.empty:
+                st.line_chart(distance_df, use_container_width=True)
+            else:
+                st.info("No numeric distance-baseline rows are available for this graph range.")
+        else:
+            st.info("Distance-baseline columns are not available.")
+
+    with tab_scale:
+        scale_cols = [c for c in ["scale_kpc_per_arcsec"] if c in df.columns]
+        if scale_cols:
+            scale_df = df[scale_cols].dropna(how="any")
+            if not scale_df.empty:
+                st.line_chart(scale_df, use_container_width=True)
+            else:
+                st.info("Angular scale is undefined for the available graph rows.")
+        else:
+            st.info("Angular-scale column is not available.")
+
+    with st.expander("Raw data — audit view", expanded=False):
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+
+# DTI_BACKGROUND_GEOMETRY_GRAPH_DROPNA_FIX_V6
+# Graph tables drop None rows per panel before st.line_chart.
+# Boundary: Background Geometry FLRW-only graph rendering; no CLASS, no API, no likelihood/posterior/Planck validation.
+_DTI_BACKGROUND_GEOMETRY_GRAPH_DROPNA_FIX_V6 = True
+# /DTI_BACKGROUND_GEOMETRY_GRAPH_DROPNA_FIX_V6
+
+
+# DTI_BACKGROUND_GEOMETRY_GRAPH_DROPNA_FIX_V6B
+# Graph tables drop None rows per panel before st.line_chart.
+# Boundary: Background Geometry FLRW-only graph rendering; no CLASS, no API, no likelihood/posterior/Planck validation.
+_DTI_BACKGROUND_GEOMETRY_GRAPH_DROPNA_FIX_V6B = True
+# /DTI_BACKGROUND_GEOMETRY_GRAPH_DROPNA_FIX_V6B
+
+# --- /DTI_BACKGROUND_GEOMETRY_GRAPH_V1 ---
 
 
 # --- DTI_UI_CONSOLIDATION_V1 ---
