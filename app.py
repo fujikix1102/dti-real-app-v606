@@ -10880,3 +10880,116 @@ _dti_render_jump_translator_panel_v1()
 
 # === END DTI_FRONTEND_TRANSLATOR_INTEGRATION_LOCAL_PATCH_V1 ===
 
+# DTI_REAL_APP_UI_BOUNDED_STATUS_PANEL_PATCH_V1_BEGIN
+# Bounded DTI capability status panel.
+# Boundary: diagnostic capability/status only. No CLASS run, no CMB generation,
+# no likelihood, no Planck chi2, no posterior comparison, no physical validation,
+# and no perturbation-closure claim.
+
+def _dti_bounded_status_badge(value):
+    """Return a conservative display badge for bounded DTI status values."""
+    text = str(value) if value is not None else "UNKNOWN"
+    return text
+
+
+def _render_dti_bounded_capability_status_panel(backend_base_url=None):
+    """
+    Render audited DTI backend capability status.
+
+    This panel is diagnostic/status-only. It does not run CLASS, generate spectra,
+    evaluate likelihoods, compute Planck chi2, perform posterior comparison,
+    validate physical CMB output, or claim perturbation closure.
+    """
+    import streamlit as st
+
+    st.markdown("### DTI backend capability status")
+    st.caption(
+        "Bounded diagnostic capability status only. "
+        "No physical CMB validation, likelihood, Planck chi2, posterior comparison, "
+        "or perturbation-closure claim."
+    )
+
+    default_url = "https://dti-class-api.onrender.com"
+    base_url = backend_base_url or default_url
+
+    status_payload = None
+    error_text = None
+
+    try:
+        import requests
+        r = requests.get(base_url.rstrip("/") + "/dti/capability-status", timeout=8)
+        if r.status_code == 200:
+            status_payload = r.json()
+        else:
+            error_text = f"Capability endpoint returned HTTP {r.status_code}"
+    except Exception as exc:
+        error_text = f"Capability endpoint unavailable: {exc}"
+
+    if status_payload is None:
+        st.warning("DTI capability endpoint is not available in this session.")
+        if error_text:
+            st.caption(error_text)
+        st.info(
+            "Boundary retained: this panel does not run CLASS, generate spectra, "
+            "evaluate likelihoods, or claim physical validation."
+        )
+        return
+
+    fields = status_payload.get("status_fields", {})
+    boundaries = status_payload.get("boundaries", {})
+    provenance = status_payload.get("provenance", {})
+
+    rows = [
+        ("Compile gate", fields.get("compile_gate", "UNKNOWN"), "no physics claim"),
+        ("Short-root smoke", fields.get("short_root_smoke", "UNKNOWN"), "no physics claim"),
+        ("perturbations_derivs reached", fields.get("derivs_entry_reached", "UNKNOWN"), "diagnostic path only"),
+        ("Guard zone reached", fields.get("guard_zone_reached", "UNKNOWN"), "diagnostic path only"),
+        ("V1C hook reached", fields.get("v1c_hook_reached", "UNKNOWN"), "diagnostic path only"),
+        ("Numeric hygiene", fields.get("numeric_hygiene", "UNKNOWN"), "log hygiene only"),
+        ("Diagnostic response", fields.get("probe_response", "UNKNOWN"), "not non-inertness proof"),
+        ("Non-inertness", fields.get("non_inertness_status", "UNKNOWN"), "not established"),
+        ("Physical validation", fields.get("physical_validation", "NOT_OPENED"), "not run"),
+        ("Likelihood", fields.get("likelihood_status", "NOT_OPENED"), "not run"),
+        ("Planck chi2", fields.get("planck_chi2_status", "NOT_OPENED"), "not run"),
+        ("Posterior comparison", fields.get("posterior_comparison", "NOT_OPENED"), "not run"),
+        ("Closure claim", fields.get("closure_claim", "NO"), "none"),
+        ("Public claim level", fields.get("public_claim_level", "BOUNDED_DIAGNOSTIC_ONLY"), "bounded diagnostic only"),
+    ]
+
+    st.table(
+        [
+            {"item": name, "status": _dti_bounded_status_badge(value), "boundary": boundary}
+            for name, value, boundary in rows
+        ]
+    )
+
+    with st.expander("DTI capability provenance and no-claim boundary", expanded=False):
+        st.json(
+            {
+                "classification": status_payload.get("classification"),
+                "schema_name": status_payload.get("schema_name"),
+                "provenance": provenance,
+                "boundaries": boundaries,
+                "no_claims": {
+                    "class_run_from_panel": False,
+                    "cmb_generation": False,
+                    "physical_validation": False,
+                    "likelihood": False,
+                    "planck_chi2": False,
+                    "posterior_comparison": False,
+                    "perturbation_closure_claim": False,
+                    "hubble_tension_solution_claim": False,
+                },
+            }
+        )
+
+# DTI_REAL_APP_UI_BOUNDED_STATUS_PANEL_PATCH_V1_END
+
+# DTI_REAL_APP_UI_BOUNDED_STATUS_PANEL_RENDER_V1_BEGIN
+try:
+    _render_dti_bounded_capability_status_panel()
+except Exception as _dti_status_panel_exc:
+    import streamlit as st
+    st.warning("DTI capability status panel could not be rendered.")
+    st.caption(str(_dti_status_panel_exc))
+# DTI_REAL_APP_UI_BOUNDED_STATUS_PANEL_RENDER_V1_END
