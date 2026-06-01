@@ -10993,3 +10993,32 @@ except Exception as _dti_status_panel_exc:
     st.warning("DTI capability status panel could not be rendered.")
     st.caption(str(_dti_status_panel_exc))
 # DTI_REAL_APP_UI_BOUNDED_STATUS_PANEL_RENDER_V1_END
+
+# --- PAPER/APJ STATUS PANEL: project-status boundary readout only ---
+with st.expander("Paper / APJ conversion status", expanded=False):
+    st.markdown(
+        """
+        **Current APJ-oriented text artifact**
+
+        A non-promoted APJ-oriented clone has completed title, abstract, and introduction compression.
+
+        - artifact type: project-status manuscript clone
+        - page count: 76
+        - PDF SHA256: `d8f31844e3b061da5f71bf8bb2c12f769338d27469635bb63fca53c503b8fd02`
+        - status: human-accepted for app-facing status display
+        - promotion status: not promoted
+        - submission status: no submission-ready claim
+
+        **Boundary**
+
+        This panel is a status and boundary-readout panel only.
+
+        It is not a likelihood result, posterior comparison, Planck chi-square evaluation,
+        CMB validation, perturbation-sector validation, or Hubble-tension solution.
+
+        **Correct reading**
+
+        This records manuscript-conversion progress only. It does not add new cosmological evidence.
+        """
+    )
+# --- END PAPER/APJ STATUS PANEL ---
