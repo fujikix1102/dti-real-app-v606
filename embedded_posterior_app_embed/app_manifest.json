@@ -1,0 +1,18 @@
+{
+  "package_type": "DTI_MCMC_OFFLINE_SMOKE_RUN_PACKAGE_V1",
+  "route": "L0_SYNTHETIC_INTERFACE_SMOKE_ONLY",
+  "live_mcmc_app": false,
+  "real_likelihood": false,
+  "physics_validation": false,
+  "posterior_physics_claim": false,
+  "public_app_role": "frozen embedded posterior viewer only",
+  "parameters": [
+    "H0",
+    "omega_cdm",
+    "dti_jump_amp",
+    "dti_jump_z"
+  ],
+  "chain_count": 4,
+  "kept_rows_total": 4000,
+  "required_ui_warning": "Displayed posterior results are precomputed and frozen. This public app does not run live MCMC, likelihood evaluation, posterior comparison, or physics validation."
+}

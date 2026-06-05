@@ -1,0 +1,5 @@
+key	value
+verdict	PASS_SMOKE_PACKAGE
+route	L0_SYNTHETIC_INTERFACE_SMOKE_ONLY
+physical_posterior_claim	NO
+real_likelihood	NO
