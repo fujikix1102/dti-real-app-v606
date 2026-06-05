@@ -1,9 +1,0 @@
-key	value
-diagnostic_label	CONVERGED_WEAK
-acceptance_fraction_mean	0.5830950520833333
-acceptance_fraction_min	0.56825
-acceptance_fraction_max	0.5956
-finite_logprob_fraction	1.0
-seed_split_max_mean_difference	0.008442416294793365
-edge_hit_rate_max	0.0145625
-long_run_interpretation	proxy_likelihood_only_not_physical_posterior

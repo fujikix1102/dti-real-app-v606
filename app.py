@@ -11033,105 +11033,42 @@ from pathlib import Path as _DTIPath
 import json as _dti_json
 
 def _dti_embedded_posterior_viewer_public_section():
-    import pandas as _dti_pd
-    import streamlit as _dti_st
-
-    _base = _DTIPath(__file__).resolve().parent / "embedded_posterior_app_embed"
-    _manifest_path = _base / "app_manifest.json"
-
-    _dti_st.markdown("---")
-    _dti_st.header("Embedded posterior viewer — frozen offline audit")
-    _dti_st.warning(
-        "Displayed posterior results are precomputed and frozen. "
-        "This public app does not run live MCMC, likelihood evaluation, "
-        "posterior comparison, backend inference, or physics validation."
+    """Display pending state only; no sample/synthetic/proxy posterior is shown."""
+    st.subheader("Observed-data posterior")
+    st.warning(
+        "Status: pending. No sample, synthetic, smoke, or proxy posterior is displayed."
     )
-
-    if not _manifest_path.exists():
-        _dti_st.error("Embedded posterior artifact manifest is missing.")
-        return
-
-    try:
-        _manifest = _dti_json.loads(_manifest_path.read_text(encoding="utf-8"))
-    except Exception as _e:
-        _dti_st.error(f"Could not read embedded posterior manifest: {_e}")
-        return
-
-    _dti_st.subheader("Package identity")
-    _identity_rows = []
-    for _key in [
-        "package_type",
-        "route",
-        "chain_count",
-        "kept_rows_total",
-        "public_app_role",
-        "live_mcmc_app",
-        "real_likelihood",
-        "physics_validation",
-        "posterior_physics_claim",
-    ]:
-        if _key in _manifest:
-            _identity_rows.append({"key": _key, "value": _manifest.get(_key)})
-    if _identity_rows:
-        _dti_st.dataframe(_dti_pd.DataFrame(_identity_rows), use_container_width=True)
-
-    _dti_st.subheader("Audit boundary")
-    _dti_st.markdown(
-        "- Frozen display artifacts only\n"
-        "- L0 synthetic/interface smoke route only\n"
-        "- No live MCMC\n"
-        "- No live likelihood\n"
-        "- No backend posterior comparison\n"
-        "- No physics validation\n"
-        "- Not a physical posterior claim"
+    st.markdown(
+        """
+    This public panel is intentionally disabled until the posterior is connected to a real-data likelihood path.
+    
+    Required before posterior display:
+    - CLASS output path
+    - real likelihood connection
+    - at least one observed-data likelihood source such as CMB, BAO, SN, or H(z)
+    - reproducible offline chain freeze
+    - manifest/hash/audit package
+    - explicit boundary review
+    
+    Current boundary:
+    - no sample posterior displayed
+    - no synthetic posterior displayed
+    - no smoke posterior displayed
+    - no proxy posterior displayed
+    - no live MCMC in Streamlit
+    - no real likelihood evaluation in the public app
+    - no Planck likelihood in the public app
+    - no physics validation claim
+    - no cosmological inference claim
+    - no manuscript value update
+    """
     )
-
-    def _show_table(_title, _filename):
-        _path = _base / _filename
-        _dti_st.subheader(_title)
-        if _path.exists():
-            try:
-                _df = _dti_pd.read_csv(_path, sep="\t")
-                _dti_st.dataframe(_df, use_container_width=True)
-            except Exception as _e:
-                _dti_st.error(f"Could not read {_filename}: {_e}")
-        else:
-            _dti_st.info(f"{_filename} not found.")
-
-    _show_table("Posterior summary table", "posterior_summary_for_app.tsv")
-    _show_table("Best-fit table", "bestfit_for_app.tsv")
-    _show_table("Diagnostics table", "diagnostics_for_app.tsv")
-
-    _dti_st.subheader("Frozen figures")
-    _figs = [
-        ("Posterior map", "posterior_map.png"),
-        ("Corner plot", "corner_plot.png"),
-        ("Trace plot", "trace_plot.png"),
-        ("Trace: H0", "trace_H0.png"),
-        ("Trace: omega_cdm", "trace_omega_cdm.png"),
-        ("Trace: dti_jump_amp", "trace_dti_jump_amp.png"),
-        ("Trace: dti_jump_z", "trace_dti_jump_z.png"),
-    ]
-    for _label, _filename in _figs:
-        _path = _base / _filename
-        if _path.exists():
-            _dti_st.caption(f"{_label} — frozen dark-background thin-line display artifact")
-            _dti_st.image(str(_path), use_container_width=True)
-
-    _dti_st.subheader("Claim boundary")
-    _dti_st.info(
-        "This section displays frozen L0 smoke artifacts only. "
-        "It does not establish a physical posterior, physics validation, "
-        "perturbation closure, or cosmological inference."
-    )
-
-try:
-    _dti_embedded_posterior_viewer_public_section()
-except Exception as _dti_embedded_viewer_error:
-    try:
-        import streamlit as _dti_st
-        _dti_st.error(f"Embedded posterior viewer failed safely: {_dti_embedded_viewer_error}")
-    except Exception:
-        pass
-
-# === DTI EMBEDDED POSTERIOR VIEWER PUBLIC SECTION: END ===
+    with st.expander("Boundary / audit status", expanded=True):
+        st.markdown(
+            """
+    **Displayed posterior:** none.  
+    **Reason:** the previous embedded viewer used a proxy/smoke/synthetic path, not observed-data likelihood inference.  
+    **Next valid route:** real data / real likelihood / CLASS output / CMB or BAO or SN or H(z) connected posterior.
+    """
+        )
+    return
