@@ -1,18 +1,24 @@
 {
-  "package_type": "DTI_MCMC_OFFLINE_SMOKE_RUN_PACKAGE_V1",
-  "route": "L0_SYNTHETIC_INTERFACE_SMOKE_ONLY",
+  "package_type": "DTI embedded posterior app-ready package",
+  "source_freeze": "DTI_OFFLINE_MCMC_HARVEST_FREEZE_V1",
+  "source_long_run": "/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_OFFLINE_MCMC_LONG_RUN_V1_20260605_180134",
+  "source_review": "/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_OFFLINE_MCMC_LONG_RUN_HARVEST_REVIEW_V1B_LAYOUT_AWARE_20260605_180924",
+  "route": "offline_local_emcee_proxy_posterior_to_frozen_embedded_viewer",
+  "sampler": "emcee",
+  "run_type": "LONG_PROXY_ONLY",
+  "diagnostic_label": "CONVERGED_WEAK",
+  "chain_shape": [3, 20000, 64, 4],
+  "logprob_shape": [3, 20000, 64],
+  "posterior_flat_rows_after_burnin_thin": 288000,
   "live_mcmc_app": false,
   "real_likelihood": false,
+  "planck_likelihood": false,
+  "backend_inference": false,
   "physics_validation": false,
   "posterior_physics_claim": false,
-  "public_app_role": "frozen embedded posterior viewer only",
-  "parameters": [
-    "H0",
-    "omega_cdm",
-    "dti_jump_amp",
-    "dti_jump_z"
-  ],
-  "chain_count": 4,
-  "kept_rows_total": 4000,
-  "required_ui_warning": "Displayed posterior results are precomputed and frozen. This public app does not run live MCMC, likelihood evaluation, posterior comparison, or physics validation."
+  "cosmological_inference_claim": false,
+  "manuscript_value_update": false,
+  "large_arrays_copied": false,
+  "public_app_role": "display_frozen_proxy_only_artifacts",
+  "safe_interpretation": "offline proxy-only posterior display package; not physical posterior or cosmological validation"
 }
