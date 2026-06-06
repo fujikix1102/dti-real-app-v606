@@ -11099,7 +11099,31 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
     source_identity_path = base / "meta" / "source_identity.tsv"
     claim_boundary_path = base / "notes" / "CLAIM_BOUNDARY.md"
 
-    with st.expander("Embedded posterior viewer — offline BAO chain, audit-only", expanded=False):
+    def _dti_redact_local_paths_for_public_ui_v1(df):
+        """Redact local absolute paths before displaying provenance tables in the UI."""
+        try:
+            redacted = df.copy()
+            for col in redacted.columns:
+                if redacted[col].dtype == object:
+                    redacted[col] = redacted[col].astype(str).str.replace(
+                        r"/Users/[^\s\t\n]+",
+                        "[LOCAL_PATH_REDACTED]",
+                        regex=True,
+                    )
+                    redacted[col] = redacted[col].str.replace(
+                        r"/private/var/[^\s\t\n]+",
+                        "[LOCAL_PATH_REDACTED]",
+                        regex=True,
+                    )
+            return redacted
+        except Exception:
+            return df
+
+    with st.expander("Embedded posterior viewer — offline BAO chain, audit-only", expanded=True):
+        st.success(
+            "REAL-DATA BAO VIEWER ACTIVE: this section uses frozen SDSS DR16cosmo BAO offline-chain outputs only. "
+            "Smoke / synthetic figures are not used for this graph viewer."
+        )
         st.warning(
             "Audit-only embedded package. Not a live MCMC run, not a Planck likelihood, "
             "not a physics validation, and not a manuscript claim."
@@ -11128,20 +11152,246 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
         st.caption("Boundary: offline BAO chain only; public display does not imply physics validation.")
         st.json(payload)
 
-        st.subheader("Chain summary")
-        st.dataframe(pd.read_csv(summary_path, sep="\t"), use_container_width=True)
+        with st.expander("Raw embedded tables — provenance / audit readback", expanded=False):
+            st.subheader("Chain summary")
+            st.dataframe(pd.read_csv(summary_path, sep="\t"), use_container_width=True)
 
-        st.subheader("Diagnostics")
-        st.dataframe(pd.read_csv(diagnostics_path, sep="\t"), use_container_width=True)
+            st.subheader("G02 diagnostics — TSV")
+            st.dataframe(pd.read_csv(diagnostics_path, sep="\t"), use_container_width=True)
 
-        st.subheader("MAP / best-fit table")
-        st.dataframe(pd.read_csv(bestfit_path, sep="\t"), use_container_width=True)
+            st.subheader("MAP / best-fit table")
+            st.dataframe(pd.read_csv(bestfit_path, sep="\t"), use_container_width=True)
 
-        st.subheader("Source identity")
-        st.dataframe(pd.read_csv(source_identity_path, sep="\t"), use_container_width=True)
+            st.subheader("Source identity")
+            st.caption("Local absolute paths are redacted in the public UI. Full provenance remains in the frozen local artifact.")
+            source_identity_df = pd.read_csv(source_identity_path, sep="\t")
+            source_identity_df = _dti_redact_local_paths_for_public_ui_v1(source_identity_df)
+            for _dti_col in source_identity_df.columns:
+                source_identity_df[_dti_col] = source_identity_df[_dti_col].astype(str).str.replace(
+                    r"/Users/[^\s\t\n]+",
+                    "[LOCAL_PATH_REDACTED]",
+                    regex=True,
+                )
+                source_identity_df[_dti_col] = source_identity_df[_dti_col].astype(str).str.replace(
+                    r"/private/var/[^\s\t\n]+",
+                    "[LOCAL_PATH_REDACTED]",
+                    regex=True,
+                )
+            st.dataframe(source_identity_df, use_container_width=True)
 
         with st.expander("Claim boundary", expanded=False):
             st.markdown(claim_boundary_path.read_text(encoding="utf-8"))
+
+        # --- DTI real-data graph viewer: frozen BAO chain audit-only V1 ---
+        try:
+            st.markdown("#### Embedded graph viewer — frozen offline BAO chain, audit-only")
+            st.warning(
+                "This graph viewer renders frozen real-data-derived offline BAO chain outputs "
+                "from the embedded package. It is not a toy model, not a sample model, "
+                "not synthetic data, not live MCMC, not CLASS execution, not a Planck likelihood, "
+                "not physics validation, and not a manuscript claim."
+            )
+
+            graph_root = base
+            graph_chain_summary = graph_root / "data" / "chain_summary.tsv"
+            graph_diagnostics = graph_root / "data" / "diagnostics.tsv"
+            graph_bestfit = graph_root / "data" / "map_or_bestfit.tsv"
+
+            # FORCE_REAL_DATA_TSV_CHART_BOARD_V1
+            # FORCE_NUMERIC_TSV_CHART_RENDER_FIX7
+            st.markdown("### Real-data TSV chart board — G01/G02/G03")
+            st.caption(
+                "These charts are rendered directly from frozen SDSS DR16cosmo BAO embedded TSV files. "
+                "No smoke figures, no generated samples, no synthetic fallback, and no live inference are used."
+            )
+
+            def _dti_numeric_chart_frame_v1(df, label_col_candidates):
+                """Return a numeric-only chart frame, coercing TSV string values to numbers."""
+                chart_df = df.copy()
+
+                label_col = None
+                for cand in label_col_candidates:
+                    if cand in chart_df.columns:
+                        label_col = cand
+                        break
+
+                numeric = chart_df.drop(columns=[label_col], errors="ignore").copy()
+                for col in numeric.columns:
+                    numeric[col] = pd.to_numeric(numeric[col], errors="coerce")
+
+                numeric = numeric.dropna(axis=1, how="all")
+
+                if label_col is not None:
+                    numeric.index = chart_df[label_col].astype(str)
+
+                return numeric
+
+            def _dti_html_bar_chart_from_numeric_frame_v1(numeric_df, title):
+                """FORCE_HTML_TSV_BAR_RENDER_FIX8: deterministic UI bars from frozen TSV numeric values."""
+                try:
+                    work = numeric_df.copy()
+                    if work.empty or len(work.columns) == 0:
+                        return "<div><b>No numeric values available for chart.</b></div>"
+
+                    html = []
+                    html.append('<div style="border:1px solid #3a3f4b; border-radius:8px; padding:12px; margin:8px 0 16px 0;">')
+                    html.append(f'<div style="font-weight:700; margin-bottom:10px;">{title}</div>')
+                    html.append('<div style="font-size:12px; opacity:0.8; margin-bottom:10px;">Bars are rendered directly from frozen embedded TSV numeric values. No generated samples.</div>')
+
+                    flat = []
+                    for idx, row in work.iterrows():
+                        for col in work.columns:
+                            val = row[col]
+                            if pd.notna(val):
+                                try:
+                                    fval = float(val)
+                                    flat.append((str(idx), str(col), fval))
+                                except Exception:
+                                    pass
+
+                    if not flat:
+                        html.append('<div>No finite numeric values available after coercion.</div>')
+                        html.append('</div>')
+                        return "\n".join(html)
+
+                    max_abs = max(abs(v) for _, _, v in flat)
+                    if max_abs == 0:
+                        max_abs = 1.0
+
+                    for idx, col, val in flat:
+                        width = max(2.0, min(100.0, abs(val) / max_abs * 100.0))
+                        label = f"{idx} / {col}"
+                        html.append('<div style="margin:7px 0;">')
+                        html.append(f'<div style="font-size:12px; margin-bottom:2px;">{label}: <code>{val:.6g}</code></div>')
+                        html.append(
+                            '<div style="height:13px; background:#242833; border-radius:6px; overflow:hidden;">'
+                            f'<div style="height:13px; width:{width:.2f}%; background:#7aa2f7;"></div>'
+                            '</div>'
+                        )
+                        html.append('</div>')
+
+                    html.append('</div>')
+                    return "\n".join(html)
+                except Exception as exc:
+                    return f"<div><b>HTML TSV chart failed closed:</b> {exc}</div>"
+
+            try:
+                board_chain_df = pd.read_csv(graph_chain_summary, sep="\t")
+                board_diag_df = pd.read_csv(graph_diagnostics, sep="\t")
+                board_bestfit_df = pd.read_csv(graph_bestfit, sep="\t")
+
+                board_tabs = st.tabs([
+                    "G01 chart — chain summary TSV",
+                    "G02 chart — diagnostics TSV",
+                    "G03 chart — MAP/best-fit TSV",
+                ])
+
+                with board_tabs[0]:
+                    st.markdown("**TSV-derived chart — G01 chain summary**")
+                    board_chart_df = _dti_numeric_chart_frame_v1(
+                        board_chain_df,
+                        ["parameter", "param", "name", "key"],
+                    )
+                    if not board_chart_df.empty and len(board_chart_df.columns) >= 1:
+                        st.markdown(
+                            _dti_html_bar_chart_from_numeric_frame_v1(board_chart_df, "G01 chain summary TSV bars"),
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.error("G01 chart could not render because no numeric TSV columns were available after coercion.")
+                    with st.expander("Source TSV table — G01", expanded=False):
+                        st.dataframe(board_chain_df, use_container_width=True)
+
+                with board_tabs[1]:
+                    st.markdown("**TSV-derived chart — G02 diagnostics**")
+                    board_chart_df = _dti_numeric_chart_frame_v1(
+                        board_diag_df,
+                        ["chain", "chain_seed", "key"],
+                    )
+                    if not board_chart_df.empty and len(board_chart_df.columns) >= 1:
+                        st.markdown(
+                            _dti_html_bar_chart_from_numeric_frame_v1(board_chart_df, "G02 diagnostics TSV bars"),
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.error("G02 chart could not render because no numeric TSV columns were available after coercion.")
+                    with st.expander("Source TSV table — G02", expanded=False):
+                        st.dataframe(board_diag_df, use_container_width=True)
+
+                with board_tabs[2]:
+                    st.markdown("**TSV-derived chart — G03 MAP / best-fit**")
+                    board_chart_df = _dti_numeric_chart_frame_v1(
+                        board_bestfit_df,
+                        ["chain", "step", "key"],
+                    )
+                    if not board_chart_df.empty and len(board_chart_df.columns) >= 1:
+                        st.markdown(
+                            _dti_html_bar_chart_from_numeric_frame_v1(board_chart_df, "G03 MAP / best-fit TSV bars"),
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.error("G03 chart could not render because no numeric TSV columns were available after coercion.")
+                    with st.expander("Source TSV table — G03", expanded=False):
+                        st.dataframe(board_bestfit_df, use_container_width=True)
+
+            except Exception as board_exc:
+                st.error(f"Real-data TSV chart board failed closed: {board_exc}")
+
+            graph_tabs = st.tabs([
+                "G01 source table",
+                "G02 source table",
+                "G03 source table",
+                "Boundary / forbidden plots",
+            ])
+
+            with graph_tabs[0]:
+                if not graph_chain_summary.exists():
+                    st.error("Missing frozen embedded file: chain_summary.tsv")
+                else:
+                    graph_chain_df = pd.read_csv(graph_chain_summary, sep="\t")
+                    st.caption("G01 — source readback from frozen chain_summary.tsv.")
+                    st.dataframe(graph_chain_df, use_container_width=True)
+
+            with graph_tabs[1]:
+                if not graph_diagnostics.exists():
+                    st.error("Missing frozen embedded file: diagnostics.tsv")
+                else:
+                    graph_diag_df = pd.read_csv(graph_diagnostics, sep="\t")
+                    st.caption("G02 — source readback from frozen diagnostics.tsv.")
+                    st.dataframe(graph_diag_df, use_container_width=True)
+
+            with graph_tabs[2]:
+                if not graph_bestfit.exists():
+                    st.error("Missing frozen embedded file: map_or_bestfit.tsv")
+                else:
+                    graph_bestfit_df = pd.read_csv(graph_bestfit, sep="\t")
+                    st.caption("G03 — source readback from frozen map_or_bestfit.tsv.")
+                    st.dataframe(graph_bestfit_df, use_container_width=True)
+
+            with graph_tabs[3]:
+                st.markdown(
+                    """
+                    **Allowed graphs in this patch**
+
+                    - G01: `chain_summary.tsv` chart/table
+                    - G02: `diagnostics.tsv` chart/table
+                    - G03: `map_or_bestfit.tsv` chart/table
+
+                    **Explicitly not rendered**
+
+                    - G04: alpha_DM / alpha_DH scatter
+                    - G05: chi2 trace
+                    - G06: alpha_DM histogram
+                    - G07: alpha_DH histogram
+
+                    These are not rendered because the current `posterior_payload.json`
+                    does not contain real frozen sample arrays. No generated, toy,
+                    sample, synthetic, random, demo, illustrative, or fallback data are used.
+                    """
+                )
+        except Exception as exc:
+            st.error(f"Frozen real-data graph viewer failed closed: {exc}")
+        # --- /DTI real-data graph viewer: frozen BAO chain audit-only V1 ---
 
 
 try:
@@ -11152,5 +11402,8 @@ except Exception as _dti_embed_exc:
         st.error(f"Embedded posterior viewer failed safely: {_dti_embed_exc}")
     except Exception:
         pass
+
+
+
 # --- /DTI embedded posterior viewer: SDSS DR16cosmo offline BAO chain V1 ---
 
