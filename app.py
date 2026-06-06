@@ -11072,3 +11072,85 @@ def _dti_embedded_posterior_viewer_public_section():
     """
         )
     return
+
+
+# --- DTI embedded posterior viewer: SDSS DR16cosmo offline BAO chain V1 ---
+def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
+    """Render an audit-only embedded posterior package.
+
+    Boundary:
+    - offline BAO chain only
+    - no live MCMC
+    - no Planck likelihood
+    - no CLASS execution
+    - no physics validation claim
+    """
+    import json
+    from pathlib import Path
+
+    import pandas as pd
+    import streamlit as st
+
+    base = Path(__file__).resolve().parent / "data" / "embedded_bao_sdss_dr16cosmo_v1"
+    payload_path = base / "data" / "posterior_payload.json"
+    summary_path = base / "data" / "chain_summary.tsv"
+    diagnostics_path = base / "data" / "diagnostics.tsv"
+    bestfit_path = base / "data" / "map_or_bestfit.tsv"
+    source_identity_path = base / "meta" / "source_identity.tsv"
+    claim_boundary_path = base / "notes" / "CLAIM_BOUNDARY.md"
+
+    with st.expander("Embedded posterior viewer — offline BAO chain, audit-only", expanded=False):
+        st.warning(
+            "Audit-only embedded package. Not a live MCMC run, not a Planck likelihood, "
+            "not a physics validation, and not a manuscript claim."
+        )
+
+        required = [
+            payload_path,
+            summary_path,
+            diagnostics_path,
+            bestfit_path,
+            source_identity_path,
+            claim_boundary_path,
+        ]
+        missing = [str(p) for p in required if not p.exists()]
+        if missing:
+            st.error("Embedded posterior package files are missing.")
+            st.code("\n".join(missing))
+            return
+
+        try:
+            payload = json.loads(payload_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            st.error(f"Could not read posterior payload JSON: {exc}")
+            return
+
+        st.caption("Boundary: offline BAO chain only; public display does not imply physics validation.")
+        st.json(payload)
+
+        st.subheader("Chain summary")
+        st.dataframe(pd.read_csv(summary_path, sep="\t"), use_container_width=True)
+
+        st.subheader("Diagnostics")
+        st.dataframe(pd.read_csv(diagnostics_path, sep="\t"), use_container_width=True)
+
+        st.subheader("MAP / best-fit table")
+        st.dataframe(pd.read_csv(bestfit_path, sep="\t"), use_container_width=True)
+
+        st.subheader("Source identity")
+        st.dataframe(pd.read_csv(source_identity_path, sep="\t"), use_container_width=True)
+
+        with st.expander("Claim boundary", expanded=False):
+            st.markdown(claim_boundary_path.read_text(encoding="utf-8"))
+
+
+try:
+    _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1()
+except Exception as _dti_embed_exc:
+    try:
+        import streamlit as st
+        st.error(f"Embedded posterior viewer failed safely: {_dti_embed_exc}")
+    except Exception:
+        pass
+# --- /DTI embedded posterior viewer: SDSS DR16cosmo offline BAO chain V1 ---
+

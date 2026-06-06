@@ -1,0 +1,43 @@
+{
+  "bestfit": {
+    "accepted_this_step": 1,
+    "alpha_DH": 0.9999239925060978,
+    "alpha_DM": 1.0001225142640107,
+    "chain": 1,
+    "chi2": 4.478061228022676e-05,
+    "log_prob": -2.239030614011338e-05,
+    "step": 17550
+  },
+  "boundary": {
+    "class_run": "NO",
+    "manuscript_update": "NO",
+    "physics_validation": "NO",
+    "planck_likelihood": "NO",
+    "posterior_display": "NO",
+    "public_app_update": "NO"
+  },
+  "status": "FROZEN_OFFLINE_CHAIN_OUTPUT_NOT_PUBLIC_DISPLAY",
+  "summary": {
+    "alpha_DH": {
+      "mean": 1.0002459797556416,
+      "p16": 0.9732799548924866,
+      "p50": 0.9998489085721161,
+      "p84": 1.0276349429795197,
+      "std": 0.027617479104418852
+    },
+    "alpha_DM": {
+      "mean": 1.0000129474213963,
+      "p16": 0.9820885770673066,
+      "p50": 0.9997014436625968,
+      "p84": 1.0186437864446864,
+      "std": 0.018165592767715975
+    },
+    "chi2": {
+      "mean": 1.9870671596484035,
+      "p16": 0.34736303310436123,
+      "p50": 1.3779837728467887,
+      "p84": 3.668305196472247,
+      "std": 1.9870068995549999
+    }
+  }
+}
