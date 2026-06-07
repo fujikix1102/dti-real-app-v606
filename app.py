@@ -11139,8 +11139,9 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
         ]
         missing = [str(p) for p in required if not p.exists()]
         if missing:
-            st.error("Embedded posterior package files are missing.")
-            st.code("\n".join(missing))
+            st.info("Embedded posterior package is not loaded here; frozen BAO graph/table sections remain audit-only where available.")
+            # DTI_HIDE_ABSOLUTE_PATH_DUMP_V1
+            st.caption("Local package path details hidden for UI safety.")
             return
 
         try:
@@ -11407,3 +11408,40 @@ except Exception as _dti_embed_exc:
 
 # --- /DTI embedded posterior viewer: SDSS DR16cosmo offline BAO chain V1 ---
 
+
+# ---------------------------------------------------------------------
+# DTI_INLINE_SAFE_V5_BLOCK_BEGIN
+# Local-only embedded payload viewer. Audit display only.
+# Boundaries: no MCMC, no CLASS, no likelihood, no posterior claim,
+# no Planck/CMB validation, no physics validation, no public app update.
+try:
+    from pathlib import Path as _DTI_Path
+    import runpy as _DTI_runpy
+    import streamlit as _DTI_st
+
+    _DTI_st.markdown("---")
+    with _DTI_st.expander(
+        "11. Embedded payload viewer — SAFE V5 frozen offline MCMC audit",
+        expanded=False,
+    ):
+        _DTI_st.warning(
+            "Audit-only embedded payload viewer. "
+            "No new MCMC. No CLASS. No likelihood. No posterior claim. "
+            "No Planck/CMB validation. No physics validation. No public app update."
+        )
+        _DTI_VIEWER = (
+            _DTI_Path(__file__).resolve().parent
+            / "embedded_payload_viewer_inline"
+            / "local_embedded_payload_viewer_safe_v5.py"
+        )
+        if _DTI_VIEWER.exists():
+            _DTI_runpy.run_path(str(_DTI_VIEWER), run_name="__main__")
+        else:
+            _DTI_st.error("SAFE V5 embedded viewer file is missing.")
+except Exception as _dti_inline_safe_v5_exc:
+    try:
+        import streamlit as _DTI_st
+        _DTI_st.error(f"SAFE V5 embedded viewer failed safely: {_dti_inline_safe_v5_exc}")
+    except Exception:
+        pass
+# DTI_INLINE_SAFE_V5_BLOCK_END

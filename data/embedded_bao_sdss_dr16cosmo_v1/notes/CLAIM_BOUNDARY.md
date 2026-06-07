@@ -1,18 +1,20 @@
-# Embedded posterior package claim boundary
+# Claim boundary
 
-This package is an offline-chain embedded-posterior package candidate.
+This embedded BAO viewer is audit-only.
 
-It may be used only after a separate public-display boundary review.
+Allowed:
+- display frozen small TSV readbacks
+- display deterministic TSV-derived bars
+- inspect package identity and provenance boundaries
 
-It does not:
-- update the public Streamlit app
-- display posterior publicly
-- update manuscript
-- validate physics
-- evaluate Planck likelihood
-- establish a cosmological science claim
-
-Current display status:
-- public display: NO
-- public app update: NO
-- manuscript update: NO
+Not allowed:
+- new MCMC
+- CLASS execution
+- likelihood evaluation
+- posterior comparison claim
+- Planck/CMB validation claim
+- DESI fit claim
+- physics validation claim
+- Hubble-tension solution claim
+- manuscript result claim
+- public app update

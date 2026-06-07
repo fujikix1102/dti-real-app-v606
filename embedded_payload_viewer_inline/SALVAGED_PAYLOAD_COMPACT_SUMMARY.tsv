@@ -1,0 +1,9 @@
+payload_key	ledger_status	class	chain_or_combined_rows	thin_sample_rows	header_column_count	boundary_ok	note
+woc_n82	PASS	WOC_DTI_CORE			25	YES	WOC n82 audit-only embedded payload; correction ledger converted prior CHECK to PASS
+mac_curvature	PASS	EXTENDED_CONTROL_CURVATURE	32760	1024	24	YES	curvature candidate; correction ledger converted prior CHECK to PASS
+mac_wcdm	PASS	EXTENDED_CONTROL_WCDM	4480		24	YES	wCDM candidate; correction ledger converted prior CHECK to PASS
+visc_run	PASS	EXTENDED_CONTROL_VISCOSITY	5600		26	YES	viscosity/full-CMB candidate; correction ledger converted prior CHECK to PASS
+visc_nocmb_run	PASS	EXTENDED_CONTROL_VISCOSITY_NO_CMB	5200	867	21	YES	viscosity/no-CMB candidate; robust payload final_allowed YES
+mac_no_cmb	PASS	EXTENDED_CONTROL_NO_CMB	1560	1024	17	YES	no-CMB control candidate; robust payload final_allowed YES
+mac_lite_run	PASS	LITE_SMOKE_CONTROL	2880	1024	23	YES	lite/smoke/provenance candidate; not primary science result
+vtt_woc_final_result_primary	PASS	WOC_DTI_PRIMARY_LOST_ATTRACTOR	739089	4096	37	YES	primary vTT WOC final result; two huge chains streamed; full raw chains not copied
