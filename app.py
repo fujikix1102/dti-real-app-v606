@@ -25,6 +25,12 @@ def dom_safe_json_box(obj, label="Result"):
 
 
 import pandas as pd
+def _dti_arrow_safe_df_v1(df):
+    try:
+        return df.fillna("").astype(str)
+    except Exception:
+        return df
+
 import streamlit as st
 
 # --- DTI_ORIGINAL_STREAMLIT_MARKDOWN_NO_RECURSION ---
@@ -1006,9 +1012,9 @@ def _dti_render_parameter_quality_matrix_v1f():
 
     try:
         styled = df[display_cols].style.apply(_dti_parameter_quality_style_v1f, axis=1)
-        st.dataframe(styled, use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(styled), width="stretch", hide_index=True)
     except Exception:
-        st.dataframe(df[display_cols], use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(df[display_cols]), width="stretch", hide_index=True)
 
     st.markdown("#### Best current leads")
 
@@ -1345,12 +1351,11 @@ def _dti_render_parameter_quality_matrix_v1g():
 
     try:
         st.dataframe(
-            _dti_pqm_v1g_styler(sorted_df[display_cols]),
-            use_container_width=True,
+            _dti_pqm_v1g_styler(sorted_df[display_cols]), width="stretch",
             hide_index=True,
         )
     except Exception:
-        st.dataframe(sorted_df[display_cols], use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(sorted_df[display_cols]), width="stretch", hide_index=True)
 
     st.markdown("#### Next-test priority order")
     st.caption("This section shows the next practical test order, not a scientific ranking of truth.")
@@ -1386,7 +1391,7 @@ def _dti_render_parameter_quality_matrix_v1g():
         .sort_values(["best_score", "best_readiness"], ascending=False)
     )
 
-    st.dataframe(role_summary, use_container_width=True, hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(role_summary), width="stretch", hide_index=True)
 
     st.markdown("#### How to use this table")
     st.code(
@@ -1717,9 +1722,9 @@ def _dti_render_parameter_quality_matrix_v1g():
 
     try:
         styled = df_view.style.apply(_dti_parameter_quality_row_style_v1g, axis=1)
-        st.dataframe(styled, use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(styled), width="stretch", hide_index=True)
     except Exception:
-        st.dataframe(df_view, use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(df_view), width="stretch", hide_index=True)
 
     st.markdown("#### Legacy next-test priority order")
     st.caption("This is the practical test order, not a scientific ranking of truth.")
@@ -1949,8 +1954,7 @@ def _dti_render_probe_result_value_matrix_v1():
         return dataframe.style.map(cell_style, subset=["value_badge"])
 
     st.dataframe(
-        style_probe_value_matrix_v1(df[compact_cols]),
-        use_container_width=True,
+        style_probe_value_matrix_v1(df[compact_cols]), width="stretch",
         hide_index=True,
     )
 
@@ -2120,7 +2124,7 @@ def _dti_render_one_readout_detail_v1b(row):
     label = f"{row['name']} — {row['role']}"
 
     if hasattr(st, "popover"):
-        with st.popover(label, use_container_width=True):
+        with st.popover(label, width="stretch"):
             st.markdown(f"**Research role:** {row['role']}")
             st.markdown(f"**Why it matters:** {row['why']}")
             st.markdown(f"**Safe interpretation:** {row['safe']}")
@@ -2470,7 +2474,7 @@ def _dti_render_probe_result_value_matrix_v2():
         "claim_readiness",
         "session_hits",
     ]
-    st.dataframe(df[compact_cols], use_container_width=True, hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(df[compact_cols]), width="stretch", hide_index=True)
 
     st.markdown("#### What each probe teaches")
 
@@ -2777,15 +2781,13 @@ def _dti_render_parameter_quality_matrix_v1h():
     try:
         compact_styled = compact_df.style.apply(_dti_parameter_quality_badge_style_v1h, axis=1)
         st.dataframe(
-            compact_styled,
-            use_container_width=True,
+            compact_styled, width="stretch",
             hide_index=True,
             height=330,
         )
     except Exception:
         st.dataframe(
-            compact_df,
-            use_container_width=True,
+            compact_df, width="stretch",
             hide_index=True,
             height=330,
         )
@@ -3206,8 +3208,7 @@ def _dti_render_param_table_editor_v1(prefix, preset_values, preset_name, editor
     edited = st.data_editor(
         df,
         key=editor_key,
-        hide_index=True,
-        use_container_width=True,
+        hide_index=True, width="stretch",
         height=300,
         disabled=["parameter"],
         column_config={
@@ -3823,7 +3824,7 @@ def _dti_main_candidate_reference_panel_v1():
         if col in show_df.columns:
             show_df[col] = show_df[col].map(lambda x: "" if x is None else f"{x:.6g}")
     st.markdown("### Candidate vs Reference")
-    st.dataframe(show_df, use_container_width=True, hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(show_df), width="stretch", hide_index=True)
 
     st.markdown("### What changed from the reference?")
     notes = []
@@ -3855,7 +3856,7 @@ def _dti_main_candidate_reference_panel_v1():
             "parameter": key,
             "how to read it": _DTI_UI_PARAM_META_V1[key]["help"],
         })
-    st.dataframe(pd.DataFrame(guide_rows), use_container_width=True, hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(guide_rows)), width="stretch", hide_index=True)
 
     st.caption(
         "Boundary: comparison guide only. No graph, no 8011 realtime, no likelihood result, "
@@ -4689,7 +4690,7 @@ def _dti_render_categorized_active_profile_loader_v2b(preset_names, current_defa
     with st.sidebar.expander("Active loader category counts", expanded=False):
         rows = [{"category": cat, "count": len(grouped.get(cat, []))} for cat in available_categories]
         try:
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(rows)), width="stretch", hide_index=True)
         except Exception:
             st.write(rows)
 
@@ -5257,7 +5258,7 @@ def _dti_render_correlated_boundary_triage_v1():
         {"field": "omega_burden", "value": result.get("omega_burden")},
         {"field": "reason", "value": result.get("reason")},
     ]
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(rows)), width="stretch", hide_index=True)
 
     with st.expander("Boundary and claim limits", expanded=False):
         st.markdown(
@@ -5348,12 +5349,12 @@ def _dti_render_static_delta_audit_table_v1():
                     .rename_axis("direction")
                     .reset_index(name="count")
                 )
-                st.dataframe(summary_df, use_container_width=True, hide_index=True)
+                st.dataframe(_dti_arrow_safe_df_v1(summary_df), width="stretch", hide_index=True)
             except Exception:
                 st.caption("Direction summary unavailable.")
 
     with st.expander("Compact static delta table — audit display only", expanded=False):
-        st.dataframe(display_df, use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(display_df), width="stretch", hide_index=True)
 
     
     st.caption("Compact reader-facing view: wide model names are shortened into columns; source TSV remains unchanged.")
@@ -5361,7 +5362,7 @@ def _dti_render_static_delta_audit_table_v1():
         _dti_delta_compact_v1b = _dti_static_delta_table_compact_v1b(df)
         if not _dti_delta_compact_v1b.empty:
             with st.expander("Compact static delta table — reader view", expanded=True):
-                st.dataframe(_dti_delta_compact_v1b, use_container_width=True, hide_index=True)
+                st.dataframe(_dti_arrow_safe_df_v1(_dti_delta_compact_v1b), width="stretch", hide_index=True)
     except Exception:
         st.caption("Compact static delta reader view unavailable; source TSV display remains bounded.")
 
@@ -5499,7 +5500,7 @@ def _dti_render_vanilla_probe_input_display_v1(payload):
     )
     rows = _dti_vanilla_payload_rows_v1(payload)
     if rows:
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(rows)), width="stretch", hide_index=True)
     else:
         st.info("No vanilla-profile payload values are available yet.")
     with st.expander("Raw data — audit view", expanded=False):
@@ -5526,12 +5527,12 @@ def _dti_render_vanilla_api_result_display_v1(result, http_status=None, cache_no
     if cache_note:
         summary_rows.append({"field": "frontend cache", "value": cache_note})
 
-    st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(summary_rows)), width="stretch", hide_index=True)
 
     rows = _dti_vanilla_result_rows_v1(result)
     if rows:
         st.markdown("#### Input and derived summary")
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(rows)), width="stretch", hide_index=True)
 
     with st.expander("Raw data — audit view", expanded=False):
         # DTI_VANILLA_RAW_RESULT_JSON_FIX_AFTER_7C_MISPATCH_V1D
@@ -5804,13 +5805,13 @@ def _dti_render_background_geometry_anchor_v1():
             {"field": "boundary", "value": "local FLRW background geometry only; not CLASS, likelihood, posterior, or Planck validation"},
         ]
         st.markdown("#### Summary")
-        st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(summary_rows)), width="stretch", hide_index=True)
 
         st.markdown("#### Time baseline")
-        st.dataframe(pd.DataFrame(_dti_bggeom_rows_v1(result, "time")), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(_dti_bggeom_rows_v1(result, "time"))), width="stretch", hide_index=True)
 
         st.markdown("#### Distance baseline")
-        st.dataframe(pd.DataFrame(_dti_bggeom_rows_v1(result, "distance")), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(_dti_bggeom_rows_v1(result, "distance"))), width="stretch", hide_index=True)
 
         
         # DTI_BACKGROUND_GEOMETRY_GRAPH_CALL_V1
@@ -6057,12 +6058,12 @@ def _dti_render_background_geometry_jump_toy_v1b(H0, omega_m, omega_vac, z):
             {"field": "boundary", "value": "local background-geometry toy only; not validation of DTI, Planck, JWST, likelihood, or posterior"},
         ]
         st.markdown("#### Summary")
-        st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(summary_rows)), width="stretch", hide_index=True)
 
         st.markdown("#### Compact table")
         delta_rows = _dti_bggeom_jump_delta_rows_v1b(vanilla, jump)
         if delta_rows:
-            st.dataframe(pd.DataFrame(delta_rows), use_container_width=True, hide_index=True)
+            st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(delta_rows)), width="stretch", hide_index=True)
         else:
             st.info("Jump comparator table is unavailable for the selected parameters.")
 
@@ -6469,7 +6470,7 @@ def _dti_render_global_claim_limits_audit_boundary_v1():
             {"scope": "Manuscript", "limit": "No manuscript update or manuscript conclusion."},
             {"scope": "Raw data", "limit": "Raw payloads remain available under Raw data — audit view expanders."},
         ]
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(rows)), width="stretch", hide_index=True)
 
 def _dti_panel_note_v1(text):
     st.caption(text)
@@ -6576,19 +6577,19 @@ def _dti_render_7c_examiner_payload_display_v1(payload):
         {"field": "interpretation", "value": "exploratory local triage input only"},
         {"field": "claim boundary", "value": "not likelihood, posterior, Planck validation, or physical-discontinuity proof"},
     ]
-    st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(summary_rows)), width="stretch", hide_index=True)
 
     if sweep_rows:
         st.markdown("#### Sweep summary")
-        st.dataframe(pd.DataFrame(sweep_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(sweep_rows)), width="stretch", hide_index=True)
 
     if input_rows:
         st.markdown("#### Base payload summary")
-        st.dataframe(pd.DataFrame(input_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(input_rows)), width="stretch", hide_index=True)
 
     if boundary_rows:
         st.markdown("#### Boundary flags")
-        st.dataframe(pd.DataFrame(boundary_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(boundary_rows)), width="stretch", hide_index=True)
 
     with st.expander("Raw data — audit view", expanded=False):
         st.json(payload)
@@ -6647,27 +6648,27 @@ def _dti_render_7c_examiner_verdict_record_v1(record):
         {"field": "overall_bounded_verdict", "value": _dti_7c_verdict_display_value_v1(verdict)},
         {"field": "boundary", "value": "local numerical examiner only; not likelihood, posterior, Planck validation, or physical-discontinuity proof"},
     ]
-    st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(summary_rows)), width="stretch", hide_index=True)
 
     base_rows = _dti_7c_dict_rows_v1("", record.get("base_payload", {}))
     if base_rows:
         st.markdown("###### Base payload summary")
-        st.dataframe(pd.DataFrame(base_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(base_rows)), width="stretch", hide_index=True)
 
     sweep_rows = _dti_7c_dict_rows_v1("", record.get("sweep", {}))
     if sweep_rows:
         st.markdown("###### Sweep summary")
-        st.dataframe(pd.DataFrame(sweep_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(sweep_rows)), width="stretch", hide_index=True)
 
     result_rows = _dti_7c_dict_rows_v1("", record.get("result", {}))
     if result_rows:
         st.markdown("###### Result summary")
-        st.dataframe(pd.DataFrame(result_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(result_rows)), width="stretch", hide_index=True)
 
     boundary_rows = _dti_7c_dict_rows_v1("", record.get("boundary", {}))
     if boundary_rows:
         st.markdown("###### Boundary flags")
-        st.dataframe(pd.DataFrame(boundary_rows), use_container_width=True, hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(boundary_rows)), width="stretch", hide_index=True)
 
     warning = record.get("interpretation_warning")
     if warning:
@@ -8504,13 +8505,13 @@ st.markdown(f"""
 
 st.header("3. Literature text audit")
 
-st.dataframe(df_blocks, width="stretch", hide_index=True)
+st.dataframe(_dti_arrow_safe_df_v1(df_blocks), width="stretch", hide_index=True)
 
 st.subheader("TARGET_MODEL vs LCDM comparison")
 if delta_df.empty:
     st.warning("TARGET_MODEL and LCDM comparison values are incomplete.")
 else:
-    st.dataframe(delta_df, width="stretch", hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(delta_df), width="stretch", hide_index=True)
 
 st.markdown("---")
 st.header("4. High-precision parameter search engine")
@@ -8540,7 +8541,7 @@ else:
         st.metric("Similarity score", f"{top['rank_score']:.2f}")
     with c3:
         st.caption(top["difference_notes"])
-    st.dataframe(search_df, width="stretch", hide_index=True)
+    st.dataframe(_dti_arrow_safe_df_v1(search_df), width="stretch", hide_index=True)
 
 st.subheader("Current input model safety/readout cards")
 # DTI_READOUT_CARD_DETAIL_GUIDE_CALL_V1B
@@ -8668,13 +8669,13 @@ else:
                 st.caption(str(r.get("source_note", "")))
 
     with tabs[3]:
-        st.dataframe(axi_results, width="stretch", hide_index=True)
+        st.dataframe(_dti_arrow_safe_df_v1(axi_results), width="stretch", hide_index=True)
 
     with tabs[4]:
         if axi_delta.empty:
             st.warning("AxiCLASS FIX1 delta TSV was not found.")
         else:
-            st.dataframe(axi_delta, width="stretch", hide_index=True)
+            st.dataframe(_dti_arrow_safe_df_v1(axi_delta), width="stretch", hide_index=True)
 
 st.markdown("---")
 st.header("6. RK45 background-universe proxy")
@@ -8746,7 +8747,7 @@ def _render_local_axiclass_fixed_example_v606():
             st.session_state["dti_public_api_warmup_rows_7a7b_v2"] = rows
 
         if "dti_public_api_warmup_rows_7a7b_v2" in st.session_state:
-            st.dataframe(st.session_state["dti_public_api_warmup_rows_7a7b_v2"], use_container_width=True)
+            st.dataframe(_dti_arrow_safe_df_v1(st.session_state["dti_public_api_warmup_rows_7a7b_v2"]), width="stretch")
 
     # DTI_POSITIVE_ANSWER_NAVIGATOR_CALL_V2
     _dti_render_positive_answer_navigator_v2()
@@ -8894,7 +8895,7 @@ bash run_local.sh
                 derived_rows.append({"quantity": key, "value": derived.get(key)})
         if derived_rows:
             st.markdown("##### Derived values")
-            st.dataframe(pd.DataFrame(derived_rows), hide_index=True, width="stretch")
+            st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(derived_rows), hide_index=True), width="stretch")
 
     bg = result.get("compact_background_summary", {})
     if isinstance(bg, dict) and bg:
@@ -8910,14 +8911,14 @@ bash run_local.sh
                 })
         if selected_rows:
             st.markdown("##### Selected scalar-field / axion background summary")
-            st.dataframe(pd.DataFrame(selected_rows), hide_index=True, width="stretch")
+            st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(selected_rows), hide_index=True), width="stretch")
 
     boundary = result.get("boundary", {})
     if isinstance(boundary, dict) and boundary:
         boundary_rows = [{"flag": k, "value": v} for k, v in boundary.items() if k != "note"]
         if boundary_rows:
             st.markdown("##### Boundary flags")
-            st.dataframe(pd.DataFrame(boundary_rows), hide_index=True, width="stretch")
+            st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(boundary_rows), hide_index=True), width="stretch")
 
     with st.expander("Raw fixed-example API response", expanded=False):
         st.code(json.dumps(result, indent=2, sort_keys=True), language="json")
@@ -9107,7 +9108,7 @@ _compat_rows_8b = [
     {"field": "sigma8_reference", "value": _current_sidebar_values_8b["sigma8_reference"], "used_by_vanilla_probe": "NO; reference/display only"},
     {"field": "S8_reference", "value": _current_sidebar_values_8b["S8_reference"], "used_by_vanilla_probe": "NO; reference/display only"},
 ]
-st.dataframe(_compat_rows_8b, width="stretch", hide_index=True)
+st.dataframe(_dti_arrow_safe_df_v1(_compat_rows_8b), width="stretch", hide_index=True)
 
 col_live_1, col_live_2, col_live_3 = st.columns(3)
 
@@ -9571,7 +9572,7 @@ def _dti_render_section7c_visuals_v607():
             st.info("No compatible sweep table is currently available in session memory. No graph is drawn until source-of-record data are present.")
             _dti_graph_ui_v607_fallback_notice("Section 7c fallback")
             df = _dti_graph_ui_v607_fallback_sweep_frame()
-            _DTI_DISABLED_GRAPH_CALL(_dti_graph_ui_v607_altair_line_with_band(df, "sweep_value", "sigma8").properties(height=260), use_container_width=True, key="dti_graph_ui_dom_stable_chart_01")
+            _DTI_DISABLED_GRAPH_CALL(_dti_graph_ui_v607_altair_line_with_band(df, "sweep_value", "sigma8").properties(height=260), width="stretch", key="dti_graph_ui_dom_stable_chart_01")
             st.info(
                 "No sweep table is currently available in session memory. "
                 "Run or load a sweep/examiner table to draw adjacent response-difference profiles."
@@ -9592,7 +9593,7 @@ def _dti_render_section7c_visuals_v607():
                 f"Found table `{name}`, but it does not contain a recognized sweep axis and response column. "
                 "Expected examples: sweep_value with S8/sigma8/rs_drag."
             )
-            st.dataframe(df.head(30), use_container_width=True)
+            st.dataframe(_dti_arrow_safe_df_v1(df.head(30)), width="stretch")
             return
 
         work = df[[xcol] + ycols].copy()
@@ -9611,7 +9612,7 @@ def _dti_render_section7c_visuals_v607():
 
         if not rows:
             st.info("Not enough numeric rows to draw adjacent-difference profile.")
-            st.dataframe(work.head(30), use_container_width=True)
+            st.dataframe(_dti_arrow_safe_df_v1(work.head(30)), width="stretch")
             return
 
         plot_df = pd.concat(rows, ignore_index=True)
@@ -9627,7 +9628,7 @@ def _dti_render_section7c_visuals_v607():
             )
             .properties(height=280)
         )
-        _DTI_DISABLED_GRAPH_CALL(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_02")
+        _DTI_DISABLED_GRAPH_CALL(chart, width="stretch", key="dti_graph_ui_dom_stable_chart_02")
         st.caption(
             "Scatter distributions and vertical outliers indicate numerical non-smoothness candidates within the available diagnostic table. "
             "This is not evidence establishing physical discontinuity."
@@ -9688,7 +9689,7 @@ def _dti_render_section8_visuals_v607():
                 )
                 .properties(height=max(180, min(520, 24 * len(distance_frame) + 40)))
             )
-            _DTI_DISABLED_GRAPH_CALL(chart, use_container_width=True, key="dti_graph_ui_dom_stable_chart_03")
+            _DTI_DISABLED_GRAPH_CALL(chart, width="stretch", key="dti_graph_ui_dom_stable_chart_03")
             st.caption(
                 f"Source table: `{distance_name}`. Smaller values indicate closer proximity in the registered "
                 "parameter-profile space. This is heuristic triage only."
@@ -9702,7 +9703,7 @@ def _dti_render_section8_visuals_v607():
                 y=alt.Y("profile:N", sort="-x", title="profile"),
                 tooltip=list(distance_frame.columns),
             )
-            _DTI_DISABLED_GRAPH_CALL(dist_chart.properties(height=220), use_container_width=True, key="dti_graph_ui_dom_stable_chart_04")
+            _DTI_DISABLED_GRAPH_CALL(dist_chart.properties(height=220), width="stretch", key="dti_graph_ui_dom_stable_chart_04")
             st.info(
                 "No reference-distance table found in session memory. "
                 "If a table with model/profile labels and a distance or triage score is available, a bar chart will appear here."
@@ -9739,7 +9740,7 @@ def _dti_render_section8_visuals_v607():
                         y="ymin:Q",
                         y2="ymax:Q",
                     )
-                    _DTI_DISABLED_GRAPH_CALL((band_chart + base).properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_05")
+                    _DTI_DISABLED_GRAPH_CALL((band_chart + base).properties(height=280), width="stretch", key="dti_graph_ui_dom_stable_chart_05")
                     st.caption(
                         "The S8 band display is disabled until source-of-record data are present. "
                         "Crossing it is a diagnostic stress indicator only; it is not a likelihood-based exclusion."
@@ -9753,7 +9754,7 @@ def _dti_render_section8_visuals_v607():
             _dti_graph_ui_v607_fallback_notice("Section 8 S8 fallback")
             fallback_s8 = _dti_graph_ui_v607_fallback_sweep_frame()
             chart_s8 = _dti_graph_ui_v607_altair_line_with_band(fallback_s8, "sweep_value", "S8")
-            _DTI_DISABLED_GRAPH_CALL(chart_s8.properties(height=280), use_container_width=True, key="dti_graph_ui_dom_stable_chart_06")
+            _DTI_DISABLED_GRAPH_CALL(chart_s8.properties(height=280), width="stretch", key="dti_graph_ui_dom_stable_chart_06")
 
         # C. Boundary confirmation scatter
         st.markdown("##### Boundary confirmation view")
@@ -9794,7 +9795,7 @@ def _dti_render_section8_visuals_v607():
                 hband = alt.Chart(pd.DataFrame({"ymin": [0.75], "ymax": [0.79]})).mark_rect(opacity=0.12).encode(
                     y="ymin:Q", y2="ymax:Q"
                 )
-                _DTI_DISABLED_GRAPH_CALL((hband + vline + chart).properties(height=300), use_container_width=True, key="dti_graph_ui_dom_stable_chart_07")
+                _DTI_DISABLED_GRAPH_CALL((hband + vline + chart).properties(height=300), width="stretch", key="dti_graph_ui_dom_stable_chart_07")
                 st.caption(
                     "This scatter visualizes a heuristic early-scale / late-clustering trade-off. "
                     "The reference line and band are visual guides only, not a formal exclusion rule regions."
@@ -10234,7 +10235,7 @@ type="primary",
                     result_rows_7c.append(row)
 
             st.markdown("##### Examiner grid output")
-            st.dataframe(result_rows_7c, width="stretch", hide_index=True)
+            st.dataframe(_dti_arrow_safe_df_v1(result_rows_7c), width="stretch", hide_index=True)
 
             score_rows_7c = []
             for q in [
@@ -10249,7 +10250,7 @@ type="primary",
                 score_rows_7c.append(_section7c_jump_scores(result_rows_7c, q))
 
             st.markdown("##### Continuity / discontinuity score table")
-            st.dataframe(score_rows_7c, width="stretch", hide_index=True)
+            st.dataframe(_dti_arrow_safe_df_v1(score_rows_7c), width="stretch", hide_index=True)
 
             any_solver_failure = any(row.get("status") != "ok" for row in result_rows_7c)
             jump_candidates = [
@@ -10384,13 +10385,11 @@ try:
     _tab_trade_v3 = _dti_noop_context_v1()
     with _tab_s8_v3:
         _DTI_DISABLED_GRAPH_CALL(
-            _dti_graph_ui_v607_altair_line_with_band(_fallback_v3, "sweep_value", "S8").properties(height=280),
-            use_container_width=True,
+            _dti_graph_ui_v607_altair_line_with_band(_fallback_v3, "sweep_value", "S8").properties(height=280), width="stretch",
         )
     with _tab_trade_v3:
         _DTI_DISABLED_GRAPH_CALL(
-            _dti_graph_ui_v607_altair_scatter(_fallback_v3, "rs_drag", "S8").properties(height=280),
-            use_container_width=True,
+            _dti_graph_ui_v607_altair_scatter(_fallback_v3, "rs_drag", "S8").properties(height=280), width="stretch",
         )
 except Exception as _graph_v3_exc:
     st.info(f"Section 8 graph fallback unavailable: {_graph_v3_exc}")
@@ -10501,7 +10500,7 @@ fit_col1, fit_col2 = st.columns(2)
 
 with fit_col1:
     st.markdown("##### Registered fit-region references")
-    st.dataframe(fit_df, hide_index=True, width="stretch")
+    st.dataframe(_dti_arrow_safe_df_v1(fit_df, hide_index=True), width="stretch")
 
 with fit_col2:
     st.markdown("##### Current input profile position")
@@ -10606,7 +10605,7 @@ external_api_text = st.session_state.get("paper_text_widget", st.session_state.g
 external_api_payload = extract_external_class_api_payload_v606(external_api_text)
 
 st.markdown("##### Payload sent to external API")
-st.dataframe(pd.DataFrame([external_api_payload]), hide_index=True, width="stretch")
+st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame([external_api_payload]), hide_index=True), width="stretch")
 
 if st.button("Run external CLASS API for current input model", key="run_external_class_api_v606", width="stretch", type="primary"):
     try:
@@ -10658,7 +10657,7 @@ if external_api_result:
             if key in derived:
                 derived_rows.append({"quantity": key, "value": derived.get(key)})
         if derived_rows:
-            st.dataframe(pd.DataFrame(derived_rows), hide_index=True, width="stretch")
+            st.dataframe(_dti_arrow_safe_df_v1(pd.DataFrame(derived_rows), hide_index=True), width="stretch")
 
     with st.expander("Raw external API response", expanded=False):
         st.caption("Large arrays are summarized here to keep the UI readable. The CMB graph still uses the full real API arrays.")
@@ -11155,13 +11154,13 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
 
         with st.expander("Raw embedded tables — provenance / audit readback", expanded=False):
             st.subheader("Chain summary")
-            st.dataframe(pd.read_csv(summary_path, sep="\t"), use_container_width=True)
+            st.dataframe(_dti_arrow_safe_df_v1(pd.read_csv(summary_path, sep="\t")), width="stretch")
 
             st.subheader("G02 diagnostics — TSV")
-            st.dataframe(pd.read_csv(diagnostics_path, sep="\t"), use_container_width=True)
+            st.dataframe(_dti_arrow_safe_df_v1(pd.read_csv(diagnostics_path, sep="\t")), width="stretch")
 
             st.subheader("MAP / best-fit table")
-            st.dataframe(pd.read_csv(bestfit_path, sep="\t"), use_container_width=True)
+            st.dataframe(_dti_arrow_safe_df_v1(pd.read_csv(bestfit_path, sep="\t")), width="stretch")
 
             st.subheader("Source identity")
             st.caption("Local absolute paths are redacted in the public UI. Full provenance remains in the frozen local artifact.")
@@ -11178,7 +11177,7 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
                     "[LOCAL_PATH_REDACTED]",
                     regex=True,
                 )
-            st.dataframe(source_identity_df, use_container_width=True)
+            st.dataframe(_dti_arrow_safe_df_v1(source_identity_df), width="stretch")
 
         with st.expander("Claim boundary", expanded=False):
             st.markdown(claim_boundary_path.read_text(encoding="utf-8"))
@@ -11301,7 +11300,7 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
                     else:
                         st.error("G01 chart could not render because no numeric TSV columns were available after coercion.")
                     with st.expander("Source TSV table — G01", expanded=False):
-                        st.dataframe(board_chain_df, use_container_width=True)
+                        st.dataframe(_dti_arrow_safe_df_v1(board_chain_df), width="stretch")
 
                 with board_tabs[1]:
                     st.markdown("**TSV-derived chart — G02 diagnostics**")
@@ -11317,7 +11316,7 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
                     else:
                         st.error("G02 chart could not render because no numeric TSV columns were available after coercion.")
                     with st.expander("Source TSV table — G02", expanded=False):
-                        st.dataframe(board_diag_df, use_container_width=True)
+                        st.dataframe(_dti_arrow_safe_df_v1(board_diag_df), width="stretch")
 
                 with board_tabs[2]:
                     st.markdown("**TSV-derived chart — G03 MAP / best-fit**")
@@ -11333,7 +11332,7 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
                     else:
                         st.error("G03 chart could not render because no numeric TSV columns were available after coercion.")
                     with st.expander("Source TSV table — G03", expanded=False):
-                        st.dataframe(board_bestfit_df, use_container_width=True)
+                        st.dataframe(_dti_arrow_safe_df_v1(board_bestfit_df), width="stretch")
 
             except Exception as board_exc:
                 st.error(f"Real-data TSV chart board failed closed: {board_exc}")
@@ -11351,7 +11350,7 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
                 else:
                     graph_chain_df = pd.read_csv(graph_chain_summary, sep="\t")
                     st.caption("G01 — source readback from frozen chain_summary.tsv.")
-                    st.dataframe(graph_chain_df, use_container_width=True)
+                    st.dataframe(_dti_arrow_safe_df_v1(graph_chain_df), width="stretch")
 
             with graph_tabs[1]:
                 if not graph_diagnostics.exists():
@@ -11359,7 +11358,7 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
                 else:
                     graph_diag_df = pd.read_csv(graph_diagnostics, sep="\t")
                     st.caption("G02 — source readback from frozen diagnostics.tsv.")
-                    st.dataframe(graph_diag_df, use_container_width=True)
+                    st.dataframe(_dti_arrow_safe_df_v1(graph_diag_df), width="stretch")
 
             with graph_tabs[2]:
                 if not graph_bestfit.exists():
@@ -11367,7 +11366,7 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
                 else:
                     graph_bestfit_df = pd.read_csv(graph_bestfit, sep="\t")
                     st.caption("G03 — source readback from frozen map_or_bestfit.tsv.")
-                    st.dataframe(graph_bestfit_df, use_container_width=True)
+                    st.dataframe(_dti_arrow_safe_df_v1(graph_bestfit_df), width="stretch")
 
             with graph_tabs[3]:
                 st.markdown(
@@ -11445,3 +11444,53 @@ except Exception as _dti_inline_safe_v5_exc:
     except Exception:
         pass
 # DTI_INLINE_SAFE_V5_BLOCK_END
+
+
+# DTI_CLAIM_BOUNDARY_RED_SHIELD_VIEWER_V1_BEGIN
+def _dti_claim_boundary_red_shield_viewer_v1():
+    from pathlib import Path
+    import streamlit as st
+    import pandas as pd
+
+    st.markdown("---")
+    st.error("🛑 Panel 7: Claim Boundary Red Shield — audit guardrail")
+    st.caption("This panel is a claim-boundary guardrail. It is not a new computation and it does not change the frozen payloads.")
+
+    vows = [
+        ("No new live MCMC execution inside this public app", "PASS"),
+        ("No CLASS execution inside this public app", "PASS"),
+        ("No live likelihood evaluation inside this public app", "PASS"),
+        ("No Planck CMB validation claim", "PASS"),
+        ("No posterior-validation claim beyond frozen audited packages", "PASS"),
+        ("No physics-validation claim", "PASS"),
+        ("No Hubble-tension-solution claim", "PASS"),
+        ("No manuscript update claim", "PASS"),
+        ("No raw-chain or large-original payload exposure", "PASS"),
+    ]
+
+    df = pd.DataFrame(vows, columns=["boundary_vow", "status"])
+    st.dataframe(_dti_arrow_safe_df_v1(df), width="stretch")
+
+    base = Path(__file__).resolve().parent
+    boundary_path = base / "data" / "embedded_bao_sdss_dr16cosmo_v1" / "notes" / "CLAIM_BOUNDARY.md"
+
+    if boundary_path.exists():
+        st.success("Frozen claim-boundary file found.")
+        with st.expander("Frozen CLAIM_BOUNDARY.md readback", expanded=False):
+            st.markdown(boundary_path.read_text(encoding="utf-8", errors="replace"))
+    else:
+        st.error("Frozen claim-boundary file is missing.")
+
+    st.warning(
+        "Current status: source-lock and public visual freeze are complete, "
+        "but this does not constitute full physical proof, Planck validation, "
+        "or final cosmological solution."
+    )
+
+try:
+    _dti_claim_boundary_red_shield_viewer_v1()
+except Exception as exc:
+    import streamlit as st
+    st.error(f"Claim Boundary Red Shield failed to render: {exc}")
+# DTI_CLAIM_BOUNDARY_RED_SHIELD_VIEWER_V1_END
+
