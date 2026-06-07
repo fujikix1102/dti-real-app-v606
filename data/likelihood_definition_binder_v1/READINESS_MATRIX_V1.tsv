@@ -1,0 +1,12 @@
+component	current_status	viewer_allowed	next_required_gate
+embedded_BAO_payload	IDENTITY_LOCKED	display summary/source identity	likelihood definition documentation
+eight_salvaged_payloads	HASH_LOCKED	display inventory/diagnostics only	payload-specific claim boundary
+BAO_likelihood	NOT_EVALUATED	definition only	covariance and observable contract
+SN_likelihood	NOT_BOUND	definition only	source lock and formula contract
+H_z_likelihood	NOT_BOUND	definition only	source lock and formula contract
+Planck_CMB_likelihood	NOT_READY	capability matrix only	backend/clik/source readiness
+MCMC	NOT_RUNNING	display preserved payload identity only	chain audit gate
+CLASS	NOT_RUNNING	display boundary only	backend execution gate
+posterior_claim	FORBIDDEN	warning only	validation package and reviewer-safe wording
+physics_validation	FORBIDDEN	warning only	independent validation gate
+manuscript_update	FORBIDDEN	warning only	separate manuscript gate

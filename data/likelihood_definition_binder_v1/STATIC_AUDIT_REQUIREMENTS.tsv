@@ -1,0 +1,14 @@
+check	expected
+panel8_label_count	1
+panel7_red_shield_count	1
+safe_v5_label_count	1
+bao_chart_board_label_count	1
+use_container_width_count	0
+run_mcmc_marker_count	0
+classy_marker_count	0
+likelihood_execution_marker_count	0
+planck_clik_marker_count	0
+raw_chain_copy_marker_count	0
+posterior_claim_marker	NO
+physics_validation_marker	NO
+hubble_tension_solution_claim_marker	NO
