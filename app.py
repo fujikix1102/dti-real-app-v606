@@ -6103,10 +6103,15 @@ def _dti_bggeom_jump_graph_rows_v1b(H0, omega_m, omega_vac, zmax, z_jump, jump_f
 
 def _dti_render_background_geometry_jump_toy_v1b(H0, omega_m, omega_vac, z):
     # DTI_BACKGROUND_GEOMETRY_JUMP_TOY_RENDERER_V1B
-    with st.expander("Jump toy comparator — piecewise background geometry", expanded=False):
+    with st.expander("Jump toy comparator — piecewise background geometry", expanded=True):
         st.caption(
             "Summary → compact table → Raw data — audit view. Toy background-geometry comparator only; not CLASS, likelihood, posterior, Planck, or JWST validation."
         )
+
+        if st.button("Load jump-toy demonstration values", key="dti_bggeom_load_jump_toy_demo_values_v1"):
+            st.session_state["dti_bggeom_jump_z_v1b"] = 2.5
+            st.session_state["dti_bggeom_jump_factor_v1b"] = 1.00001
+            st.rerun()
 
         jc1, jc2 = st.columns(2)
         with jc1:
