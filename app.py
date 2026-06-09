@@ -11709,3 +11709,33 @@ except Exception as exc:
 
 # DTI_PANEL8_LIKELIHOOD_BINDER_CALL_V1
 _dti_render_likelihood_definition_binder_v1()
+
+# --- DTI citation/contact block V1 BEGIN ---
+st.divider()
+with st.expander("About / Citation / Provenance", expanded=False):
+    st.markdown(
+        """
+**Author**  
+Junichi Fujiki / FUJIKIX
+
+**Contact**  
+jun@fujikix.com
+
+**Project**  
+MAXOMEGA / DTI diagnostic viewer
+
+**Related archival records, not live-compute dependencies**
+
+1. **Extended Evidence Ledger and Provenance Framework for Fixed-H0 Cosmology Branch Audits**  
+   106-Page Comprehensive Freeze Candidate  
+   DOI: `10.5281/zenodo.20603277`
+
+2. **Audit-First Evidence for Reproducible Branch Structure in Fixed-H0 Cosmology Fits**  
+   Core Manuscript / Review Target  
+   DOI: `10.5281/zenodo.20603167`
+
+**Boundary**  
+This public app is a diagnostic and provenance viewer. It does not perform live likelihood evaluation, MCMC sampling, Planck validation, posterior inference, or manuscript-level claim promotion.
+        """
+    )
+# --- DTI citation/contact block V1 END ---
