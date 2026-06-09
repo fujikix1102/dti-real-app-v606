@@ -8483,8 +8483,6 @@ with st.sidebar:
             st.rerun()
 
     st.markdown("---")
-    # DTI_README_SIDEBAR_BEFORE_CURRENT_PROFILE_STATUS_FIX
-    _dti_render_readme_download_v3_safe()
 
     # --- DTI_REAL_APP_MANUAL_DOCS_LINKS_V1 BEGIN ---
     with st.expander("DTI Real App manuals / documentation", expanded=False):
