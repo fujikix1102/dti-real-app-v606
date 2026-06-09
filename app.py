@@ -8488,6 +8488,17 @@ with st.sidebar:
     # DTI_MANUAL_PDF_DOWNLOAD_BUTTON_RENDER_CALL_V1
     _dti_render_manual_pdf_download_v1()
 
+    # --- DTI_REAL_APP_MANUAL_DOCS_LINKS_V1 BEGIN ---
+    with st.expander("DTI Real App manuals / documentation", expanded=False):
+        st.markdown(
+            "- [Full parameter manual](https://github.com/fujikix1102/dti-real-app-v606/blob/main/docs/DTI_REAL_APP_FULL_PARAMETER_MANUAL_V1.md)  \\n"
+            "- [Item-by-item manual](https://github.com/fujikix1102/dti-real-app-v606/blob/main/docs/DTI_REAL_APP_ITEM_BY_ITEM_MANUAL_V1.md)  \\n\\n"
+            "These manuals are documentation-only references. They do not run CLASS/AxiCLASS, "
+            "do not evaluate likelihoods, do not perform MCMC/posterior inference, and do not "
+            "modify any manuscript-level claim."
+        )
+    # --- DTI_REAL_APP_MANUAL_DOCS_LINKS_V1 END ---
+
     st.subheader("2. Current profile status")
 
     active_profile_name = st.session_state.get("selected_preset", selected_preset)
