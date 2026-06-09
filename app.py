@@ -11479,6 +11479,81 @@ def _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1():
 
 try:
     _dti_render_embedded_bao_sdss_dr16cosmo_posterior_v1()
+
+    # --- DTI Route A manual-sanity static diagnostic panel V1 BEGIN ---
+    with st.expander("Route A manual-sanity diagnostic — frozen independent lane", expanded=False):
+        st.caption(
+            "Frozen diagnostic values only. Not a full eBOSS LRG likelihood, "
+            "not a full BAO likelihood, not a posterior comparison, and not a Planck validation claim."
+        )
+    
+        st.warning(
+            "Boundary: diagnostic-only static display. No backend call, no CLASS/AxiCLASS run, "
+            "no likelihood, no MCMC, no posterior claim, no manuscript update."
+        )
+    
+        st.markdown("### Frozen diagnostic comparison")
+        st.table([
+            {
+                "lane": "Route B frozen reference",
+                "chi2": "0.2887322581504387",
+                "scope": "TOPLEFT_2X2_DM_DH_ONLY / NOT_FULL_EBOSS_LRG_LIKELIHOOD",
+                "status": "FROZEN_REFERENCE_ACTIVE",
+            },
+            {
+                "lane": "Route A derived-from-Route-B template",
+                "chi2": "0.2887322581504387",
+                "scope": "MINIMAL_CHI2_DIAGNOSTIC_ONLY",
+                "status": "FROZEN_REVIEW_PASS",
+            },
+            {
+                "lane": "Route A manual-sanity independent lane",
+                "chi2": "0.848405000840325",
+                "scope": "MANUAL_SANITY_GEOMETRY_RATIO_DIAGNOSTIC_ONLY",
+                "status": "FROZEN_REVIEW_PASS",
+            },
+        ])
+    
+        st.markdown("### Manual-sanity algebraic decomposition")
+        st.json({
+            "source": {
+                "handoff": "_DTI_ROUTE_A_ROUTE_B_DIAGNOSTIC_HANDOFF_V1B_WITH_MANUAL_SANITY_LANE_20260609_150156",
+                "mount_request": "_DTI_APP_ROUTE_A_MANUAL_SANITY_MOUNT_REQUEST_V1B_20260609_150643",
+                "payload_json_sha256": "045a01b4c1c57a2d4e1eb6f10dbd97220745848308ad449b9e8c0a0d86c94ed5",
+                "app_py_pre_patch_sha256": "7e08d5056dae8b3351f7deddb60dccd5b402c3e0c5dd1e54c821d72f53a744dc",
+            },
+            "manual_sanity": {
+                "model_vector": [17.45, 19.55],
+                "observation_vector": [17.65, 19.77],
+                "delta_model_minus_observation": [-0.1999999999999993, -0.21999999999999886],
+                "inverse_covariance": [[11.6279311211, 1.75457174953], [1.75457174953, 4.72903805863]],
+                "terms": {
+                    "DM_DM": 0.4651172448439967,
+                    "cross_total": 0.15440231395863865,
+                    "DH_DH": 0.22888544203768962,
+                    "term_sum_chi2": 0.848405000840325,
+                },
+                "manual_minus_route_b": 0.5596727426898863,
+            },
+            "boundaries": {
+                "full_eboss_lrg_likelihood": False,
+                "full_bao_likelihood": False,
+                "likelihood": False,
+                "mcmc": False,
+                "posterior_claim": False,
+                "planck_validation": False,
+                "physical_validation": False,
+                "backend_call": False,
+                "class_or_axiclass_run": False,
+                "manuscript_update": False,
+            },
+        })
+    
+        st.caption(
+            "Source-locked static panel. The values are displayed as frozen diagnostics; "
+            "the app does not recompute chi2 in this panel."
+        )
+    # --- DTI Route A manual-sanity static diagnostic panel V1 END ---
 except Exception as _dti_embed_exc:
     try:
         import streamlit as st
