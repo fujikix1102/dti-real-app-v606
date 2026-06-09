@@ -11564,6 +11564,79 @@ except Exception as _dti_embed_exc:
 
 
 # --- /DTI embedded posterior viewer: SDSS DR16cosmo offline BAO chain V1 ---
+# --- DTI Route A/B boundary matrix static UI V1 BEGIN ---
+with st.expander("Route A/B Boundary Matrix — diagnostic available, full inference unavailable", expanded=False):
+    st.warning(
+        "Boundary: diagnostic lanes are available, but full BAO/eBOSS likelihood, "
+        "MCMC, posterior inference, Planck validation, and manuscript-level claim promotion "
+        "remain unavailable in this public app."
+    )
+    st.markdown("### Diagnostic availability matrix")
+    _dti_route_ab_boundary_rows_v1 = [
+        {
+            "lane": "Route B frozen reference",
+            "available": "YES",
+            "what_it_is": "Top-left 2x2 DM/DH diagnostic",
+            "what_it_is_not": "Not full eBOSS LRG likelihood",
+            "frozen_value_or_source": "chi2 = 0.2887322581504387",
+        },
+        {
+            "lane": "Route A derived template",
+            "available": "YES",
+            "what_it_is": "Minimal diagnostic derived from frozen Route B values",
+            "what_it_is_not": "Not independent full likelihood",
+            "frozen_value_or_source": "chi2 = 0.2887322581504387",
+        },
+        {
+            "lane": "Route A manual-sanity independent lane",
+            "available": "YES",
+            "what_it_is": "Independent geometry-ratio diagnostic lane",
+            "what_it_is_not": "Not posterior, not MCMC, not Planck validation",
+            "frozen_value_or_source": "chi2 = 0.848405000840325",
+        },
+        {
+            "lane": "Full BAO/eBOSS likelihood",
+            "available": "NO",
+            "what_it_is": "Not implemented in this public app",
+            "what_it_is_not": "Current diagnostic lanes are not full likelihood inference",
+            "frozen_value_or_source": "Unavailable here",
+        },
+        {
+            "lane": "MCMC / posterior / Planck validation",
+            "available": "NO",
+            "what_it_is": "Out of scope for this public diagnostic viewer",
+            "what_it_is_not": "No inference claim and no validation claim",
+            "frozen_value_or_source": "Unavailable here",
+        },
+    ]
+    st.table(_dti_route_ab_boundary_rows_v1)
+    st.caption(
+        "Status badge: Diagnostic available / full inference unavailable. "
+        "Route B, Route A template, and Route A manual-sanity are frozen diagnostic lanes only. "
+        "They do not constitute a full BAO/eBOSS likelihood, MCMC posterior, Planck validation, "
+        "or manuscript-level claim promotion."
+    )
+    with st.expander("Route A/B boundary provenance", expanded=False):
+        st.json(
+            {
+                "route_b_frozen_reference_chi2": 0.2887322581504387,
+                "route_a_derived_template_chi2": 0.2887322581504387,
+                "route_a_manual_sanity_independent_lane_chi2": 0.848405000840325,
+                "manual_minus_route_b": 0.5596727426898863,
+                "route_b_scope": "TOPLEFT_2X2_DM_DH_ONLY / NOT_FULL_EBOSS_LRG_LIKELIHOOD",
+                "route_a_scope": "MINIMAL_CHI2_DIAGNOSTIC_ONLY",
+                "manual_sanity_scope": "MANUAL_SANITY_GEOMETRY_RATIO_DIAGNOSTIC_ONLY",
+                "full_bao_eboss_likelihood": False,
+                "mcmc": False,
+                "posterior_inference": False,
+                "planck_validation": False,
+                "manuscript_claim_promotion": False,
+                "source_dossier": "_DTI_ROUTE_A_ROUTE_B_DIAGNOSTIC_LANE_CONVERGENCE_DOSSIER_V1_20260609_155139",
+                "source_app_hits_review": "_DTI_APP_ROUTE_AB_BOUNDARY_APP_HITS_REVIEW_V1_20260609_163516",
+            }
+        )
+# --- DTI Route A/B boundary matrix static UI V1 END ---
+
 
 
 # ---------------------------------------------------------------------
