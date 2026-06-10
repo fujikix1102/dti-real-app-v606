@@ -5745,6 +5745,69 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
             st.caption("DTI_MORESCO2016_PLOTLY_MARKER_BEFORE_CHART")
             st.plotly_chart(fig, use_container_width=True)
             st.caption("DTI_MORESCO2016_PLOTLY_MARKER_AFTER_CHART")
+
+            st.caption("DTI_MORESCO2016_STATIC_SVG_CHART_V1")
+            static_svg = """
+<svg viewBox="0 0 720 360" width="100%" height="360" role="img" aria-label="Moresco2016 BC03 static SVG chart">
+  <rect x="0" y="0" width="720" height="360" fill="#0e1117" rx="10"></rect>
+  <text x="360" y="26" text-anchor="middle" fill="#f0f2f6" font-size="16" font-family="sans-serif">Moresco2016 BC03 component rows — static SVG visual check</text>
+  <text x="360" y="344" text-anchor="middle" fill="#c9d1d9" font-size="12" font-family="sans-serif">redshift z</text>
+  <text x="22" y="180" text-anchor="middle" fill="#c9d1d9" font-size="12" font-family="sans-serif" transform="rotate(-90 22 180)">H(z) [km s^-1 Mpc^-1]</text>
+
+  <line x1="70" y1="300" x2="680" y2="300" stroke="#8b949e" stroke-width="1"></line>
+  <line x1="70" y1="50" x2="70" y2="300" stroke="#8b949e" stroke-width="1"></line>
+
+  <line x1="70" y1="300" x2="680" y2="300" stroke="#30363d" stroke-width="1"></line>
+  <line x1="70" y1="237.5" x2="680" y2="237.5" stroke="#30363d" stroke-width="1"></line>
+  <line x1="70" y1="175" x2="680" y2="175" stroke="#30363d" stroke-width="1"></line>
+  <line x1="70" y1="112.5" x2="680" y2="112.5" stroke="#30363d" stroke-width="1"></line>
+  <line x1="70" y1="50" x2="680" y2="50" stroke="#30363d" stroke-width="1"></line>
+
+  <text x="60" y="304" text-anchor="end" fill="#c9d1d9" font-size="11" font-family="sans-serif">60</text>
+  <text x="60" y="241.5" text-anchor="end" fill="#c9d1d9" font-size="11" font-family="sans-serif">70</text>
+  <text x="60" y="179" text-anchor="end" fill="#c9d1d9" font-size="11" font-family="sans-serif">80</text>
+  <text x="60" y="116.5" text-anchor="end" fill="#c9d1d9" font-size="11" font-family="sans-serif">90</text>
+  <text x="60" y="54" text-anchor="end" fill="#c9d1d9" font-size="11" font-family="sans-serif">100</text>
+
+  <text x="90" y="320" text-anchor="middle" fill="#c9d1d9" font-size="11" font-family="sans-serif">0.38</text>
+  <text x="258" y="320" text-anchor="middle" fill="#c9d1d9" font-size="11" font-family="sans-serif">0.40</text>
+  <text x="460" y="320" text-anchor="middle" fill="#c9d1d9" font-size="11" font-family="sans-serif">0.425</text>
+  <text x="668" y="320" text-anchor="middle" fill="#c9d1d9" font-size="11" font-family="sans-serif">0.478</text>
+
+  <line x1="90" y1="106.25" x2="90" y2="275" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="84" y1="106.25" x2="96" y2="106.25" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="84" y1="275" x2="96" y2="275" stroke="#58a6ff" stroke-width="2"></line>
+  <circle cx="90" cy="193.75" r="5" fill="#58a6ff"></circle>
+  <text x="90" y="96" text-anchor="middle" fill="#f0f2f6" font-size="10" font-family="sans-serif">83.0±13.5</text>
+
+  <line x1="258" y1="191.25" x2="258" y2="318.75" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="252" y1="191.25" x2="264" y2="191.25" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="252" y1="318.75" x2="264" y2="318.75" stroke="#58a6ff" stroke-width="2"></line>
+  <circle cx="258" cy="231.25" r="5" fill="#58a6ff"></circle>
+  <text x="258" y="181" text-anchor="middle" fill="#f0f2f6" font-size="10" font-family="sans-serif">77.0±10.2</text>
+
+  <line x1="460" y1="60.625" x2="460" y2="200.625" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="454" y1="60.625" x2="466" y2="60.625" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="454" y1="200.625" x2="466" y2="200.625" stroke="#58a6ff" stroke-width="2"></line>
+  <circle cx="460" cy="135.625" r="5" fill="#58a6ff"></circle>
+  <text x="460" y="49" text-anchor="middle" fill="#f0f2f6" font-size="10" font-family="sans-serif">87.1±11.2</text>
+
+  <line x1="668" y1="13.125" x2="668" y2="174.375" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="662" y1="13.125" x2="674" y2="13.125" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="662" y1="174.375" x2="674" y2="174.375" stroke="#58a6ff" stroke-width="2"></line>
+  <circle cx="668" cy="100" r="5" fill="#58a6ff"></circle>
+  <text x="668" y="42" text-anchor="middle" fill="#f0f2f6" font-size="10" font-family="sans-serif">92.8±12.9</text>
+
+  <line x1="430" y1="193.125" x2="430" y2="305.625" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="424" y1="193.125" x2="436" y2="193.125" stroke="#58a6ff" stroke-width="2"></line>
+  <line x1="424" y1="305.625" x2="436" y2="305.625" stroke="#58a6ff" stroke-width="2"></line>
+  <circle cx="430" cy="206.875" r="5" fill="#58a6ff"></circle>
+  <text x="430" y="327" text-anchor="middle" fill="#f0f2f6" font-size="10" font-family="sans-serif">80.9±9.0</text>
+
+  <text x="360" y="336" text-anchor="middle" fill="#8b949e" font-size="10" font-family="sans-serif">Static visual-only SVG; not a likelihood evaluation, not a posterior comparison, not a fit.</text>
+</svg>
+"""
+            st.markdown(static_svg, unsafe_allow_html=True)
         except Exception as exc:
             st.caption("DTI_MORESCO2016_PLOTLY_MARKER_EXCEPTION")
             st.info(f"Plotly chart rendering skipped; table remains available. Reason: {exc}")
