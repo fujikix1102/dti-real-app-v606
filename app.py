@@ -5709,6 +5709,7 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
         st.dataframe(rows, use_container_width=True)
 
         try:
+            st.caption("DTI_MORESCO2016_PLOTLY_MARKER_BEFORE_IMPORT")
             import plotly.graph_objects as go
 
             z_values = [row["z"] for row in rows]
@@ -5741,8 +5742,11 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
                 height=360,
                 margin={"l": 20, "r": 20, "t": 45, "b": 20},
             )
+            st.caption("DTI_MORESCO2016_PLOTLY_MARKER_BEFORE_CHART")
             st.plotly_chart(fig, use_container_width=True)
+            st.caption("DTI_MORESCO2016_PLOTLY_MARKER_AFTER_CHART")
         except Exception as exc:
+            st.caption("DTI_MORESCO2016_PLOTLY_MARKER_EXCEPTION")
             st.info(f"Plotly chart rendering skipped; table remains available. Reason: {exc}")
 
         st.caption(
