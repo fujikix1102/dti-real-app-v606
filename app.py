@@ -5697,8 +5697,8 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
             "H(z) measurements from the direct Moresco2016 BOSS DR9 cosmic-chronometer "
             "source record. The table uses sigma_tot_BC03. Combined points, M11 "
             "alternatives, and LeafMelia duplicate/compiled rows are excluded. This panel "
-            "is not a likelihood evaluation, not a posterior comparison, not a fit, not an "
-            "independent-count claim, and not a cosmological validation."
+            "is visual-only, not a likelihood evaluation, not a posterior comparison, "
+            "not a fit, not an independent-count claim, and not a cosmological validation."
         )
 
         st.caption(
@@ -5708,133 +5708,25 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
 
         st.dataframe(rows, use_container_width=True)
 
-        try:
-            st.caption("DTI_MORESCO2016_PLOTLY_MARKER_BEFORE_IMPORT")
-            import plotly.graph_objects as go
+        st.caption("DTI_MORESCO2016_STATIC_PNG_ASSET_CHART_V1")
+        from pathlib import Path as _DtiPath
 
-            z_values = [row["z"] for row in rows]
-            h_values = [row["H_km_s_Mpc"] for row in rows]
-            sigma_values = [row["sigma_km_s_Mpc"] for row in rows]
-
-            fig = go.Figure()
-            fig.add_trace(
-                go.Scatter(
-                    x=z_values,
-                    y=h_values,
-                    error_y={
-                        "type": "data",
-                        "array": sigma_values,
-                        "visible": True,
-                    },
-                    mode="markers",
-                    name="Moresco2016 BC03",
-                    hovertemplate=(
-                        "z=%{x}<br>"
-                        "H(z)=%{y} km s^-1 Mpc^-1"
-                        "<extra>Moresco2016 BC03</extra>"
-                    ),
-                )
-            )
-            fig.update_layout(
-                title="Moresco2016 BC03 component rows",
-                xaxis_title="z",
-                yaxis_title="H(z) [km s^-1 Mpc^-1]",
-                height=360,
-                margin={"l": 20, "r": 20, "t": 45, "b": 20},
-            )
-            st.caption("DTI_MORESCO2016_PLOTLY_MARKER_BEFORE_CHART")
-            st.plotly_chart(fig, use_container_width=True)
-            st.caption("DTI_MORESCO2016_PLOTLY_MARKER_AFTER_CHART")
-
-            st.caption("DTI_MORESCO2016_STATIC_SVG_CHART_V1")
-            static_svg = """
-<svg viewBox="0 0 760 420" width="100%" height="420" role="img" aria-label="Moresco2016 BC03 component-row H(z) chart">
-  <rect x="0" y="0" width="760" height="420" fill="#0e1117" rx="12"></rect>
-
-  <text x="380" y="30" text-anchor="middle" fill="#f0f2f6" font-size="17" font-family="Arial, sans-serif">
-    Moresco2016 BC03 component rows — static visual check
-  </text>
-
-  <rect x="90" y="55" width="630" height="295" fill="#111820" stroke="#30363d" stroke-width="1"></rect>
-
-  <line x1="90" y1="350" x2="720" y2="350" stroke="#8b949e" stroke-width="1.2"></line>
-  <line x1="90" y1="55" x2="90" y2="350" stroke="#8b949e" stroke-width="1.2"></line>
-
-  <line x1="90" y1="296.36" x2="720" y2="296.36" stroke="#26313d" stroke-width="1"></line>
-  <line x1="90" y1="242.73" x2="720" y2="242.73" stroke="#26313d" stroke-width="1"></line>
-  <line x1="90" y1="189.09" x2="720" y2="189.09" stroke="#26313d" stroke-width="1"></line>
-  <line x1="90" y1="135.45" x2="720" y2="135.45" stroke="#26313d" stroke-width="1"></line>
-  <line x1="90" y1="81.82" x2="720" y2="81.82" stroke="#26313d" stroke-width="1"></line>
-
-  <text x="78" y="354" text-anchor="end" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">55</text>
-  <text x="78" y="300" text-anchor="end" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">65</text>
-  <text x="78" y="247" text-anchor="end" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">75</text>
-  <text x="78" y="193" text-anchor="end" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">85</text>
-  <text x="78" y="139" text-anchor="end" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">95</text>
-  <text x="78" y="86" text-anchor="end" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">105</text>
-
-  <line x1="142.50" y1="350" x2="142.50" y2="356" stroke="#8b949e" stroke-width="1"></line>
-  <line x1="247.50" y1="350" x2="247.50" y2="356" stroke="#8b949e" stroke-width="1"></line>
-  <line x1="352.50" y1="350" x2="352.50" y2="356" stroke="#8b949e" stroke-width="1"></line>
-  <line x1="457.50" y1="350" x2="457.50" y2="356" stroke="#8b949e" stroke-width="1"></line>
-  <line x1="562.50" y1="350" x2="562.50" y2="356" stroke="#8b949e" stroke-width="1"></line>
-  <line x1="667.50" y1="350" x2="667.50" y2="356" stroke="#8b949e" stroke-width="1"></line>
-
-  <text x="142.50" y="374" text-anchor="middle" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">0.38</text>
-  <text x="247.50" y="374" text-anchor="middle" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">0.40</text>
-  <text x="352.50" y="374" text-anchor="middle" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">0.42</text>
-  <text x="457.50" y="374" text-anchor="middle" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">0.44</text>
-  <text x="562.50" y="374" text-anchor="middle" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">0.46</text>
-  <text x="667.50" y="374" text-anchor="middle" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">0.48</text>
-
-  <text x="405" y="404" text-anchor="middle" fill="#c9d1d9" font-size="13" font-family="Arial, sans-serif">redshift z</text>
-  <text x="25" y="205" text-anchor="middle" fill="#c9d1d9" font-size="13" font-family="Arial, sans-serif" transform="rotate(-90 25 205)">H(z) [km s^-1 Mpc^-1]</text>
-
-  <line x1="143.55" y1="209.82" x2="143.55" y2="354.73" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="135.55" y1="209.82" x2="151.55" y2="209.82" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="135.55" y1="354.73" x2="151.55" y2="354.73" stroke="#58a6ff" stroke-width="2.2"></line>
-  <circle cx="143.55" cy="282.27" r="6.5" fill="#58a6ff" stroke="#f0f2f6" stroke-width="1.2"></circle>
-
-  <line x1="249.60" y1="289.76" x2="249.60" y2="399.22" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="241.60" y1="289.76" x2="257.60" y2="289.76" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="241.60" y1="399.22" x2="257.60" y2="399.22" stroke="#58a6ff" stroke-width="2.2"></line>
-  <circle cx="249.60" cy="314.55" r="6.5" fill="#58a6ff" stroke="#f0f2f6" stroke-width="1.2"></circle>
-
-  <line x1="377.18" y1="215.18" x2="377.18" y2="335.36" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="369.18" y1="215.18" x2="385.18" y2="215.18" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="369.18" y1="335.36" x2="385.18" y2="335.36" stroke="#58a6ff" stroke-width="2.2"></line>
-  <circle cx="377.18" cy="260.55" r="6.5" fill="#58a6ff" stroke="#f0f2f6" stroke-width="1.2"></circle>
-
-  <line x1="508.42" y1="138.55" x2="508.42" y2="277.00" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="500.42" y1="138.55" x2="516.42" y2="138.55" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="500.42" y1="277.00" x2="516.42" y2="277.00" stroke="#58a6ff" stroke-width="2.2"></line>
-  <circle cx="508.42" cy="229.98" r="6.5" fill="#58a6ff" stroke="#f0f2f6" stroke-width="1.2"></circle>
-
-  <line x1="658.58" y1="268.73" x2="658.58" y2="365.27" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="650.58" y1="268.73" x2="666.58" y2="268.73" stroke="#58a6ff" stroke-width="2.2"></line>
-  <line x1="650.58" y1="365.27" x2="666.58" y2="365.27" stroke="#58a6ff" stroke-width="2.2"></line>
-  <circle cx="658.58" cy="293.54" r="6.5" fill="#58a6ff" stroke="#f0f2f6" stroke-width="1.2"></circle>
-
-  <circle cx="112" cy="32" r="5.5" fill="#58a6ff" stroke="#f0f2f6" stroke-width="1"></circle>
-  <text x="126" y="36" fill="#c9d1d9" font-size="12" font-family="Arial, sans-serif">BC03 component row with sigma_tot_BC03 error bar</text>
-  <text x="380" y="392" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Arial, sans-serif">Static visual-only SVG; not a likelihood evaluation, not a posterior comparison, not a fit.</text>
-</svg>
-"""
-            st.caption("DTI_MORESCO2016_STATIC_PNG_ASSET_CHART_V1")
-            from pathlib import Path as _DtiPath
-
-            png_asset_path = _DtiPath(__file__).resolve().parent / "assets/moresco2016/moresco2016_bc03_component_rows_static_visual_v1.png"
+        png_asset_path = _DtiPath(__file__).resolve().parent / "assets/moresco2016/moresco2016_bc03_component_rows_static_visual_v1.png"
+        if png_asset_path.exists():
             st.image(str(png_asset_path), use_container_width=True)
-        except Exception as exc:
-            st.caption("DTI_MORESCO2016_PLOTLY_MARKER_EXCEPTION")
-            st.info(f"Plotly chart rendering skipped; table remains available. Reason: {exc}")
+        else:
+            st.warning("Moresco2016 static PNG asset is missing; the source table remains available.")
 
         st.caption(
             "Excluded from this primary visual table: BC03 combined point, M11 combined "
             "point, M11 component rows, and LeafMelia duplicated/compiled rows."
         )
 
-
+        st.caption(
+            "Static PNG visual-only chart; not a likelihood evaluation, "
+            "not a posterior comparison, not a fit, not an independent-count claim, "
+            "and not a cosmological validation."
+        )
 # --- DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: end ---
 
 # Early safe raw renderer for Background Geometry.
