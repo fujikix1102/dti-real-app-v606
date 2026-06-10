@@ -6352,8 +6352,6 @@ def _dti_render_background_geometry_jump_toy_v1b(H0, omega_m, omega_vac, z):
 # Streamlit Cloud can fail when st.json receives nested numeric objects that
 # are internally routed through PyArrow. Keep raw audit visibility but render
 # through sanitized json.dumps + st.code.
-    _dti_render_moresco2016_bc03_cc_visual_overlay_v1()
-
 _DTI_BGGEOM_SAFE_RAW_JSON_RENDERER_V6E = True
 
 def _dti_bggeom_json_safe_v6e(obj):
@@ -11921,6 +11919,10 @@ _dti_render_likelihood_definition_binder_v1()
 
 # --- DTI citation/contact block V1 BEGIN ---
 st.divider()
+# --- DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: visible call ---
+_dti_render_moresco2016_bc03_cc_visual_overlay_v1()
+# --- /DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: visible call ---
+
 with st.expander("About / Citation / Provenance", expanded=False):
     st.markdown(
         """
