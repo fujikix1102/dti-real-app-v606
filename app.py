@@ -5911,21 +5911,27 @@ def _dti_render_background_geometry_anchor_v1():
 # no likelihood evaluation, no posterior comparison, no Planck/JWST validation.
 _DTI_BACKGROUND_GEOMETRY_JUMP_TOY_COMPARATOR_V1B = True
 
-def _dti_bggeom_E_jump_toy_v1b(z, omega_m, omega_vac, z_jump, jump_factor):
+def _dti_bggeom_E_jump_toy_v1b(z, omega_m, omega_vac, z_jump, jump_factor, delta_z=None):
+    import math as _math_jump_width_v1
+
     base = _dti_bggeom_E_v1(z, omega_m, omega_vac)
     try:
         zf = float(z)
         zj = float(z_jump)
         jf = float(jump_factor)
+        dz = None if delta_z is None else float(delta_z)
     except Exception:
         return None
     if base is None:
         return None
-    if zf > zj:
-        return jf * float(base)
-    return float(base)
+    if dz is None or dz <= 0:
+        if zf > zj:
+            return jf * float(base)
+        return float(base)
+    transition = 0.5 * (1.0 + _math_jump_width_v1.tanh((zf - zj) / dz))
+    return float(base) * (1.0 + (jf - 1.0) * transition)
 
-def _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor):
+def _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor, delta_z=0.010):
     import math as _math_jump_v1b
 
     try:
@@ -5935,10 +5941,11 @@ def _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_fac
         z = float(z)
         z_jump = float(z_jump)
         jump_factor = float(jump_factor)
+        delta_z = float(delta_z)
     except Exception:
         return {"status": "invalid_input", "boundary": "jump toy background geometry only"}
 
-    if H0 <= 0 or omega_m < 0 or omega_vac < 0 or z < 0 or z_jump < 0 or jump_factor <= 0:
+    if H0 <= 0 or omega_m < 0 or omega_vac < 0 or z < 0 or z_jump < 0 or jump_factor <= 0 or delta_z <= 0:
         return {"status": "invalid_support", "boundary": "jump toy background geometry only"}
 
     c_km_s = 299792.458
@@ -5946,7 +5953,7 @@ def _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_fac
     hubble_time_gyr = 9.778131 / (H0 / 100.0)
 
     def E_jump(zz):
-        return _dti_bggeom_E_jump_toy_v1b(zz, omega_m, omega_vac, z_jump, jump_factor)
+        return _dti_bggeom_E_jump_toy_v1b(zz, omega_m, omega_vac, z_jump, jump_factor, delta_z)
 
     def inv_E(zz):
         E = E_jump(zz)
@@ -5986,7 +5993,7 @@ def _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_fac
         "status": "ok",
         "boundary": {
             "local_background_geometry_toy": True,
-            "jump_model": "piecewise multiply E(z) above z_jump",
+            "jump_model": "smoothed tanh transition in E(z) around z_jump",
             "class_run": False,
             "render_api_call": False,
             "likelihood_evaluation": False,
@@ -6004,6 +6011,7 @@ def _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_fac
             "z": z,
             "z_jump": z_jump,
             "jump_factor_E_above_zjump": jump_factor,
+            "transition_width_delta_z": delta_z,
         },
         "time": {
             "hubble_time_Gyr": hubble_time_gyr,
@@ -6061,7 +6069,7 @@ def _dti_bggeom_jump_delta_rows_v1b(vanilla, jump):
             })
     return rows
 
-def _dti_bggeom_jump_graph_rows_v1b(H0, omega_m, omega_vac, zmax, z_jump, jump_factor):
+def _dti_bggeom_jump_graph_rows_v1b(H0, omega_m, omega_vac, zmax, z_jump, jump_factor, delta_z):
     rows = []
     try:
         zmax = float(zmax)
@@ -6075,7 +6083,7 @@ def _dti_bggeom_jump_graph_rows_v1b(H0, omega_m, omega_vac, zmax, z_jump, jump_f
 
     for zz in grid:
         vanilla = _dti_bggeom_compute_v1(H0, omega_m, omega_vac, zz)
-        jump = _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, zz, z_jump, jump_factor)
+        jump = _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, zz, z_jump, jump_factor, delta_z)
         if vanilla.get("status") != "ok" or jump.get("status") != "ok":
             continue
 
@@ -6134,15 +6142,29 @@ def _dti_render_background_geometry_jump_toy_v1b(H0, omega_m, omega_vac, z):
                 format="%.5f",
                 key="dti_bggeom_jump_factor_v1b",
             )
+        delta_z_width = st.slider(
+            "Transition Width (delta_z)",
+            min_value=0.001,
+            max_value=0.500,
+            value=0.010,
+            step=0.001,
+            key="dti_bggeom_delta_z_width_v1",
+        )
+        st.caption(
+            "Transition-width control is a front-end toy-background diagnostic only. "
+            "It does not run CLASS/AxiCLASS, compute a likelihood, compare posteriors, "
+            "perform MCMC, or update manuscript-level values."
+        )
 
         vanilla = _dti_bggeom_compute_v1(H0, omega_m, omega_vac, z)
-        jump = _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor)
+        jump = _dti_bggeom_compute_jump_toy_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor, delta_z_width)
 
         summary_rows = [
             {"field": "mode", "value": "Vanilla FLRW vs piecewise jump toy geometry"},
-            {"field": "jump_definition", "value": "E_jump(z) = jump_factor × E_vanilla(z) for z > z_jump"},
+            {"field": "jump_definition", "value": "E_jump(z) = E_vanilla(z) × [1 + (jump_factor - 1)/2 × (1 + tanh((z - z_jump)/delta_z))]"},
             {"field": "z_jump", "value": z_jump},
             {"field": "jump_factor", "value": jump_factor},
+            {"field": "transition_width_delta_z", "value": delta_z_width},
             {"field": "boundary", "value": "local background-geometry toy only; not validation of DTI, Planck, JWST, likelihood, or posterior"},
         ]
         st.markdown("#### Summary")
@@ -6155,7 +6177,7 @@ def _dti_render_background_geometry_jump_toy_v1b(H0, omega_m, omega_vac, z):
         else:
             st.info("Jump comparator table is unavailable for the selected parameters.")
 
-        graph_rows = _dti_bggeom_jump_graph_rows_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor)
+        graph_rows = _dti_bggeom_jump_graph_rows_v1b(H0, omega_m, omega_vac, z, z_jump, jump_factor, delta_z_width)
         if graph_rows:
             st.markdown("#### Jump toy curves")
             ttab, dtab, deltab = st.tabs(["Time baseline", "Distance baseline", "Delta"])
