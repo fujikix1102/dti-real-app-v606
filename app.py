@@ -5709,22 +5709,41 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
         st.dataframe(rows, use_container_width=True)
 
         try:
-            import matplotlib.pyplot as plt
+            import plotly.graph_objects as go
 
             z_values = [row["z"] for row in rows]
             h_values = [row["H_km_s_Mpc"] for row in rows]
             sigma_values = [row["sigma_km_s_Mpc"] for row in rows]
 
-            fig, ax = plt.subplots(figsize=(6.5, 3.8))
-            ax.errorbar(z_values, h_values, yerr=sigma_values, fmt="o", capsize=3)
-            ax.set_xlabel("z")
-            ax.set_ylabel("H(z) [km s$^{-1}$ Mpc$^{-1}$]")
-            ax.set_title("Moresco2016 BC03 component rows")
-            ax.grid(True, alpha=0.3)
-            st.pyplot(fig)
-            plt.close(fig)
+            fig = go.Figure()
+            fig.add_trace(
+                go.Scatter(
+                    x=z_values,
+                    y=h_values,
+                    error_y={
+                        "type": "data",
+                        "array": sigma_values,
+                        "visible": True,
+                    },
+                    mode="markers",
+                    name="Moresco2016 BC03",
+                    hovertemplate=(
+                        "z=%{x}<br>"
+                        "H(z)=%{y} km s^-1 Mpc^-1"
+                        "<extra>Moresco2016 BC03</extra>"
+                    ),
+                )
+            )
+            fig.update_layout(
+                title="Moresco2016 BC03 component rows",
+                xaxis_title="z",
+                yaxis_title="H(z) [km s^-1 Mpc^-1]",
+                height=360,
+                margin={"l": 20, "r": 20, "t": 45, "b": 20},
+            )
+            st.plotly_chart(fig, use_container_width=True)
         except Exception as exc:
-            st.info(f"Chart rendering skipped; table remains available. Reason: {exc}")
+            st.info(f"Plotly chart rendering skipped; table remains available. Reason: {exc}")
 
         st.caption(
             "Excluded from this primary visual table: BC03 combined point, M11 combined "
