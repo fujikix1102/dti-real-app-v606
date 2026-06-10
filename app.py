@@ -5709,6 +5709,128 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
         st.dataframe(rows, use_container_width=True)
 
         st.caption("DTI_MORESCO2016_STATIC_PNG_ASSET_CHART_V1")
+        # DTI_MORESCO2016_LOCAL_DIAG_CHI2_LOCAL_ONLY_PATCH_V1_BEGIN
+        # Local diagnostic-only residual auditor for Moresco2016 BC03 rows.
+        # Boundary: not likelihood, not posterior, not fit, not validation, backend-disconnected.
+        def _dti_moresco2016_validate_model_grid_v1(z_model, h_model):
+            try:
+                if z_model is None or h_model is None:
+                    return False, "missing_model_grid"
+                z_vals = list(z_model)
+                h_vals = list(h_model)
+                if len(z_vals) != len(h_vals):
+                    return False, "grid_length_mismatch"
+                if len(z_vals) < 2:
+                    return False, "grid_too_short"
+                for j in range(len(z_vals) - 1):
+                    if not float(z_vals[j]) < float(z_vals[j + 1]):
+                        return False, "grid_not_strictly_increasing"
+                return True, "ok"
+            except Exception as exc:
+                return False, f"grid_validation_exception: {exc}"
+
+        def _dti_moresco2016_linear_interp_v1(z_model, h_model, z_obs):
+            z_vals = [float(v) for v in z_model]
+            h_vals = [float(v) for v in h_model]
+            z = float(z_obs)
+            if z < z_vals[0] or z > z_vals[-1]:
+                return None, "out_of_range"
+            for j in range(len(z_vals) - 1):
+                z0 = z_vals[j]
+                z1 = z_vals[j + 1]
+                if z0 <= z <= z1:
+                    h0 = h_vals[j]
+                    h1 = h_vals[j + 1]
+                    if z1 == z0:
+                        return None, "zero_width_grid_interval"
+                    t = (z - z0) / (z1 - z0)
+                    return h0 + t * (h1 - h0), "ok"
+            return None, "interpolation_interval_not_found"
+
+        def _dti_moresco2016_find_app_side_hz_grid_v1(local_scope):
+            # Conservative local-only discovery. No backend, no CLASS/AxiCLASS, no network.
+            candidates = [
+                ("z_model_grid", "h_model_grid"),
+                ("z_model_grid", "H_model_grid"),
+                ("z_grid", "H_grid"),
+                ("z_grid", "h_grid"),
+                ("z_values", "H_values"),
+                ("z_bg", "H_bg"),
+                ("z_arr", "H_arr"),
+            ]
+            for z_name, h_name in candidates:
+                if z_name in local_scope and h_name in local_scope:
+                    ok, reason = _dti_moresco2016_validate_model_grid_v1(local_scope.get(z_name), local_scope.get(h_name))
+                    if ok:
+                        return local_scope.get(z_name), local_scope.get(h_name), f"local_scope:{z_name},{h_name}"
+            return None, None, "missing_model_grid"
+
+        def _dti_moresco2016_compute_local_diag_chi2_like_v1(z_model, h_model):
+            rows = (
+                {"row_id": "M2016_BC03_ROW_001", "z": 0.3802, "H_obs": 83.0, "sigma_eff": 13.5},
+                {"row_id": "M2016_BC03_ROW_002", "z": 0.4004, "H_obs": 77.0, "sigma_eff": 10.2},
+                {"row_id": "M2016_BC03_ROW_003", "z": 0.4247, "H_obs": 87.1, "sigma_eff": 11.2},
+                {"row_id": "M2016_BC03_ROW_004", "z": 0.4497, "H_obs": 92.8, "sigma_eff": 12.9},
+                {"row_id": "M2016_BC03_ROW_005", "z": 0.4783, "H_obs": 80.9, "sigma_eff": 9.0},
+            )
+            ok, reason = _dti_moresco2016_validate_model_grid_v1(z_model, h_model)
+            if not ok:
+                return {"status": "inactive", "reason": reason, "N_used": 0, "N_deferred": len(rows), "chi2_diag_like": None, "used_rows": [], "deferred_rows": [r["row_id"] for r in rows]}
+            used_rows = []
+            deferred_rows = []
+            for row in rows:
+                h_interp, interp_status = _dti_moresco2016_linear_interp_v1(z_model, h_model, row["z"])
+                if h_interp is None:
+                    deferred_rows.append({"row_id": row["row_id"], "reason": interp_status})
+                    continue
+                residual = float(row["H_obs"]) - float(h_interp)
+                normalized = residual / float(row["sigma_eff"])
+                contribution = normalized * normalized
+                used_rows.append({
+                    "row_id": row["row_id"],
+                    "z": float(row["z"]),
+                    "H_obs": float(row["H_obs"]),
+                    "H_model_interp": float(h_interp),
+                    "sigma_eff": float(row["sigma_eff"]),
+                    "residual": float(residual),
+                    "normalized_residual": float(normalized),
+                    "chi2_like_contribution": float(contribution),
+                })
+            score = sum(r["chi2_like_contribution"] for r in used_rows) if used_rows else None
+            return {
+                "status": "active" if used_rows else "inactive_no_used_rows",
+                "reason": "ok" if used_rows else "no_used_rows",
+                "N_used": len(used_rows),
+                "N_deferred": len(deferred_rows),
+                "chi2_diag_like": score,
+                "used_rows": used_rows,
+                "deferred_rows": deferred_rows,
+            }
+
+        with st.expander("Dynamic residual auditor — diagnostic-only", expanded=False):
+            st.caption("DTI_MORESCO2016_LOCAL_DIAG_CHI2_LOCAL_ONLY_PATCH_V1")
+            st.markdown(
+                "Dataset: Moresco2016 BC03 component rows only. "
+                "Score: Moresco2016 BC03 diagonal chi2-like diagnostic score."
+            )
+            _dti_z_model_v1, _dti_h_model_v1, _dti_grid_source_v1 = _dti_moresco2016_find_app_side_hz_grid_v1(locals())
+            _dti_diag_v1 = _dti_moresco2016_compute_local_diag_chi2_like_v1(_dti_z_model_v1, _dti_h_model_v1)
+            if _dti_diag_v1.get("status") == "active":
+                st.metric("Moresco2016 BC03 diagonal χ²-like diagnostic score", f"{_dti_diag_v1['chi2_diag_like']:.3f}")
+                st.caption(f"N_used={_dti_diag_v1['N_used']} / N_deferred={_dti_diag_v1['N_deferred']} / grid={_dti_grid_source_v1}")
+                st.dataframe(_dti_diag_v1["used_rows"], use_container_width=True, hide_index=True)
+            else:
+                st.info(
+                    "Local residual auditor inactive: app-side H(z) model grid was not found in this UI scope. "
+                    "This is expected until a later gate wires an explicit local H(z) grid source."
+                )
+                st.caption(f"status={_dti_diag_v1.get('status')}; reason={_dti_diag_v1.get('reason')}; grid={_dti_grid_source_v1}")
+            st.caption(
+                "Boundary: not a likelihood evaluation; not a posterior comparison; not a fit; "
+                "not an independent-count claim; not cosmological validation; "
+                "backend-disconnected; CLASS/AxiCLASS not run; MCMC not run."
+            )
+        # DTI_MORESCO2016_LOCAL_DIAG_CHI2_LOCAL_ONLY_PATCH_V1_END
         from pathlib import Path as _DtiPath
 
         png_asset_path = _DtiPath(__file__).resolve().parent / "assets/moresco2016/moresco2016_bc03_component_rows_static_visual_v1.png"
