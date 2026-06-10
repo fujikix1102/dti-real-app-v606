@@ -5748,8 +5748,35 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
             return None, "interpolation_interval_not_found"
 
         def _dti_moresco2016_find_app_side_hz_grid_v1(local_scope):
-            # Conservative local-only discovery. No backend, no CLASS/AxiCLASS, no network.
-            candidates = [
+            # DTI_MORESCO2016_LOCAL_DERIVED_EA_TO_HZ_BRIDGE_EXECUTE_V1_HELPER
+            def _dti_as_float_array_v1(value):
+                try:
+                    arr = np.asarray(value, dtype=float).reshape(-1)
+                except Exception:
+                    return None
+                if arr.size < 2:
+                    return None
+                if not np.all(np.isfinite(arr)):
+                    return None
+                return arr
+
+            def _dti_normalize_grid_v1(z_values, h_values):
+                z_arr = _dti_as_float_array_v1(z_values)
+                h_arr = _dti_as_float_array_v1(h_values)
+                if z_arr is None or h_arr is None:
+                    return None, None
+                if z_arr.shape != h_arr.shape:
+                    return None, None
+                if np.any(h_arr <= 0):
+                    return None, None
+                order = np.argsort(z_arr)
+                z_arr = z_arr[order]
+                h_arr = h_arr[order]
+                if np.any(np.diff(z_arr) <= 0):
+                    return None, None
+                return z_arr, h_arr
+
+            candidate_pairs = [
                 ("z_model_grid", "h_model_grid"),
                 ("z_model_grid", "H_model_grid"),
                 ("z_grid", "H_grid"),
@@ -5758,12 +5785,30 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
                 ("z_bg", "H_bg"),
                 ("z_arr", "H_arr"),
             ]
-            for z_name, h_name in candidates:
+
+            for z_name, h_name in candidate_pairs:
                 if z_name in local_scope and h_name in local_scope:
-                    ok, reason = _dti_moresco2016_validate_model_grid_v1(local_scope.get(z_name), local_scope.get(h_name))
-                    if ok:
-                        return local_scope.get(z_name), local_scope.get(h_name), f"local_scope:{z_name},{h_name}"
-            return None, None, "missing_model_grid"
+                    z_arr, h_arr = _dti_normalize_grid_v1(local_scope.get(z_name), local_scope.get(h_name))
+                    if z_arr is not None and h_arr is not None:
+                        return z_arr, h_arr, f"{z_name}/{h_name}"
+
+            # Derived diagnostic-only bridge. This uses already-computed local background quantities only.
+            # It is not a backend call, CLASS/AxiCLASS run, likelihood, posterior, fit, or validation.
+            if all(k in local_scope for k in ("z_bg", "e_a", "H0")):
+                try:
+                    H0_value = float(local_scope.get("H0"))
+                except Exception:
+                    H0_value = float("nan")
+                if np.isfinite(H0_value) and H0_value > 0:
+                    z_arr = _dti_as_float_array_v1(local_scope.get("z_bg"))
+                    e_arr = _dti_as_float_array_v1(local_scope.get("e_a"))
+                    if z_arr is not None and e_arr is not None and z_arr.shape == e_arr.shape and np.all(e_arr > 0):
+                        derived_diagnostic_Hz = H0_value * e_arr
+                        z_arr, h_arr = _dti_normalize_grid_v1(z_arr, derived_diagnostic_Hz)
+                        if z_arr is not None and h_arr is not None:
+                            return z_arr, h_arr, "derived_local_Ea_to_Hz_bridge"
+
+            return None, None, "not_found"
 
         def _dti_moresco2016_compute_local_diag_chi2_like_v1(z_model, h_model):
             rows = (
@@ -5814,6 +5859,9 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
                 "Score: Moresco2016 BC03 diagonal chi2-like diagnostic score."
             )
             _dti_z_model_v1, _dti_h_model_v1, _dti_grid_source_v1 = _dti_moresco2016_find_app_side_hz_grid_v1(locals())
+            # DTI_MORESCO2016_LOCAL_DERIVED_EA_TO_HZ_BRIDGE_EXECUTE_V1_UI_WORDING
+            if _dti_grid_source_v1 == "derived_local_Ea_to_Hz_bridge":
+                st.caption("This local residual auditor uses a diagnostic-only H(z) bridge derived from already-computed local background quantities in this UI state. It is not a likelihood evaluation, posterior comparison, fit result, or cosmological validation.")
             _dti_diag_v1 = _dti_moresco2016_compute_local_diag_chi2_like_v1(_dti_z_model_v1, _dti_h_model_v1)
             if _dti_diag_v1.get("status") == "active":
                 st.metric("Moresco2016 BC03 diagonal χ²-like diagnostic score", f"{_dti_diag_v1['chi2_diag_like']:.3f}")
