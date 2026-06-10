@@ -5820,13 +5820,11 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
   <text x="380" y="392" text-anchor="middle" fill="#8b949e" font-size="11" font-family="Arial, sans-serif">Static visual-only SVG; not a likelihood evaluation, not a posterior comparison, not a fit.</text>
 </svg>
 """
-            import base64
+            st.caption("DTI_MORESCO2016_STATIC_PNG_ASSET_CHART_V1")
+            from pathlib import Path as _DtiPath
 
-            svg_data_uri = (
-                "data:image/svg+xml;base64,"
-                + base64.b64encode(static_svg.encode("utf-8")).decode("ascii")
-            )
-            st.image(svg_data_uri, use_container_width=True)
+            png_asset_path = _DtiPath(__file__).resolve().parent / "assets/moresco2016/moresco2016_bc03_component_rows_static_visual_v1.png"
+            st.image(str(png_asset_path), use_container_width=True)
         except Exception as exc:
             st.caption("DTI_MORESCO2016_PLOTLY_MARKER_EXCEPTION")
             st.info(f"Plotly chart rendering skipped; table remains available. Reason: {exc}")
