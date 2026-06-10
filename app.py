@@ -5634,6 +5634,106 @@ _DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B = True
 
 
 # --- DTI_BGGEOM_RAW_RENDERER_EARLY_DEFINE_V6G ---
+# --- DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: begin ---
+_DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1 = (
+    {
+        "row_id": "M2016_BC03_ROW_001",
+        "source_label": "Moresco2016_BOSS_DR9_CC",
+        "model_basis": "BC03",
+        "z": 0.3802,
+        "H_km_s_Mpc": 83.0,
+        "sigma_km_s_Mpc": 13.5,
+        "uncertainty_semantics": "sigma_tot_BC03",
+    },
+    {
+        "row_id": "M2016_BC03_ROW_002",
+        "source_label": "Moresco2016_BOSS_DR9_CC",
+        "model_basis": "BC03",
+        "z": 0.4004,
+        "H_km_s_Mpc": 77.0,
+        "sigma_km_s_Mpc": 10.2,
+        "uncertainty_semantics": "sigma_tot_BC03",
+    },
+    {
+        "row_id": "M2016_BC03_ROW_003",
+        "source_label": "Moresco2016_BOSS_DR9_CC",
+        "model_basis": "BC03",
+        "z": 0.4247,
+        "H_km_s_Mpc": 87.1,
+        "sigma_km_s_Mpc": 11.2,
+        "uncertainty_semantics": "sigma_tot_BC03",
+    },
+    {
+        "row_id": "M2016_BC03_ROW_004",
+        "source_label": "Moresco2016_BOSS_DR9_CC",
+        "model_basis": "BC03",
+        "z": 0.4497,
+        "H_km_s_Mpc": 92.8,
+        "sigma_km_s_Mpc": 12.9,
+        "uncertainty_semantics": "sigma_tot_BC03",
+    },
+    {
+        "row_id": "M2016_BC03_ROW_005",
+        "source_label": "Moresco2016_BOSS_DR9_CC",
+        "model_basis": "BC03",
+        "z": 0.4783,
+        "H_km_s_Mpc": 80.9,
+        "sigma_km_s_Mpc": 9.0,
+        "uncertainty_semantics": "sigma_tot_BC03",
+    },
+)
+
+
+def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
+    """Render a visual-only Moresco2016 BC03 cosmic-chronometer overlay panel."""
+    rows = list(_DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1)
+
+    with st.expander(
+        "Cosmic chronometer overlay — Moresco2016 BC03 component rows, visual-only",
+        expanded=False,
+    ):
+        st.warning(
+            "Audit-only visual overlay candidate. These are five BC03 component-row "
+            "H(z) measurements from the direct Moresco2016 BOSS DR9 cosmic-chronometer "
+            "source record. The table uses sigma_tot_BC03. Combined points, M11 "
+            "alternatives, and LeafMelia duplicate/compiled rows are excluded. This panel "
+            "is not a likelihood evaluation, not a posterior comparison, not a fit, not an "
+            "independent-count claim, and not a cosmological validation."
+        )
+
+        st.caption(
+            "Source label: Moresco2016_BOSS_DR9_CC | model basis: BC03 | "
+            "uncertainty: sigma_tot_BC03 | visual diagnostic only"
+        )
+
+        st.dataframe(rows, use_container_width=True)
+
+        try:
+            import matplotlib.pyplot as plt
+
+            z_values = [row["z"] for row in rows]
+            h_values = [row["H_km_s_Mpc"] for row in rows]
+            sigma_values = [row["sigma_km_s_Mpc"] for row in rows]
+
+            fig, ax = plt.subplots(figsize=(6.5, 3.8))
+            ax.errorbar(z_values, h_values, yerr=sigma_values, fmt="o", capsize=3)
+            ax.set_xlabel("z")
+            ax.set_ylabel("H(z) [km s$^{-1}$ Mpc$^{-1}$]")
+            ax.set_title("Moresco2016 BC03 component rows")
+            ax.grid(True, alpha=0.3)
+            st.pyplot(fig)
+            plt.close(fig)
+        except Exception as exc:
+            st.info(f"Chart rendering skipped; table remains available. Reason: {exc}")
+
+        st.caption(
+            "Excluded from this primary visual table: BC03 combined point, M11 combined "
+            "point, M11 component rows, and LeafMelia duplicated/compiled rows."
+        )
+
+
+# --- DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: end ---
+
 # Early safe raw renderer for Background Geometry.
 # Reason: Streamlit may execute the Background Geometry raw audit call before
 # the later V6E/V6F renderer block is reached. Keep this definition above the
@@ -6252,6 +6352,8 @@ def _dti_render_background_geometry_jump_toy_v1b(H0, omega_m, omega_vac, z):
 # Streamlit Cloud can fail when st.json receives nested numeric objects that
 # are internally routed through PyArrow. Keep raw audit visibility but render
 # through sanitized json.dumps + st.code.
+    _dti_render_moresco2016_bc03_cc_visual_overlay_v1()
+
 _DTI_BGGEOM_SAFE_RAW_JSON_RENDERER_V6E = True
 
 def _dti_bggeom_json_safe_v6e(obj):
