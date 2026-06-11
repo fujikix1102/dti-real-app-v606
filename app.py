@@ -12577,3 +12577,49 @@ except Exception as _dti_next_cc_hz_panel_exc_v1:
     st.warning(f"Additional CC/H(z) diagnostic panel unavailable: {type(_dti_next_cc_hz_panel_exc_v1).__name__}")
 # --- DTI_NEXT_CC_HZ_DIAGNOSTIC_PANEL_V1_END ---
 
+
+# DTI_PROVENANCE_LEDGER_UI_V1_BEGIN
+# Read-only provenance/freeze ledger panel.
+try:
+    with st.expander("Provenance / freeze ledger — source-locked, diagnostic-only", expanded=False):
+        st.caption(
+            "Read-only provenance ledger. This panel is diagnostic/provenance-only; "
+            "it is not a likelihood evaluation, not a posterior comparison, not a fit, "
+            "not validation, and not manuscript-level claim promotion."
+        )
+
+        st.markdown("**Current public source identity**")
+        st.code(
+            "commit = 99f94cec167aa2fc163b1bf981cc63449dfe0e31\n"
+            "origin/main = 99f94cec167aa2fc163b1bf981cc63449dfe0e31\n"
+            "app.py SHA256 = 1a30583d431e3c7714e0c303789994f46ad48363cafa8f3e52d9c095ad01d585\n"
+            "app.py lines = 12579",
+            language="text",
+        )
+
+        st.markdown("**Closed diagnostic lane**")
+        st.code(
+            "closed_lane = CC_HZ_ADDITIONAL_DIAGNOSTIC_LANE\n"
+            "closed_lane_status = PUBLIC_VISUAL_PASS_FREEZE_V1_PASS\n"
+            "safe_stop_point = YES\n"
+            "freeze_zip_sha256 = 07a7156714281e80d018af07103677c936b12339b464295282af6d0d688302c1",
+            language="text",
+        )
+
+        st.markdown("**Boundary**")
+        st.write(
+            "This public app remains a diagnostic and provenance viewer only. "
+            "No live likelihood evaluation, posterior comparison, fit, validation, "
+            "CLASS/AxiCLASS runtime result, MCMC result, Planck validation, DESI-fit validation, "
+            "or manuscript-level claim promotion is performed here."
+        )
+
+        st.markdown("**No-reopen rule**")
+        st.write(
+            "Moresco2016 and the current CC/H(z) lane are closed unless a new, separate "
+            "input-definition lock gate is created. Closed lanes are not reused as new "
+            "independent evidence."
+        )
+except Exception as _dti_provenance_ledger_ui_v1_err:
+    st.caption(f"Provenance ledger panel unavailable: {_dti_provenance_ledger_ui_v1_err}")
+# DTI_PROVENANCE_LEDGER_UI_V1_END
