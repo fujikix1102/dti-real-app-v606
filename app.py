@@ -5684,7 +5684,7 @@ _DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1 = (
 )
 
 
-def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
+def _dti_render_moresco2016_bc03_cc_visual_overlay_v1(_dti_moresco2016_caller_scope_v1=None):
     """Render a visual-only Moresco2016 BC03 cosmic-chronometer overlay panel."""
     rows = list(_DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1)
 
@@ -5858,10 +5858,328 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1():
                 "Dataset: Moresco2016 BC03 component rows only. "
                 "Score: Moresco2016 BC03 diagonal chi2-like diagnostic score."
             )
-            _dti_z_model_v1, _dti_h_model_v1, _dti_grid_source_v1 = _dti_moresco2016_find_app_side_hz_grid_v1(locals())
+            # DTI_MORESCO2016_LOCAL_HZ_GRID_SOURCE_ACTIVATION_EXECUTE_V1F_OVERLAY_SCOPE
+            _dti_moresco2016_helper_scope_v1 = dict(locals())
+            try:
+                _dti_payload_v1 = st.session_state.get("dti_moresco2016_bg_proxy_grid_v1", None)
+                if isinstance(_dti_payload_v1, dict):
+                    _dti_moresco2016_helper_scope_v1.update({
+                        "z_bg": _dti_payload_v1.get("z_bg"),
+                        "e_a": _dti_payload_v1.get("e_a"),
+                        "H0": _dti_payload_v1.get("H0"),
+                    })
+                    _dti_moresco2016_helper_scope_v1["dti_moresco2016_grid_source_hint_v1"] = "session_state_bg_proxy_Ea_to_Hz_bridge"
+            except Exception:
+                pass
+            # DTI_MORESCO2016_CALLSITE_GUARDED_PARAM_SOURCE_PATCH_EXECUTE_V1B_ANCHOR_TOLERANT
+            try:
+                if "dti_moresco2016_bg_proxy_grid_v1" not in st.session_state:
+                    # DTI_MORESCO2016_CALLER_SCOPE_BRIDGE_PATCH_V1
+                    _dti_moresco2016_globals_v1 = (
+                        _dti_moresco2016_caller_scope_v1
+                        if isinstance(_dti_moresco2016_caller_scope_v1, dict)
+                        else globals()
+                    )
+                    _dti_moresco2016_required_param_keys_v1 = ("h", "ob", "oc", "fe", "zc")
+                    _dti_moresco2016_has_param_source_v1 = all(
+                        _dti_key_v1 in _dti_moresco2016_globals_v1
+                        for _dti_key_v1 in _dti_moresco2016_required_param_keys_v1
+                    )
+                    # DTI_MORESCO2016_TARGET_MODEL_PARAM_BRIDGE_PATCH_V1
+                    if not _dti_moresco2016_has_param_source_v1:
+                        _dti_moresco2016_target_model_v1 = _dti_moresco2016_globals_v1.get("target_model", None)
+                        if isinstance(_dti_moresco2016_target_model_v1, dict):
+                            try:
+                                _dti_moresco2016_tm_h_v1 = _dti_moresco2016_target_model_v1.get(
+                                    "h",
+                                    _dti_moresco2016_target_model_v1.get("H0", np.nan) / 100.0,
+                                )
+                                _dti_moresco2016_tm_ob_v1 = _dti_moresco2016_target_model_v1.get("omega_b", np.nan)
+                                _dti_moresco2016_tm_oc_v1 = _dti_moresco2016_target_model_v1.get("omega_cdm", np.nan)
+                                _dti_moresco2016_tm_fe_v1 = _dti_moresco2016_target_model_v1.get("f_EDE", 0.0)
+                                _dti_moresco2016_tm_zc_v1 = _dti_moresco2016_target_model_v1.get("z_c", 0.0)
+
+                                _dti_moresco2016_tm_values_v1 = [
+                                    float(_dti_moresco2016_tm_h_v1),
+                                    float(_dti_moresco2016_tm_ob_v1),
+                                    float(_dti_moresco2016_tm_oc_v1),
+                                    float(_dti_moresco2016_tm_fe_v1),
+                                    float(_dti_moresco2016_tm_zc_v1),
+                                ]
+                                if np.isfinite(_dti_moresco2016_tm_values_v1[0]) and np.isfinite(_dti_moresco2016_tm_values_v1[1]) and np.isfinite(_dti_moresco2016_tm_values_v1[2]):
+                                    _dti_moresco2016_globals_v1 = dict(_dti_moresco2016_globals_v1)
+                                    _dti_moresco2016_globals_v1.update({
+                                        "h": _dti_moresco2016_tm_values_v1[0],
+                                        "ob": _dti_moresco2016_tm_values_v1[1],
+                                        "oc": _dti_moresco2016_tm_values_v1[2],
+                                        "fe": _dti_moresco2016_tm_values_v1[3],
+                                        "zc": _dti_moresco2016_tm_values_v1[4],
+                                    })
+                                    _dti_moresco2016_has_param_source_v1 = True
+                                    st.session_state["dti_moresco2016_bg_proxy_grid_v1_guarded_call_status"] = "param_source_from_target_model_v1"
+                                    st.session_state["dti_moresco2016_bg_proxy_param_source_v1"] = {
+                                        "h": _dti_moresco2016_tm_values_v1[0],
+                                        "ob": _dti_moresco2016_tm_values_v1[1],
+                                        "oc": _dti_moresco2016_tm_values_v1[2],
+                                        "fe": _dti_moresco2016_tm_values_v1[3],
+                                        "zc": _dti_moresco2016_tm_values_v1[4],
+                                        "source": "target_model_from_current_ui",
+                                        "boundary": "diagnostic_only_not_likelihood_not_posterior_not_fit_not_validation",
+                                    }
+                            except Exception as _dti_moresco2016_tm_exc_v1:
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1_guarded_call_status"] = (
+                                    "target_model_param_source_failed:" + type(_dti_moresco2016_tm_exc_v1).__name__
+                                )
+                    if _dti_moresco2016_has_param_source_v1:
+                        _dti_moresco2016_guarded_proxy_v1 = compute_background_proxy(
+                            float(_dti_moresco2016_globals_v1["h"]),
+                            float(_dti_moresco2016_globals_v1["ob"]),
+                            float(_dti_moresco2016_globals_v1["oc"]),
+                            float(_dti_moresco2016_globals_v1["fe"]),
+                            float(_dti_moresco2016_globals_v1["zc"]),
+                        )
+                        st.session_state["dti_moresco2016_bg_proxy_grid_v1_guarded_call_count"] = int(
+                            st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_guarded_call_count", 0)
+                        ) + 1
+                        st.session_state["dti_moresco2016_bg_proxy_grid_v1_guarded_call_status"] = "attempted_from_moresco_overlay_v1b"
+                        _dti_moresco2016_payload_after_guard_v1 = st.session_state.get("dti_moresco2016_bg_proxy_grid_v1", None)
+                        if isinstance(_dti_moresco2016_payload_after_guard_v1, dict):
+                            _dti_moresco2016_helper_scope_v1.update({
+                                "z_bg": _dti_moresco2016_payload_after_guard_v1.get("z_bg"),
+                                "e_a": _dti_moresco2016_payload_after_guard_v1.get("e_a"),
+                                "H0": _dti_moresco2016_payload_after_guard_v1.get("H0"),
+                                "H_model": _dti_moresco2016_payload_after_guard_v1.get("H_model"),
+                                "dti_moresco2016_grid_source_hint_v1": "session_state_bg_proxy_Ea_to_Hz_bridge",
+                            })
+                    else:
+                        st.session_state["dti_moresco2016_bg_proxy_grid_v1_guarded_call_status"] = "missing_global_param_source_v1b"
+            except Exception as _dti_moresco2016_guarded_exc_v1:
+                st.session_state["dti_moresco2016_bg_proxy_grid_v1_guarded_call_status"] = (
+                    "guarded_call_failed_v1b:" + type(_dti_moresco2016_guarded_exc_v1).__name__
+                )
+            # DTI_MORESCO2016_EXPLICIT_HZ_GRID_EA_COMPAT_PATCH_V1
+            # Compatibility adapter: the explicit diagnostic H(z) grid already has
+            # z_bg, H0, and H_model. The existing helper path expects e_a, so derive
+            # e_a = H_model / H0 locally. Diagnostic-only; not likelihood/posterior/fit/validation.
+            try:
+                _dti_moresco2016_payload_ea_v1 = st.session_state.get("dti_moresco2016_bg_proxy_grid_v1", None)
+                if isinstance(_dti_moresco2016_payload_ea_v1, dict):
+                    _dti_moresco2016_z_for_ea_v1 = _dti_moresco2016_payload_ea_v1.get("z_bg", None)
+                    _dti_moresco2016_h_for_ea_v1 = _dti_moresco2016_payload_ea_v1.get("H_model", None)
+                    _dti_moresco2016_h0_for_ea_v1 = _dti_moresco2016_payload_ea_v1.get("H0", None)
+                    if (
+                        "e_a" not in _dti_moresco2016_payload_ea_v1
+                        and _dti_moresco2016_z_for_ea_v1 is not None
+                        and _dti_moresco2016_h_for_ea_v1 is not None
+                        and _dti_moresco2016_h0_for_ea_v1 is not None
+                    ):
+                        _dti_moresco2016_h0_float_v1 = float(_dti_moresco2016_h0_for_ea_v1)
+                        if _dti_moresco2016_h0_float_v1 > 0:
+                            _dti_moresco2016_h_arr_for_ea_v1 = np.asarray(_dti_moresco2016_h_for_ea_v1, dtype=float)
+                            _dti_moresco2016_ea_arr_v1 = _dti_moresco2016_h_arr_for_ea_v1 / _dti_moresco2016_h0_float_v1
+                            _dti_moresco2016_payload_ea_v1["e_a"] = _dti_moresco2016_ea_arr_v1.tolist()
+                            _dti_moresco2016_payload_ea_v1["ea_compat_source"] = "H_model_over_H0"
+                            _dti_moresco2016_payload_ea_v1["ea_compat_boundary"] = "diagnostic_only_not_likelihood_not_posterior_not_fit_not_validation"
+                            st.session_state["dti_moresco2016_bg_proxy_grid_v1"] = _dti_moresco2016_payload_ea_v1
+                            st.session_state["dti_moresco2016_bg_proxy_grid_v1_ea_compat_status"] = "created_from_H_model_over_H0_v1"
+                            st.session_state["dti_moresco2016_bg_proxy_grid_v1_ea_compat_count"] = int(
+                                st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_ea_compat_count", 0)
+                            ) + 1
+                    if "e_a" in _dti_moresco2016_payload_ea_v1:
+                        _dti_moresco2016_helper_scope_v1.update({
+                            "z_bg": _dti_moresco2016_payload_ea_v1.get("z_bg"),
+                            "e_a": _dti_moresco2016_payload_ea_v1.get("e_a"),
+                            "H0": _dti_moresco2016_payload_ea_v1.get("H0"),
+                            "H_model": _dti_moresco2016_payload_ea_v1.get("H_model"),
+                            "dti_moresco2016_grid_source_hint_v1": "explicit_target_model_background_Hz_grid_diagnostic_only",
+                        })
+                else:
+                    st.session_state["dti_moresco2016_bg_proxy_grid_v1_ea_compat_status"] = "payload_missing_or_not_dict"
+            except Exception as _dti_moresco2016_ea_compat_exc_v1:
+                st.session_state["dti_moresco2016_bg_proxy_grid_v1_ea_compat_status"] = (
+                    "ea_compat_failed:" + type(_dti_moresco2016_ea_compat_exc_v1).__name__
+                )
+            _dti_z_model_v1, _dti_h_model_v1, _dti_grid_source_v1 = _dti_moresco2016_find_app_side_hz_grid_v1(_dti_moresco2016_helper_scope_v1)
+            if (
+                _dti_grid_source_v1 == "derived_local_Ea_to_Hz_bridge"
+                and _dti_moresco2016_helper_scope_v1.get("dti_moresco2016_grid_source_hint_v1") == "session_state_bg_proxy_Ea_to_Hz_bridge"
+            ):
+                _dti_grid_source_v1 = "session_state_bg_proxy_Ea_to_Hz_bridge"
+
+            # DTI_MORESCO2016_ACTIVATION_RUNTIME_DIAGNOSTIC_EXECUTE_V1_UI
+            try:
+                # DTI_MORESCO2016_PARAM_PAYLOAD_TO_EXPLICIT_HZ_GRID_PATCH_V1
+                try:
+                    if "dti_moresco2016_bg_proxy_grid_v1" not in st.session_state:
+                        _dti_param_payload_v1 = st.session_state.get("dti_moresco2016_bg_proxy_param_source_v1", None)
+                        if isinstance(_dti_param_payload_v1, dict):
+                            _dti_h_v1 = float(_dti_param_payload_v1.get("h"))
+                            _dti_ob_v1 = float(_dti_param_payload_v1.get("ob"))
+                            _dti_oc_v1 = float(_dti_param_payload_v1.get("oc"))
+                            _dti_fe_v1 = float(_dti_param_payload_v1.get("fe", 0.0))
+                            _dti_zc_v1 = float(_dti_param_payload_v1.get("zc", 0.0))
+
+                            _dti_z_grid_v1 = np.linspace(0.0, 2.5, 320)
+                            _dti_H0_v1 = 100.0 * _dti_h_v1
+                            _dti_omega_m_eff_v1 = max(_dti_ob_v1 + _dti_oc_v1, 1.0e-8)
+                            _dti_omega_de_eff_v1 = max(1.0 - _dti_omega_m_eff_v1, 1.0e-8)
+
+                            # Diagnostic-only background H(z) grid for visual residual audit.
+                            # This is not a CLASS/AxiCLASS run, not a likelihood, not a posterior,
+                            # not a fit, and not cosmological validation.
+                            _dti_E_v1 = np.sqrt(
+                                _dti_omega_m_eff_v1 * np.power(1.0 + _dti_z_grid_v1, 3.0)
+                                + _dti_omega_de_eff_v1
+                            )
+                            _dti_H_model_v1 = _dti_H0_v1 * _dti_E_v1
+
+                            if (
+                                np.all(np.isfinite(_dti_z_grid_v1))
+                                and np.all(np.isfinite(_dti_H_model_v1))
+                                and np.all(_dti_H_model_v1 > 0)
+                            ):
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1"] = {
+                                    "z_bg": _dti_z_grid_v1.tolist(),
+                                    "H_model": _dti_H_model_v1.tolist(),
+                                    "H0": float(_dti_H0_v1),
+                                    "h": float(_dti_h_v1),
+                                    "ob": float(_dti_ob_v1),
+                                    "oc": float(_dti_oc_v1),
+                                    "fe": float(_dti_fe_v1),
+                                    "zc": float(_dti_zc_v1),
+                                    "source": "explicit_target_model_background_Hz_grid_diagnostic_only",
+                                    "boundary": "diagnostic_only_not_likelihood_not_posterior_not_fit_not_validation",
+                                }
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1_explicit_grid_status"] = "created_from_param_payload_v1"
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1_explicit_grid_count"] = int(
+                                    st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_explicit_grid_count", 0)
+                                ) + 1
+
+                                _dti_moresco2016_payload_after_explicit_grid_v1 = st.session_state.get("dti_moresco2016_bg_proxy_grid_v1", None)
+                                if isinstance(_dti_moresco2016_payload_after_explicit_grid_v1, dict):
+                                    _dti_moresco2016_helper_scope_v1.update({
+                                        "z_bg": _dti_moresco2016_payload_after_explicit_grid_v1.get("z_bg"),
+                                        "H_model": _dti_moresco2016_payload_after_explicit_grid_v1.get("H_model"),
+                                        "H0": _dti_moresco2016_payload_after_explicit_grid_v1.get("H0"),
+                                        "dti_moresco2016_grid_source_hint_v1": "explicit_target_model_background_Hz_grid_diagnostic_only",
+                                    })
+                            else:
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1_explicit_grid_status"] = "nonfinite_or_nonpositive_H_model"
+                        else:
+                            st.session_state["dti_moresco2016_bg_proxy_grid_v1_explicit_grid_status"] = "missing_param_payload"
+                except Exception as _dti_explicit_grid_exc_v1:
+                    st.session_state["dti_moresco2016_bg_proxy_grid_v1_explicit_grid_status"] = (
+                        "explicit_grid_failed:" + type(_dti_explicit_grid_exc_v1).__name__
+                    )
+                # DTI_MORESCO2016_POST_EXPLICIT_GRID_EA_RERUN_HELPER_PATCH_V1B_TOLERANT
+                # The explicit diagnostic H(z) grid is created above this point.
+                # Derive e_a from H_model/H0 here, then rerun the existing helper before JSON capture.
+                # Diagnostic-only; not likelihood/posterior/fit/validation.
+                try:
+                    _dti_payload_post_grid_v1b = st.session_state.get("dti_moresco2016_bg_proxy_grid_v1", None)
+                    if isinstance(_dti_payload_post_grid_v1b, dict):
+                        _dti_post_h_model_v1b = _dti_payload_post_grid_v1b.get("H_model", None)
+                        _dti_post_h0_v1b = _dti_payload_post_grid_v1b.get("H0", None)
+                        if (
+                            "e_a" not in _dti_payload_post_grid_v1b
+                            and _dti_post_h_model_v1b is not None
+                            and _dti_post_h0_v1b is not None
+                        ):
+                            _dti_post_h0_float_v1b = float(_dti_post_h0_v1b)
+                            if _dti_post_h0_float_v1b > 0:
+                                _dti_post_h_arr_v1b = np.asarray(_dti_post_h_model_v1b, dtype=float)
+                                _dti_post_ea_arr_v1b = _dti_post_h_arr_v1b / _dti_post_h0_float_v1b
+                                _dti_payload_post_grid_v1b["e_a"] = _dti_post_ea_arr_v1b.tolist()
+                                _dti_payload_post_grid_v1b["ea_compat_source"] = "post_explicit_grid_H_model_over_H0"
+                                _dti_payload_post_grid_v1b["ea_compat_boundary"] = "diagnostic_only_not_likelihood_not_posterior_not_fit_not_validation"
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1"] = _dti_payload_post_grid_v1b
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1_post_explicit_ea_status"] = "created_from_H_model_over_H0_after_explicit_grid_v1b"
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1_post_explicit_ea_count"] = int(
+                                    st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_post_explicit_ea_count", 0)
+                                ) + 1
+                
+                        if "e_a" in _dti_payload_post_grid_v1b:
+                            _dti_moresco2016_helper_scope_v1.update({
+                                "z_bg": _dti_payload_post_grid_v1b.get("z_bg"),
+                                "e_a": _dti_payload_post_grid_v1b.get("e_a"),
+                                "H0": _dti_payload_post_grid_v1b.get("H0"),
+                                "H_model": _dti_payload_post_grid_v1b.get("H_model"),
+                                "dti_moresco2016_grid_source_hint_v1": "explicit_target_model_background_Hz_grid_diagnostic_only",
+                            })
+                            _dti_z_model_v1, _dti_h_model_v1, _dti_grid_source_v1 = _dti_moresco2016_find_app_side_hz_grid_v1(
+                                _dti_moresco2016_helper_scope_v1
+                            )
+                            if _dti_grid_source_v1 == "derived_local_Ea_to_Hz_bridge":
+                                _dti_grid_source_v1 = "explicit_target_model_background_Hz_grid_diagnostic_only"
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1_helper_rerun_status"] = "model_grid_found_after_post_explicit_ea_v1b"
+                            else:
+                                st.session_state["dti_moresco2016_bg_proxy_grid_v1_helper_rerun_status"] = str(_dti_grid_source_v1)
+                    else:
+                        st.session_state["dti_moresco2016_bg_proxy_grid_v1_post_explicit_ea_status"] = "payload_missing_or_not_dict"
+                except Exception as _dti_post_explicit_ea_exc_v1b:
+                    st.session_state["dti_moresco2016_bg_proxy_grid_v1_post_explicit_ea_status"] = (
+                        "post_explicit_ea_failed:" + type(_dti_post_explicit_ea_exc_v1b).__name__
+                    )
+                _dti_payload_diag_v1 = st.session_state.get("dti_moresco2016_bg_proxy_grid_v1", None)
+                _dti_payload_is_dict_v1 = isinstance(_dti_payload_diag_v1, dict)
+                _dti_payload_keys_v1 = sorted(list(_dti_payload_diag_v1.keys())) if _dti_payload_is_dict_v1 else []
+
+                def _dti_runtime_diag_array_summary_v1(_dti_value_v1):
+                    try:
+                        _dti_arr_v1 = np.asarray(_dti_value_v1, dtype=float)
+                        return {
+                            "present": _dti_value_v1 is not None,
+                            "len": int(_dti_arr_v1.size),
+                            "finite": int(np.isfinite(_dti_arr_v1).sum()),
+                            "positive": int((_dti_arr_v1 > 0).sum()),
+                        }
+                    except Exception as _dti_exc_v1:
+                        return {
+                            "present": _dti_value_v1 is not None,
+                            "len": 0,
+                            "finite": 0,
+                            "positive": 0,
+                            "error": str(type(_dti_exc_v1).__name__),
+                        }
+
+                _dti_runtime_diag_v1 = {
+                    "session_key_exists": "dti_moresco2016_bg_proxy_grid_v1" in st.session_state,
+                    "payload_type": type(_dti_payload_diag_v1).__name__,
+                    "payload_keys": _dti_payload_keys_v1,
+                    "store_count": st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_store_count", None),
+                    # DTI_MORESCO2016_ADD_GUARDED_STATUS_TO_RUNTIME_JSON_V1
+                    "guarded_call_status": st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_guarded_call_status", None),
+                    "guarded_call_count": st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_guarded_call_count", None),
+                    "guarded_param_source": "caller_scope_or_globals_h_ob_oc_fe_zc",
+                    "explicit_grid_status": st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_explicit_grid_status", None),
+                    "explicit_grid_count": st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_explicit_grid_count", None),
+                    "post_explicit_ea_status": st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_post_explicit_ea_status", None),
+                    "post_explicit_ea_count": st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_post_explicit_ea_count", None),
+                    "helper_rerun_status": st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_helper_rerun_status", None),
+                    "target_model_param_payload_exists": "dti_moresco2016_bg_proxy_param_source_v1" in st.session_state,
+                    "target_model_param_payload_keys": sorted(list(st.session_state.get("dti_moresco2016_bg_proxy_param_source_v1", {}).keys())) if isinstance(st.session_state.get("dti_moresco2016_bg_proxy_param_source_v1", None), dict) else [],
+                    "payload_has_z_bg": _dti_payload_is_dict_v1 and ("z_bg" in _dti_payload_diag_v1),
+                    "payload_has_e_a": _dti_payload_is_dict_v1 and ("e_a" in _dti_payload_diag_v1),
+                    "payload_has_H0": _dti_payload_is_dict_v1 and ("H0" in _dti_payload_diag_v1),
+                    "payload_has_H_model": _dti_payload_is_dict_v1 and ("H_model" in _dti_payload_diag_v1),
+                    "z_bg_summary": _dti_runtime_diag_array_summary_v1(_dti_payload_diag_v1.get("z_bg") if _dti_payload_is_dict_v1 else None),
+                    "H_model_summary": _dti_runtime_diag_array_summary_v1(_dti_payload_diag_v1.get("H_model") if _dti_payload_is_dict_v1 else None),
+                    "helper_scope_has_z_bg": "z_bg" in _dti_moresco2016_helper_scope_v1,
+                    "helper_scope_has_e_a": "e_a" in _dti_moresco2016_helper_scope_v1,
+                    "helper_scope_has_H0": "H0" in _dti_moresco2016_helper_scope_v1,
+                    "helper_scope_source_hint": _dti_moresco2016_helper_scope_v1.get("dti_moresco2016_grid_source_hint_v1", None),
+                    "grid_source_after_helper": _dti_grid_source_v1,
+                    "model_grid_found": _dti_z_model_v1 is not None and _dti_h_model_v1 is not None,
+                    "boundary": "diagnostic_only_not_likelihood_not_posterior_not_fit_not_validation",
+                }
+                st.caption("Runtime bridge diagnostic — diagnostic-only")
+                st.json(_dti_runtime_diag_v1)
+            except Exception as _dti_diag_exc_v1:
+                st.caption("Runtime bridge diagnostic — diagnostic-only")
+                st.warning(f"Runtime bridge diagnostic unavailable: {type(_dti_diag_exc_v1).__name__}")
             # DTI_MORESCO2016_LOCAL_DERIVED_EA_TO_HZ_BRIDGE_EXECUTE_V1_UI_WORDING
-            if _dti_grid_source_v1 == "derived_local_Ea_to_Hz_bridge":
-                st.caption("This local residual auditor uses a diagnostic-only H(z) bridge derived from already-computed local background quantities in this UI state. It is not a likelihood evaluation, posterior comparison, fit result, or cosmological validation.")
+            if _dti_grid_source_v1 in ("derived_local_Ea_to_Hz_bridge", "session_state_bg_proxy_Ea_to_Hz_bridge"):
+                st.caption("This local residual auditor uses a diagnostic-only H(z) bridge derived from already-computed local background quantities in this UI state. The bridge source may come from same-scope locals() or the session_state background-proxy bridge. It is not a likelihood evaluation, posterior comparison, fit result, or cosmological validation.")
             _dti_diag_v1 = _dti_moresco2016_compute_local_diag_chi2_like_v1(_dti_z_model_v1, _dti_h_model_v1)
             if _dti_diag_v1.get("status") == "active":
                 st.metric("Moresco2016 BC03 diagonal χ²-like diagnostic score", f"{_dti_diag_v1['chi2_diag_like']:.3f}")
@@ -7780,6 +8098,37 @@ def compute_background_proxy(h, omega_b, omega_cdm, f_ede, z_c):
         raise RuntimeError("RK45 background integration failed")
 
     z_bg = 1.0 / np.exp(sol.t) - 1.0
+    # DTI_MORESCO2016_LOCAL_HZ_GRID_SOURCE_ACTIVATION_EXECUTE_V1F_BG_PAYLOAD
+    try:
+        _dti_moresco2016_z_bg_v1 = np.asarray(z_bg, dtype=float)
+        _dti_moresco2016_e_a_v1 = np.asarray(e_a, dtype=float)
+        _dti_moresco2016_h0_v1 = float(H0)
+        _dti_moresco2016_h_model_v1 = _dti_moresco2016_h0_v1 * _dti_moresco2016_e_a_v1
+        if (
+            _dti_moresco2016_z_bg_v1.shape == _dti_moresco2016_h_model_v1.shape
+            and _dti_moresco2016_z_bg_v1.size >= 2
+            and np.all(np.isfinite(_dti_moresco2016_z_bg_v1))
+            and np.all(np.isfinite(_dti_moresco2016_e_a_v1))
+            and np.all(np.isfinite(_dti_moresco2016_h_model_v1))
+            and np.isfinite(_dti_moresco2016_h0_v1)
+            and _dti_moresco2016_h0_v1 > 0
+            and np.all(_dti_moresco2016_e_a_v1 > 0)
+            and np.all(_dti_moresco2016_h_model_v1 > 0)
+        ):
+            # DTI_MORESCO2016_ACTIVATION_RUNTIME_DIAGNOSTIC_EXECUTE_V1_PAYLOAD_COUNTER
+            st.session_state["dti_moresco2016_bg_proxy_grid_v1_store_count"] = int(
+                st.session_state.get("dti_moresco2016_bg_proxy_grid_v1_store_count", 0)
+            ) + 1
+            st.session_state["dti_moresco2016_bg_proxy_grid_v1"] = {
+                "z_bg": _dti_moresco2016_z_bg_v1,
+                "e_a": _dti_moresco2016_e_a_v1,
+                "H0": _dti_moresco2016_h0_v1,
+                "H_model": _dti_moresco2016_h_model_v1,
+                "source": "session_state_bg_proxy_Ea_to_Hz_bridge",
+                "boundary": "diagnostic_only_not_likelihood_not_posterior_not_fit_not_validation",
+            }
+    except Exception:
+        pass
     eta = sol.y[0]
     r_vals = (3.0 * params["Omega_b"]) / (4.0 * params["Omega_g"]) * np.exp(sol.t)
     c_s = C_LIGHT / np.sqrt(3.0 * (1.0 + r_vals))
@@ -12085,7 +12434,7 @@ _dti_render_likelihood_definition_binder_v1()
 # --- DTI citation/contact block V1 BEGIN ---
 st.divider()
 # --- DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: visible call ---
-_dti_render_moresco2016_bc03_cc_visual_overlay_v1()
+_dti_render_moresco2016_bc03_cc_visual_overlay_v1(locals())
 # --- /DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: visible call ---
 
 with st.expander("About / Citation / Provenance", expanded=False):
