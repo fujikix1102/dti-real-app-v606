@@ -12464,3 +12464,116 @@ This public app is a diagnostic and provenance viewer. It does not perform live 
         """
     )
 # --- DTI citation/contact block V1 END ---
+
+# --- DTI_NEXT_CC_HZ_DIAGNOSTIC_PANEL_V1_BEGIN ---
+# Source-locked additional CC/H(z) diagnostic-only lane.
+# This top-level block is intentionally guarded and does not call backend/API/CLASS/AxiCLASS/MCMC/likelihood.
+try:
+    with st.expander("Additional CC/H(z) diagnostic lane — source-locked, diagnostic-only", expanded=False):
+        st.caption("Diagnostic-only CC/H(z) score. This is not a likelihood evaluation, not a posterior comparison, not a fit, and not cosmological validation.")
+
+        _dti_next_cc_hz_rows_v1 = [
+    {"row_id": 'ZHANG2014_CC_ROW_001', "z": 0.07, "H_obs": 69, "sigma_H": 19.6, "source_label": 'Zhang2014_CC'},
+    {"row_id": 'ZHANG2014_CC_ROW_002', "z": 0.12, "H_obs": 68.6, "sigma_H": 26.2, "source_label": 'Zhang2014_CC'},
+    {"row_id": 'ZHANG2014_CC_ROW_003', "z": 0.2, "H_obs": 72.9, "sigma_H": 29.6, "source_label": 'Zhang2014_CC'},
+    {"row_id": 'ZHANG2014_CC_ROW_004', "z": 0.28, "H_obs": 88.8, "sigma_H": 36.6, "source_label": 'Zhang2014_CC'},
+    {"row_id": 'ZHANG2014_CC_ROW_005', "z": 1.363, "H_obs": 160, "sigma_H": 33.6, "source_label": 'Zhang2014_CC'},
+    {"row_id": 'ZHANG2014_CC_ROW_006', "z": 1.965, "H_obs": 186.5, "sigma_H": 50.4, "source_label": 'Zhang2014_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_001', "z": 0.09, "H_obs": 69, "sigma_H": 12, "source_label": 'Simon2005_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_002', "z": 0.17, "H_obs": 83, "sigma_H": 8, "source_label": 'Simon2005_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_003', "z": 0.27, "H_obs": 77, "sigma_H": 14, "source_label": 'Simon2005_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_004', "z": 0.4, "H_obs": 95, "sigma_H": 17, "source_label": 'Simon2005_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_005', "z": 0.9, "H_obs": 117, "sigma_H": 23, "source_label": 'Simon2005_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_006', "z": 1.3, "H_obs": 168, "sigma_H": 17, "source_label": 'Simon2005_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_007', "z": 1.43, "H_obs": 177, "sigma_H": 18, "source_label": 'Simon2005_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_008', "z": 1.53, "H_obs": 140, "sigma_H": 14, "source_label": 'Simon2005_CC'},
+    {"row_id": 'SIMON2005_CC_ROW_009', "z": 1.75, "H_obs": 202, "sigma_H": 40, "source_label": 'Simon2005_CC'},
+]
+        _dti_next_cc_hz_excluded_summary_v1 = {'Moresco2016_BC03': 5, 'Moresco2016_combined': 1, 'Moresco2016_M11': 1, 'LeafMelia_compiled': 1}
+
+        _dti_next_cc_hz_payload_v1 = None
+        for _dti_next_cc_hz_key_v1 in (
+            "explicit_target_model_background_Hz_grid_diagnostic_only",
+            "dti_explicit_target_model_background_Hz_grid_diagnostic_only",
+            "target_model_background_Hz_grid_diagnostic_only",
+        ):
+            if _dti_next_cc_hz_key_v1 in st.session_state:
+                _dti_next_cc_hz_payload_v1 = st.session_state.get(_dti_next_cc_hz_key_v1)
+                break
+
+        _dti_next_cc_hz_status_v1 = "model_grid_unavailable"
+        _dti_next_cc_hz_score_v1 = None
+        _dti_next_cc_hz_used_v1 = []
+        _dti_next_cc_hz_deferred_v1 = []
+
+        if isinstance(_dti_next_cc_hz_payload_v1, dict):
+            _dti_next_cc_hz_z_grid_v1 = _dti_next_cc_hz_payload_v1.get("z_bg")
+            _dti_next_cc_hz_H_grid_v1 = _dti_next_cc_hz_payload_v1.get("H_model")
+
+            if _dti_next_cc_hz_z_grid_v1 is not None and _dti_next_cc_hz_H_grid_v1 is not None:
+                try:
+                    import numpy as _dti_next_cc_hz_np_v1
+
+                    _dti_next_cc_hz_z_arr_v1 = _dti_next_cc_hz_np_v1.asarray(_dti_next_cc_hz_z_grid_v1, dtype=float)
+                    _dti_next_cc_hz_H_arr_v1 = _dti_next_cc_hz_np_v1.asarray(_dti_next_cc_hz_H_grid_v1, dtype=float)
+
+                    _dti_next_cc_hz_grid_ok_v1 = (
+                        _dti_next_cc_hz_z_arr_v1.ndim == 1
+                        and _dti_next_cc_hz_H_arr_v1.ndim == 1
+                        and len(_dti_next_cc_hz_z_arr_v1) == len(_dti_next_cc_hz_H_arr_v1)
+                        and len(_dti_next_cc_hz_z_arr_v1) >= 2
+                        and bool(_dti_next_cc_hz_np_v1.all(_dti_next_cc_hz_np_v1.isfinite(_dti_next_cc_hz_z_arr_v1)))
+                        and bool(_dti_next_cc_hz_np_v1.all(_dti_next_cc_hz_np_v1.isfinite(_dti_next_cc_hz_H_arr_v1)))
+                    )
+
+                    if _dti_next_cc_hz_grid_ok_v1:
+                        _dti_next_cc_hz_order_v1 = _dti_next_cc_hz_np_v1.argsort(_dti_next_cc_hz_z_arr_v1)
+                        _dti_next_cc_hz_z_arr_v1 = _dti_next_cc_hz_z_arr_v1[_dti_next_cc_hz_order_v1]
+                        _dti_next_cc_hz_H_arr_v1 = _dti_next_cc_hz_H_arr_v1[_dti_next_cc_hz_order_v1]
+
+                        _dti_next_cc_hz_terms_v1 = []
+                        for _dti_next_cc_hz_row_v1 in _dti_next_cc_hz_rows_v1:
+                            _z_v1 = float(_dti_next_cc_hz_row_v1["z"])
+                            _obs_v1 = float(_dti_next_cc_hz_row_v1["H_obs"])
+                            _sig_v1 = float(_dti_next_cc_hz_row_v1["sigma_H"])
+
+                            if _sig_v1 <= 0 or _z_v1 < float(_dti_next_cc_hz_z_arr_v1[0]) or _z_v1 > float(_dti_next_cc_hz_z_arr_v1[-1]):
+                                _dti_next_cc_hz_deferred_v1.append(_dti_next_cc_hz_row_v1["row_id"])
+                                continue
+
+                            _model_v1 = float(_dti_next_cc_hz_np_v1.interp(_z_v1, _dti_next_cc_hz_z_arr_v1, _dti_next_cc_hz_H_arr_v1))
+                            _term_v1 = ((_model_v1 - _obs_v1) / _sig_v1) ** 2
+                            _dti_next_cc_hz_terms_v1.append(_term_v1)
+                            _dti_next_cc_hz_used_v1.append(_dti_next_cc_hz_row_v1["row_id"])
+
+                        if _dti_next_cc_hz_terms_v1:
+                            _dti_next_cc_hz_score_v1 = float(sum(_dti_next_cc_hz_terms_v1))
+                            _dti_next_cc_hz_status_v1 = "computed_from_runtime_Hz_grid_diagnostic_only"
+                        else:
+                            _dti_next_cc_hz_status_v1 = "no_locked_rows_inside_runtime_grid"
+
+                except Exception as _dti_next_cc_hz_exc_v1:
+                    _dti_next_cc_hz_status_v1 = f"guarded_unavailable: {type(_dti_next_cc_hz_exc_v1).__name__}"
+
+        _dti_next_cc_hz_col1_v1, _dti_next_cc_hz_col2_v1, _dti_next_cc_hz_col3_v1 = st.columns(3)
+        _dti_next_cc_hz_col1_v1.metric("N locked included", len(_dti_next_cc_hz_rows_v1))
+        _dti_next_cc_hz_col2_v1.metric("N used", len(_dti_next_cc_hz_used_v1))
+        _dti_next_cc_hz_col3_v1.metric("N excluded/deferred", 8 + len(_dti_next_cc_hz_deferred_v1))
+
+        if _dti_next_cc_hz_score_v1 is None:
+            st.info("Additional CC/H(z) diagnostic score unavailable: runtime H(z) model grid is not available or no locked rows fall inside the grid.")
+        else:
+            st.metric("Additional CC/H(z) chi2-like diagnostic score", f"{_dti_next_cc_hz_score_v1:.6g}")
+
+        st.write("Status:", _dti_next_cc_hz_status_v1)
+        st.write("Included source families: Zhang2014_CC; Simon2005_CC")
+        st.write("Excluded/deferred source families:", _dti_next_cc_hz_excluded_summary_v1)
+
+        with st.expander("Locked included CC/H(z) rows", expanded=False):
+            st.dataframe(_dti_next_cc_hz_rows_v1, use_container_width=True)
+
+        st.caption("Moresco2016 BC03 rows are not reused as new independent evidence. Backend disconnected; CLASS/AxiCLASS not run; MCMC not run.")
+except Exception as _dti_next_cc_hz_panel_exc_v1:
+    st.warning(f"Additional CC/H(z) diagnostic panel unavailable: {type(_dti_next_cc_hz_panel_exc_v1).__name__}")
+# --- DTI_NEXT_CC_HZ_DIAGNOSTIC_PANEL_V1_END ---
+
