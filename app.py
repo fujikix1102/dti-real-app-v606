@@ -12590,10 +12590,10 @@ try:
 
         st.markdown("**Current public source identity**")
         st.code(
-            "commit = 99f94cec167aa2fc163b1bf981cc63449dfe0e31\n"
-            "origin/main = 99f94cec167aa2fc163b1bf981cc63449dfe0e31\n"
-            "app.py SHA256 = 1a30583d431e3c7714e0c303789994f46ad48363cafa8f3e52d9c095ad01d585\n"
-            "app.py lines = 12579",
+            "commit = d6d2697f7a8191c60c689df09edf8eec31aebf83\n"
+            "origin/main = d6d2697f7a8191c60c689df09edf8eec31aebf83\n"
+            "app.py SHA256 = f8c0f6c1475fcf562f4d397243d466bd02400d25c7ed690ad456784a712f16e8\n"
+            "app.py lines = 12625",
             language="text",
         )
 
