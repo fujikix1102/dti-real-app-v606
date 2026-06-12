@@ -12623,3 +12623,109 @@ try:
 except Exception as _dti_provenance_ledger_ui_v1_err:
     st.caption(f"Provenance ledger panel unavailable: {_dti_provenance_ledger_ui_v1_err}")
 # DTI_PROVENANCE_LEDGER_UI_V1_END
+
+
+# DTI_WOC_PAYLOAD_DETAIL_SUMMARY_PUBLIC_V1_BEGIN
+def _dti_render_woc_payload_detail_summary_v1():
+    """Render static WOC payload detail summary metadata.
+
+    Boundary:
+    - diagnostic/provenance-only
+    - static metadata only
+    - no backend/API call
+    - no CLASS/AxiCLASS runtime
+    - no likelihood/posterior/MCMC computation
+    - no raw chain copy
+    - no payload copy
+    - no source mutation
+    - no manuscript update
+    - no new physics claim
+    """
+    with st.expander("WOC payload detail summary export", expanded=False):
+        st.caption(
+            "Static diagnostic/provenance summary only. "
+            "This section does not run backend/API, CLASS/AxiCLASS, likelihood, posterior, or MCMC."
+        )
+
+        st.markdown("#### Payload identity")
+        st.table([
+            {"field": "selected_payload", "value": "vtt_woc_final_result_primary"},
+            {"field": "source_index_row_count", "value": "13"},
+            {"field": "panel_count", "value": "8"},
+            {"field": "raw_chain_copy", "value": "NO"},
+            {"field": "payload_copy", "value": "NO"},
+            {"field": "source_mutation", "value": "NO"},
+            {"field": "public_update_source_note", "value": "static derived summary metadata only"},
+        ])
+
+        st.markdown("#### Boundary")
+        st.table([
+            {"boundary": "backend/API", "status": "NO"},
+            {"boundary": "CLASS/AxiCLASS", "status": "NO"},
+            {"boundary": "likelihood/posterior/MCMC", "status": "NO"},
+            {"boundary": "fit/validation", "status": "NO"},
+            {"boundary": "manuscript_update", "status": "NO"},
+            {"boundary": "new_physics_claim", "status": "NO"},
+            {"boundary": "claim_level", "status": "DIAGNOSTIC_PROVENANCE_ONLY"},
+        ])
+
+        with st.expander("Source IDs", expanded=False):
+            st.markdown(
+                "- source_01: payload identity\n"
+                "- source_02: chain summary table\n"
+                "- source_03: diagnostics\n"
+                "- source_04: MAP / bestfit candidate table\n"
+                "- source_05: parameter identity\n"
+                "- source_06: thin sample preview\n"
+                "- source_07: boundary warning\n"
+                "- source_08: source identity\n"
+                "- source_09: no-copy policy\n"
+                "- source_10: placeholder-only policy\n"
+                "- source_11: local-only diagnostic status\n"
+                "- source_12: provenance-only status\n"
+                "- source_13: hard-boundary status"
+            )
+
+        with st.expander("Panel names", expanded=False):
+            st.markdown(
+                "- Payload identity\n"
+                "- Chain summary table\n"
+                "- Diagnostics\n"
+                "- MAP / bestfit candidate table\n"
+                "- Parameter identity\n"
+                "- Thin sample preview\n"
+                "- Boundary warning\n"
+                "- Source identity"
+            )
+
+        with st.expander("Frozen Markdown summary", expanded=False):
+            st.code(
+                "WOC payload detail summary export\n"
+                "selected_payload = vtt_woc_final_result_primary\n"
+                "source_index_row_count = 13\n"
+                "panel_count = 8\n"
+                "raw_chain_copy = NO\n"
+                "payload_copy = NO\n"
+                "source_mutation = NO\n"
+                "public_update = NO\n"
+                "claim_level = DIAGNOSTIC_PROVENANCE_ONLY\n",
+                language="markdown",
+            )
+
+        with st.expander("Frozen TSV summary", expanded=False):
+            st.code(
+                "field\tvalue\n"
+                "selected_payload\tvtt_woc_final_result_primary\n"
+                "source_index_row_count\t13\n"
+                "panel_count\t8\n"
+                "raw_chain_copy\tNO\n"
+                "payload_copy\tNO\n"
+                "source_mutation\tNO\n"
+                "public_update\tNO\n"
+                "claim_level\tDIAGNOSTIC_PROVENANCE_ONLY\n",
+                language="tsv",
+            )
+
+
+_dti_render_woc_payload_detail_summary_v1()
+# DTI_WOC_PAYLOAD_DETAIL_SUMMARY_PUBLIC_V1_END
