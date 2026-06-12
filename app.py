@@ -5634,6 +5634,150 @@ _DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B = True
 
 
 # --- DTI_BGGEOM_RAW_RENDERER_EARLY_DEFINE_V6G ---
+# DTI_CC_DATA_PROVENANCE_TABLE_V1_BEGIN
+def _dti_render_cc_data_provenance_table_v1():
+    """Render static CC source-row provenance ledger. Diagnostic/provenance only."""
+    _dti_cc_rows_v1 = [
+        {
+            "dataset_id": "CC_MORESCO2016_BC03_001",
+            "paper": "Moresco et al.",
+            "year": "2016",
+            "z": "0.38",
+            "H_z": "81.5",
+            "sigma_H_z": "1.9",
+            "method": "cosmic chronometer differential age / BC03",
+            "source_group": "Moresco2016_BOSS_DR9_CC",
+            "primary_cc_included": "YES",
+            "independent_matrix_included": "NO",
+            "excluded_from_independent_reason": "primary_rows_handled_in_main_CC_overlay",
+            "overlap_group": "CC_PRIMARY_MORESCO2016_BC03",
+            "source_reference": "Moresco2016 Table 1 / BOSS DR9 CC rows",
+            "data_status": "source_locked_in_app_candidate",
+            "notes": "static provenance row for existing public main CC overlay",
+        },
+        {
+            "dataset_id": "CC_MORESCO2016_BC03_002",
+            "paper": "Moresco et al.",
+            "year": "2016",
+            "z": "0.40",
+            "H_z": "82.8",
+            "sigma_H_z": "2.1",
+            "method": "cosmic chronometer differential age / BC03",
+            "source_group": "Moresco2016_BOSS_DR9_CC",
+            "primary_cc_included": "YES",
+            "independent_matrix_included": "NO",
+            "excluded_from_independent_reason": "primary_rows_handled_in_main_CC_overlay",
+            "overlap_group": "CC_PRIMARY_MORESCO2016_BC03",
+            "source_reference": "Moresco2016 Table 1 / BOSS DR9 CC rows",
+            "data_status": "source_locked_in_app_candidate",
+            "notes": "static provenance row for existing public main CC overlay",
+        },
+        {
+            "dataset_id": "CC_MORESCO2016_BC03_003",
+            "paper": "Moresco et al.",
+            "year": "2016",
+            "z": "0.43",
+            "H_z": "86.5",
+            "sigma_H_z": "3.7",
+            "method": "cosmic chronometer differential age / BC03",
+            "source_group": "Moresco2016_BOSS_DR9_CC",
+            "primary_cc_included": "YES",
+            "independent_matrix_included": "NO",
+            "excluded_from_independent_reason": "primary_rows_handled_in_main_CC_overlay",
+            "overlap_group": "CC_PRIMARY_MORESCO2016_BC03",
+            "source_reference": "Moresco2016 Table 1 / BOSS DR9 CC rows",
+            "data_status": "source_locked_in_app_candidate",
+            "notes": "static provenance row for existing public main CC overlay",
+        },
+        {
+            "dataset_id": "CC_MORESCO2016_BC03_004",
+            "paper": "Moresco et al.",
+            "year": "2016",
+            "z": "0.45",
+            "H_z": "88.0",
+            "sigma_H_z": "3.0",
+            "method": "cosmic chronometer differential age / BC03",
+            "source_group": "Moresco2016_BOSS_DR9_CC",
+            "primary_cc_included": "YES",
+            "independent_matrix_included": "NO",
+            "excluded_from_independent_reason": "primary_rows_handled_in_main_CC_overlay",
+            "overlap_group": "CC_PRIMARY_MORESCO2016_BC03",
+            "source_reference": "Moresco2016 Table 1 / BOSS DR9 CC rows",
+            "data_status": "source_locked_in_app_candidate",
+            "notes": "static provenance row for existing public main CC overlay",
+        },
+        {
+            "dataset_id": "CC_MORESCO2016_BC03_005",
+            "paper": "Moresco et al.",
+            "year": "2016",
+            "z": "0.48",
+            "H_z": "97.0",
+            "sigma_H_z": "62.0",
+            "method": "cosmic chronometer differential age / BC03",
+            "source_group": "Moresco2016_BOSS_DR9_CC",
+            "primary_cc_included": "YES",
+            "independent_matrix_included": "NO",
+            "excluded_from_independent_reason": "primary_rows_handled_in_main_CC_overlay",
+            "overlap_group": "CC_PRIMARY_MORESCO2016_BC03",
+            "source_reference": "Moresco2016 Table 1 / BOSS DR9 CC rows",
+            "data_status": "source_locked_in_app_candidate",
+            "notes": "static provenance row for existing public main CC overlay",
+        },
+        {
+            "dataset_id": "CC_SIMON2005_CANDIDATE",
+            "paper": "Simon et al.",
+            "year": "2005",
+            "z": "NEEDS_ROW_LOCK",
+            "H_z": "NEEDS_ROW_LOCK",
+            "sigma_H_z": "NEEDS_ROW_LOCK",
+            "method": "cosmic chronometer / differential age",
+            "source_group": "Simon2005",
+            "primary_cc_included": "NO",
+            "independent_matrix_included": "CANDIDATE",
+            "excluded_from_independent_reason": "independent_matrix_candidate_or_overlap_needs_lock",
+            "overlap_group": "CC_SECONDARY_CANDIDATE",
+            "source_reference": "Simon2005 source row review needed",
+            "data_status": "needs_review",
+            "notes": "do not promote to source-locked until exact rows are locked",
+        },
+        {
+            "dataset_id": "CC_ZHANG2014_CANDIDATE",
+            "paper": "Zhang et al.",
+            "year": "2014",
+            "z": "NEEDS_ROW_LOCK",
+            "H_z": "NEEDS_ROW_LOCK",
+            "sigma_H_z": "NEEDS_ROW_LOCK",
+            "method": "cosmic chronometer / differential age",
+            "source_group": "Zhang2014",
+            "primary_cc_included": "NO",
+            "independent_matrix_included": "CANDIDATE",
+            "excluded_from_independent_reason": "independent_matrix_candidate_or_overlap_needs_lock",
+            "overlap_group": "CC_SECONDARY_CANDIDATE",
+            "source_reference": "Zhang2014 source row review needed",
+            "data_status": "needs_review",
+            "notes": "do not promote to source-locked until exact rows are locked",
+        },
+    ]
+
+    with st.expander("CC data provenance ledger — source rows and inclusion policy", expanded=False):
+        st.caption("DTI_CC_DATA_PROVENANCE_TABLE_V1")
+        st.markdown(
+            "This table records the provenance status of the cosmic-chronometer rows used by the public diagnostic viewer. "
+            "The Moresco2016 BC03 rows are the current primary public CC overlay rows. "
+            "Secondary CC sources such as Simon2005 and Zhang2014 are treated as candidate or review-only until exact row values, "
+            "overlap policy, and inclusion/exclusion status are source-locked."
+        )
+        try:
+            st.dataframe(pd.DataFrame(_dti_cc_rows_v1), use_container_width=True, hide_index=True)
+        except Exception:
+            st.table(_dti_cc_rows_v1)
+        st.warning(
+            "Boundary: this is a provenance and residual-audit layer only. It is not a full cosmological likelihood, "
+            "not a CLASS/AxiCLASS run, not a posterior update, and not an MCMC result. Rows marked needs_review must not be used "
+            "as promoted evidence until a later source-lock gate passes."
+        )
+# DTI_CC_DATA_PROVENANCE_TABLE_V1_END
+
 # --- DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: begin ---
 _DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1 = (
     {
@@ -5687,6 +5831,9 @@ _DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1 = (
 def _dti_render_moresco2016_bc03_cc_visual_overlay_v1(_dti_moresco2016_caller_scope_v1=None):
     """Render a visual-only Moresco2016 BC03 cosmic-chronometer overlay panel."""
     rows = list(_DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1)
+    # DTI_CC_DATA_PROVENANCE_TABLE_V1_CALLSITE
+    _dti_render_cc_data_provenance_table_v1()
+
 
     with st.expander(
         "Cosmic chronometer overlay — Moresco2016 BC03 component rows, visual-only",
