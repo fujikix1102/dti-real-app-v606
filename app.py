@@ -9320,19 +9320,48 @@ else:
 st.subheader("Current input model safety/readout cards")
 # DTI_READOUT_CARD_DETAIL_GUIDE_CALL_V1B
 _dti_render_readout_card_detail_guide_v1b()
+
+# DTI_READOUT_VALUE_SOURCE_FIX_V1D_BEGIN
+def _dti_current_readout_value_v1d(_dti_readout_key_v1d, _dti_original_target_model_v1d=None):
+    _dti_profile_v1d = st.session_state.get("dti_ui_candidate_profile_v1", None)
+    if isinstance(_dti_profile_v1d, dict) and _dti_readout_key_v1d in _dti_profile_v1d:
+        return _dti_profile_v1d.get(_dti_readout_key_v1d), "Candidate form profile"
+    _dti_target_key_map_v1d = {
+        "H0": "target_H0",
+        "omega_b": "target_omega_b",
+        "omega_cdm": "target_omega_cdm",
+        "f_EDE": "target_f_EDE",
+        "z_c": "target_z_c",
+        "sigma8": "target_sigma8",
+        "S8": "target_S8",
+        "ln10_10_As": "target_ln10_10_As",
+        "n_s": "target_n_s",
+        "tau_reio": "target_tau_reio",
+    }
+    _dti_target_key_v1d = _dti_target_key_map_v1d.get(_dti_readout_key_v1d)
+    if _dti_target_key_v1d and _dti_target_key_v1d in st.session_state:
+        return st.session_state.get(_dti_target_key_v1d), "TARGET_MODEL form field"
+    if isinstance(_dti_original_target_model_v1d, dict):
+        return _dti_original_target_model_v1d.get(_dti_readout_key_v1d, np.nan), "parsed target_model fallback"
+    return np.nan, "missing"
+
+st.caption("Readout source: Candidate form profile; fallback to TARGET_MODEL form fields if needed. Display-only, not likelihood/posterior/CLASS/AxiCLASS output.")
+# DTI_READOUT_VALUE_SOURCE_FIX_V1D_END
 card_cols = st.columns(5)
 for i, p in enumerate(["H0", "omega_b", "omega_cdm", "f_EDE", "z_c"]):
-    v = target_model.get(p, np.nan)
+    v, _dti_readout_source_label_v1d = _dti_current_readout_value_v1d(p, target_model)
     color, note = safety_class_for_param(p, v, delta_df)
-    value = "missing" if np.isnan(v) else f"{v:.5g}"
+    note = f"{note} Source: {_dti_readout_source_label_v1d}."
+    value = "missing" if not np.isfinite(_dti_ui_float_v1(v, np.nan)) else f"{_dti_ui_float_v1(v, np.nan):.5g}"
     with card_cols[i]:
         st.markdown(card(p, value, note, color), unsafe_allow_html=True)
 
 card_cols2 = st.columns(5)
 for i, p in enumerate(["sigma8", "S8", "ln10_10_As", "n_s", "tau_reio"]):
-    v = target_model.get(p, np.nan)
+    v, _dti_readout_source_label_v1d = _dti_current_readout_value_v1d(p, target_model)
     color, note = safety_class_for_param(p, v, delta_df)
-    value = "missing" if np.isnan(v) else f"{v:.5g}"
+    note = f"{note} Source: {_dti_readout_source_label_v1d}."
+    value = "missing" if not np.isfinite(_dti_ui_float_v1(v, np.nan)) else f"{_dti_ui_float_v1(v, np.nan):.5g}"
     with card_cols2[i]:
         st.markdown(card(p, value, note, color), unsafe_allow_html=True)
 
