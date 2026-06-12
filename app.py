@@ -5855,6 +5855,135 @@ def _render_woc_chain_metadata_table_v1():
 
 _dti_render_parameter_definition_source_table_v1()
 
+
+# DTI_BAO_VECTOR_COVARIANCE_SOURCE_LOCK_TABLE_V1_BEGIN
+def _render_bao_vector_covariance_source_lock_table_v1():
+    """Render the BAO 2x2 vector/covariance diagnostic source-lock ledger."""
+    rows = [
+        {
+            "object_label": "ROUTE_B_FROZEN_REFERENCE_CHI2",
+            "object_type": "chi2_scalar",
+            "source_reference": "app frozen displayed diagnostic",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "2x2",
+            "values_or_status": "0.2887322581504387",
+            "route_scope": "Route B frozen reference",
+            "allowed_use": "diagnostic reference only",
+            "forbidden_use": "not full BAO likelihood; not posterior; not MCMC",
+            "boundary_note": "Top-left 2x2 BAO DM-DH diagnostic scalar only.",
+        },
+        {
+            "object_label": "ROUTE_A_DERIVED_TEMPLATE_CHI2",
+            "object_type": "chi2_scalar",
+            "source_reference": "derived-from-Route-B template display",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "2x2",
+            "values_or_status": "0.2887322581504387",
+            "route_scope": "Route A derived template",
+            "allowed_use": "display consistency reference",
+            "forbidden_use": "not independent likelihood; not posterior",
+            "boundary_note": "Mirrors Route B reference for UI consistency.",
+        },
+        {
+            "object_label": "ROUTE_A_MANUAL_SANITY_CHI2",
+            "object_type": "chi2_scalar",
+            "source_reference": "manual-sanity independent lane",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "2x2",
+            "values_or_status": "0.848405000840325",
+            "route_scope": "Route A manual sanity",
+            "allowed_use": "geometry diagnostic only",
+            "forbidden_use": "not full likelihood; not posterior; not MCMC",
+            "boundary_note": "Manual vector lane intentionally differs from frozen Route B.",
+        },
+        {
+            "object_label": "MANUAL_SANITY_MODEL_VECTOR",
+            "object_type": "model_vector",
+            "source_reference": "manual-sanity payload",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "length=2",
+            "values_or_status": "[17.45,19.55]",
+            "route_scope": "Route A manual sanity",
+            "allowed_use": "vector source-lock display",
+            "forbidden_use": "not CLASS validation; not posterior",
+            "boundary_note": "Model vector for independent manual sanity lane.",
+        },
+        {
+            "object_label": "MANUAL_SANITY_OBSERVATION_VECTOR",
+            "object_type": "observation_vector",
+            "source_reference": "manual-sanity payload",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "length=2",
+            "values_or_status": "[17.65,19.77]",
+            "route_scope": "Route A manual sanity",
+            "allowed_use": "observation source-lock display",
+            "forbidden_use": "not full dataset claim",
+            "boundary_note": "Observation vector used for manual sanity check.",
+        },
+        {
+            "object_label": "MANUAL_SANITY_DELTA_VECTOR",
+            "object_type": "delta_vector",
+            "source_reference": "manual-sanity payload",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "length=2",
+            "values_or_status": "[-0.1999999999999993,-0.21999999999999886]",
+            "route_scope": "Route A manual sanity",
+            "allowed_use": "residual diagnostic display",
+            "forbidden_use": "not posterior residual field",
+            "boundary_note": "Delta is model minus observation in locked ordering.",
+        },
+        {
+            "object_label": "MANUAL_SANITY_INVERSE_COVARIANCE",
+            "object_type": "inverse_covariance_matrix",
+            "source_reference": "manual-sanity payload",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "2x2",
+            "values_or_status": "[[11.6279311211,1.75457174953],[1.75457174953,4.72903805863]]",
+            "route_scope": "Route A manual sanity",
+            "allowed_use": "chi2 reproducibility display",
+            "forbidden_use": "not covariance source proof",
+            "boundary_note": "Inverse covariance is only for the manual-sanity diagnostic lane.",
+        },
+        {
+            "object_label": "MANUAL_SANITY_TERM_DECOMPOSITION",
+            "object_type": "chi2_terms",
+            "source_reference": "manual-sanity payload",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "3 terms",
+            "values_or_status": "DM-DM=0.4651172448439967; cross=0.15440231395863865; DH-DH=0.22888544203768962",
+            "route_scope": "Route A manual sanity",
+            "allowed_use": "term audit display",
+            "forbidden_use": "not likelihood decomposition claim",
+            "boundary_note": "Term sum equals manual sanity chi2.",
+        },
+        {
+            "object_label": "BOUNDARY_TOPLEFT_2X2_ONLY",
+            "object_type": "diagnostic_boundary",
+            "source_reference": "UI source-lock ledger",
+            "ordering": "DM_over_rd,DH_over_rd",
+            "dimension": "2x2",
+            "values_or_status": "status=diagnostic-only",
+            "route_scope": "Route A/B BAO diagnostic",
+            "allowed_use": "provenance and reproducibility aid",
+            "forbidden_use": "not full BAO likelihood; not posterior; not MCMC; not CLASS-AxiCLASS validation",
+            "boundary_note": "This table source-locks the diagnostic inputs shown in the app; it does not upgrade them into a full likelihood.",
+        },
+    ]
+
+    with st.expander(
+        "BAO vector/covariance source-lock ledger — 2x2 diagnostic inputs and boundaries",
+        expanded=False,
+    ):
+        st.caption("DTI_BAO_VECTOR_COVARIANCE_SOURCE_LOCK_TABLE_V1")
+        st.dataframe(pd.DataFrame(rows), use_container_width=True)
+        st.info(
+            "BAO vector/covariance source-lock is a diagnostic provenance layer only. "
+            "It records the 2x2 DM/rd and DH/rd vectors, inverse covariance, and scalar chi2 values "
+            "used by the displayed diagnostic lanes. It does not perform a full BAO likelihood evaluation, "
+            "does not validate a posterior chain, does not run CLASS or AxiCLASS, and does not create an MCMC result."
+        )
+# DTI_BAO_VECTOR_COVARIANCE_SOURCE_LOCK_TABLE_V1_END
+
 # DTI_CC_DATA_PROVENANCE_TABLE_V1_BEGIN
 def _dti_render_cc_data_provenance_table_v1():
     """Render static CC source-row provenance ledger. Diagnostic/provenance only."""
@@ -6054,6 +6183,9 @@ def _dti_render_moresco2016_bc03_cc_visual_overlay_v1(_dti_moresco2016_caller_sc
     rows = list(_DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1)
     # DTI_WOC_CHAIN_METADATA_TABLE_V1_CALLSITE
     _render_woc_chain_metadata_table_v1()
+    # DTI_BAO_VECTOR_COVARIANCE_SOURCE_LOCK_TABLE_V1_CALLSITE
+    _render_bao_vector_covariance_source_lock_table_v1()
+
 
     # DTI_CC_DATA_PROVENANCE_TABLE_V1_CALLSITE
     _dti_render_cc_data_provenance_table_v1()
