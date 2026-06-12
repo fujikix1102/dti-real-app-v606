@@ -9007,6 +9007,38 @@ apply_pending_paper_text()
 
 st.title("DTI-Core Grand Auditor v6.0.6")
 st.caption("Public parameter-profile audit interface for cosmological model comparison, benchmark proximity review, and reproducibility-first inspection.")
+
+# --- DTI citation/contact block V1 BEGIN ---
+st.divider()
+
+with st.expander("About / Citation / Provenance", expanded=False):
+    st.markdown(
+        """
+**Author**  
+Junichi Fujiki / FUJIKIX
+
+**Contact**  
+jun@fujikix.com
+
+**Project**  
+MAXOMEGA / DTI diagnostic viewer
+
+**Related archival records, not live-compute dependencies**
+
+1. **Extended Evidence Ledger and Provenance Framework for Fixed-H0 Cosmology Branch Audits**  
+   106-Page Comprehensive Freeze Candidate  
+   DOI: `10.5281/zenodo.20603277`
+
+2. **Audit-First Evidence for Reproducible Branch Structure in Fixed-H0 Cosmology Fits**  
+   Core Manuscript / Review Target  
+   DOI: `10.5281/zenodo.20603167`
+
+**Boundary**  
+This public app is a diagnostic and provenance viewer. It does not perform live likelihood evaluation, MCMC sampling, Planck validation, posterior inference, or manuscript-level claim promotion.
+        """
+    )
+# --- DTI citation/contact block V1 END ---
+
 st.markdown("""
 <div class="card">
 <b>Purpose:</b> inspect and compare cosmological parameter profiles using registered presets, candidate/reference forms, and locked benchmark references.<br>
@@ -9160,10 +9192,14 @@ with st.sidebar:
 
     st.markdown("[Open GitHub](https://github.com/fujikix1102/dti-real-app-v606)")
     st.markdown("[Open public app](https://dti-real-app-v606.streamlit.app)")
+
+
+
 st.header("1. Candidate / Reference parameter input form")
 st.markdown(
     "Parameter names are fixed. Edit only the values. Use the button to convert form values into text and feed the audit/search engine."
 )
+
 
 with st.expander("TARGET_MODEL form", expanded=True):
     cols = st.columns(5)
@@ -9204,6 +9240,8 @@ if st.button("Apply form values to text and update search engine", type="primary
     st.session_state.pending_paper_text = form_to_text()
     st.rerun()
 
+
+
 df_blocks = parse_blocks(st.session_state.paper_text)
 delta_df = calc_delta_table(df_blocks)
 target_model = model_vector_from_target(first_block_dict(df_blocks, "TARGET_MODEL"))
@@ -9233,6 +9271,11 @@ st.markdown(f"""
 <b>Reference location:</b> {reference_source_location}
 </div>
 """, unsafe_allow_html=True)
+
+# --- DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: visible call ---
+_dti_render_moresco2016_bc03_cc_visual_overlay_v1(locals())
+# --- /DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: visible call ---
+
 
 st.header("3. Literature text audit")
 
@@ -12431,39 +12474,6 @@ except Exception as exc:
 # DTI_PANEL8_LIKELIHOOD_BINDER_CALL_V1
 _dti_render_likelihood_definition_binder_v1()
 
-# --- DTI citation/contact block V1 BEGIN ---
-st.divider()
-# --- DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: visible call ---
-_dti_render_moresco2016_bc03_cc_visual_overlay_v1(locals())
-# --- /DTI Moresco2016 BC03 cosmic chronometer visual overlay V1: visible call ---
-
-with st.expander("About / Citation / Provenance", expanded=False):
-    st.markdown(
-        """
-**Author**  
-Junichi Fujiki / FUJIKIX
-
-**Contact**  
-jun@fujikix.com
-
-**Project**  
-MAXOMEGA / DTI diagnostic viewer
-
-**Related archival records, not live-compute dependencies**
-
-1. **Extended Evidence Ledger and Provenance Framework for Fixed-H0 Cosmology Branch Audits**  
-   106-Page Comprehensive Freeze Candidate  
-   DOI: `10.5281/zenodo.20603277`
-
-2. **Audit-First Evidence for Reproducible Branch Structure in Fixed-H0 Cosmology Fits**  
-   Core Manuscript / Review Target  
-   DOI: `10.5281/zenodo.20603167`
-
-**Boundary**  
-This public app is a diagnostic and provenance viewer. It does not perform live likelihood evaluation, MCMC sampling, Planck validation, posterior inference, or manuscript-level claim promotion.
-        """
-    )
-# --- DTI citation/contact block V1 END ---
 
 # --- DTI_NEXT_CC_HZ_DIAGNOSTIC_PANEL_V1_BEGIN ---
 # Source-locked additional CC/H(z) diagnostic-only lane.
