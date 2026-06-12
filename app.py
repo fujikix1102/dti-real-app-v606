@@ -5761,7 +5761,98 @@ def _dti_render_parameter_definition_source_table_v1():
         )
 # DTI_PARAMETER_DEFINITION_SOURCE_TABLE_V1_END
 
+# DTI_WOC_CHAIN_METADATA_TABLE_V1_BEGIN
+def _render_woc_chain_metadata_table_v1():
+    """Static WOC chain metadata/provenance ledger.
+
+    This is a documentation/index layer only. It does not validate posterior
+    chains, create MCMC results, or perform likelihood/CLASS/AxiCLASS evaluation.
+    """
+    woc_rows = [
+        {
+            "chain_or_run_label": "CURRENT_PUBLIC_APP_COMMIT",
+            "source_type": "git_commit",
+            "source_path_or_reference": "fba63302f3c8091153a4e19f9b1a8b18c5af4b71",
+            "commit_or_package_hash": "fba63302f3c8091153a4e19f9b1a8b18c5af4b71",
+            "parameter_scope": "UI provenance ledgers",
+            "dataset_scope": "app UI",
+            "run_status": "frozen_public",
+            "sample_or_row_count": "1",
+            "seed_or_replicate": "not_applicable",
+            "diagnostic_use": "source-current app identity",
+            "boundary_note": "Not a cosmological posterior chain.",
+        },
+        {
+            "chain_or_run_label": "CC_PROVENANCE_LEDGER_UI",
+            "source_type": "app_static_table",
+            "source_path_or_reference": "DTI_CC_DATA_PROVENANCE_TABLE_V1",
+            "commit_or_package_hash": "6a6ca4f409a6c5553bfc6efa270349feb22129b90dd3d8e9819198c4b99734e7",
+            "parameter_scope": "CC source rows",
+            "dataset_scope": "CC",
+            "run_status": "frozen_public",
+            "sample_or_row_count": "7",
+            "seed_or_replicate": "not_applicable",
+            "diagnostic_use": "source-row provenance only",
+            "boundary_note": "Not a likelihood evaluation.",
+        },
+        {
+            "chain_or_run_label": "PARAMETER_DEFINITION_SOURCE_LEDGER_UI",
+            "source_type": "app_static_table",
+            "source_path_or_reference": "DTI_PARAMETER_DEFINITION_SOURCE_TABLE_V1",
+            "commit_or_package_hash": "6a6ca4f409a6c5553bfc6efa270349feb22129b90dd3d8e9819198c4b99734e7",
+            "parameter_scope": "parameter definitions",
+            "dataset_scope": "UI/documentation",
+            "run_status": "frozen_public",
+            "sample_or_row_count": "11",
+            "seed_or_replicate": "not_applicable",
+            "diagnostic_use": "definition/source documentation only",
+            "boundary_note": "Not posterior, MCMC, CLASS, or AxiCLASS output.",
+        },
+        {
+            "chain_or_run_label": "WOC_CHAIN_METADATA_TABLE_CANDIDATE",
+            "source_type": "app_static_table",
+            "source_path_or_reference": "DTI_WOC_CHAIN_METADATA_TABLE_V1",
+            "commit_or_package_hash": "NEEDS_PATCH",
+            "parameter_scope": "chain metadata",
+            "dataset_scope": "documentation/provenance",
+            "run_status": "candidate",
+            "sample_or_row_count": "needs_review",
+            "seed_or_replicate": "needs_review",
+            "diagnostic_use": "metadata index only",
+            "boundary_note": "Do not imply posterior validity.",
+        },
+    ]
+
+    woc_columns = [
+        "chain_or_run_label",
+        "source_type",
+        "source_path_or_reference",
+        "commit_or_package_hash",
+        "parameter_scope",
+        "dataset_scope",
+        "run_status",
+        "sample_or_row_count",
+        "seed_or_replicate",
+        "diagnostic_use",
+        "boundary_note",
+    ]
+
+    with st.expander(
+        "WOC chain metadata ledger — source packages, status, and allowed diagnostic use",
+        expanded=False,
+    ):
+        st.caption("DTI_WOC_CHAIN_METADATA_TABLE_V1")
+        st.dataframe(woc_rows, column_order=woc_columns, use_container_width=True)
+        st.info(
+            "WOC chain metadata is a provenance/index layer only. "
+            "It does not validate posterior chains by itself, does not create an MCMC result, "
+            "and does not perform likelihood, CLASS, or AxiCLASS evaluation."
+        )
+# DTI_WOC_CHAIN_METADATA_TABLE_V1_END
+
+
 # DTI_PARAMETER_DEFINITION_SOURCE_TABLE_V1_CALLSITE
+
 _dti_render_parameter_definition_source_table_v1()
 
 # DTI_CC_DATA_PROVENANCE_TABLE_V1_BEGIN
@@ -5961,6 +6052,9 @@ _DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1 = (
 def _dti_render_moresco2016_bc03_cc_visual_overlay_v1(_dti_moresco2016_caller_scope_v1=None):
     """Render a visual-only Moresco2016 BC03 cosmic-chronometer overlay panel."""
     rows = list(_DTI_MORESCO2016_BC03_COMPONENT_VISUAL_TABLE_V1)
+    # DTI_WOC_CHAIN_METADATA_TABLE_V1_CALLSITE
+    _render_woc_chain_metadata_table_v1()
+
     # DTI_CC_DATA_PROVENANCE_TABLE_V1_CALLSITE
     _dti_render_cc_data_provenance_table_v1()
 
