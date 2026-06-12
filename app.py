@@ -13271,3 +13271,134 @@ def _dti_render_woc_payload_detail_summary_v1():
 
 _dti_render_woc_payload_detail_summary_v1()
 # DTI_WOC_PAYLOAD_DETAIL_SUMMARY_PUBLIC_V1_END
+
+
+
+# DTI_STRATEGY_AB_PROXY_EMULATOR_UI_PUBLIC_READY_PAYLOAD_V1
+# PUBLIC_READY_LOCAL_PATCH: repo-relative payload path; still diagnostic dryrun only.
+# Boundary: no CLASS/AxiCLASS, no MCMC, no full likelihood, no posterior claim, no manuscript claim.
+
+def _dti_render_strategy_ab_proxy_emulator_public_ready_v1():
+    """Public-ready Strategy A/B proxy-emulator diagnostic dryrun panel."""
+    import math
+    from pathlib import Path
+    import pandas as pd
+    import streamlit as st
+
+    payload_relpath = "data/strategy_ab_proxy_emulator_tiny_static_payload_dryrun_v1.tsv"
+    payload_path = Path(__file__).parent / "data" / "strategy_ab_proxy_emulator_tiny_static_payload_dryrun_v1.tsv"
+    payload_sha256 = "1e1823ae4af068923177a4d3d815ef6dba7a6bbbeb3a4b2cabd7090a7311f158"
+
+    with st.expander("Strategy A/B proxy-emulator diagnostic — precomputed basin visualization", expanded=False):
+        st.caption("DTI_STRATEGY_AB_PROXY_EMULATOR_UI_PUBLIC_READY_PAYLOAD_V1")
+        st.warning(
+            "Diagnostic dryrun only. This panel reads a tiny static payload from the repo-local data/ directory. "
+            "It does not run CLASS or AxiCLASS, does not perform MCMC, does not evaluate a full likelihood, "
+            "and does not establish a posterior or manuscript claim."
+        )
+
+        st.markdown("**Payload provenance**")
+        st.code(
+            "\n".join([
+                f"payload_relpath={payload_relpath}",
+                f"payload_path={payload_path}",
+                f"payload_sha256={payload_sha256}",
+            ]),
+            language="text",
+        )
+
+        try:
+            df = pd.read_csv(payload_path, sep="\t")
+        except Exception as exc:
+            st.error(f"Could not read proxy-emulator dryrun payload: {exc}")
+            return
+
+        required = [
+            "payload_id",
+            "strategy_label",
+            "grid_id",
+            "axis_f_EDE",
+            "axis_H0",
+            "diagnostic_chi2",
+            "claim_boundary",
+            "not_class_run",
+            "not_axiclass_run",
+            "not_mcmc",
+            "not_full_likelihood",
+            "not_posterior",
+            "not_manuscript_claim",
+        ]
+        missing = [c for c in required if c not in df.columns]
+        if missing:
+            st.error(f"Payload schema missing columns: {missing}")
+            return
+
+        boundary_cols = [
+            "not_class_run",
+            "not_axiclass_run",
+            "not_mcmc",
+            "not_full_likelihood",
+            "not_posterior",
+            "not_manuscript_claim",
+        ]
+        boundary_ok = all(str(v).upper() == "TRUE" for col in boundary_cols for v in df[col].tolist())
+        if not boundary_ok:
+            st.error("Payload boundary flags are not all TRUE. Refusing to display diagnostic selection.")
+            st.dataframe(df, use_container_width=True)
+            return
+
+        st.dataframe(df, use_container_width=True)
+
+        q_fede = st.number_input(
+            "Preview query f_EDE",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.055,
+            step=0.001,
+            key="dti_strategy_ab_public_ready_fede_v1",
+        )
+        q_h0 = st.number_input(
+            "Preview query H0",
+            min_value=40.0,
+            max_value=100.0,
+            value=72.6,
+            step=0.1,
+            key="dti_strategy_ab_public_ready_h0_v1",
+        )
+
+        rows = []
+        for _, row in df.iterrows():
+            try:
+                f = float(row["axis_f_EDE"])
+                h = float(row["axis_H0"])
+                dist = math.sqrt((q_fede - f) ** 2 + ((q_h0 - h) / 10.0) ** 2)
+                rows.append((dist, row))
+            except Exception:
+                continue
+
+        if not rows:
+            st.error("No valid nearest-neighbor rows available.")
+            return
+
+        dist, nearest = sorted(rows, key=lambda x: x[0])[0]
+        st.markdown("**Nearest-neighbor dryrun selection**")
+        st.write({
+            "query_f_EDE": q_fede,
+            "query_H0": q_h0,
+            "nearest_grid_id": nearest.get("grid_id"),
+            "nearest_strategy": nearest.get("strategy_label"),
+            "nearest_diagnostic_chi2": nearest.get("diagnostic_chi2"),
+            "distance": dist,
+        })
+
+        st.info(
+            "Interpretation boundary: these values are dryrun diagnostic payload entries only. "
+            "They are not live cosmological inference and must not be read as posterior, full likelihood, public validation, or manuscript results."
+        )
+
+
+# DTI_STRATEGY_AB_PROXY_EMULATOR_UI_PUBLIC_READY_PAYLOAD_V1_RENDER
+_dti_render_strategy_ab_proxy_emulator_public_ready_v1()
+# DTI_STRATEGY_AB_PROXY_EMULATOR_UI_PUBLIC_READY_PAYLOAD_V1_END
+
+
