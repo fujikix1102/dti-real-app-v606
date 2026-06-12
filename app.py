@@ -5634,6 +5634,136 @@ _DTI_VANILLA_RESULT_RAW_JSON_RECURSION_FIX_V1B = True
 
 
 # --- DTI_BGGEOM_RAW_RENDERER_EARLY_DEFINE_V6G ---
+# DTI_PARAMETER_DEFINITION_SOURCE_TABLE_V1_BEGIN
+def _dti_render_parameter_definition_source_table_v1():
+    """Render a bounded parameter definition/source ledger.
+
+    Boundary:
+    - Documentation/provenance aid only.
+    - Does not run backend/API/CLASS/AxiCLASS.
+    - Does not evaluate likelihood, posterior, MCMC, or manuscript claims.
+    """
+    import pandas as pd
+
+    rows = [
+        {
+            "parameter": "H0",
+            "ui_label": "H0 / Hubble constant",
+            "internal_variable_or_key": "H0, h, target_model.H0",
+            "theory_meaning": "Expansion-rate normalization at z=0",
+            "unit": "km/s/Mpc",
+            "default_or_source": "UI profile / target model / locked benchmark source",
+            "boundary_note": "Display/input value only unless tied to an audited likelihood or posterior package.",
+        },
+        {
+            "parameter": "Omega_m",
+            "ui_label": "Omega_m / Matter density",
+            "internal_variable_or_key": "Omega_m, Omega_m_computed, target_model.Omega_m",
+            "theory_meaning": "Total matter density fraction today",
+            "unit": "dimensionless",
+            "default_or_source": "UI profile / derived profile / locked benchmark source",
+            "boundary_note": "Not a posterior estimate unless explicitly sourced from an audited chain.",
+        },
+        {
+            "parameter": "omega_b h^2",
+            "ui_label": "omega_b h^2 / Physical baryon density",
+            "internal_variable_or_key": "omega_b, omega_b_h2, ombh2",
+            "theory_meaning": "Physical baryon density",
+            "unit": "dimensionless",
+            "default_or_source": "Planck/LCDM reference or explicit candidate profile",
+            "boundary_note": "Must state whether value is fixed benchmark, UI input, or audited chain-derived.",
+        },
+        {
+            "parameter": "omega_c h^2",
+            "ui_label": "omega_c h^2 / Physical CDM density",
+            "internal_variable_or_key": "omega_c, omega_c_h2, omch2",
+            "theory_meaning": "Physical cold dark matter density",
+            "unit": "dimensionless",
+            "default_or_source": "Planck/LCDM reference or explicit candidate profile",
+            "boundary_note": "Central diagnostic/compensating direction; not by itself a mechanism proof.",
+        },
+        {
+            "parameter": "f_EDE",
+            "ui_label": "f_EDE / EDE fraction",
+            "internal_variable_or_key": "f_EDE, fde",
+            "theory_meaning": "Early-dark-energy fraction or interface-compatible EDE-like control",
+            "unit": "dimensionless",
+            "default_or_source": "Candidate profile / docs / compatibility layer",
+            "boundary_note": "In public app this is not automatically a live AxiCLASS microphysics run.",
+        },
+        {
+            "parameter": "z_c / log10 z_c",
+            "ui_label": "z_c / log10 z_c",
+            "internal_variable_or_key": "z_c, zc, log10zc",
+            "theory_meaning": "Critical redshift or transition scale for EDE-like control",
+            "unit": "redshift or log10(redshift), depending on UI/source",
+            "default_or_source": "Candidate profile / docs",
+            "boundary_note": "Representation must be explicit; log10zc and z_c are not interchangeable labels.",
+        },
+        {
+            "parameter": "z_jump",
+            "ui_label": "Jump toy redshift",
+            "internal_variable_or_key": "z_jump, dti_bggeom_jump_z_v1b",
+            "theory_meaning": "Redshift location for toy background-geometry jump",
+            "unit": "redshift",
+            "default_or_source": "Jump toy comparator UI",
+            "boundary_note": "Toy background-geometry diagnostic only; not a physical discontinuity proof.",
+        },
+        {
+            "parameter": "jump_factor",
+            "ui_label": "Jump toy factor",
+            "internal_variable_or_key": "jump_factor, dti_bggeom_jump_factor_v1b",
+            "theory_meaning": "Multiplicative factor used in jump toy comparator",
+            "unit": "dimensionless",
+            "default_or_source": "Jump toy comparator UI",
+            "boundary_note": "Toy diagnostic only; not CLASS/AxiCLASS or likelihood validation.",
+        },
+        {
+            "parameter": "A_planck",
+            "ui_label": "A_planck / Planck calibration",
+            "internal_variable_or_key": "A_planck",
+            "theory_meaning": "Planck calibration/nuisance amplitude",
+            "unit": "dimensionless",
+            "default_or_source": "Planck/Cobaya context or documentation",
+            "boundary_note": "Public app does not perform live Planck likelihood evaluation.",
+        },
+        {
+            "parameter": "BAO DM/rd, DH/rd",
+            "ui_label": "BAO diagnostic ratios",
+            "internal_variable_or_key": "DM_over_rd, DH_over_rd, BAO vector/covariance entries",
+            "theory_meaning": "BAO distance-ratio observables",
+            "unit": "dimensionless ratios",
+            "default_or_source": "Route A/B diagnostic source-lock",
+            "boundary_note": "Diagnostic subset only unless full BAO/eBOSS likelihood is explicitly implemented.",
+        },
+        {
+            "parameter": "CC H(z)",
+            "ui_label": "Cosmic chronometer H(z)",
+            "internal_variable_or_key": "H_z, Hz, Moresco2016 rows",
+            "theory_meaning": "Expansion-rate measurements from cosmic chronometers",
+            "unit": "km/s/Mpc",
+            "default_or_source": "Moresco2016 primary rows / candidate Simon-Zhang review rows",
+            "boundary_note": "Provenance/residual-audit display only; not a full cosmological likelihood.",
+        },
+    ]
+
+    df = pd.DataFrame(rows)
+    with st.expander(
+        "Parameter definition/source ledger — UI labels, internal keys, units, and boundaries",
+        expanded=False,
+    ):
+        st.caption("DTI_PARAMETER_DEFINITION_SOURCE_TABLE_V1")
+        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.info(
+            "Boundary: these definitions are documentation/provenance aids. "
+            "They are not likelihood, posterior, CLASS/AxiCLASS, or MCMC results. "
+            "A UI value is not a posterior estimate unless it is explicitly tied to an audited chain/source package."
+        )
+# DTI_PARAMETER_DEFINITION_SOURCE_TABLE_V1_END
+
+# DTI_PARAMETER_DEFINITION_SOURCE_TABLE_V1_CALLSITE
+_dti_render_parameter_definition_source_table_v1()
+
 # DTI_CC_DATA_PROVENANCE_TABLE_V1_BEGIN
 def _dti_render_cc_data_provenance_table_v1():
     """Render static CC source-row provenance ledger. Diagnostic/provenance only."""
