@@ -13014,6 +13014,24 @@ try:
     with st.expander("Additional CC/H(z) diagnostic lane — source-locked, diagnostic-only", expanded=False):
         st.caption("Diagnostic-only CC/H(z) score. This is not a likelihood evaluation, not a posterior comparison, not a fit, and not cosmological validation.")
 
+        st.markdown("**CC/H(z) source-lock / provenance**")
+        st.code(
+            "lane = Additional_CC_Hz_diagnostic_lane\\n"
+            "row_source = hardcoded_app_py_rows_source_locked\\n"
+            "included_source_families = Zhang2014_CC; Simon2005_CC\\n"
+            "included_rows = 15\\n"
+            "excluded_deferred_rows = 8\\n"
+            "excluded_deferred_families = Moresco2016_BC03=5; Moresco2016_combined=1; Moresco2016_M11=1; LeafMelia_compiled=1\\n"
+            "runtime_Hz_grid = optional_session_state_diagnostic_bridge_only\\n"
+            "score_type = chi2_like_diagnostic_only_when_runtime_grid_available\\n"
+            "boundary = not_likelihood_not_fit_not_posterior_not_validation_not_manuscript_claim",
+            language="text",
+        )
+        st.caption(
+            "The included CC/H(z) rows are source-locked diagnostic rows embedded in app.py. "
+            "They are not a new independent likelihood, not a full covariance treatment, and not a posterior constraint."
+        )
+
         _dti_next_cc_hz_rows_v1 = [
     {"row_id": 'ZHANG2014_CC_ROW_001', "z": 0.07, "H_obs": 69, "sigma_H": 19.6, "source_label": 'Zhang2014_CC'},
     {"row_id": 'ZHANG2014_CC_ROW_002', "z": 0.12, "H_obs": 68.6, "sigma_H": 26.2, "source_label": 'Zhang2014_CC'},
@@ -13112,9 +13130,10 @@ try:
         st.write("Excluded/deferred source families:", _dti_next_cc_hz_excluded_summary_v1)
 
         with st.expander("Locked included CC/H(z) rows", expanded=False):
-            st.dataframe(_dti_next_cc_hz_rows_v1, use_container_width=True)
+            _dti_next_cc_hz_rows_df_v1 = pd.DataFrame(_dti_next_cc_hz_rows_v1).fillna("").astype(str)
+            _dti_arrow_safe_df_v1(_dti_next_cc_hz_rows_df_v1, width="stretch")
 
-        st.caption("Moresco2016 BC03 rows are not reused as new independent evidence. Backend disconnected; CLASS/AxiCLASS not run; MCMC not run.")
+        st.caption("Moresco2016 BC03 rows are not reused as new independent evidence. Backend disconnected; CLASS/AxiCLASS not run; MCMC not run. This is a source-locked diagnostic-only CC/H(z) display.")
 except Exception as _dti_next_cc_hz_panel_exc_v1:
     st.warning(f"Additional CC/H(z) diagnostic panel unavailable: {type(_dti_next_cc_hz_panel_exc_v1).__name__}")
 # --- DTI_NEXT_CC_HZ_DIAGNOSTIC_PANEL_V1_END ---
@@ -13132,19 +13151,22 @@ try:
 
         st.markdown("**Current public source identity**")
         st.code(
-            "commit = d6d2697f7a8191c60c689df09edf8eec31aebf83\n"
-            "origin/main = d6d2697f7a8191c60c689df09edf8eec31aebf83\n"
-            "app.py SHA256 = f8c0f6c1475fcf562f4d397243d466bd02400d25c7ed690ad456784a712f16e8\n"
-            "app.py lines = 12625",
+            "commit = 998804c10d1474701dd457b5abe54c147f46eb2b\\n"
+            "origin/main = 998804c10d1474701dd457b5abe54c147f46eb2b\\n"
+            "app.py SHA256 = 8eee77ee9c3553015bb6b776f3289a0d26d0029a7140d13522f54d4d1f4e72d4\\n"
+            "app.py lines = 13480",
             language="text",
         )
 
         st.markdown("**Closed diagnostic lane**")
         st.code(
-            "closed_lane = CC_HZ_ADDITIONAL_DIAGNOSTIC_LANE\n"
-            "closed_lane_status = PUBLIC_VISUAL_PASS_FREEZE_V1_PASS\n"
-            "safe_stop_point = YES\n"
-            "freeze_zip_sha256 = 07a7156714281e80d018af07103677c936b12339b464295282af6d0d688302c1",
+            "closed_lane = STRATEGY_AB_REAL_PAYLOAD_PROVENANCE_SHA_DISPLAY\\n"
+            "closed_lane_status = PUBLIC_VISUAL_FREEZE_PASS\\n"
+            "strategy_ab_public_commit = 998804c10d1474701dd457b5abe54c147f46eb2b\\n"
+            "strategy_ab_real_payload_sha256 = 4dd98ed78d8bbddf6b86cb873af918508afe30ee93c520aee4701b78a4fed423\\n"
+            "current_lane = CC_HZ_ADDITIONAL_DIAGNOSTIC_LANE\\n"
+            "current_lane_status = SOURCE_LOCKED_DIAGNOSTIC_ONLY_PROVENANCE_DISPLAY\\n"
+            "safe_stop_point = YES",
             language="text",
         )
 
