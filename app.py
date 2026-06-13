@@ -13326,11 +13326,19 @@ def _dti_render_strategy_ab_proxy_emulator_public_ready_v1():
         )
 
         st.markdown("**Payload provenance**")
+        displayed_payload_sha256 = payload_sha256
+        # DTI_STRATEGY_AB_REAL_PAYLOAD_PROVENANCE_SHA_DISPLAY_FIX_V1 BEGIN
+        # If the installed real Route A/B diagnostic payload is active, the provenance
+        # SHA shown in this UI block must refer to the active real payload, not the
+        # retained dryrun payload. This is display/provenance bookkeeping only.
+        if using_installed_real_payload and real_payload_sha256:
+            displayed_payload_sha256 = real_payload_sha256
+        # DTI_STRATEGY_AB_REAL_PAYLOAD_PROVENANCE_SHA_DISPLAY_FIX_V1 END
         st.code(
             "\n".join([
                 f"payload_relpath={payload_relpath}",
                 f"payload_path={payload_path}",
-                f"payload_sha256={payload_sha256}",
+                f"payload_sha256={displayed_payload_sha256}",
             ]),
             language="text",
         )
