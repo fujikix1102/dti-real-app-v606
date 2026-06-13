@@ -13285,11 +13285,39 @@ def _dti_render_strategy_ab_proxy_emulator_public_ready_v1():
     import pandas as pd
     import streamlit as st
 
-    payload_relpath = "data/strategy_ab_proxy_emulator_tiny_static_payload_dryrun_v1.tsv"
-    payload_path = Path(__file__).parent / "data" / "strategy_ab_proxy_emulator_tiny_static_payload_dryrun_v1.tsv"
+    # --- DTI_STRATEGY_AB_REAL_PAYLOAD_WIRING_V1 BEGIN ---
+    # Static diagnostic payload selection only.
+    # This does not call backend/API/CLASS/AxiCLASS and does not compute likelihood/MCMC/posterior.
+    dryrun_payload_relpath = "data/strategy_ab_proxy_emulator_tiny_static_payload_dryrun_v1.tsv"
+    dryrun_payload_path = Path(__file__).parent / "data" / "strategy_ab_proxy_emulator_tiny_static_payload_dryrun_v1.tsv"
+    real_payload_relpath = "data/strategy_ab_real_payload_candidate_v1.tsv"
+    real_payload_path = Path(__file__).parent / "data" / "strategy_ab_real_payload_candidate_v1.tsv"
+    real_payload_sha_path = Path(__file__).parent / "data" / "strategy_ab_real_payload_candidate_v1.sha256"
+
+    if real_payload_path.exists():
+        payload_relpath = real_payload_relpath
+        payload_path = real_payload_path
+        payload_mode_label = "Installed Route A/B real diagnostic payload"
+        payload_boundary_label = "diagnostic only / not a complete eBOSS LRG likelihood / no posterior inference"
+    else:
+        payload_relpath = dryrun_payload_relpath
+        payload_path = dryrun_payload_path
+        payload_mode_label = "Dryrun demonstration payload"
+        payload_boundary_label = "demonstration only / no posterior inference"
+    # --- DTI_STRATEGY_AB_REAL_PAYLOAD_WIRING_V1 END ---
     payload_sha256 = "1e1823ae4af068923177a4d3d815ef6dba7a6bbbeb3a4b2cabd7090a7311f158"
 
     with st.expander("Strategy A/B proxy-emulator diagnostic — precomputed basin visualization", expanded=False):
+        # --- DTI_STRATEGY_AB_REAL_PAYLOAD_STATUS_V1 BEGIN ---
+        st.caption(f"Payload source: {payload_mode_label} — `{payload_relpath}`")
+        st.caption(f"Boundary: {payload_boundary_label}")
+        if payload_path == real_payload_path and real_payload_sha_path.exists():
+            try:
+                real_payload_sha_text = real_payload_sha_path.read_text(encoding="utf-8").strip()
+            except Exception:
+                real_payload_sha_text = "SHA sidecar unreadable"
+            st.caption(f"Payload SHA256 sidecar: `{real_payload_sha_text}`")
+        # --- DTI_STRATEGY_AB_REAL_PAYLOAD_STATUS_V1 END ---
         st.caption("DTI_STRATEGY_AB_PROXY_EMULATOR_UI_PUBLIC_READY_PAYLOAD_V1")
         st.warning(
             "Diagnostic dryrun only. This panel reads a tiny static payload from the repo-local data/ directory. "
@@ -13330,6 +13358,43 @@ def _dti_render_strategy_ab_proxy_emulator_public_ready_v1():
         ]
         missing = [c for c in required if c not in df.columns]
         if missing:
+            # --- DTI_STRATEGY_AB_REAL_PAYLOAD_SCHEMA_BRANCH_V1 BEGIN ---
+            # Real Route A/B diagnostic payload uses a source-locked key/value schema.
+            # It is diagnostic-only and must not be treated as a complete likelihood, MCMC,
+            # posterior, CLASS/AxiCLASS, or manuscript-claim result.
+            if payload_path == real_payload_path:
+                st.info("Installed real Route A/B diagnostic payload detected. Rendering key/value diagnostic summary instead of proxy-emulator grid.")
+                st.caption("Boundary: diagnostic only / not a complete eBOSS LRG likelihood / no posterior inference")
+                show_cols = [c for c in ["row_id", "value_key", "value", "typed_value", "value_class", "boundary", "likelihood_scope", "claim_guard"] if c in df.columns]
+                summary_keys = [
+                    "observation_vector",
+                    "model_vector",
+                    "delta_model_minus_observation",
+                    "inverse_covariance",
+                    "chi2_minimal",
+                    "term_DM_DM",
+                    "term_cross_total",
+                    "term_DH_DH",
+                    "term_sum",
+                    "boundary",
+                    "likelihood_scope",
+                    "route_a_b_merge_allowed",
+                    "full_likelihood_claim_allowed",
+                    "posterior_claim_allowed",
+                    "manuscript_claim_allowed",
+                ]
+                if "value_key" in df.columns:
+                    summary_df = df[df["value_key"].isin(summary_keys)].copy()
+                else:
+                    summary_df = df.copy()
+                st.markdown("**Installed real payload diagnostic summary**")
+                if show_cols:
+                    st.dataframe(summary_df[show_cols], use_container_width=True)
+                else:
+                    st.dataframe(summary_df, use_container_width=True)
+                st.caption("No CLASS/AxiCLASS call, no backend compute, no likelihood evaluation, no MCMC, no posterior inference, no manuscript claim.")
+                return
+            # --- DTI_STRATEGY_AB_REAL_PAYLOAD_SCHEMA_BRANCH_V1 END ---
             st.error(f"Payload schema missing columns: {missing}")
             return
 
