@@ -13499,4 +13499,71 @@ def _dti_render_strategy_ab_proxy_emulator_public_ready_v1():
 _dti_render_strategy_ab_proxy_emulator_public_ready_v1()
 # DTI_STRATEGY_AB_PROXY_EMULATOR_UI_PUBLIC_READY_PAYLOAD_V1_END
 
+# DTI_STRATEGY_AB_PROXY_EMULATOR_READINESS_V1_BEGIN
+def _dti_render_strategy_ab_proxy_emulator_readiness_v1():
+    """Static diagnostic-only readiness panel for Strategy A/B proxy-emulator."""
+    import pandas as _pd
+    import streamlit as _st
+    from pathlib import Path as _Path
+
+    _st.markdown("### Strategy A/B proxy-emulator readiness — frozen payload only")
+    with _st.expander("Strategy A/B proxy-emulator readiness — frozen payload only", expanded=False):
+        _st.warning(
+            "Diagnostic-readiness panel only. This does not run CLASS, AxiCLASS, "
+            "MCMC, likelihood evaluation, posterior inference, Planck validation, "
+            "BAO validation, or manuscript-level claim promotion."
+        )
+        _st.markdown("**Source lock**")
+        _st.code(
+            "payload = data/strategy_ab_real_payload_candidate_v1.tsv\n"
+            "payload_sha256 = 4dd98ed78d8bbddf6b86cb873af918508afe30ee93c520aee4701b78a4fed423\n"
+            "payload_rows = 32\n"
+            "claim_boundary = diagnostic_proxy_emulator_readiness_only",
+            language="text",
+        )
+        _payload_path = _Path("data/strategy_ab_real_payload_candidate_v1.tsv")
+        if _payload_path.exists():
+            try:
+                _df = _pd.read_csv(_payload_path, sep="\t")
+                _st.success("Frozen Strategy A/B payload found locally.")
+                _st.write(
+                    {
+                        "payload_rows_observed": int(len(_df)),
+                        "payload_rows_expected": int(32),
+                        "payload_sha256_expected": "4dd98ed78d8bbddf6b86cb873af918508afe30ee93c520aee4701b78a4fed423",
+                        "live_compute": "NO",
+                        "runtime_class": "NO",
+                        "runtime_axiclass": "NO",
+                        "runtime_mcmc": "NO",
+                        "likelihood_evaluation": "NO",
+                        "posterior_claim": "NO",
+                    }
+                )
+                _preview_cols = [c for c in ["row_id", "route_group", "payload_family", "value_key", "value", "boundary", "claim_guard"] if c in _df.columns]
+                if _preview_cols:
+                    _dti_arrow_safe_df_v1(_df[_preview_cols].head(12), width="stretch")
+                else:
+                    _dti_arrow_safe_df_v1(_df.head(12), width="stretch")
+            except Exception as _e:
+                _st.error(f"Frozen payload exists but could not be read: {_e}")
+        else:
+            _st.error("Frozen Strategy A/B payload file is not available in this deployment context.")
+
+        _st.markdown("**Activation boundary**")
+        _st.info(
+            "This panel prepares a source-locked readiness surface only. "
+            "Any actual proxy/emulator activation requires a later, separately frozen gate."
+        )
+# DTI_STRATEGY_AB_PROXY_EMULATOR_READINESS_V1_END
+
+
+
+# DTI_STRATEGY_AB_PROXY_EMULATOR_READINESS_V1_CALL
+try:
+    _dti_render_strategy_ab_proxy_emulator_readiness_v1()
+except Exception as _e:
+    try:
+        st.error(f"Strategy A/B proxy-emulator readiness panel failed safely: {_e}")
+    except Exception:
+        pass
 
