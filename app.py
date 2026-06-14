@@ -13706,3 +13706,96 @@ except Exception as _e:
     except Exception:
         pass
 
+
+# BEGIN DESI_DR2_COSMOLOGY_PRODUCTS_UI_V1
+def _dti_render_desi_dr2_cosmology_products_ui_v1():
+    """Read-only local display for staged DESI DR2 cosmology-products diagnostic artifacts.
+
+    UI privacy boundary:
+    - do not display local absolute paths
+    - show only filenames, sha256, bytes, and bounded diagnostic text
+    - no likelihood evaluation
+    - no MCMC
+    - no posterior inference
+    - no backend/API/CLASS/AxiCLASS call
+    - no physical claim
+    - no public update by this function
+    """
+    from pathlib import Path as _Path
+
+    import streamlit as st
+
+    _root = _Path(__file__).resolve().parent
+    _data_dir = _root / "data" / "desi_dr2_cosmology_products"
+
+    with st.expander("DESI DR2 cosmology-products diagnostic — local staged view", expanded=False):
+        st.caption(
+            "Read-only local diagnostic display. "
+            "No likelihood evaluation, no MCMC, no posterior inference, no physical claim. "
+            "Local absolute paths are hidden in the UI."
+        )
+
+        if not _data_dir.exists():
+            st.warning("Local staged DESI DR2 cosmology-products directory was not found.")
+            st.caption("Path intentionally hidden.")
+            return
+
+        _manifest = _data_dir / "staged_manifest.tsv"
+        _summary = _data_dir / "diagnostic_numeric_summary.tsv"
+        _text = _data_dir / "diagnostic_text_summary.md"
+        _boundary = _data_dir / "staging_boundary.tsv"
+
+        st.write("Staging source:")
+        st.code("app-local data/desi_dr2_cosmology_products/")
+
+        if _text.exists():
+            st.markdown(_text.read_text(encoding="utf-8"))
+        else:
+            st.warning("diagnostic_text_summary.md is missing.")
+
+        if _summary.exists():
+            try:
+                import pandas as pd
+                _df = pd.read_csv(_summary, sep="\t")
+                st.dataframe(_df, use_container_width=True)
+            except Exception as _exc:
+                st.warning(f"Could not render diagnostic_numeric_summary.tsv as a table: {_exc}")
+                st.code(_summary.read_text(encoding="utf-8")[:4000])
+        else:
+            st.warning("diagnostic_numeric_summary.tsv is missing.")
+
+        if _boundary.exists():
+            st.write("Boundary")
+            st.code(_boundary.read_text(encoding="utf-8"))
+        else:
+            st.warning("staging_boundary.tsv is missing.")
+
+        if _manifest.exists():
+            try:
+                import pandas as pd
+                _mf = pd.read_csv(_manifest, sep="\t")
+                _cols = [c for c in ["filename", "sha256", "bytes"] if c in _mf.columns]
+                if _cols:
+                    st.write("Staged manifest")
+                    st.dataframe(_mf[_cols], use_container_width=True)
+                else:
+                    st.warning("staged_manifest.tsv exists, but expected public-safe columns were not found.")
+            except Exception as _exc:
+                st.warning(f"Could not render staged_manifest.tsv safely: {_exc}")
+                st.caption("Manifest path values intentionally hidden.")
+        else:
+            st.warning("staged_manifest.tsv is missing.")
+
+
+def _dti_try_render_desi_dr2_cosmology_products_ui_v1():
+    try:
+        _dti_render_desi_dr2_cosmology_products_ui_v1()
+    except Exception as _exc:
+        import streamlit as st
+        st.warning(f"DESI DR2 cosmology-products local diagnostic panel failed safely: {_exc}")
+
+
+# Render at end of Streamlit script, local-only. No compute, no backend, no public deployment.
+_dti_try_render_desi_dr2_cosmology_products_ui_v1()
+# END DESI_DR2_COSMOLOGY_PRODUCTS_UI_V1
+

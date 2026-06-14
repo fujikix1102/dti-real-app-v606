@@ -1,0 +1,9 @@
+boundary	status
+diagnostic_summary_created	YES
+descriptive_summary_only	YES
+likelihood	NO
+mcmc	NO
+posterior_inference	NO
+physical_claim	NO
+app_update	NO
+manuscript_update	NO

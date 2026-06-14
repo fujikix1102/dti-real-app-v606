@@ -1,0 +1,13 @@
+boundary	status
+local_app_data_staging	YES
+app_py_patch	NO
+git_add	NO
+git_commit	NO
+git_push	NO
+public_app_update	NO
+backend_update	NO
+likelihood	NO
+mcmc	NO
+posterior_inference	NO
+physical_claim	NO
+manuscript_update	NO
