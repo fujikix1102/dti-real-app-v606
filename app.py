@@ -9514,6 +9514,145 @@ st.caption("Public parameter-profile audit interface for cosmological model comp
 # --- DTI citation/contact block V1 BEGIN ---
 st.divider()
 
+
+# DTI_STRATEGY_AB_PROXY_EMULATOR_ACTIVATION_PANEL_V1_BEGIN
+def _dti_render_strategy_ab_proxy_emulator_activation_panel_v1():
+    """Render a source-locked synthetic proxy activation diagnostic panel.
+
+    Boundary:
+    - no live MCMC
+    - no likelihood evaluation
+    - no posterior inference
+    - no CLASS/AxiCLASS runtime
+    - no DESI DR2 ingest
+    - no physical validation claim
+    """
+    import pandas as pd
+    from pathlib import Path
+
+    payload_path = Path(__file__).resolve().parent / "data/strategy_ab_activation_synthetic_proxy_payload_v1.tsv"
+    expected_sha256 = "59906716e478bf32a28af828c5b62ae9954895c07164f3d6814c492575554aa2"
+    expected_rows = 128
+
+    with st.expander("Strategy A/B proxy-emulator activation — synthetic diagnostic payload", expanded=True):
+        st.caption(
+            "Source mode: SYNTHETIC_PROXY. "
+            "This is a frozen diagnostic proxy payload, not MCMC output, "
+            "not likelihood evaluation, and not posterior inference."
+        )
+
+        st.info(
+            "Runtime boundary: this panel does not run CLASS, AxiCLASS, MCMC, "
+            "likelihood evaluation, posterior inference, DESI DR2 ingest, backend compute, "
+            "or manuscript-level claim promotion."
+        )
+
+        st.code(
+            "\n".join([
+                "payload = data/strategy_ab_activation_synthetic_proxy_payload_v1.tsv",
+                "payload_sha256 = 59906716e478bf32a28af828c5b62ae9954895c07164f3d6814c492575554aa2",
+                "payload_rows = 128",
+                "source_mode = SYNTHETIC_PROXY",
+                "claim_boundary = diagnostic_proxy_emulator_only",
+                "live_mcmc = NO",
+                "likelihood = NO",
+                "posterior_inference = NO",
+                "desi_dr2_ingest = NO",
+            ]),
+            language="text",
+        )
+
+        if not payload_path.exists():
+            st.warning("Frozen synthetic proxy activation payload is not available locally.")
+            return
+
+        try:
+            df = pd.read_csv(payload_path, sep="\t")
+        except Exception as exc:
+            st.error(f"Could not read synthetic proxy activation payload: {exc}")
+            return
+
+        observed_rows = len(df)
+        required_columns = [
+            "activation_payload_id",
+            "payload_version",
+            "source_mode",
+            "strategy_label",
+            "chain_id",
+            "sample_index",
+            "H0_value",
+            "H0_basin_label",
+            "branch_label",
+            "sticking_score",
+            "separation_metric",
+            "transition_indicator",
+            "regime_label",
+            "display_group",
+            "source_reference",
+            "claim_boundary",
+        ]
+        missing_columns = [c for c in required_columns if c not in df.columns]
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Payload rows", observed_rows)
+        c2.metric("Expected rows", expected_rows)
+        c3.metric("Strategy labels", int(df["strategy_label"].nunique()) if "strategy_label" in df.columns else 0)
+
+        if observed_rows != expected_rows:
+            st.warning(f"Payload row count differs from frozen expectation: observed={observed_rows}, expected={expected_rows}")
+
+        if missing_columns:
+            st.error("Payload schema mismatch: missing columns " + ", ".join(missing_columns))
+            return
+
+        source_modes = sorted(str(x) for x in df["source_mode"].dropna().unique())
+        boundaries = sorted(str(x) for x in df["claim_boundary"].dropna().unique())
+
+        st.write({
+            "source_modes": source_modes,
+            "claim_boundaries": boundaries,
+            "H0_min": float(df["H0_value"].min()),
+            "H0_max": float(df["H0_value"].max()),
+            "sticking_score_min": float(df["sticking_score"].min()),
+            "sticking_score_max": float(df["sticking_score"].max()),
+            "separation_metric_min": float(df["separation_metric"].min()),
+            "separation_metric_max": float(df["separation_metric"].max()),
+            "transition_indicator_min": float(df["transition_indicator"].min()),
+            "transition_indicator_max": float(df["transition_indicator"].max()),
+        })
+
+        st.dataframe(
+            df[
+                [
+                    "strategy_label",
+                    "sample_index",
+                    "H0_value",
+                    "H0_basin_label",
+                    "sticking_score",
+                    "separation_metric",
+                    "transition_indicator",
+                    "regime_label",
+                ]
+            ].head(24),
+            use_container_width=True,
+        )
+
+        st.caption(
+            "Interpretation boundary: branch separation, H0 basin-sticking, and regime-like indicators "
+            "are displayed as a source-locked synthetic diagnostic scaffold only. "
+            "They are not physical validation, not posterior probability, and not a DESI DR2 result."
+        )
+
+
+try:
+    _dti_render_strategy_ab_proxy_emulator_activation_panel_v1()
+except Exception as _dti_strategy_ab_activation_panel_error_v1:
+    st.warning(
+        "Strategy A/B proxy-emulator activation panel could not be rendered. "
+        f"Boundary preserved; no runtime inference was attempted. Error: {_dti_strategy_ab_activation_panel_error_v1}"
+    )
+# DTI_STRATEGY_AB_PROXY_EMULATOR_ACTIVATION_PANEL_V1_END
+
 with st.expander("About / Citation / Provenance", expanded=False):
     st.markdown(
         """
