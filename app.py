@@ -13880,3 +13880,39 @@ except Exception as _desi_candidate_ui_error:
     except Exception:
         pass
 # --- DESI DR2 candidate diagnostic comparison UI V1 END ---
+
+
+
+# --- DTI DESI DR2 F4/base/desi-bao-all static diagnostic V1 BEGIN ---
+def _dti_render_desi_dr2_f4_base_bao_all_static_diagnostic_v1():
+    """Render a source-locked DESI DR2 BAO-all static diagnostic panel.
+
+    Boundary: raw source-locked tokens only. No numeric adoption, no likelihood,
+    no posterior inference, no physical claim.
+    """
+    try:
+        payload = {'payload_id': 'F4_base_desi_bao_all_bestfit_minimum_static_source_locked_diagnostic_v1', 'scope': 'DESI DR2 F4/base/desi-bao-all bestfit.minimum.txt static diagnostic', 'source_file': 'bestfit.minimum.txt', 'source_file_sha256': 'bf8e35e2380ef35b137a77645dcb351af2ed2a93ca8da16c1fd71cb5dd7a1358', 'source_token_map_sha256': '63da84f8d9434fca35018a4fd270afcf43b4e94afb7ff099f5792763952d0349', 'display_policy': 'raw source-locked tokens only', 'claim_boundary': {'numeric_adoption': 'NO', 'global_numeric_adoption': 'NO', 'computed_chi2': 'NO', 'likelihood': 'NO', 'mcmc': 'NO', 'posterior_inference': 'NO', 'physical_claim': 'NO', 'app_patch': 'NO'}, 'rows': [{'column_index': '1', 'header_label': 'weight', 'raw_token': '1', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '2', 'header_label': 'minuslogpost', 'raw_token': '12.018652', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '3', 'header_label': 'hrdrag', 'raw_token': '101.54786', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '4', 'header_label': 'omm', 'raw_token': '0.29717787', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '5', 'header_label': 'As', 'raw_token': '2.0821789e-09', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '6', 'header_label': 'omch2', 'raw_token': '0.11182639', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '7', 'header_label': 'omegam', 'raw_token': '0.29717936', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '8', 'header_label': 'omegamh2', 'raw_token': '0.13484126', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '9', 'header_label': 'omegal', 'raw_token': '0.70274102', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '10', 'header_label': 'zrei', 'raw_token': '7.5415403', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '11', 'header_label': 'YHe', 'raw_token': '0.24539541', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '12', 'header_label': 'Y_p', 'raw_token': '0.2467254', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '13', 'header_label': 'DHBBN', 'raw_token': '2.5855788', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '14', 'header_label': 'A', 'raw_token': '2.0821789', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '15', 'header_label': 'clamp', 'raw_token': '1.8675266', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '16', 'header_label': 'age', 'raw_token': '14.026193', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '17', 'header_label': 'rdrag', 'raw_token': '150.75395', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '18', 'header_label': 'zdrag', 'raw_token': '1059.3375', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '19', 'header_label': 'H0rdrag', 'raw_token': '10154.786', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '20', 'header_label': 'chi2__BAO', 'raw_token': '10.282299', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '21', 'header_label': 'minuslogprior', 'raw_token': '6.8775022', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '22', 'header_label': 'minuslogprior__0', 'raw_token': '6.8775022', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '23', 'header_label': 'chi2', 'raw_token': '10.282299', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}, {'column_index': '24', 'header_label': 'chi2__desi_y3_cosmo_bindings.cobaya_likelihoods.bao_likelihoods_v1p2.desi_bao_all', 'raw_token': '10.282299', 'token_class': 'numeric_token', 'numeric_adoption': 'NO', 'display_value_type': 'raw_source_locked_token'}]}
+        rows = payload.get("rows", [])
+        claim_boundary = payload.get("claim_boundary", {})
+
+        with st.expander("DESI DR2 F4/base/desi-bao-all static diagnostic — source-locked raw tokens", expanded=False):
+            st.caption(
+                "Source-locked static diagnostic. Raw tokens only. "
+                "No numeric adoption, no chi-square computation, no likelihood, "
+                "no posterior inference, and no physical claim."
+            )
+            st.write("Source file:", payload.get("source_file", "bestfit.minimum.txt"))
+            st.write("Source file SHA256:", payload.get("source_file_sha256", ""))
+            st.write("Source token-map SHA256:", payload.get("source_token_map_sha256", ""))
+            st.write("Display policy:", payload.get("display_policy", "raw source-locked tokens only"))
+
+            st.table(rows)
+
+            st.write("Boundary")
+            st.json(claim_boundary)
+    except Exception as exc:
+        st.error(f"DESI DR2 static diagnostic panel failed safely: {exc}")
+
+_dti_render_desi_dr2_f4_base_bao_all_static_diagnostic_v1()
+# --- DTI DESI DR2 F4/base/desi-bao-all static diagnostic V1 END ---
+
