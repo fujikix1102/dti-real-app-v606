@@ -13799,3 +13799,84 @@ def _dti_try_render_desi_dr2_cosmology_products_ui_v1():
 _dti_try_render_desi_dr2_cosmology_products_ui_v1()
 # END DESI_DR2_COSMOLOGY_PRODUCTS_UI_V1
 
+# --- DESI DR2 candidate diagnostic comparison UI V1 BEGIN ---
+try:
+    from pathlib import Path as _Path_desi_candidate_ui
+    import pandas as _pd_desi_candidate_ui
+    import streamlit as _st_desi_candidate_ui
+
+    _DESI_CANDIDATE_DIR = _Path_desi_candidate_ui(__file__).resolve().parent / "data" / "desi_dr2_candidate_diagnostic_comparison"
+    _rank_summary_path = _DESI_CANDIDATE_DIR / "candidate_diagnostic_comparison_rank_summary_v1_LOCKED.tsv"
+    _field_delta_path = _DESI_CANDIDATE_DIR / "candidate_diagnostic_comparison_field_delta_v1_LOCKED.tsv"
+    _exec_review_path = _DESI_CANDIDATE_DIR / "candidate_diagnostic_comparison_execution_review_v1_LOCKED.tsv"
+    _review_summary_path = _DESI_CANDIDATE_DIR / "candidate_diagnostic_comparison_review_summary_v1_LOCKED.tsv"
+
+    with _st_desi_candidate_ui.expander(
+        "DESI DR2 candidate diagnostic comparison — bounded display only",
+        expanded=False,
+    ):
+        _st_desi_candidate_ui.caption(
+            "Boundary: diagnostic display only. No global numeric adoption, no likelihood evaluation, no MCMC, no posterior inference, and no physical claim."
+        )
+
+        if not _rank_summary_path.exists() or not _field_delta_path.exists():
+            _st_desi_candidate_ui.warning(
+                "Candidate diagnostic comparison files are not staged in data/desi_dr2_candidate_diagnostic_comparison."
+            )
+        else:
+            _rank_df = _pd_desi_candidate_ui.read_csv(_rank_summary_path, sep="\t")
+            _field_df = _pd_desi_candidate_ui.read_csv(_field_delta_path, sep="\t")
+
+            _st_desi_candidate_ui.markdown("**Rank-level bounded comparison to baseline rank 1**")
+            _rank_cols = [
+                "rank",
+                "baseline_rank",
+                "common_field_count",
+                "comparison_status",
+                "max_abs_delta_field",
+                "max_abs_delta",
+                "max_rel_delta_field",
+                "max_rel_delta_abs",
+                "global_numeric_adoption",
+                "likelihood",
+                "physical_claim",
+            ]
+            _rank_cols = [c for c in _rank_cols if c in _rank_df.columns]
+            _st_desi_candidate_ui.dataframe(_rank_df[_rank_cols], use_container_width=True)
+
+            with _st_desi_candidate_ui.expander("Field-level delta table", expanded=False):
+                _field_cols = [
+                    "rank",
+                    "baseline_rank",
+                    "field",
+                    "baseline_value",
+                    "candidate_value",
+                    "delta",
+                    "abs_delta",
+                    "relative_delta",
+                    "global_numeric_adoption",
+                    "likelihood",
+                    "physical_claim",
+                ]
+                _field_cols = [c for c in _field_cols if c in _field_df.columns]
+                _st_desi_candidate_ui.dataframe(_field_df[_field_cols], use_container_width=True)
+
+            if _exec_review_path.exists():
+                _st_desi_candidate_ui.markdown("**Execution boundary record**")
+                _exec_review_df = _pd_desi_candidate_ui.read_csv(_exec_review_path, sep="\t")
+                _st_desi_candidate_ui.dataframe(_exec_review_df, use_container_width=True)
+
+            if _review_summary_path.exists():
+                _st_desi_candidate_ui.markdown("**Review boundary record**")
+                _review_summary_df = _pd_desi_candidate_ui.read_csv(_review_summary_path, sep="\t")
+                _st_desi_candidate_ui.dataframe(_review_summary_df, use_container_width=True)
+
+except Exception as _desi_candidate_ui_error:
+    try:
+        import streamlit as _st_desi_candidate_ui_fallback
+        _st_desi_candidate_ui_fallback.warning(
+            f"DESI DR2 candidate diagnostic comparison UI block skipped: {_desi_candidate_ui_error}"
+        )
+    except Exception:
+        pass
+# --- DESI DR2 candidate diagnostic comparison UI V1 END ---

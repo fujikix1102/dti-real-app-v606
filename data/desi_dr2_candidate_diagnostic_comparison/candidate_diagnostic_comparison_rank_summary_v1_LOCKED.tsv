@@ -1,0 +1,9 @@
+rank	baseline_rank	common_field_count	comparison_status	issues	max_abs_delta_field	max_abs_delta	max_rel_delta_field	max_rel_delta_abs	diagnostic_comparison	global_numeric_adoption	likelihood	mcmc	posterior_inference	physical_claim
+1	1	6	PASS		omegam	0.0	omegam	0.0	YES	NO	NO	NO	NO	NO
+2	1	6	PASS		chi2	1453.9592010000001	chi2	141.40409659357312	YES	NO	NO	NO	NO	NO
+3	1	6	PASS		chi2	1654.366901	chi2	160.8946502139259	YES	NO	NO	NO	NO	NO
+4	1	6	PASS		chi2	1410.655601	chi2	137.19262598763174	YES	NO	NO	NO	NO	NO
+5	1	6	PASS		H0rdrag	71.10599999999977	chi2	3.2379253900319367	YES	NO	NO	NO	NO	NO
+6	1	6	PASS		H0rdrag	54.75699999999961	chi2	0.4726232917366049	YES	NO	NO	NO	NO	NO
+7	1	6	PASS		chi2	1648.742001	chi2	160.347603293777	YES	NO	NO	NO	NO	NO
+8	1	6	PASS		chi2	1405.895401	chi2	136.7296750464074	YES	NO	NO	NO	NO	NO

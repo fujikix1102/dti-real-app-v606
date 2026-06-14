@@ -1,0 +1,17 @@
+key	value
+diagnostic_comparison_review_status	PASS
+row_count	8
+pass_count	8
+fail_count	0
+issue_count	0
+issues	
+field_delta_row_count	48
+comparison_family	bounded_rank_to_baseline_field_delta
+baseline_rank	1
+common_field_count	6
+all_delta_values_finite	YES
+global_numeric_adoption	NO
+likelihood	NO
+mcmc	NO
+posterior_inference	NO
+physical_claim	NO

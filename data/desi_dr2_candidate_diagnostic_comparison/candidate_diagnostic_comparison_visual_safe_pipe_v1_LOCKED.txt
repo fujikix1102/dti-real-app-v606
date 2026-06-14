@@ -1,0 +1,9 @@
+rank | baseline_rank | common_field_count | comparison_status | max_abs_delta_field | max_abs_delta | global_numeric_adoption | physical_claim
+1 | 1 | 6 | PASS | omegam | 0.0 | NO | NO
+2 | 1 | 6 | PASS | chi2 | 1453.9592010000001 | NO | NO
+3 | 1 | 6 | PASS | chi2 | 1654.366901 | NO | NO
+4 | 1 | 6 | PASS | chi2 | 1410.655601 | NO | NO
+5 | 1 | 6 | PASS | H0rdrag | 71.10599999999977 | NO | NO
+6 | 1 | 6 | PASS | H0rdrag | 54.75699999999961 | NO | NO
+7 | 1 | 6 | PASS | chi2 | 1648.742001 | NO | NO
+8 | 1 | 6 | PASS | chi2 | 1405.895401 | NO | NO
