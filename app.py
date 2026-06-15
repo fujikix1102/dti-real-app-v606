@@ -13914,7 +13914,6 @@ def _dti_render_desi_dr2_f4_base_bao_all_static_diagnostic_v1():
         st.error(f"DESI DR2 static diagnostic panel failed safely: {exc}")
 
 _dti_render_desi_dr2_f4_base_bao_all_static_diagnostic_v1()
-_dti_render_desi_dr2_bao_cosmo_params_source_map_payload_v1b()
 # --- DTI DESI DR2 F4/base/desi-bao-all static diagnostic V1 END ---
 
 # --- DTI DESI DR2 iminuit product index static payload V1C BEGIN ---
@@ -14033,4 +14032,5 @@ def _dti_render_desi_dr2_bao_cosmo_params_source_map_payload_v1b():
         )
 
 # --- DTI DESI DR2 bao-cosmo-params source map static payload V1B END ---
+_dti_render_desi_dr2_bao_cosmo_params_source_map_payload_v1b()
 
