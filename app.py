@@ -14169,3 +14169,85 @@ except Exception as _strategy_ab_proxy_emulator_panel_error:
         f"{_strategy_ab_proxy_emulator_panel_error}"
     )
 # --- STRATEGY_AB_PROXY_EMULATOR_STATIC_PAYLOAD_PANEL_V1B_END ---
+
+# === DTI CACHE/STUB DIAGNOSTIC VIEWER V1 BEGIN ===
+# Local static diagnostic viewer only.
+# No backend import, no API server call, no cache file read, no network call, no mutation.
+
+def _dti_render_cache_stub_diagnostic_viewer_v1():
+    """Static Streamlit diagnostic viewer for locked cache/stub provenance."""
+    try:
+        import streamlit as st
+    except Exception:
+        return
+
+    integration_id = "streamlit_cache_viewer_integration_v1"
+    stub_id = "backend_api_stub_v1"
+    contract_id = "backend_api_contract_v1"
+    cache_id = "synthetic_schema_only_probe_v1_cache"
+    cache_payload_sha256 = "2f5d1a13841460a5b36ac18a1a553de82a83f6a2adcd7ed7fc824ca3ec75e21e"
+    stub_main_sha256 = "12995569990096cba4b96cf2c43530e46a4e07c0f4e90bae290ab56411157b69"
+
+    with st.expander("Embedded cache/stub diagnostic viewer — local static diagnostic", expanded=False):
+        st.caption(
+            "Diagnostic viewer only. Static identity display; no backend runtime call, "
+            "no API server, no source download, no raw DESI ingest, no likelihood, no MCMC, no posterior claim."
+        )
+
+        st.markdown("**Stub / contract identity**")
+        st.table([
+            {"key": "integration_id", "value": integration_id},
+            {"key": "stub_id", "value": stub_id},
+            {"key": "contract_id", "value": contract_id},
+            {"key": "cache_id", "value": cache_id},
+            {"key": "cache_payload_sha256", "value": cache_payload_sha256},
+            {"key": "stub_main_sha256", "value": stub_main_sha256},
+        ])
+
+        st.markdown("**Boundary flags**")
+        st.table([
+            {"boundary": "backend_runtime_call", "status": "NO"},
+            {"boundary": "api_server_create", "status": "NO"},
+            {"boundary": "cache_file_read_by_app", "status": "NO"},
+            {"boundary": "source_download", "status": "NO"},
+            {"boundary": "raw_desi_ingest", "status": "NO"},
+            {"boundary": "computed_chi2", "status": "NO"},
+            {"boundary": "likelihood", "status": "NO"},
+            {"boundary": "mcmc", "status": "NO"},
+            {"boundary": "posterior_inference", "status": "NO"},
+            {"boundary": "physical_claim", "status": "NO"},
+        ])
+
+        st.markdown("**Safe sample request**")
+        st.json({
+            "cache_id": cache_id,
+            "query_mode": "identity",
+            "allow_interpolation": False,
+            "allow_extrapolation": False,
+            "allow_silent_fallback": False,
+            "claim_mode": "diagnostic_only",
+        })
+
+        st.markdown("**Safe sample response**")
+        st.json({
+            "result_status": "ok_static_identity_display",
+            "cache_id": cache_id,
+            "contract_id": contract_id,
+            "stub_id": stub_id,
+            "scientific_cache": False,
+            "source_download": False,
+            "raw_desi_ingest": False,
+            "computed_chi2": False,
+            "likelihood": False,
+            "mcmc": False,
+            "posterior_inference": False,
+            "physical_claim": False,
+        })
+
+        st.info(
+            "Next gate: local visual/review confirmation before any commit or public update. "
+            "This block is static and does not execute the backend stub."
+        )
+
+_dti_render_cache_stub_diagnostic_viewer_v1()
+# === DTI CACHE/STUB DIAGNOSTIC VIEWER V1 END ===
