@@ -14034,3 +14034,138 @@ def _dti_render_desi_dr2_bao_cosmo_params_source_map_payload_v1b():
 # --- DTI DESI DR2 bao-cosmo-params source map static payload V1B END ---
 _dti_render_desi_dr2_bao_cosmo_params_source_map_payload_v1b()
 
+
+# --- STRATEGY_AB_PROXY_EMULATOR_STATIC_PAYLOAD_PANEL_V1B_BEGIN ---
+try:
+    with st.expander("Strategy A/B proxy-emulator payload — diagnostic display only", expanded=False):
+        st.caption(
+            "Static reviewed payload display only. No raw DESI ingest, no numeric adoption, "
+            "no chi-square computation, no likelihood calculation, no MCMC run, no posterior inference, "
+            "and no physical claim."
+        )
+
+        st.warning(
+            "Boundary: source/provenance and reviewed payload identity only. "
+            "This panel does not validate a model, compute a likelihood, or promote any cosmological claim.",
+            icon="⚠️",
+        )
+
+        st.markdown("**Payload identity**")
+        st.table(
+            [
+                {"field": "payload_id", "value": "strategy_ab_proxy_emulator_payload_v1b"},
+                {"field": "payload_version", "value": "v1b"},
+                {"field": "payload_status", "value": "PREPARED_STATIC_SKELETON_REPAIRED"},
+                {"field": "payload_json_sha256", "value": "a5c5d43d468881b5c5f695721b6c704396549f33f3460fd0690957015181899c"},
+                {"field": "payload_review_zip_sha256", "value": "22b1f84ffcb64544d55628231b591e62e5d4209698ff4a707d82b9349b82cb26"},
+                {"field": "public_display_scan_target_sha256", "value": "33bed7c40df963f08aabfc2ea8c74d09484e7b1e5686fa35cb7d33ab563ab0d2"},
+            ]
+        )
+
+        st.markdown("**Strategy A/B roles**")
+        st.table(
+            [
+                {
+                    "strategy": "Strategy A",
+                    "role": "Manual-sanity / minimal diagnostic lane.",
+                    "display": "Static frozen explanation, source identity, and boundary flags.",
+                    "runtime_compute": "NO",
+                },
+                {
+                    "strategy": "Strategy B",
+                    "role": "Source-locked proxy/emulator lane.",
+                    "display": "Static frozen payload identity, provenance, and non-adoptive diagnostic labels.",
+                    "runtime_compute": "NO",
+                },
+                {
+                    "strategy": "A/B boundary matrix",
+                    "role": "Boundary comparison table.",
+                    "display": "Scope comparison and allowed/forbidden operation flags.",
+                    "runtime_compute": "NO",
+                },
+                {
+                    "strategy": "Proxy/emulator layer",
+                    "role": "Lightweight diagnostic representation.",
+                    "display": "Payload hash, schema version, source family, and display limitations.",
+                    "runtime_compute": "NO",
+                },
+                {
+                    "strategy": "Review layer",
+                    "role": "Pre-patch safety gate.",
+                    "display": "Required PASS checks before any app patch request.",
+                    "runtime_compute": "NO",
+                },
+            ]
+        )
+
+        st.markdown("**Boundary flags**")
+        st.table(
+            [
+                {"boundary": "raw_desi_ingest", "status": "NO"},
+                {"boundary": "large_download", "status": "NO"},
+                {"boundary": "bestfit_raw_token_values", "status": "NO"},
+                {"boundary": "optimizer_fit_interpretation", "status": "NO"},
+                {"boundary": "numeric_adoption", "status": "NO"},
+                {"boundary": "computed_chi2", "status": "NO"},
+                {"boundary": "likelihood", "status": "NO"},
+                {"boundary": "mcmc", "status": "NO"},
+                {"boundary": "posterior_inference", "status": "NO"},
+                {"boundary": "physical_claim", "status": "NO"},
+                {"boundary": "backend_call", "status": "NO"},
+                {"boundary": "network_call", "status": "NO"},
+            ]
+        )
+
+        st.markdown("**Review status**")
+        st.table(
+            [
+                {
+                    "gate": "STRATEGY_AB_PROXY_EMULATOR_PAYLOAD_PREP_REPAIR_V1B",
+                    "status": "PASS",
+                    "sha256": "30b48c31ab13bdd1beb97fa3ed18bdda438e909c3ac61e136495e636631d1812",
+                },
+                {
+                    "gate": "STRATEGY_AB_PROXY_EMULATOR_PAYLOAD_REVIEW_V1",
+                    "status": "PASS",
+                    "sha256": "22b1f84ffcb64544d55628231b591e62e5d4209698ff4a707d82b9349b82cb26",
+                },
+                {
+                    "gate": "STRATEGY_AB_PROXY_EMULATOR_APP_PATCH_REQUEST_V1",
+                    "status": "PASS",
+                    "sha256": "77634f5cab3e18763419eb9a3bf348d3605ac9df62acc1c4b30b471c40c60fd0",
+                },
+            ]
+        )
+
+        with st.expander("Source / scan scope details", expanded=False):
+            st.table(
+                [
+                    {
+                        "item": "public_display_scan_target_sha256",
+                        "value": "33bed7c40df963f08aabfc2ea8c74d09484e7b1e5686fa35cb7d33ab563ab0d2",
+                    },
+                    {
+                        "item": "schema_lock_repair_zip_sha256",
+                        "value": "c2469ea22b0249a3feebd753d4c9a658a40c2e6a2dc06d90d0194f224d6b44d9",
+                    },
+                    {
+                        "item": "source_map_freeze_zip_sha256",
+                        "value": "2e916d9fa54aad48b46b2fc08ee72a7b6b211dba599884c84ed23b538a892ea7",
+                    },
+                    {
+                        "item": "public-display scan",
+                        "value": "PASS; policy rows are kept separate from public-claim text.",
+                    },
+                ]
+            )
+
+        st.caption(
+            "Display policy: this is a reviewed static skeleton. It is not a live emulator, "
+            "not a likelihood layer, not a chain-output display, and not a posterior-layer claim."
+        )
+except Exception as _strategy_ab_proxy_emulator_panel_error:
+    st.caption(
+        "Strategy A/B proxy-emulator payload panel skipped: "
+        f"{_strategy_ab_proxy_emulator_panel_error}"
+    )
+# --- STRATEGY_AB_PROXY_EMULATOR_STATIC_PAYLOAD_PANEL_V1B_END ---
