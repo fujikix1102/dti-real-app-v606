@@ -14356,3 +14356,108 @@ except Exception:
     pass
 # === DTI STREAMLIT BACKEND RUNTIME ADAPTER V1 END ===
 
+
+# === DTI STREAMLIT INTERACTIVE QUERY MODE ADAPTER V1 BEGIN ===
+def _dti_render_interactive_query_mode_adapter_v1():
+    import json
+    import streamlit as st
+
+    st.markdown("### Interactive diagnostic query mode adapter")
+    st.caption(
+        "Adapter second stage before real data or real compute. "
+        "Diagnostic modes only: identity, boundary, source_identity. "
+        "No API server, no source download, no raw DESI ingest, no cache build, "
+        "no chi2, no likelihood, no MCMC, no posterior inference, no physical claim."
+    )
+
+    allowed_modes = ("identity", "boundary", "source_identity")
+
+    selected_mode = st.radio(
+        "Diagnostic query mode",
+        allowed_modes,
+        index=0,
+        horizontal=True,
+        key="dti_interactive_query_mode_adapter_v1",
+    )
+
+    safe_request = {
+        "cache_id": "synthetic_schema_only_probe_v1_cache",
+        "query_mode": selected_mode,
+        "allow_interpolation": False,
+        "allow_extrapolation": False,
+        "allow_silent_fallback": False,
+        "claim_mode": "diagnostic_only",
+    }
+
+    st.markdown("#### Fixed diagnostic request")
+    st.json(safe_request)
+
+    st.markdown("#### Interactive diagnostic result")
+
+    try:
+        from pathlib import Path as _DtiPath
+        import sys as _dti_sys
+
+        _dti_runtime_dir = _DtiPath(__file__).resolve().parent / "backend_runtime"
+        if str(_dti_runtime_dir) not in _dti_sys.path:
+            _dti_sys.path.insert(0, str(_dti_runtime_dir))
+
+        from backend_stub_runtime_v1 import (
+            RuntimeBoundaryError,
+            cache_boundary,
+            cache_identity,
+            cache_query,
+            source_identity,
+        )
+
+        if selected_mode == "identity":
+            result = cache_query(safe_request)
+            st.dataframe(
+                [
+                    {"field": "status", "value": result.status},
+                    {"field": "cache_id", "value": result.payload.get("cache_id")},
+                    {"field": "contract_id", "value": result.payload.get("contract_id")},
+                    {"field": "stub_id", "value": result.payload.get("stub_id")},
+                    {"field": "runtime_id", "value": result.payload.get("runtime_id")},
+                    {"field": "scientific_cache", "value": result.payload.get("scientific_cache")},
+                    {"field": "computed_chi2", "value": result.boundary.get("computed_chi2")},
+                    {"field": "likelihood", "value": result.boundary.get("likelihood")},
+                    {"field": "mcmc", "value": result.boundary.get("mcmc")},
+                    {"field": "posterior_inference", "value": result.boundary.get("posterior_inference")},
+                    {"field": "physical_claim", "value": result.boundary.get("physical_claim")},
+                ],
+                hide_index=True,
+                use_container_width=True,
+            )
+        elif selected_mode == "boundary":
+            result = cache_boundary()
+            boundary = result.payload.get("boundary", {})
+            st.dataframe(
+                [{"boundary": k, "status": v} for k, v in boundary.items()],
+                hide_index=True,
+                use_container_width=True,
+            )
+        elif selected_mode == "source_identity":
+            result = source_identity()
+            st.dataframe(
+                [{"field": k, "value": v} for k, v in result.payload.items()],
+                hide_index=True,
+                use_container_width=True,
+            )
+        else:
+            raise RuntimeBoundaryError("QUERY_MODE_FORBIDDEN")
+
+        st.caption(
+            "Interactive adapter result remains diagnostic-only. It does not evaluate "
+            "chi2, likelihood, MCMC, posterior inference, or physical claims."
+        )
+
+    except Exception as exc:
+        st.warning(f"Interactive diagnostic adapter unavailable or rejected safely: {exc}")
+
+with st.expander("Interactive diagnostic query mode adapter — safe modes only", expanded=False):
+    _dti_render_interactive_query_mode_adapter_v1()
+# === DTI STREAMLIT INTERACTIVE QUERY MODE ADAPTER V1 END ===
+
+
+
