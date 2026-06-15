@@ -14251,3 +14251,108 @@ def _dti_render_cache_stub_diagnostic_viewer_v1():
 
 _dti_render_cache_stub_diagnostic_viewer_v1()
 # === DTI CACHE/STUB DIAGNOSTIC VIEWER V1 END ===
+
+# === DTI STREAMLIT BACKEND RUNTIME ADAPTER V1 BEGIN ===
+def _dti_render_backend_runtime_adapter_v1():
+    """Optional local callable adapter over backend_runtime; diagnostic-only."""
+    try:
+        import streamlit as st
+        import pandas as pd
+    except Exception:
+        return
+
+    st.markdown("### Backend runtime adapter — diagnostic local callable")
+    st.caption(
+        "Local diagnostic callable adapter only. No API server, no source download, "
+        "no raw DESI ingest, no likelihood, no MCMC, no posterior inference, no physical claim."
+    )
+
+    boundary_rows = [
+        {"boundary": "api_server_create", "status": "NO"},
+        {"boundary": "source_download", "status": "NO"},
+        {"boundary": "raw_desi_ingest", "status": "NO"},
+        {"boundary": "cache_build", "status": "NO"},
+        {"boundary": "computed_chi2", "status": "NO"},
+        {"boundary": "likelihood", "status": "NO"},
+        {"boundary": "mcmc", "status": "NO"},
+        {"boundary": "posterior_inference", "status": "NO"},
+        {"boundary": "physical_claim", "status": "NO"},
+    ]
+
+    try:
+        from pathlib import Path as _DtiPath
+        import sys as _dti_sys
+        _dti_runtime_dir = _DtiPath(__file__).resolve().parent / "backend_runtime"
+        if str(_dti_runtime_dir) not in _dti_sys.path:
+            _dti_sys.path.insert(0, str(_dti_runtime_dir))
+        from backend_stub_runtime_v1 import (
+            RuntimeBoundaryError,
+            cache_boundary,
+            cache_identity,
+            cache_query,
+            health,
+            source_identity,
+        )
+    except Exception as exc:
+        st.warning("Backend runtime adapter unavailable. Static diagnostic viewer remains valid.")
+        st.dataframe(pd.DataFrame(boundary_rows), use_container_width=True)
+        st.caption(f"Import status: unavailable; reason={type(exc).__name__}")
+        return
+
+    safe_request = {
+        "cache_id": "synthetic_schema_only_probe_v1_cache",
+        "query_mode": "identity",
+        "allow_interpolation": False,
+        "allow_extrapolation": False,
+        "allow_silent_fallback": False,
+        "claim_mode": "diagnostic_only",
+    }
+
+    st.dataframe(pd.DataFrame(boundary_rows), use_container_width=True)
+
+    calls = [
+        ("health", health),
+        ("cache_identity", cache_identity),
+        ("cache_boundary", cache_boundary),
+        ("source_identity", source_identity),
+        ("cache_query_identity", lambda: cache_query(dict(safe_request))),
+    ]
+
+    result_rows = []
+    for name, fn in calls:
+        try:
+            response = fn()
+            result_rows.append({
+                "call": name,
+                "status": getattr(response, "status", "unknown"),
+                "cache_id": getattr(response, "payload", {}).get("cache_id", ""),
+                "contract_id": getattr(response, "payload", {}).get("contract_id", ""),
+                "stub_id": getattr(response, "payload", {}).get("stub_id", ""),
+                "runtime_id": getattr(response, "payload", {}).get("runtime_id", ""),
+                "likelihood": getattr(response, "boundary", {}).get("likelihood", "NO"),
+                "mcmc": getattr(response, "boundary", {}).get("mcmc", "NO"),
+                "posterior_inference": getattr(response, "boundary", {}).get("posterior_inference", "NO"),
+                "physical_claim": getattr(response, "boundary", {}).get("physical_claim", "NO"),
+            })
+        except RuntimeBoundaryError as exc:
+            result_rows.append({"call": name, "status": f"boundary_error:{exc}"})
+        except Exception as exc:
+            result_rows.append({"call": name, "status": f"safe_error:{type(exc).__name__}"})
+
+    st.markdown("#### Runtime adapter smoke result")
+    st.dataframe(pd.DataFrame(result_rows), use_container_width=True)
+
+    st.markdown("#### Fixed safe request")
+    st.json(safe_request)
+
+    st.caption(
+        "Adapter result is local diagnostic-only. It does not create an API server and does not evaluate "
+        "chi2, likelihood, MCMC, posterior inference, or physical claims."
+    )
+
+try:
+    _dti_render_backend_runtime_adapter_v1()
+except Exception:
+    pass
+# === DTI STREAMLIT BACKEND RUNTIME ADAPTER V1 END ===
+
