@@ -14461,3 +14461,69 @@ with st.expander("Interactive diagnostic query mode adapter — safe modes only"
 
 
 
+
+# BEGIN ZC_GTDS_BOUNDED_PAYLOAD_CANDIDATE_LOCAL_VIEWER_V1C
+with st.sidebar.expander("ZC / GTDS payload candidate", expanded=False):
+    st.warning(
+        "BOUNDED PAYLOAD CANDIDATE ONLY. "
+        "Not GTDS true payload. "
+        "Not posterior validation. "
+        "Not observed-likelihood confirmation. "
+        "Not likelihood result. "
+        "Not physical or cosmological claim."
+    )
+
+    st.markdown("**Boundary flags**")
+    st.table([
+        {"boundary": "GTDS true payload", "status": "NO"},
+        {"boundary": "posterior validation", "status": "NO"},
+        {"boundary": "observed-likelihood confirmation", "status": "NO"},
+        {"boundary": "likelihood result", "status": "NO"},
+        {"boundary": "physical claim", "status": "NO"},
+        {"boundary": "cosmological claim", "status": "NO"},
+        {"boundary": "public result", "status": "NO"},
+        {"boundary": "manuscript evidence", "status": "NO"},
+    ])
+
+    st.markdown("**Source identity**")
+    st.table([
+        {
+            "field": "freeze root",
+            "value": "_ZC_GTDS_BINARY_MATRIX_PAYLOAD_CANDIDATE_FREEZE_V1_20260616_135142",
+        },
+        {
+            "field": "frozen payload JSON SHA256",
+            "value": "5365b77a26c91d4d6197b796959e60842d638280b3b0fdae2a74de671b3abdf7",
+        },
+        {
+            "field": "schema source",
+            "value": "tools/run_joint_mcmc_stepM.py",
+        },
+    ])
+
+    st.markdown("**Schema scope**")
+    st.table([
+        {"item": "joint_stepM_chain.npy", "value": "(800, 64, 7)"},
+        {"item": "joint_stepM_flat.npy", "value": "(51200, 7)"},
+        {"item": "dtype", "value": "float64"},
+        {"item": "columns", "value": "H0, ZC, Om_L, Om_H, rd, M_low, M_high"},
+    ])
+
+    st.markdown("**Descriptive frozen candidate readout**")
+    st.caption("Descriptive only. Not posterior validation. Not likelihood inference.")
+    st.table([
+        {"parameter": "H0", "median": "66.6387771012"},
+        {"parameter": "ZC", "median": "0.840793462499"},
+        {"parameter": "Om_L", "median": "0.319738875712"},
+        {"parameter": "Om_H", "median": "0.352705260616"},
+        {"parameter": "rd", "median": "150.844480564"},
+        {"parameter": "M_low", "median": "0.202779008548"},
+        {"parameter": "M_high", "median": "0.202023225358"},
+    ])
+
+    st.markdown("**Allowed use**")
+    st.caption(
+        "Local diagnostic display only: source identity, schema, shape, "
+        "hashes, descriptive summary, and boundary status."
+    )
+# END ZC_GTDS_BOUNDED_PAYLOAD_CANDIDATE_LOCAL_VIEWER_V1C
