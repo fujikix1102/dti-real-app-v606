@@ -13675,6 +13675,7 @@ try:
 
         _base_81_grid_v1 = _Path_81_grid_v1(__file__).resolve().parent
         _candidate_81_grid_paths_v1 = [
+            _base_81_grid_v1 / "data" / "strategy_ab_bao_2x2_diagnostic_81_grid_source_v1.tsv",
             _base_81_grid_v1 / "data" / "strategy_ab_proxy_emulator_81_grid_v1.tsv",
             _base_81_grid_v1 / "data" / "strategy_ab_proxy_emulator_81grid_v1.tsv",
             _base_81_grid_v1 / "data" / "strategy_ab_81_grid_basin_v1.tsv",
@@ -13713,6 +13714,17 @@ try:
             st.caption(f"source={_src_81_grid_v1.relative_to(_base_81_grid_v1)}")
 
             _shown_81_grid_v1 = _df_81_grid_v1.copy()
+
+            # DTI public-safety redaction:
+            # keep the frozen source unchanged, but do not expose local Mac absolute paths in UI tables.
+            _local_path_cols_81_grid_v1 = [
+                "provenance_root",
+                "parameter_grid_lock_root",
+                "lockroot",
+            ]
+            for _path_col_81_grid_v1 in _local_path_cols_81_grid_v1:
+                if _path_col_81_grid_v1 in _shown_81_grid_v1.columns:
+                    _shown_81_grid_v1[_path_col_81_grid_v1] = "[redacted-local-source-root]"
             st.dataframe(_shown_81_grid_v1, use_container_width=True)
 
             _numeric_cols_81_grid_v1 = [
@@ -13721,9 +13733,15 @@ try:
             ]
 
             if len(_df_81_grid_v1) == 81 and len(_numeric_cols_81_grid_v1) >= 3:
-                _x_col_81_grid_v1 = _numeric_cols_81_grid_v1[0]
-                _y_col_81_grid_v1 = _numeric_cols_81_grid_v1[1]
-                _z_col_81_grid_v1 = _numeric_cols_81_grid_v1[2]
+                _preferred_cols_81_grid_v1 = ["x_value", "y_value", "basin_value"]
+                if all(_c_81_grid_v1 in _df_81_grid_v1.columns for _c_81_grid_v1 in _preferred_cols_81_grid_v1):
+                    _x_col_81_grid_v1 = "x_value"
+                    _y_col_81_grid_v1 = "y_value"
+                    _z_col_81_grid_v1 = "basin_value"
+                else:
+                    _x_col_81_grid_v1 = _numeric_cols_81_grid_v1[0]
+                    _y_col_81_grid_v1 = _numeric_cols_81_grid_v1[1]
+                    _z_col_81_grid_v1 = _numeric_cols_81_grid_v1[2]
 
                 st.markdown("#### 81-grid diagnostic chart candidate")
                 st.caption(
