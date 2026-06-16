@@ -13638,6 +13638,145 @@ def _dti_render_strategy_ab_proxy_emulator_public_ready_v1():
 _dti_render_strategy_ab_proxy_emulator_public_ready_v1()
 # DTI_STRATEGY_AB_PROXY_EMULATOR_UI_PUBLIC_READY_PAYLOAD_V1_END
 
+# BEGIN BAO_CC_SNE_81_GRID_UI_EXPOSURE_LOCAL_PATCH_V1
+# Local-only UI exposure patch.
+# Purpose:
+# - Preserve the installed real Route A/B diagnostic payload summary.
+# - Expose a separate 81-grid/proxy-emulator basin visualization panel only when a real frozen/static source exists.
+# - If no compatible source exists, show a no-graph notice.
+# Boundaries:
+# - no CLASS-like / AXI-class-style call
+# - no backend compute
+# - no new cache generation
+# - no likelihood evaluation
+# - no normalized likelihood evaluation
+# - no MCMC
+# - no posterior inference
+# - no physical proof
+# - no manuscript claim
+# - no synthetic/fake/illustrative/fallback contour
+
+try:
+    with st.expander("Strategy A/B proxy-emulator 81-grid basin visualization — frozen diagnostic view", expanded=False):
+        st.caption("BAO_CC_SNE_81_GRID_UI_EXPOSURE_LOCAL_PATCH_V1")
+        st.write(
+            "Separate diagnostic panel for a frozen/static 81-grid proxy-emulator basin visualization. "
+            "This panel does not replace the installed real Route A/B diagnostic payload summary."
+        )
+
+        st.warning(
+            "Boundary: diagnostic display only. No CLASS-like / AXI-class-style call, no backend compute, no cache regeneration, "
+            "no likelihood evaluation, no normalized likelihood evaluation, no MCMC, no posterior inference, "
+            "no physical proof, and no manuscript claim."
+        )
+
+        from pathlib import Path as _Path_81_grid_v1
+        import pandas as _pd_81_grid_v1
+
+        _base_81_grid_v1 = _Path_81_grid_v1(__file__).resolve().parent
+        _candidate_81_grid_paths_v1 = [
+            _base_81_grid_v1 / "data" / "strategy_ab_proxy_emulator_81_grid_v1.tsv",
+            _base_81_grid_v1 / "data" / "strategy_ab_proxy_emulator_81grid_v1.tsv",
+            _base_81_grid_v1 / "data" / "strategy_ab_81_grid_basin_v1.tsv",
+            _base_81_grid_v1 / "data" / "strategy_ab_grid81_basin_v1.tsv",
+            _base_81_grid_v1 / "data" / "strategy_ab_proxy_emulator_grid_v1.tsv",
+            _base_81_grid_v1 / "data" / "strategy_ab_proxy_emulator_basin_v1.tsv",
+        ]
+
+        _existing_81_grid_paths_v1 = [p for p in _candidate_81_grid_paths_v1 if p.exists() and p.is_file()]
+
+        _source_rows_81_grid_v1 = []
+        for _p_81_grid_v1 in _candidate_81_grid_paths_v1:
+            _source_rows_81_grid_v1.append(
+                {
+                    "candidate_source": str(_p_81_grid_v1.relative_to(_base_81_grid_v1)),
+                    "exists": bool(_p_81_grid_v1.exists() and _p_81_grid_v1.is_file()),
+                }
+            )
+
+        st.markdown("#### Frozen/static source search")
+        st.dataframe(_pd_81_grid_v1.DataFrame(_source_rows_81_grid_v1), use_container_width=True)
+
+        if not _existing_81_grid_paths_v1:
+            st.info(
+                "No compatible frozen/static 81-grid source was found in repo-local data/. "
+                "No graph is rendered. This avoids fake, synthetic, illustrative, fallback, or invented contours."
+            )
+        else:
+            _src_81_grid_v1 = _existing_81_grid_paths_v1[0]
+            _df_81_grid_v1 = _pd_81_grid_v1.read_csv(_src_81_grid_v1, sep=None, engine="python")
+
+            st.success(
+                "Compatible frozen/static 81-grid source detected. Rendering diagnostic table and chart candidates "
+                "from the source only."
+            )
+            st.caption(f"source={_src_81_grid_v1.relative_to(_base_81_grid_v1)}")
+
+            _shown_81_grid_v1 = _df_81_grid_v1.copy()
+            st.dataframe(_shown_81_grid_v1, use_container_width=True)
+
+            _numeric_cols_81_grid_v1 = [
+                c for c in _df_81_grid_v1.columns
+                if _pd_81_grid_v1.api.types.is_numeric_dtype(_df_81_grid_v1[c])
+            ]
+
+            if len(_df_81_grid_v1) == 81 and len(_numeric_cols_81_grid_v1) >= 3:
+                _x_col_81_grid_v1 = _numeric_cols_81_grid_v1[0]
+                _y_col_81_grid_v1 = _numeric_cols_81_grid_v1[1]
+                _z_col_81_grid_v1 = _numeric_cols_81_grid_v1[2]
+
+                st.markdown("#### 81-grid diagnostic chart candidate")
+                st.caption(
+                    f"Using numeric columns x={_x_col_81_grid_v1}, y={_y_col_81_grid_v1}, value={_z_col_81_grid_v1}. "
+                    "This is a source-only diagnostic visualization, not a likelihood, posterior, or physical proof."
+                )
+
+                _chart_df_81_grid_v1 = _df_81_grid_v1[[_x_col_81_grid_v1, _y_col_81_grid_v1, _z_col_81_grid_v1]].copy()
+                _chart_df_81_grid_v1 = _chart_df_81_grid_v1.dropna()
+
+                if len(_chart_df_81_grid_v1) > 0:
+                    st.scatter_chart(
+                        _chart_df_81_grid_v1,
+                        x=_x_col_81_grid_v1,
+                        y=_y_col_81_grid_v1,
+                        size=_z_col_81_grid_v1,
+                        use_container_width=True,
+                    )
+                else:
+                    st.info("Compatible source was found, but numeric chart rows were empty after NA removal.")
+            else:
+                st.info(
+                    "A frozen/static source was found, but it does not satisfy the 81-row and >=3 numeric-column "
+                    "chart rule. Showing table only; no fallback graph is rendered."
+                )
+
+        with st.expander("81-grid exposure boundary readback", expanded=False):
+            st.write(
+                {
+                    "panel": "Strategy A/B proxy-emulator 81-grid basin visualization — frozen diagnostic view",
+                    "source_policy": "repo-local frozen/static source only",
+                    "fallback_policy": "no-graph notice if source is absent or incompatible",
+                    "class_axiclass_call": "NO",
+                    "backend_compute": "NO",
+                    "cache_regeneration": "NO",
+                    "likelihood_evaluation": "NO",
+                    "normalized_likelihood_evaluation": "NO",
+                    "mcmc": "NO",
+                    "posterior_inference": "NO",
+                    "physical_proof": "NO",
+                    "manuscript_claim": "NO",
+                    "real_route_ab_summary_replaced": "NO",
+                }
+            )
+except Exception as _bao_cc_sne_81_grid_ui_exposure_exc_v1:
+    st.warning(
+        "81-grid diagnostic exposure panel failed safely: "
+        + type(_bao_cc_sne_81_grid_ui_exposure_exc_v1).__name__
+        + ". No fallback or synthetic graph was rendered."
+    )
+# END BAO_CC_SNE_81_GRID_UI_EXPOSURE_LOCAL_PATCH_V1
+
+
 # DTI_STRATEGY_AB_PROXY_EMULATOR_READINESS_V1_BEGIN
 def _dti_render_strategy_ab_proxy_emulator_readiness_v1():
     """Static diagnostic-only readiness panel for Strategy A/B proxy-emulator."""
