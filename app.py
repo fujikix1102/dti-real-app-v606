@@ -12439,6 +12439,176 @@ except Exception as _dti_status_panel_exc:
 # DTI_REAL_APP_UI_BOUNDED_STATUS_PANEL_RENDER_V1_END
 
 # --- PAPER/APJ STATUS PANEL: project-status boundary readout only ---
+
+# --- Strategy A/B proxy-emulator static viewer V1 BEGIN ---
+with st.expander("Strategy A/B proxy-emulator diagnostic viewer — static derived source", expanded=False):
+    st.markdown(
+        """
+        This panel is a static diagnostic viewer for a frozen Strategy A/B 81-grid source product.
+
+        Boundary: this is not official raw DESI DR2 data, not DESI DR2 ingest, not a live emulator engine,
+        not a likelihood evaluation, not posterior inference, not MCMC, and not a physical validation or proof.
+        """
+    )
+
+    _strategy_ab_source_rel_v1 = "data/strategy_ab_bao_2x2_diagnostic_81_grid_source_v1.tsv"
+    _strategy_ab_source_identity_rel_v1 = "data/strategy_ab_bao_2x2_diagnostic_81_grid_source_v1.SOURCE_IDENTITY.tsv"
+    _strategy_ab_source_sha_v1 = "b0e50383ab12dceb91d87f268aec050d06d0093a6dbd5ad52e669b3a2cc2ee97"
+    _strategy_ab_source_identity_sha_v1 = "292baf310b6ff220ac2e606b639db3106eb06da368936ae99235ccc15628b1f7"
+
+    st.caption("Source lock")
+    st.table(
+        {
+            "field": [
+                "source kind",
+                "rows",
+                "columns",
+                "source sha256",
+                "source identity sha256",
+                "viewer mode",
+            ],
+            "value": [
+                "REAL_DERIVED_FROZEN_STATIC_DIAGNOSTIC_SOURCE",
+                "81",
+                "33",
+                _strategy_ab_source_sha_v1,
+                _strategy_ab_source_identity_sha_v1,
+                "static precomputed table/diagnostic viewer only",
+            ],
+        }
+    )
+
+    st.caption("Always-on boundary badges")
+    st.table(
+        {
+            "boundary": [
+                "official raw DESI DR2",
+                "DESI DR2 ingest",
+                "runtime CLASS",
+                "likelihood evaluation",
+                "posterior inference",
+                "MCMC",
+                "physical validation/proof",
+                "manuscript claim update",
+            ],
+            "status": ["NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO"],
+        }
+    )
+
+    try:
+        _strategy_ab_df_v1 = pd.read_csv(_strategy_ab_source_rel_v1, sep="\\t")
+        _required_cols_v1 = [
+            "row_index",
+            "x_index",
+            "y_index",
+            "x_value",
+            "y_value",
+            "basin_value",
+            "basin_label",
+            "diagnostic_class",
+            "delta_DM_model_minus_obs",
+            "delta_DH_model_minus_obs",
+            "likelihood_evaluation",
+            "posterior_inference",
+            "mcmc",
+            "physical_proof",
+            "manuscript_claim",
+        ]
+        _missing_cols_v1 = [c for c in _required_cols_v1 if c not in _strategy_ab_df_v1.columns]
+        if _missing_cols_v1:
+            st.error("Static viewer source contract failed: missing required columns.")
+            st.write(_missing_cols_v1)
+        else:
+            _flag_cols_v1 = [
+                "likelihood_evaluation",
+                "posterior_inference",
+                "mcmc",
+                "physical_proof",
+                "manuscript_claim",
+            ]
+            _flag_ok_v1 = all(
+                sorted(_strategy_ab_df_v1[c].astype(str).str.strip().unique().tolist()) == ["NO"]
+                for c in _flag_cols_v1
+            )
+            st.write(
+                {
+                    "source_rows_loaded": int(len(_strategy_ab_df_v1)),
+                    "source_columns_loaded": int(len(_strategy_ab_df_v1.columns)),
+                    "boundary_flags_all_NO": bool(_flag_ok_v1),
+                    "interpolation": "NO_IN_PATCH_V1",
+                    "runtime_compute": "NO",
+                }
+            )
+
+            _row_options_v1 = _strategy_ab_df_v1["row_index"].astype(int).tolist()
+            _selected_row_v1 = st.selectbox(
+                "Select frozen diagnostic row",
+                _row_options_v1,
+                index=0,
+                key="strategy_ab_static_viewer_row_select_v1",
+            )
+            _selected_df_v1 = _strategy_ab_df_v1[
+                _strategy_ab_df_v1["row_index"].astype(int) == int(_selected_row_v1)
+            ]
+
+            st.caption("Selected frozen row")
+            st.dataframe(
+                _selected_df_v1[
+                    [
+                        "row_index",
+                        "x_index",
+                        "y_index",
+                        "x_value",
+                        "y_value",
+                        "basin_value",
+                        "basin_label",
+                        "diagnostic_class",
+                        "delta_DM_model_minus_obs",
+                        "delta_DH_model_minus_obs",
+                        "boundary_tag",
+                    ]
+                ],
+                use_container_width=True,
+            )
+
+            st.caption("Static numeric ranges from frozen grid")
+            _range_rows_v1 = []
+            for _c_v1 in [
+                "x_value",
+                "y_value",
+                "basin_value",
+                "delta_DM_model_minus_obs",
+                "delta_DH_model_minus_obs",
+            ]:
+                _range_rows_v1.append(
+                    {
+                        "field": _c_v1,
+                        "min": float(pd.to_numeric(_strategy_ab_df_v1[_c_v1]).min()),
+                        "max": float(pd.to_numeric(_strategy_ab_df_v1[_c_v1]).max()),
+                    }
+                )
+            st.table(_range_rows_v1)
+
+            st.caption("Static grid preview; no interpolation, no likelihood, no posterior.")
+            st.dataframe(
+                _strategy_ab_df_v1[
+                    [
+                        "row_index",
+                        "x_value",
+                        "y_value",
+                        "basin_value",
+                        "basin_label",
+                        "diagnostic_class",
+                    ]
+                ].head(20),
+                use_container_width=True,
+            )
+    except FileNotFoundError:
+        st.error("Strategy A/B frozen static source TSV was not found in the app data directory.")
+    except Exception as _strategy_ab_static_viewer_error_v1:
+        st.error("Strategy A/B static viewer could not load the frozen diagnostic source.")
+        st.write(str(_strategy_ab_static_viewer_error_v1))
+# --- Strategy A/B proxy-emulator static viewer V1 END ---
 with st.expander("Paper / APJ conversion status", expanded=False):
     st.markdown(
         """
