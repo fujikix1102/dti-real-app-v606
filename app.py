@@ -12925,6 +12925,61 @@ except Exception as _dti_embed_exc:
 
 
 
+# === BEGIN PUBLIC_APP_SUMMARY_INSERT_V1 ===
+# Static UI panel inserted from PUBLIC_APP_SUMMARY_INSERT_V1.
+# Boundary: no backend call, no CLASS run, no likelihood/posterior/MCMC/physical claim.
+try:
+    with st.expander("CLASS reference-row compute check — bounded summary", expanded=False):
+        st.markdown("""
+A source-locked reference CLASS input row was executed once as a bounded environment and adapter check. The run successfully instantiated CLASS, set the locked vanilla LCDM-like input row, completed the CLASS calculation step, and returned background quantities near z=0.7.
+
+This result is not an inverse mapping from source-grid row 49. It is not an 81-grid BAO validation, not a cross-solver validation, not a likelihood evaluation, not posterior inference, not MCMC, and not a physical validation claim.
+        """)
+
+        st.caption("Scope: one locked reference CLASS input row only; static summary; no backend call in this panel.")
+
+        st.table({
+            "field": [
+                "status",
+                "scope",
+                "nearest z",
+                "H [1/Mpc]",
+                "comoving distance",
+                "angular diameter distance",
+                "luminosity distance",
+                "comoving sound horizon",
+                "growth D",
+                "growth f",
+                "not inverse mapping from source-grid row 49",
+                "not 81-grid validation",
+                "not cross-solver validation",
+                "not likelihood/posterior/MCMC",
+                "not physical validation claim",
+            ],
+            "value": [
+                "PASS",
+                "One locked reference CLASS input row only",
+                "0.6994396929998403",
+                "0.0003344983460512316",
+                "2595.800690294089",
+                "1527.445016723128",
+                "4411.40672820216",
+                "1158.1161086607933",
+                "0.696050174394494",
+                "0.8190543671902409",
+                "YES",
+                "YES",
+                "YES",
+                "YES",
+                "YES",
+            ],
+        })
+except Exception as _public_summary_panel_error:
+    st.caption(f"CLASS reference-row summary panel unavailable: {_public_summary_panel_error}")
+# === END PUBLIC_APP_SUMMARY_INSERT_V1 ===
+
+
+
 # --- /DTI embedded posterior viewer: SDSS DR16cosmo offline BAO chain V1 ---
 # --- DTI Route A/B boundary matrix static UI V1 BEGIN ---
 with st.expander("Route A/B Boundary Matrix — diagnostic available, full inference unavailable", expanded=False):
