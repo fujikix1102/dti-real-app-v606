@@ -15246,3 +15246,56 @@ with st.sidebar.expander("ZC / GTDS payload candidate", expanded=False):
         "hashes, descriptive summary, and boundary status."
     )
 # END ZC_GTDS_BOUNDED_PAYLOAD_CANDIDATE_LOCAL_VIEWER_V1C
+
+
+# --- DTI Strategy A/B proxy-emulator activation design scaffold V1 BEGIN ---
+def _dti_render_strategy_ab_proxy_emulator_activation_design_scaffold_v1():
+    import streamlit as st
+
+    with st.expander("Strategy A/B proxy-emulator activation design scaffold", expanded=False):
+        st.warning(
+            "DESIGN_SCAFFOLD_ONLY / NO_LIVE_COMPUTE / NO_LIKELIHOOD. "
+            "This panel is a source-locked design scaffold, not a CLASS run, not AxiCLASS, "
+            "not a backend/API call, not DESI DR2 raw ingest, not likelihood evaluation, "
+            "not posterior inference, not MCMC, not physical proof, and not a manuscript claim."
+        )
+
+        st.markdown(
+            """
+            This scaffold records the approved activation-design boundary after the public
+            Float64 schema gate freeze. It does not activate live computation.
+
+            Current allowed role:
+            - Source-locked viewer
+            - Static diagnostic inspection
+            - Fail-closed boundary notice
+            - No-data / no-graph notice when compatible real frozen data are absent
+
+            Deferred lanes:
+            - DESI DR2 ingest schema design
+            - WOC-DTI constraint-to-UI binding design
+            - Offline or backend-derived frozen product viewer
+            """
+        )
+
+        st.json({
+            "panel_mode": "DESIGN_SCAFFOLD_ONLY",
+            "source_locked_viewer": "YES",
+            "base_float64_schema_gate": "PASS",
+            "live_compute": "NO",
+            "runtime_CLASS": "NO",
+            "AxiCLASS": "NO",
+            "backend_API_call": "NO",
+            "DESI_DR2_raw_ingest": "NO",
+            "likelihood_evaluation": "NO",
+            "posterior_inference": "NO",
+            "MCMC": "NO",
+            "physical_proof": "NO",
+            "manuscript_update": "NO",
+            "fake_fallback_graph": "NO",
+            "if_compatible_real_data_absent": "show_no_data_or_no_graph_notice",
+        })
+# --- DTI Strategy A/B proxy-emulator activation design scaffold V1 END ---
+
+# --- DTI Strategy A/B proxy-emulator activation design scaffold V1 CALL ---
+_dti_render_strategy_ab_proxy_emulator_activation_design_scaffold_v1()
