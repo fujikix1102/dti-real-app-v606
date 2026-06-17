@@ -12946,6 +12946,93 @@ with st.expander("Strategy A/B proxy-emulator activation candidate — nearest l
         st.stop()
 # --- Strategy A/B nearest locked-row activation candidate V1 END ---
 
+# --- DESI DR2 local static audit panel insertion V1 BEGIN ---
+# === DESI DR2 LOCAL STATIC AUDIT PANEL V1 START ===
+# Boundary:
+# - Static local audit summary only.
+# - No posterior import.
+# - No posterior inference.
+# - No likelihood evaluation.
+# - No chi2 recomputation.
+# - No live raw-chain loading.
+# - No physical claim.
+
+def _dti_render_desi_dr2_local_static_audit_panel_v1():
+    import streamlit as st
+
+    st.markdown("### DESI DR2 local audit panel")
+    st.caption(
+        "Static, provenance-first DR2 audit summary. "
+        "This panel does not perform posterior inference, likelihood evaluation, "
+        "chi2 recomputation, or Strategy A/B translation comparison."
+    )
+
+    with st.expander("DESI DR2 local artifact registry", expanded=False):
+        st.table([
+            {"item": "Registered DR2 artifacts", "value": "8", "boundary": "no inference"},
+            {"item": "Registered chain files", "value": "4", "boundary": "no inference"},
+            {"item": "Manifest SHA256", "value": "ac35d5ffb27e5a508e2686aca573ec2915a3630f4ab2a90328a615273d2f84c9", "boundary": "provenance only"},
+        ])
+
+    with st.expander("DESI DR2 chain integrity microscan", expanded=False):
+        st.table([
+            {"metric": "Scanned numeric rows", "value": "118374", "boundary": "descriptive only"},
+            {"metric": "ESS estimate", "value": "83111.38695257358", "boundary": "not posterior claim"},
+            {"metric": "Finite-fail count", "value": "0", "boundary": "data integrity only"},
+        ])
+
+    with st.expander("DR2 descriptive chain metrics", expanded=False):
+        st.warning(
+            "These are descriptive values from existing chain columns. "
+            "They are not new posterior inference, not likelihood evaluation, "
+            "and not chi2 recomputation."
+        )
+        st.table([
+            {"metric": "H0rdrag weighted mean", "value": "9468.821943201272", "boundary": "descriptive only"},
+            {"metric": "w weighted mean", "value": "-0.4798734615804429", "boundary": "descriptive only"},
+            {"metric": "wa weighted mean", "value": "-1.6559580701537915", "boundary": "descriptive only"},
+            {"metric": "Observed chi2_BAO minimum", "value": "5.6204112", "boundary": "existing chain column only"},
+        ])
+
+    with st.expander("Strategy A/B bridge status", expanded=False):
+        st.table([
+            {"item": "Approved Strategy A/B bridges", "value": "0", "boundary": "no translation"},
+            {"item": "Translation comparison allowed", "value": "NO", "boundary": "no forced mapping"},
+            {"item": "Comparison status", "value": "SCHEMA_ONLY_NO_DIRECT_NUMERIC_COMPARISON", "boundary": "schema only"},
+        ])
+        st.warning(
+            "Strategy A/B translation comparison and nearest-grid search remain blocked "
+            "until a reviewed semantic bridge is approved."
+        )
+
+    with st.expander("Bridge false-positive warning", expanded=False):
+        st.table([
+            {"candidate": "w to row_index", "status": "rejected", "reason": "token false positive"},
+            {"candidate": "minuslogpost to posterior_inference", "status": "rejected", "reason": "string boundary column, not objective value"},
+            {"candidate": "H0rdrag to obs_DH_over_rd / obs_DM_over_rd", "status": "not direct", "reason": "requires explicit transform policy"},
+        ])
+
+    with st.expander("DR2 audit timeline", expanded=False):
+        st.table([
+            {"gate": "Manifest fill execute review", "status": "PASS"},
+            {"gate": "Chain sample microscan review", "status": "PASS"},
+            {"gate": "Compare to Strategy A/B review", "status": "PASS_SCHEMA_ONLY"},
+            {"gate": "Column bridge design review", "status": "PASS_NO_TRANSLATION"},
+            {"gate": "Feature candidate matrix review V1C", "status": "PASS"},
+        ])
+
+    st.caption(
+        "Blocked: posterior viewer, likelihood evaluation, chi2 recomputation, "
+        "Strategy A/B translation comparison, nearest-grid search, and public raw-chain loading."
+    )
+
+# Render call to insert at reviewed location:
+# _dti_render_desi_dr2_local_static_audit_panel_v1()
+# === DESI DR2 LOCAL STATIC AUDIT PANEL V1 END ===
+# Render DESI DR2 local static audit panel V1
+_dti_render_desi_dr2_local_static_audit_panel_v1()
+# --- DESI DR2 local static audit panel insertion V1 END ---
+
 with st.expander("Paper / APJ conversion status", expanded=False):
     st.markdown(
         """
