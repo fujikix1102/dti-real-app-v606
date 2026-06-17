@@ -12609,6 +12609,175 @@ with st.expander("Strategy A/B proxy-emulator diagnostic viewer — static deriv
         st.error("Strategy A/B static viewer could not load the frozen diagnostic source.")
         st.write(str(_strategy_ab_static_viewer_error_v1))
 # --- Strategy A/B proxy-emulator static viewer V1 END ---
+
+# --- Strategy A/B nearest locked-row activation candidate V1 BEGIN ---
+with st.expander("Strategy A/B proxy-emulator activation candidate — nearest locked row", expanded=False):
+    st.markdown("**Mode:** `NEAREST_LOCKED_ROW_ONLY` / `NO_INTERPOLATION` / `NO_LIKELIHOOD`")
+    st.caption("Static-source-backed candidate only. No CLASS, no backend/API call, no likelihood, no posterior, no MCMC, no physical proof.")
+
+    import hashlib as _strategy_ab_hashlib_v1
+    from pathlib import Path as _StrategyABPathV1
+
+    _strategy_ab_expected_source_sha_v1 = "b0e50383ab12dceb91d87f268aec050d06d0093a6dbd5ad52e669b3a2cc2ee97"
+    _strategy_ab_expected_identity_sha_v1 = "292baf310b6ff220ac2e606b639db3106eb06da368936ae99235ccc15628b1f7"
+    _strategy_ab_expected_schema_payload_recorded_sha_v1 = "c7a3a3c35c9d4e7aa20b8bab10479b276edb9c1759e13190326ecad361d2fe7e"
+    _strategy_ab_expected_schema_payload_file_sha_v1 = "4443eb56eed406dbe044e755fd2dd595dd3a268c1f5949e5b15385493e4ac539"
+
+    _strategy_ab_data_path_v1 = _StrategyABPathV1("data/strategy_ab_bao_2x2_diagnostic_81_grid_source_v1.tsv")
+    _strategy_ab_identity_path_v1 = _StrategyABPathV1("data/strategy_ab_bao_2x2_diagnostic_81_grid_source_v1.SOURCE_IDENTITY.tsv")
+
+    def _strategy_ab_sha256_file_v1(path):
+        return _strategy_ab_hashlib_v1.sha256(path.read_bytes()).hexdigest()
+
+    try:
+        if not _strategy_ab_data_path_v1.exists():
+            st.error("Fail-closed: Strategy A/B source TSV is missing.")
+            st.stop()
+        if not _strategy_ab_identity_path_v1.exists():
+            st.error("Fail-closed: Strategy A/B source identity TSV is missing.")
+            st.stop()
+
+        _strategy_ab_source_sha_v1 = _strategy_ab_sha256_file_v1(_strategy_ab_data_path_v1)
+        _strategy_ab_identity_sha_v1 = _strategy_ab_sha256_file_v1(_strategy_ab_identity_path_v1)
+
+        if _strategy_ab_source_sha_v1 != _strategy_ab_expected_source_sha_v1:
+            st.error("Fail-closed: Strategy A/B source SHA mismatch.")
+            st.stop()
+        if _strategy_ab_identity_sha_v1 != _strategy_ab_expected_identity_sha_v1:
+            st.error("Fail-closed: Strategy A/B source identity SHA mismatch.")
+            st.stop()
+
+        _strategy_ab_df_v1 = pd.read_csv(_strategy_ab_data_path_v1, sep="\t")
+
+        _strategy_ab_required_cols_v1 = [
+            "source_id", "source_kind", "row_index", "x_index", "y_index",
+            "x_value", "y_value", "basin_value", "basin_label", "diagnostic_class",
+            "obs_DM_over_rd", "obs_DH_over_rd",
+            "delta_DM_model_minus_obs", "delta_DH_model_minus_obs",
+            "Cinv_00", "Cinv_01", "Cinv_10", "Cinv_11",
+            "boundary_tag", "likelihood_evaluation", "normalized_likelihood_evaluation",
+            "mcmc", "posterior_inference", "physical_proof", "manuscript_claim",
+            "fake_synthetic_fallback_contour",
+        ]
+
+        _strategy_ab_missing_cols_v1 = [c for c in _strategy_ab_required_cols_v1 if c not in _strategy_ab_df_v1.columns]
+        if _strategy_ab_missing_cols_v1:
+            st.error("Fail-closed: required source columns are missing.")
+            st.write(_strategy_ab_missing_cols_v1)
+            st.stop()
+
+        if len(_strategy_ab_df_v1) != 81 or len(_strategy_ab_df_v1.columns) != 33:
+            st.error("Fail-closed: source shape mismatch. Expected 81 rows / 33 columns.")
+            st.write({"rows": len(_strategy_ab_df_v1), "columns": len(_strategy_ab_df_v1.columns)})
+            st.stop()
+
+        _strategy_ab_flag_cols_v1 = [
+            "likelihood_evaluation", "normalized_likelihood_evaluation",
+            "mcmc", "posterior_inference", "physical_proof",
+            "manuscript_claim", "fake_synthetic_fallback_contour",
+        ]
+        _strategy_ab_bad_flags_v1 = {}
+        for _c_v1 in _strategy_ab_flag_cols_v1:
+            _vals_v1 = sorted(set(str(x) for x in _strategy_ab_df_v1[_c_v1].dropna().unique()))
+            if _vals_v1 != ["NO"]:
+                _strategy_ab_bad_flags_v1[_c_v1] = _vals_v1
+        if _strategy_ab_bad_flags_v1:
+            st.error("Fail-closed: boundary flags are not all NO.")
+            st.write(_strategy_ab_bad_flags_v1)
+            st.stop()
+
+        if not _strategy_ab_df_v1["row_index"].is_unique:
+            st.error("Fail-closed: row_index is not unique.")
+            st.stop()
+
+        st.success("Locked source verified. Nearest-row activation candidate is available as static lookup only.")
+
+        st.write({
+            "source_sha256": _strategy_ab_source_sha_v1,
+            "source_identity_sha256": _strategy_ab_identity_sha_v1,
+            "schema_payload_recorded_sha256": _strategy_ab_expected_schema_payload_recorded_sha_v1,
+            "schema_payload_file_sha256": _strategy_ab_expected_schema_payload_file_sha_v1,
+            "rows": int(len(_strategy_ab_df_v1)),
+            "columns": int(len(_strategy_ab_df_v1.columns)),
+            "lookup_policy": "NEAREST_LOCKED_ROW_ONLY",
+            "interpolation": "NO",
+            "extrapolation": "NO",
+            "likelihood_evaluation": "NO",
+            "posterior_inference": "NO",
+            "mcmc": "NO",
+            "physical_claim": "NO",
+        })
+
+        _strategy_ab_row_options_v1 = sorted([int(x) for x in _strategy_ab_df_v1["row_index"].tolist()])
+        _strategy_ab_selected_row_index_v1 = st.selectbox(
+            "Select locked row_index",
+            _strategy_ab_row_options_v1,
+            index=0,
+            key="strategy_ab_nearest_locked_row_index_v1",
+        )
+
+        _strategy_ab_selected_df_v1 = _strategy_ab_df_v1[_strategy_ab_df_v1["row_index"] == _strategy_ab_selected_row_index_v1]
+        if _strategy_ab_selected_df_v1.empty:
+            st.error("Fail-closed: selected row_index was not found.")
+            st.stop()
+
+        _strategy_ab_selected_row_v1 = _strategy_ab_selected_df_v1.iloc[0].to_dict()
+
+        st.markdown("#### Selected locked source row")
+        st.dataframe(_strategy_ab_selected_df_v1, use_container_width=True)
+
+        st.markdown("#### Boundary badges")
+        st.write({
+            "DESI_DR2_ingest": "NO",
+            "runtime_CLASS": "NO",
+            "backend_API_call": "NO",
+            "full_81_grid_run": "NO",
+            "cross_solver_validation_compute": "NO",
+            "likelihood_evaluation": "NO",
+            "posterior_inference": "NO",
+            "MCMC": "NO",
+            "physical_proof": "NO",
+            "manuscript_update": "NO",
+        })
+
+        st.markdown("#### Static diagnostic summary")
+        st.write({
+            "row_index": _strategy_ab_selected_row_v1.get("row_index"),
+            "x_index": _strategy_ab_selected_row_v1.get("x_index"),
+            "y_index": _strategy_ab_selected_row_v1.get("y_index"),
+            "x_value": _strategy_ab_selected_row_v1.get("x_value"),
+            "y_value": _strategy_ab_selected_row_v1.get("y_value"),
+            "basin_value": _strategy_ab_selected_row_v1.get("basin_value"),
+            "basin_label": _strategy_ab_selected_row_v1.get("basin_label"),
+            "diagnostic_class": _strategy_ab_selected_row_v1.get("diagnostic_class"),
+            "delta_DM_model_minus_obs": _strategy_ab_selected_row_v1.get("delta_DM_model_minus_obs"),
+            "delta_DH_model_minus_obs": _strategy_ab_selected_row_v1.get("delta_DH_model_minus_obs"),
+        })
+
+        _strategy_ab_payload_v1 = {
+            "source_sha256": _strategy_ab_source_sha_v1,
+            "source_identity_sha256": _strategy_ab_identity_sha_v1,
+            "lookup_policy": "NEAREST_LOCKED_ROW_ONLY",
+            "selected_row": _strategy_ab_selected_row_v1,
+            "boundary": {
+                "interpolation": False,
+                "extrapolation": False,
+                "likelihood_evaluation": False,
+                "posterior_inference": False,
+                "mcmc": False,
+                "physical_claim": False,
+                "manuscript_update": False,
+            },
+        }
+        st.markdown("#### Audit payload preview")
+        st.json(_strategy_ab_payload_v1)
+
+    except Exception as _strategy_ab_exc_v1:
+        st.error("Fail-closed: Strategy A/B nearest-row candidate could not be rendered.")
+        st.write(str(_strategy_ab_exc_v1))
+        st.stop()
+# --- Strategy A/B nearest locked-row activation candidate V1 END ---
+
 with st.expander("Paper / APJ conversion status", expanded=False):
     st.markdown(
         """
