@@ -12849,10 +12849,10 @@ with st.expander("Strategy A/B proxy-emulator activation candidate — nearest l
         st.success("Locked source verified. Nearest-row activation candidate is available as static lookup only.")
 
         try:
-            _strategy_ab_source_df = strategy_ab_validate_float64_schema_v1(
-                _strategy_ab_source_df,
-                source_path=str(STRATEGY_AB_SOURCE_TSV),
-                source_identity_path=str(STRATEGY_AB_SOURCE_IDENTITY_TSV),
+            _strategy_ab_df_v1 = strategy_ab_validate_float64_schema_v1(
+                _strategy_ab_df_v1,
+                source_path=str(_strategy_ab_data_path_v1),
+                source_identity_path=str(_strategy_ab_identity_path_v1),
             )
         except NameError:
             # Dry-run compatibility fallback: if local variable names differ, preserve fail-closed behavior.
