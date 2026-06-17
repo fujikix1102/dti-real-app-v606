@@ -12610,6 +12610,162 @@ with st.expander("Strategy A/B proxy-emulator diagnostic viewer — static deriv
         st.write(str(_strategy_ab_static_viewer_error_v1))
 # --- Strategy A/B proxy-emulator static viewer V1 END ---
 
+
+# --- Strategy A/B Float64 schema apply gate V1 BEGIN ---
+def strategy_ab_validate_float64_schema_v1(df, source_path=None, source_identity_path=None):
+    """
+    Fail-closed schema validator for the Strategy A/B static diagnostic source.
+    Boundary: validation only. No CLASS, no backend/API, no likelihood, no posterior, no MCMC.
+    """
+    import hashlib
+    import numpy as np
+    import pandas as pd
+    import streamlit as st
+
+    expected_source_sha256 = "b0e50383ab12dceb91d87f268aec050d06d0093a6dbd5ad52e669b3a2cc2ee97"
+    expected_source_identity_sha256 = "292baf310b6ff220ac2e606b639db3106eb06da368936ae99235ccc15628b1f7"
+
+    required_columns = [
+        "source_id",
+        "source_kind",
+        "row_index",
+        "x_index",
+        "y_index",
+        "x_offset_sigma",
+        "y_offset_sigma",
+        "x_name",
+        "y_name",
+        "x_value",
+        "y_value",
+        "basin_value",
+        "basin_label",
+        "diagnostic_class",
+        "obs_DM_over_rd",
+        "obs_DH_over_rd",
+        "delta_DM_model_minus_obs",
+        "delta_DH_model_minus_obs",
+        "Cinv_00",
+        "Cinv_01",
+        "Cinv_10",
+        "Cinv_11",
+        "boundary_tag",
+        "likelihood_evaluation",
+        "normalized_likelihood_evaluation",
+        "mcmc",
+        "posterior_inference",
+        "physical_proof",
+        "manuscript_claim",
+        "fake_synthetic_fallback_contour",
+    ]
+
+    numeric_columns = [
+        "row_index",
+        "x_index",
+        "y_index",
+        "x_offset_sigma",
+        "y_offset_sigma",
+        "x_value",
+        "y_value",
+        "basin_value",
+        "obs_DM_over_rd",
+        "obs_DH_over_rd",
+        "delta_DM_model_minus_obs",
+        "delta_DH_model_minus_obs",
+        "Cinv_00",
+        "Cinv_01",
+        "Cinv_10",
+        "Cinv_11",
+    ]
+
+    boundary_columns = [
+        "likelihood_evaluation",
+        "normalized_likelihood_evaluation",
+        "mcmc",
+        "posterior_inference",
+        "physical_proof",
+        "manuscript_claim",
+        "fake_synthetic_fallback_contour",
+    ]
+
+    def _sha256_file(path):
+        h = hashlib.sha256()
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                h.update(chunk)
+        return h.hexdigest()
+
+    if source_path is not None:
+        try:
+            actual_source_sha256 = _sha256_file(source_path)
+        except Exception as exc:
+            st.error(f"Float64 schema gate failed: source SHA read error: {exc}")
+            st.stop()
+        if actual_source_sha256 != expected_source_sha256:
+            st.error("Float64 schema gate failed: source SHA mismatch.")
+            st.stop()
+
+    if source_identity_path is not None:
+        try:
+            actual_identity_sha256 = _sha256_file(source_identity_path)
+        except Exception as exc:
+            st.error(f"Float64 schema gate failed: source identity SHA read error: {exc}")
+            st.stop()
+        if actual_identity_sha256 != expected_source_identity_sha256:
+            st.error("Float64 schema gate failed: source identity SHA mismatch.")
+            st.stop()
+
+    missing = [c for c in required_columns if c not in df.columns]
+    if missing:
+        st.error("Float64 schema gate failed: missing required columns: " + ", ".join(missing))
+        st.stop()
+
+    if len(df) != 81:
+        st.error(f"Float64 schema gate failed: expected 81 rows, found {len(df)}.")
+        st.stop()
+
+    if len(df.columns) != 33:
+        st.error(f"Float64 schema gate failed: expected 33 columns, found {len(df.columns)}.")
+        st.stop()
+
+    checked = df.copy()
+
+    for col in numeric_columns:
+        parsed = pd.to_numeric(checked[col], errors="coerce")
+        if parsed.isna().any():
+            st.error(f"Float64 schema gate failed: numeric parse failure or NaN in {col}.")
+            st.stop()
+        arr = parsed.to_numpy(dtype="float64")
+        if not np.isfinite(arr).all():
+            st.error(f"Float64 schema gate failed: non-finite value in {col}.")
+            st.stop()
+        checked[col] = parsed
+
+    row_index_int = checked["row_index"].astype(int)
+    if row_index_int.nunique() != 81 or row_index_int.min() != 1 or row_index_int.max() != 81:
+        st.error("Float64 schema gate failed: row_index must be unique 1..81.")
+        st.stop()
+
+    x_index_int = checked["x_index"].astype(int)
+    y_index_int = checked["y_index"].astype(int)
+    if x_index_int.min() < 1 or x_index_int.max() > 9:
+        st.error("Float64 schema gate failed: x_index out of 1..9 range.")
+        st.stop()
+    if y_index_int.min() < 1 or y_index_int.max() > 9:
+        st.error("Float64 schema gate failed: y_index out of 1..9 range.")
+        st.stop()
+
+    safe_false_values = {"no", "false", "0", ""}
+    for col in boundary_columns:
+        values = {str(v).strip().lower() for v in checked[col].fillna("")}
+        if not values <= safe_false_values:
+            st.error(f"Float64 schema gate failed: unsafe boundary flag in {col}: {sorted(values)}")
+            st.stop()
+
+    st.caption("Float64 schema gate: PASS — static source validated, fail-closed policy active.")
+    return checked
+# --- Strategy A/B Float64 schema apply gate V1 END ---
+
+
 # --- Strategy A/B nearest locked-row activation candidate V1 BEGIN ---
 with st.expander("Strategy A/B proxy-emulator activation candidate — nearest locked row", expanded=False):
     st.markdown("**Mode:** `NEAREST_LOCKED_ROW_ONLY` / `NO_INTERPOLATION` / `NO_LIKELIHOOD`")
@@ -12691,6 +12847,18 @@ with st.expander("Strategy A/B proxy-emulator activation candidate — nearest l
             st.stop()
 
         st.success("Locked source verified. Nearest-row activation candidate is available as static lookup only.")
+
+        try:
+            _strategy_ab_source_df = strategy_ab_validate_float64_schema_v1(
+                _strategy_ab_source_df,
+                source_path=str(STRATEGY_AB_SOURCE_TSV),
+                source_identity_path=str(STRATEGY_AB_SOURCE_IDENTITY_TSV),
+            )
+        except NameError:
+            # Dry-run compatibility fallback: if local variable names differ, preserve fail-closed behavior.
+            st.error("Float64 schema gate failed: expected Strategy A/B source dataframe/path variables are unavailable.")
+            st.stop()
+
 
         st.write({
             "source_sha256": _strategy_ab_source_sha_v1,
