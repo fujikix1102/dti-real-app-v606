@@ -13031,6 +13031,28 @@ def _dti_render_desi_dr2_local_static_audit_panel_v1():
 # === DESI DR2 LOCAL STATIC AUDIT PANEL V1 END ===
 # Render DESI DR2 local static audit panel V1
 _dti_render_desi_dr2_local_static_audit_panel_v1()
+# --- DESI DR2 numeric summary static audit panel V1 BEGIN ---
+with st.expander("DESI DR2 numeric summary — bounded finite/range, audit-only", expanded=False):
+    st.warning(
+        "Audit-only finite/range summary. "
+        "This is not posterior inference, not a likelihood evaluation, "
+        "not a chi2 recomputation, not a Strategy A/B translation comparison, "
+        "and not a physical claim."
+    )
+    st.markdown("**Source:** frozen DESI DR2 numeric conversion dryrun summary.")
+    st.markdown("**Selected columns:** 12")
+    st.markdown("**Rows checked:** 118,374")
+    st.markdown("**NaN / Inf / conversion risk:** PASS in selected columns")
+    st.markdown('column | finite | min | max | boundary\n--- | ---: | ---: | ---: | ---\nweight | 118374 | 1.0 | 17.0 | descriptive range only\nminuslogpost | 118374 | 12.68344 | 43.70017 | descriptive range only\nw | 118374 | -1.4028685 | 0.10672229 | descriptive range only\nwa | 118374 | -2.999917 | 1.2405602 | descriptive range only\nhrdrag | 118374 | 85.957247 | 109.68759 | descriptive range only\nomm | 118374 | 0.20379447 | 0.4279765 | descriptive range only\nomch2 | 118374 | 0.069454892 | 0.17117456 | descriptive range only\nomegam | 118374 | 0.20379596 | 0.42797799 | descriptive range only\nomegamh2 | 118374 | 0.092469759 | 0.19418943 | descriptive range only\nH0rdrag | 118374 | 8595.7247 | 10968.759 | descriptive range only\nchi2__BAO | 118374 | 5.6204112 | 67.653872 | descriptive range only\nchi2 | 118374 | 5.6204112 | 67.653872 | descriptive range only')
+    st.caption(
+        "Boundary: source-derived static display only; no raw DR2 reread, "
+        "no new numeric conversion, no posterior import, no likelihood evaluation, "
+        "no chi2 recomputation, no Strategy A/B translation comparison, "
+        "no bridge approval, no physical claim."
+    )
+# --- DESI DR2 numeric summary static audit panel V1 END ---
+
+
 # --- DESI DR2 local static audit panel insertion V1 END ---
 
 with st.expander("Paper / APJ conversion status", expanded=False):
