@@ -12987,7 +12987,12 @@ def _dti_render_command_center_display_only_v1():
             # No existing lower-panel warning is removed in this preview.
             st.caption("SEE_COMMAND_CENTER = detailed public boundary summary is centralized above.")
             st.caption("Lower-panel dedup preview: repeated boundary text should remain conservative unless separately reviewed.")
-            # === DTI LOWER PANEL BOUNDARY DEDUP PREVIEW V1 END ===
+            # === DTI LOWER PANEL BOUNDARY POINTER POLICY V1 PREVIEW BEGIN ===
+            # Preview-only policy for bounded future lower-panel text compression.
+            # High-risk locks and ZC/GTDS warnings remain local and visible.
+            st.caption("Boundary pointer policy: compress only low-risk repeated guidance; keep explicit locks and ZC/GTDS warnings visible.")
+            st.caption("Detailed audit boundaries remain centralized in this Command Center; lower panels may point here only after separate review.")
+            # === DTI LOWER PANEL BOUNDARY POINTER POLICY V1 PREVIEW END ===
 
             st.markdown("**Boundary locks**")
             st.code(
