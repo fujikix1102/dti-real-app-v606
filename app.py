@@ -13025,7 +13025,9 @@ def _dti_render_desi_dr2_local_static_audit_panel_v1():
 
     st.caption(
         "Blocked: posterior viewer, likelihood evaluation, chi2 recomputation, "
-        "Strategy A/B translation comparison, nearest-grid search, and public raw-chain loading."
+        "Strategy A/B translation comparison, nearest-grid search, and public raw-chain loading. "
+        "Strategy A/B translation comparison = NO_EXECUTION. "
+        "nearest-grid search = NO_EXECUTION."
     )
 
 # Render call to insert at reviewed location:
