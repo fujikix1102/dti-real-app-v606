@@ -12982,6 +12982,13 @@ def _dti_render_command_center_display_only_v1():
             st.caption("Boundary source: this Command Center is the single public boundary summary.")
             # === DTI COMMAND CENTER CLARITY LEGEND V1 PREVIEW END ===
 
+            # === DTI LOWER PANEL BOUNDARY DEDUP PREVIEW V1 BEGIN ===
+            # Preview-only badge policy for future lower-panel deduplication.
+            # No existing lower-panel warning is removed in this preview.
+            st.caption("SEE_COMMAND_CENTER = detailed public boundary summary is centralized above.")
+            st.caption("Lower-panel dedup preview: repeated boundary text should remain conservative unless separately reviewed.")
+            # === DTI LOWER PANEL BOUNDARY DEDUP PREVIEW V1 END ===
+
             st.markdown("**Boundary locks**")
             st.code(
                 "likelihood_evaluation = NO\n"
