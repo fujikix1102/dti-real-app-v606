@@ -12970,6 +12970,18 @@ def _dti_render_command_center_display_only_v1():
             st.caption("S/P/FN/CC/BB namespace lock active.")
             st.caption("Session-state namespace reserved: dti_ui_*")
 
+            # === DTI COMMAND CENTER CLARITY LEGEND V1 PREVIEW BEGIN ===
+            # Display-only readability legend. No buttons, no state, no API, no compute.
+            st.markdown("**Audit readability legend**")
+            st.caption("AUDIT_LOCKED = public freeze / visual review completed.")
+            st.caption("DISPLAY_ONLY = UI text or static display only; no live execution.")
+            st.caption("NO_LIVE_COMPUTE = no CLASS/AxiCLASS, likelihood, posterior, MCMC, or chi2 run.")
+            st.caption("CANDIDATE_ONLY = descriptive or schema-bound payload; not validated as inference.")
+            st.caption("NO_EXECUTION = explicitly not executed in this public UI.")
+            st.caption("FORBIDDEN_NOT_READ = protected raw/source data not read by the public app.")
+            st.caption("Boundary source: this Command Center is the single public boundary summary.")
+            # === DTI COMMAND CENTER CLARITY LEGEND V1 PREVIEW END ===
+
             st.markdown("**Boundary locks**")
             st.code(
                 "likelihood_evaluation = NO\n"
