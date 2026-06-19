@@ -12957,6 +12957,44 @@ with st.expander("Strategy A/B proxy-emulator activation candidate — nearest l
 # - No live raw-chain loading.
 # - No physical claim.
 
+
+# === DTI COMMAND CENTER DISPLAY ONLY V1 BEGIN ===
+# S/P/FN/CC/BB namespace-safe display-only command center.
+# This block is UI-only: no API call, no live compute, no posterior inference.
+def _dti_render_command_center_display_only_v1():
+    """Display-only DTI Auditor / Command Center. No compute, no API, no state mutation."""
+    try:
+        with st.sidebar.expander("🛡 DTI Auditor / Command Center — display only", expanded=False):
+            st.markdown("**Status:** Green — Audit Active / No live compute")
+            st.caption("CC_AUDIT_STATUS: display-only command center.")
+            st.caption("S/P/FN/CC/BB namespace lock active.")
+            st.caption("Session-state namespace reserved: dti_ui_*")
+
+            st.markdown("**Boundary locks**")
+            st.code(
+                "likelihood_evaluation = NO\n"
+                "posterior_inference = NO\n"
+                "chi2_recompute = NO\n"
+                "CLASS_AxiCLASS_run = NO\n"
+                "proxy_emulator_activation = NO\n"
+                "Strategy_A_B_translation_comparison = NO_EXECUTION\n"
+                "nearest_grid_search = NO_EXECUTION\n"
+                "raw_DR2_chain_files = FORBIDDEN_NOT_READ",
+                language="text",
+            )
+
+            st.markdown("**Source identity**")
+            st.caption("Public freeze source: APP_BOUNDARY_PANEL_TEXT_VISUAL_FIX_PUBLIC_FREEZE_V1C")
+            st.caption("HEAD/origin: a375f0c09500357df678bbe118bc9dca856d49ca")
+            st.caption("app.py SHA256: e29adc20138bf01d0682a09b5793bd59d1c44c2eeea3c72e577b88e294cb33df")
+
+            st.markdown("**Actions**")
+            st.caption("Reload/API/live compute controls are intentionally absent in V1.")
+    except Exception as exc:
+        st.caption(f"DTI Command Center display-only render skipped: {exc}")
+# === DTI COMMAND CENTER DISPLAY ONLY V1 END ===
+
+
 def _dti_render_desi_dr2_local_static_audit_panel_v1():
     import streamlit as st
 
@@ -13033,6 +13071,8 @@ def _dti_render_desi_dr2_local_static_audit_panel_v1():
 # Render call to insert at reviewed location:
 # _dti_render_desi_dr2_local_static_audit_panel_v1()
 # === DESI DR2 LOCAL STATIC AUDIT PANEL V1 END ===
+# Render DTI Command Center display-only V1
+_dti_render_command_center_display_only_v1()
 # Render DESI DR2 local static audit panel V1
 _dti_render_desi_dr2_local_static_audit_panel_v1()
 # --- DESI DR2 numeric summary static audit panel V1 BEGIN ---
