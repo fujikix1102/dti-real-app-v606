@@ -13008,9 +13008,9 @@ def _dti_render_command_center_display_only_v1():
             )
 
             st.markdown("**Source identity**")
-            st.caption("Public freeze source: APP_BOUNDARY_PANEL_TEXT_VISUAL_FIX_PUBLIC_FREEZE_V1C")
-            st.caption("HEAD/origin: a375f0c09500357df678bbe118bc9dca856d49ca")
-            st.caption("app.py SHA256: e29adc20138bf01d0682a09b5793bd59d1c44c2eeea3c72e577b88e294cb33df")
+            st.caption("Public freeze source: DTI_UI_REFINEMENT_LOWER_PANEL_BOUNDARY_DEDUP_NEXT_SURVEY_PUBLIC_FREEZE_V1")
+            st.caption("HEAD/origin: 84484e3e3862c93df7dfbf60df0c95e18276b71a")
+            st.caption("app.py SHA256: 735e5d2815bf59da8c5e1fe1b6347177e770402e8843549f2837020230a4e3cb")
 
             st.markdown("**Actions**")
             st.caption("Reload/API/live compute controls are intentionally absent in V1.")
