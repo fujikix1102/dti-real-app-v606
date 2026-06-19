@@ -15360,6 +15360,7 @@ with st.expander("Interactive diagnostic query mode adapter — safe modes only"
 
 # BEGIN ZC_GTDS_BOUNDED_PAYLOAD_CANDIDATE_LOCAL_VIEWER_V1C
 with st.sidebar.expander("ZC / GTDS payload candidate", expanded=False):
+    st.caption("Boundary: CANDIDATE_ONLY / DISPLAY_ONLY / NO_EXECUTION. raw_DR2_chain_files = FORBIDDEN_NOT_READ. No live compute, no inference execution, no live cosmology engine execution, no model-activation execution, no Strategy A/B comparison, no nearest-grid search, and no physical-claim promotion.")
     st.warning(
         "BOUNDED PAYLOAD CANDIDATE ONLY. "
         "Not GTDS true payload. "
