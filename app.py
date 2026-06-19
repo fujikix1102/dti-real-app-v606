@@ -13119,6 +13119,7 @@ with st.expander("DESI DR2 numeric summary — bounded finite/range, audit-only"
         "no bridge approval, no physical claim."
     )
 # --- DESI DR2 numeric summary static audit panel V1 END ---
+st.caption("Boundary: DISPLAY_ONLY / NO_EXECUTION / DIAGNOSTIC_ONLY. This DESI DR2 numeric summary is not manuscript evidence and is not a manuscript-level claim. It does not read raw DESI DR2 chain files, does not run likelihood/posterior/chi2 evaluation, does not perform Strategy A/B comparison or nearest-grid search, and does not promote a physical or cosmological claim.")
 
 
 # --- DESI DR2 local static audit panel insertion V1 END ---
