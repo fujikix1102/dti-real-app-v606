@@ -13004,6 +13004,8 @@ def _dti_render_desi_dr2_local_static_audit_panel_v1():
             "Strategy A/B translation comparison and nearest-grid search remain blocked "
             "until a reviewed semantic bridge is approved."
         )
+        st.caption("Strategy A/B translation comparison = NO_EXECUTION.")
+        st.caption("nearest-grid search = NO_EXECUTION.")
 
     with st.expander("Bridge false-positive warning", expanded=False):
         st.table([
