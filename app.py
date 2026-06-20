@@ -7653,6 +7653,33 @@ _DTI_UI_CONSOLIDATION_V1 = True
 
 def _dti_render_global_claim_limits_audit_boundary_v1():
     st.markdown("### Global claim limits / audit boundary")
+
+    # DTI_UI_CLAIM_BOUNDARY_COMPRESSION_NO_NEW_BUTTONS_LOCAL_PATCH_V1_BEGIN
+    st.markdown("##### Claim-boundary compact matrix")
+    st.markdown(
+        """
+    | Panel | Source state | Visual state | Inference status | Claim boundary |
+    |---|---|---|---|---|
+    | Global app frame | SOURCE LOCKED | DISPLAY ONLY | NOT POSTERIOR · NOT LIKELIHOOD · NO MCMC | diagnostic UI boundary |
+    | Jump visual comparator | SOURCE LOCKED | PUBLIC VISUAL PASS | NOT POSTERIOR · NOT LIKELIHOOD · NO MCMC | visual comparator only |
+    | DESI DR2 diagnostic lane | SOURCE LOCKED | DISPLAY ONLY | NOT POSTERIOR · NOT LIKELIHOOD · NO MCMC | diagnostic candidate only |
+    | Route A/B static lane | SOURCE LOCKED | DISPLAY ONLY | NOT POSTERIOR · NOT LIKELIHOOD · NO MCMC | static diagnostic only |
+    """
+    )
+    st.caption("DTI_CLAIM_BOUNDARY_COMPACT_MATRIX_V1 · DISPLAY ONLY · SOURCE LOCKED · NOT POSTERIOR · NOT LIKELIHOOD · NO MCMC")
+    with st.expander("Details / provenance — claim-boundary compact matrix", expanded=False):
+        st.markdown(
+            """
+    - `DTI_CLAIM_BADGE_ROW_V1`: compact boundary tags replace repeated long boundary prose.
+    - Source line: `DTI_UI_CLAIM_BOUNDARY_COMPRESSION_NO_NEW_BUTTONS_LOCAL_PATCH_EXECUTE_V1`.
+    - Source request ZIP SHA256: `b652a62c97e7ab2361255a5d68df971774b7596e9b72eaffeffa633359011ee1`.
+    - Implementation plan ZIP SHA256: `0b977b9da3068ee7f74ab68d82d13a6b212e7e99f6dbaef71a384ade7ffa525f`.
+    - Public freeze ZIP SHA256: `245e5aaad2d83710402d0a9580b4f04a40039ce392b0d38495c2657b62228329`.
+    - This UI block adds no run/probe/compute controls and performs no likelihood, MCMC, chi-square, posterior, or raw DESI DR2 read.
+    """
+        )
+    # DTI_UI_CLAIM_BOUNDARY_COMPRESSION_NO_NEW_BUTTONS_LOCAL_PATCH_V1_END
+
     st.caption(
         "Applies to all panels unless a panel explicitly states otherwise. "
         "Panel-local notes are intentionally short; detailed limits are centralized here."
@@ -15552,6 +15579,8 @@ def render_dti_jump_visual_cognitive_revival_panel_v2b_png_image():
         return
 
     with st.expander("DTI Jump toy comparator V2B - PNG visual anchor / multi-jump proxy", expanded=True):
+        # DTI_CLAIM_BADGE_ROW_V1_JUMP_VISUAL
+        st.caption("DTI_CLAIM_BADGE_ROW_V1 · DISPLAY ONLY · SOURCE LOCKED · PUBLIC VISUAL PASS · NOT POSTERIOR · NOT LIKELIHOOD · NO MCMC")
         st.caption(
             "Proxy visualization only. "
             "No MCMC, no likelihood, no chi-square, no posterior constraint, no credible interval claim."
