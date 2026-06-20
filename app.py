@@ -6912,6 +6912,9 @@ def _dti_bggeom_rows_v1(result, group):
     return rows
 
 def _dti_render_background_geometry_anchor_v1():
+    # DTI Jump visual slot relocation V2F FIX1: render panel immediately before BG geometry panel.
+    globals()["_dti_jump_visual_slot_v2f_before_bggeom"] = st.container()
+
     with st.expander("Background geometry anchor — local FLRW calculator", expanded=False):
         st.caption(
             "Summary → compact table → raw audit view. Local background-geometry baseline only; detailed limits are in Global claim limits / audit boundary."
@@ -15514,4 +15517,231 @@ with st.expander("DESI DR2 diagnostic interval-candidate viewer", expanded=False
         "sampling-chain claim, sampling-convergence diagnostic, manuscript promotion, or pointer promotion."
     )
 # DTI_RAW_DR2_PUBLIC_UI_BOUNDARY_DIAGNOSTIC_INTERVAL_CANDIDATES_V1_END
+
+
+# --- DTI Jump Visual Cognitive Revival static/proxy panel V2B PNG IMAGE BEGIN ---
+def render_dti_jump_visual_cognitive_revival_panel_v2b_png_image():
+    """
+    DTI Jump Visual Cognitive Revival panel V2B.
+
+    Repair policy:
+    - render Matplotlib figure into a PNG memory buffer
+    - display the rendered image through Streamlit image output
+    - place the image before the compact endpoint table
+
+    Boundary:
+    - Proxy visualization only.
+    - No MCMC.
+    - No likelihood.
+    - No chi-square.
+    - No raw DESI DR2 read.
+    - No posterior constraint.
+    - No credible interval claim.
+    - No manuscript claim.
+    """
+    try:
+        import io as _io
+        import numpy as _np
+        import matplotlib.pyplot as _plt
+        import streamlit as _st
+    except Exception as _e:
+        try:
+            st.warning(f"DTI Jump Visual V2B panel unavailable: {_e}")
+        except Exception:
+            pass
+        return
+
+    with st.expander("DTI Jump toy comparator V2B - PNG visual anchor / multi-jump proxy", expanded=True):
+        st.caption(
+            "Proxy visualization only. "
+            "No MCMC, no likelihood, no chi-square, no posterior constraint, no credible interval claim."
+        )
+
+        left, right = st.columns([1, 1])
+
+        with left:
+            selected_modes = st.multiselect(
+                "Jump overlay modes",
+                options=[
+                    "Strategy A: zc1 = 0.78105",
+                    "Strategy B: zc2 = 0.87505",
+                    "Hybrid A+B: zc1 + zc2",
+                ],
+                default=[
+                    "Strategy A: zc1 = 0.78105",
+                    "Strategy B: zc2 = 0.87505",
+                    "Hybrid A+B: zc1 + zc2",
+                ],
+                key="dti_jump_visual_modes_v2b_png",
+                help="Overlay one-wall or two-wall proxy jumps. Diagnostic visualization only.",
+            )
+
+            visual_anchor = st.checkbox(
+                "Fixed Y-axis visual anchor: ax.set_ylim(-1200, 10)",
+                value=True,
+                key="dti_jump_visual_fixed_ylim_v2b_png",
+            )
+
+        with right:
+            amp_scale = st.slider(
+                "Proxy amplitude scale",
+                min_value=0.20,
+                max_value=1.50,
+                value=1.00,
+                step=0.05,
+                key="dti_jump_visual_amp_scale_v2b_png",
+                help="Scales the diagnostic toy amplitude. This is not a fit parameter.",
+            )
+
+            width = st.slider(
+                "Wall softness dz",
+                min_value=0.005,
+                max_value=0.120,
+                value=0.035,
+                step=0.005,
+                key="dti_jump_visual_wall_width_v2b_png",
+                help="Controls tanh smoothing of the proxy discontinuity wall.",
+            )
+
+        z = _np.linspace(0.0, 3.0, 500)
+        zc1 = 0.78105
+        zc2 = 0.87505
+
+        def _smooth_wall(_z, _zc, _width):
+            return 0.5 * (1.0 + _np.tanh((_z - _zc) / max(_width, 1e-9)))
+
+        def _growth_gate(_z):
+            return 1.0 - _np.exp(-1.15 * _z)
+
+        def _delta_dl_proxy(_z, walls):
+            y = _np.zeros_like(_z, dtype=float)
+            for _zc, _amp in walls:
+                y += _amp * _smooth_wall(_z, _zc, width) * _growth_gate(_z)
+            return amp_scale * y
+
+        mode_specs = {
+            "Strategy A: zc1 = 0.78105": {
+                "walls": [(zc1, -1041.0)],
+                "label": "A wall: zc1=0.78105",
+                "linestyle": "-",
+            },
+            "Strategy B: zc2 = 0.87505": {
+                "walls": [(zc2, -1118.0)],
+                "label": "B wall: zc2=0.87505",
+                "linestyle": "--",
+            },
+            "Hybrid A+B: zc1 + zc2": {
+                "walls": [(zc1, -520.5), (zc2, -559.0)],
+                "label": "Hybrid A+B: zc1+zc2",
+                "linestyle": "-.",
+            },
+        }
+
+        fig, ax = _plt.subplots(figsize=(9.2, 5.4), dpi=150)
+        # V2D STYLE EXACT: black plot background for contrast; visual style only.
+        v2d_black_background = "#050505"
+        fig.patch.set_facecolor(v2d_black_background)
+        ax.set_facecolor(v2d_black_background)
+        plotted = 0
+        endpoint_rows = []
+
+        for mode in selected_modes:
+            spec = mode_specs.get(mode)
+            if spec is None:
+                continue
+
+            y = _delta_dl_proxy(z, spec["walls"])
+            endpoint = float(y[-1])
+            plotted += 1
+
+            ax.plot(
+                z,
+                y,
+                linewidth=2.4,
+                linestyle=spec["linestyle"],
+                label=f'{spec["label"]}   dDL(z=3)={endpoint:.1f} Mpc',
+            )
+
+            ax.scatter([3.0], [endpoint], s=42, zorder=5)
+            # V2C FIX1: compute stagger before ax.annotate call.
+            # This keeps the assignment outside the annotate argument list.
+            label_stagger_points = {1: 46, 2: 4, 3: -46}.get(plotted, 46 - 38 * (plotted - 1))
+            # V2E REMOVE INPLOT LABEL BOXES: keep endpoint dot only.
+            # A/B/A+B and dDL(z=3) are intentionally read from the legend and table,
+            # avoiding in-plot label boxes that can be mistaken for physical markers.
+
+            endpoint_rows.append(
+                {
+                    "mode": spec["label"],
+                    "delta_DL_z3_Mpc": f"{endpoint:.6f}",
+                    "boundary": "PROXY_DIAGNOSTIC_ONLY_NOT_CLAIM",
+                }
+            )
+
+        ax.axhline(0.0, linewidth=0.9, alpha=0.55)
+        ax.axvline(zc1, linewidth=1.0, alpha=0.38)
+        ax.axvline(zc2, linewidth=1.0, alpha=0.38)
+
+        ax.text(zc1, -1185, "zc1=0.78105", rotation=90, va="bottom", ha="right", fontsize=8)
+        ax.text(zc2, -1185, "zc2=0.87505", rotation=90, va="bottom", ha="left", fontsize=8)
+
+        if visual_anchor:
+            ax.set_ylim(-1200, 10)
+        else:
+            ax.relim()
+            ax.autoscale_view()
+
+        ax.set_xlim(0.0, 3.05)
+        ax.set_xlabel("redshift z")
+        ax.set_ylabel("proxy luminosity-distance delta dDL [Mpc]")
+        ax.set_title("DTI Jump toy comparator V2E: black background, legend/table dDL readout")
+        ax.grid(True, alpha=0.20, color="#666666")
+        ax.tick_params(colors="#d8d8d8")
+        ax.xaxis.label.set_color("#e8e8e8")
+        ax.yaxis.label.set_color("#e8e8e8")
+        ax.title.set_color("#e8e8e8")
+        for _dti_spine in ax.spines.values():
+            _dti_spine.set_color("#777777")
+        legend = ax.legend(loc="lower left", fontsize=7)
+        if legend is not None:
+            legend.get_frame().set_facecolor("#111111")
+            legend.get_frame().set_edgecolor("#777777")
+            for _dti_text in legend.get_texts():
+                _dti_text.set_color("#f0f0f0")
+
+        buf = _io.BytesIO()
+        fig.tight_layout()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150, facecolor=fig.get_facecolor())
+        _plt.close(fig)
+        buf.seek(0)
+
+        st.image(
+            buf,
+            caption="V2E PNG-buffer diagnostic proxy plot: black background; endpoint dots plus legend/table, no in-plot label boxes.",
+            use_container_width=True,
+        )
+
+        st.markdown(
+            "**Boundary:** this panel is a visual proxy. It is not posterior inference, "
+            "not a likelihood result, not chi-square, not MCMC, and not a credible interval."
+        )
+
+        if endpoint_rows:
+            st.dataframe(endpoint_rows, use_container_width=True, hide_index=True)
+        else:
+            st.info("Select at least one jump overlay mode.")
+
+try:
+    _dti_jump_visual_slot_v2f = globals().get("_dti_jump_visual_slot_v2f_before_bggeom")
+    if _dti_jump_visual_slot_v2f is not None:
+        with _dti_jump_visual_slot_v2f:
+            render_dti_jump_visual_cognitive_revival_panel_v2b_png_image()
+    else:
+        render_dti_jump_visual_cognitive_revival_panel_v2b_png_image()
+except Exception as _dti_jump_visual_v2b_err:
+    try:
+        st.warning(f"DTI Jump Visual Cognitive Revival V2B panel failed safely: {_dti_jump_visual_v2b_err}")
+    except Exception:
+        pass
+# --- DTI Jump Visual Cognitive Revival static/proxy panel V2B PNG IMAGE END ---
 
