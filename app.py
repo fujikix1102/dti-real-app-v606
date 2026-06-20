@@ -15478,3 +15478,40 @@ def _dti_render_strategy_ab_proxy_emulator_activation_design_scaffold_v1():
 
 # --- DTI Strategy A/B proxy-emulator activation design scaffold V1 CALL ---
 _dti_render_strategy_ab_proxy_emulator_activation_design_scaffold_v1()
+
+# DTI_RAW_DR2_PUBLIC_UI_BOUNDARY_DIAGNOSTIC_INTERVAL_CANDIDATES_V1_BEGIN
+st.divider()
+with st.expander("DESI DR2 diagnostic interval-candidate viewer", expanded=False):
+    st.warning(
+        "This panel shows diagnostic equal-tail weighted quantile candidates only. "
+        "It is not a claim-level parameter statement, interval claim, optimization endpoint claim, "
+        "likelihood result, chi2 result, sampling-convergence diagnostic, or sampling-chain claim."
+    )
+    st.caption(
+        "Values are displayed as source-locked diagnostic candidates and must not be interpreted "
+        "as claim-level parameter statements."
+    )
+
+    _dti_raw_dr2_interval_candidate_rows = [
+        {"parameter": "w", "q2.5": "-1.0635297", "q16": "-0.77531601", "q50": "-0.44009717", "q84": "-0.20691910", "q97.5": "-0.077382236", "boundary": "DIAGNOSTIC_CANDIDATE_ONLY_NOT_CLAIM"},
+        {"parameter": "wa", "q2.5": "-2.9465823", "q16": "-2.6430377", "q50": "-1.8407263", "q84": "-0.61407523", "q97.5": "0.64271085", "boundary": "DIAGNOSTIC_CANDIDATE_ONLY_NOT_CLAIM"},
+        {"parameter": "hrdrag", "q2.5": "89.340449", "q16": "91.353472", "q50": "94.138502", "q84": "98.277971", "q97.5": "102.57999", "boundary": "DIAGNOSTIC_CANDIDATE_ONLY_NOT_CLAIM"},
+        {"parameter": "omm", "q2.5": "0.26370718", "q16": "0.31846389", "q50": "0.35861288", "q84": "0.38423379", "q97.5": "0.40172403", "boundary": "DIAGNOSTIC_CANDIDATE_ONLY_NOT_CLAIM"},
+    ]
+    st.table(_dti_raw_dr2_interval_candidate_rows)
+
+    st.caption(
+        "Method: equal-tail weighted quantile candidate, computed from frozen source-locked chain files."
+    )
+    st.code(
+        "candidate_table_sha256=7d288ec7f08341d3d48fa58f1c4332d29c9d9235638f72376349b256c89868b7\n"
+        "public_ui_boundary_freeze_zip_sha256=9d7bbeded90ddc6d0d5ee35da021f363a569a0179645fc79493526f8b0f917e6\n"
+        "local_patch_request_zip_sha256=d8072472786e9aa538610e93be0213c111031fcc6e130bbed0f9c311114102f2",
+        language="text",
+    )
+    st.info(
+        "Not provided here: claim-level parameter statement, interval claim, optimization endpoint claim, "
+        "sampling-chain claim, sampling-convergence diagnostic, manuscript promotion, or pointer promotion."
+    )
+# DTI_RAW_DR2_PUBLIC_UI_BOUNDARY_DIAGNOSTIC_INTERVAL_CANDIDATES_V1_END
+
