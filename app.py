@@ -10841,6 +10841,39 @@ def _dti_section8_boundary_notice_once_v1():
         "This section does not perform likelihood evaluation, posterior comparison, Planck validation, "
         "physics-value updates, or manuscript updates."
     )
+    # DTI_SECTION8_SOURCE_RECORD_VIEWER_V1_FIX1: BEGIN
+    try:
+        st.markdown("#### Section 8 diagnostic source-of-record viewer")
+        st.caption("DISPLAY ONLY / SOURCE LOCKED / NOT POSTERIOR / NOT LIKELIHOOD / NO MCMC")
+        _dti_s8_primary_path = r"/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_SECTION8_LOADER_DRYRUN_EXECUTE_V1_20260621_065400/normalized/section8_primary_comparison_graph_normalized.tsv"
+        _dti_s8_secondary_path = r"/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_SECTION8_LOADER_DRYRUN_EXECUTE_V1_20260621_065400/normalized/section8_secondary_summary_panel_normalized.tsv"
+        _dti_s8_primary_sha = "09b5836f3421ded18b8d3b634c06a9a1c19559310afb3c58c2c91cb8b24b704e"
+        _dti_s8_secondary_sha = "2ef9588833376098fb3f2e480b1ff68183cf7e8bb3361a2abb8fa97447afa2fd"
+        _dti_s8_primary = pd.read_csv(_dti_s8_primary_path, sep="\t")
+        _dti_s8_secondary = pd.read_csv(_dti_s8_secondary_path, sep="\t")
+        _dti_s8_primary_show = _dti_s8_primary.copy()
+        for _dti_col in ["delta_value", "abs_delta_value", "relative_delta_value", "baseline_value", "candidate_value"]:
+            if _dti_col in _dti_s8_primary_show.columns:
+                _dti_s8_primary_show[_dti_col] = pd.to_numeric(_dti_s8_primary_show[_dti_col], errors="coerce")
+        _dti_s8_secondary_show = _dti_s8_secondary.copy()
+        if "adopted_float_value" in _dti_s8_secondary_show.columns:
+            _dti_s8_secondary_show["adopted_float_value"] = pd.to_numeric(_dti_s8_secondary_show["adopted_float_value"], errors="coerce")
+        _dti_s8_plot_cols = [c for c in ["x_label", "delta_value", "abs_delta_value"] if c in _dti_s8_primary_show.columns]
+        if len(_dti_s8_plot_cols) >= 2:
+            st.bar_chart(_dti_s8_primary_show[_dti_s8_plot_cols].set_index("x_label"))
+        _dti_s8_summary_cols = [c for c in ["x_label", "adopted_float_value", "boundary_diagnostic_use", "boundary_likelihood_use", "boundary_claim_use"] if c in _dti_s8_secondary_show.columns]
+        if _dti_s8_summary_cols:
+            st.dataframe(_dti_s8_secondary_show[_dti_s8_summary_cols], use_container_width=True)
+        with st.expander("Section 8 source lock / provenance / boundary"):
+            st.write("Primary normalized source:", _dti_s8_primary_path)
+            st.code(_dti_s8_primary_sha)
+            st.write("Secondary normalized source:", _dti_s8_secondary_path)
+            st.code(_dti_s8_secondary_sha)
+            st.write("Boundary: diagnostic display only. No posterior constraint, no credible interval, no likelihood evaluation, no chi-square evaluation, no MCMC, and no physical-proof claim.")
+            st.dataframe(_dti_s8_primary_show.head(12), use_container_width=True)
+    except Exception as _dti_s8_viewer_error:
+        st.warning(f"Section 8 diagnostic source viewer unavailable: {_dti_s8_viewer_error}")
+    # DTI_SECTION8_SOURCE_RECORD_VIEWER_V1_FIX1: END
 
 def _dti_section8_no_source_data_notice_v1():
     key = "dti_section8_no_source_data_notice_v1"
