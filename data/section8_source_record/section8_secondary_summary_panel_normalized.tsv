@@ -1,0 +1,13 @@
+source_id	row_id	x_label	raw_value	raw_value_float	adopted_float_value	boundary_diagnostic_use	boundary_likelihood_use	boundary_claim_use	claim_status
+alt4_desi_numeric_summary	minuslogpost	minuslogpost	12.018652	12.018652	12.018652	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	hrdrag	hrdrag	101.54786	101.54786	101.54786	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	omm	omm	0.29717787	0.29717787	0.29717787	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	omch2	omch2	0.11182639	0.11182639	0.11182639	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	omegam	omegam	0.29717936	0.29717936	0.29717936	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	omegamh2	omegamh2	0.13484126	0.13484126	0.13484126	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	rdrag	rdrag	150.75395	150.75395	150.75395	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	zdrag	zdrag	1059.3375	1059.3375	1059.3375	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	H0rdrag	H0rdrag	10154.786	10154.786	10154.786	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	chi2__BAO	chi2__BAO	10.282299	10.282299	10.282299	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	chi2	chi2	10.282299	10.282299	10.282299	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY
+alt4_desi_numeric_summary	chi2__desi_y3_cosmo_bindings.cobaya_likelihoods.bao_likelihoods_v1p2.desi_bao_all	chi2__desi_y3_cosmo_bindings.cobaya_likelihoods.bao_likelihoods_v1p2.desi_bao_all	10.282299	10.282299	10.282299	DESCRIPTIVE_ONLY	NO	NO	DIAGNOSTIC_ONLY

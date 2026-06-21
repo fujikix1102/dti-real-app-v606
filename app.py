@@ -10845,8 +10845,8 @@ def _dti_section8_boundary_notice_once_v1():
     try:
         st.markdown("#### Section 8 diagnostic source-of-record viewer")
         st.caption("DISPLAY ONLY / SOURCE LOCKED / NOT POSTERIOR / NOT LIKELIHOOD / NO MCMC")
-        _dti_s8_primary_path = r"/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_SECTION8_LOADER_DRYRUN_EXECUTE_V1_20260621_065400/normalized/section8_primary_comparison_graph_normalized.tsv"
-        _dti_s8_secondary_path = r"/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_DTI_SECTION8_LOADER_DRYRUN_EXECUTE_V1_20260621_065400/normalized/section8_secondary_summary_panel_normalized.tsv"
+        _dti_s8_primary_path = Path(__file__).resolve().parent / "data/section8_source_record/section8_primary_comparison_graph_normalized.tsv"
+        _dti_s8_secondary_path = Path(__file__).resolve().parent / "data/section8_source_record/section8_secondary_summary_panel_normalized.tsv"
         _dti_s8_primary_sha = "09b5836f3421ded18b8d3b634c06a9a1c19559310afb3c58c2c91cb8b24b704e"
         _dti_s8_secondary_sha = "2ef9588833376098fb3f2e480b1ff68183cf7e8bb3361a2abb8fa97447afa2fd"
         _dti_s8_primary = pd.read_csv(_dti_s8_primary_path, sep="\t")
