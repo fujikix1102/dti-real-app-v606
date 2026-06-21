@@ -2104,6 +2104,24 @@ What would make this probe more claim-ready?""",
         "It does not execute 7c, draw graphs, run likelihood evaluation, compare posteriors, validate Planck, "
         "update physics values, update manuscript content, modify Render API settings, or modify Streamlit Secrets."
     )
+    # API_TIMEOUT_HANDLING_STATUS_BADGE_V1_BEGIN
+    with st.expander("API / endpoint availability status — infrastructure only", expanded=False):
+        st.caption("Endpoint timeout is infrastructure state, not model failure. This block performs no CLASS/AxiCLASS run, no compute POST, no likelihood, no chi-square, no posterior inference, and no MCMC.")
+        st.markdown("""
+    **Current endpoint interpretation**
+    
+    - **CLASS health:** slow but reachable under the prior survey.
+    - **CLASS compute GET:** method-boundary 405; this is not solver failure.
+    - **AxiCLASS health / fixed / vanilla endpoints:** timeout-confirmed under the prior survey.
+    - **Public app reachability:** may show redirect or slow-start behavior; use public visual review for display confirmation.
+    
+    **Fallback policy**
+    
+    - Silent static fallback is forbidden.
+    - Any proxy or fallback must be explicit, source-locked, and labelled diagnostic only.
+    - Endpoint unavailability must not be interpreted as evidence for or against a cosmological model.
+    """)
+    # API_TIMEOUT_HANDLING_STATUS_BADGE_V1_END
 # --- /DTI_PROBE_RESULT_VALUE_MATRIX_V1 ---
 
 
