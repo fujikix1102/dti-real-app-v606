@@ -10881,7 +10881,12 @@ def _dti_section8_boundary_notice_once_v1():
                     .max()
                     .sort_values(ascending=False)
                 )
-                st.bar_chart(_dti_s8_chart_display)
+                # DTI_SECTION8_SOURCE_RECORD_BAR_CHART_VISUAL_REPAIR_V1
+                st.bar_chart(_dti_s8_chart_display, height=320)
+                _dti_s8_chart_table = _dti_s8_chart_display.reset_index()
+                _dti_s8_chart_table.columns = ["x_label", "abs_delta_value"]
+                st.caption("Visible source-record chart series. Display only; not likelihood, not posterior, not chi-square, not MCMC.")
+                st.dataframe(_dti_s8_chart_table, use_container_width=True)
                 st.caption("Diagnostic source-record absolute delta. Display only; not likelihood, not posterior, not chi-square, not MCMC.")
         with st.expander("Section 8 source lock / provenance / boundary"):
             st.write("Primary normalized source:", _dti_s8_primary_path)
