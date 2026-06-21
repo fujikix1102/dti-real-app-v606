@@ -5325,6 +5325,33 @@ def _dti_render_correlated_boundary_triage_v1():
         "no posterior comparison, no Planck validation, and no physics-value update."
     )
 
+    # API_TIMEOUT_HANDLING_FRONT_VISIBLE_STATUS_BADGE_V1_BEGIN
+    with st.expander("API / endpoint availability status — infrastructure only", expanded=False):
+        st.caption(
+            "Endpoint timeout is infrastructure state, not model failure. "
+            "This visible status block performs no CLASS/AxiCLASS run, no compute POST, "
+            "no likelihood, no chi-square, no posterior inference, and no MCMC."
+        )
+        st.markdown("""
+    **Current endpoint interpretation**
+
+    - **CLASS health:** slow but reachable under the prior survey.
+    - **CLASS compute GET:** method-boundary 405; this is not solver failure.
+    - **AxiCLASS health / fixed / vanilla endpoints:** timeout-confirmed under the prior survey.
+    - **Public app reachability:** may show redirect or slow-start behavior; use human visual review for display confirmation.
+
+    **Fallback policy**
+
+    - Silent static fallback is forbidden.
+    - Any proxy or fallback must be explicit, source-locked, and labelled diagnostic only.
+    - Endpoint unavailability must not be interpreted as evidence for or against a cosmological model.
+
+    **Boundary**
+
+    No CLASS/AxiCLASS run, no compute POST, no likelihood, no chi-square, no posterior inference, no MCMC, no Planck validation, no manuscript update.
+    """)
+    # API_TIMEOUT_HANDLING_FRONT_VISIBLE_STATUS_BADGE_V1_END
+
     candidate_text = st.session_state.get("paper_text", "") or st.session_state.get("paper_text_widget", "")
     parsed = _dti_parse_target_model_for_correlated_boundary_v1b(candidate_text) if candidate_text else {}
 
