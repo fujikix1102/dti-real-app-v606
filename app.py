@@ -10864,6 +10864,25 @@ def _dti_section8_boundary_notice_once_v1():
         _dti_s8_summary_cols = [c for c in ["x_label", "adopted_float_value", "boundary_diagnostic_use", "boundary_likelihood_use", "boundary_claim_use"] if c in _dti_s8_secondary_show.columns]
         if _dti_s8_summary_cols:
             st.dataframe(_dti_s8_secondary_show[_dti_s8_summary_cols], use_container_width=True)
+
+            # DTI_SECTION8_SOURCE_RECORD_BAR_CHART_V1
+            st.markdown("#### Section 8 source-record diagnostic bar chart")
+            st.caption("DISPLAY ONLY / SOURCE LOCKED / NOT POSTERIOR / NOT LIKELIHOOD / NO MCMC")
+            _dti_s8_chart = _dti_s8_primary.copy()
+            _dti_s8_chart["abs_delta_value"] = pd.to_numeric(_dti_s8_chart["abs_delta_value"], errors="coerce")
+            _dti_s8_chart["delta_value"] = pd.to_numeric(_dti_s8_chart["delta_value"], errors="coerce")
+            _dti_s8_chart = _dti_s8_chart[_dti_s8_chart["abs_delta_value"].fillna(0) > 0].copy()
+            if _dti_s8_chart.empty:
+                st.info("No non-zero source-record absolute-delta rows are available for the Section 8 diagnostic bar chart.")
+            else:
+                _dti_s8_chart_display = (
+                    _dti_s8_chart[["x_label", "abs_delta_value"]]
+                    .groupby("x_label", as_index=True)["abs_delta_value"]
+                    .max()
+                    .sort_values(ascending=False)
+                )
+                st.bar_chart(_dti_s8_chart_display)
+                st.caption("Diagnostic source-record absolute delta. Display only; not likelihood, not posterior, not chi-square, not MCMC.")
         with st.expander("Section 8 source lock / provenance / boundary"):
             st.write("Primary normalized source:", _dti_s8_primary_path)
             st.code(_dti_s8_primary_sha)
