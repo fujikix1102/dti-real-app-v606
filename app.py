@@ -15876,3 +15876,20 @@ except Exception as _dti_jump_visual_v2b_err:
         pass
 # --- DTI Jump Visual Cognitive Revival static/proxy panel V2B PNG IMAGE END ---
 
+
+# DTI_SECTION11_CHAIN_SUMMARY_PUBLIC_UI_PANEL_V1_BEGIN
+# Display-only audit panel. No numeric cast. No posterior validity claim. No credible interval claim.
+try:
+    with st.sidebar.expander("Section 11 chain_summary audit boundary", expanded=False):
+        st.caption("DISPLAY ONLY / SOURCE LOCKED / NOT POSTERIOR VALIDATION / NO NUMERIC CAST")
+        st.markdown(
+            "- Source: embedded `chain_summary.tsv` audit boundary record\n"
+            "- Status: boundary/context display only\n"
+            "- No posterior validity claim\n"
+            "- No credible interval or constraint claim\n"
+            "- No likelihood, chi-square, MCMC, or physical claim"
+        )
+except Exception:
+    pass
+# DTI_SECTION11_CHAIN_SUMMARY_PUBLIC_UI_PANEL_V1_END
+
