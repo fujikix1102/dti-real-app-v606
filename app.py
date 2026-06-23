@@ -5319,6 +5319,29 @@ def _dti_correlated_boundary_score_v1(h0, s8, omega_cdm=None, f_ede=None):
 
 def _dti_render_correlated_boundary_triage_v1():
     st.markdown("### Correlated-boundary triage proxy")
+# DTI_APP_PUBLIC_UI_ROUTE_SECTION17_ACTUAL_LOADER_STATUS_V1_BEGIN
+# Static bounded public UI status panel. No compute. No backend/API. No app-session execution.
+try:
+    st.markdown("### Section17 actual-loader execution status — metadata-only freeze")
+    st.caption(
+        "APP_PUBLIC_UI_ROUTE static status panel. "
+        "This panel reports frozen provenance/status only; it does not execute loaders."
+    )
+    st.info(
+        "actual_loader_execution=FROZEN_YES_METADATA_ONLY_NO_APP_SESSION\n\n"
+        "actual_execute_ids=S17ACTUAL_EXEC_PRIMARY_V1,S17ACTUAL_EXEC_SECONDARY_V1\n\n"
+        "Boundary: no app/session execution, no compute, no likelihood, no chi-square, "
+        "no MCMC, no posterior inference, no physical/cosmological claim, "
+        "no manuscript update, no pointer promotion."
+    )
+    st.caption(
+        "Claim boundary: INFRASTRUCTURE_METADATA_STATUS_ONLY_NOT_MODEL_EVIDENCE. "
+        "Source freeze: SECTION17_ACTUAL_LOADER_EXECUTION_ACTUAL_EXECUTE_REVIEW_FREEZE_V1_PASS."
+    )
+except NameError:
+    pass
+# DTI_APP_PUBLIC_UI_ROUTE_SECTION17_ACTUAL_LOADER_STATUS_V1_END
+
     _dti_panel_note_v1("Summary → compact table → raw audit view. Proxy-only; detailed limits are in Global claim limits / audit boundary.")
     st.caption(
         "Lightweight geometric audit proxy. No CLASS run, no Render API call, no likelihood evaluation, "
