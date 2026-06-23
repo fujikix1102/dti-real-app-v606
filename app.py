@@ -5322,6 +5322,24 @@ def _dti_render_correlated_boundary_triage_v1():
 # DTI_APP_PUBLIC_UI_ROUTE_SECTION17_ACTUAL_LOADER_STATUS_V1_BEGIN
 # Static bounded public UI status panel. No compute. No backend/API. No app-session execution.
 try:
+    # S18_PUBLIC_UI_STATUS_COMPRESSION_V1_BEGIN
+    st.markdown("""
+    <div style="border:1px solid #d0d7de;border-radius:8px;padding:0.75rem 0.9rem;margin:0.35rem 0 0.75rem 0;">
+    <b>Public UI route:</b> COMPLETE<br>
+    <b>Section17 actual-loader:</b> FROZEN METADATA ONLY<br>
+    <b>Claim boundary:</b> INFRASTRUCTURE METADATA STATUS ONLY, NOT MODEL EVIDENCE<br>
+    <b>Execution boundary:</b> NO loader / NO backend / NO likelihood / NO chi-square / NO MCMC / NO posterior
+    </div>
+    """, unsafe_allow_html=True)
+    with st.expander("Source/provenance boundary details", expanded=False):
+        st.markdown("""
+        - Public status is metadata/provenance only.
+        - Source freezes remain: public final freeze, S17_B final handover freeze, S17_C cleanup ledger freeze, S18 final handover freeze.
+        - No app/session loader execution is performed here.
+        - No backend/API call, numerical recomputation, likelihood, chi-square, MCMC, posterior inference, physical claim, manuscript update, or pointer promotion is introduced.
+        """)
+    # S18_PUBLIC_UI_STATUS_COMPRESSION_V1_END
+
     st.markdown("### Section17 actual-loader execution status — metadata-only freeze")
     st.caption(
         "APP_PUBLIC_UI_ROUTE static status panel. "
