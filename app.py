@@ -15893,3 +15893,24 @@ except Exception:
     pass
 # DTI_SECTION11_CHAIN_SUMMARY_PUBLIC_UI_PANEL_V1_END
 
+# DTI_SECTION13_PUBLIC_UI_PROVENANCE_COMPRESSION_V1_BEGIN
+with st.sidebar.expander("Provenance / boundary status", expanded=False):
+    st.caption("Compressed audit provenance. Display-only; no compute controls.")
+    st.markdown(
+        '''
+        **Audit chain:** Section 11 source locked -> Section 12 sanity audit PASS -> Section 13 provenance compression local patch.
+
+        **Claim boundary:** no likelihood evaluation · no chi-square evaluation · no MCMC · no posterior inference · no physical claim.
+
+        **Artifact identity:** app.py SHA256 `c2a3980a4dcd680966b8faf138df2bf886e0a6460cb5398dbc49cbb2249d7c00`; locked chain_summary SHA256 `f51da728d3bb139beca8e5a379a754a1c20c3fe4d14c1347b35cf24b5cf5f455`.
+
+        | item | status |
+        |---|---|
+        | Section 12 final handover | PASS / handover-ready |
+        | Section 12 numeric audit freeze | PASS / sanity-audit only |
+        | Locked source | source-locked |
+        | Public-claim boundary | no likelihood / no posterior / no physical claim |
+        '''
+    )
+# DTI_SECTION13_PUBLIC_UI_PROVENANCE_COMPRESSION_V1_END
+
