@@ -16047,3 +16047,53 @@ except Exception as _dti_stage2_panel_error:
         pass
 # === DTI_STAGE2_LOADER_BINDING_STATUS_PANEL_END ===
 
+# DTI_STAGE2_LOOKUP_SOLVER_API_BINDING_STATUS_BEGIN
+def _dti_stage2_lookup_solver_binding_status_v1():
+    """Fail-closed Stage 2 lookup-solver binding status.
+
+    Boundary: infrastructure/status only. This helper does not read raw DESI DR2
+    data, execute the loader, bind lookup assets, interpolate, instantiate lookup
+    numeric values, evaluate likelihoods, run posterior/MCMC inference, update
+    manuscript text, or promote pointers.
+    """
+    status = {
+        "solver_module": "unavailable",
+        "lookup_assets": "not_bound_in_this_patch",
+        "interpolation": "disabled",
+        "lookup_numeric_values": "unavailable",
+        "likelihood_posterior_mcmc": "unavailable",
+        "raw_parse": "not_executed",
+        "loader_execution": "not_executed",
+        "boundary": "infrastructure_status_only_not_model_evidence",
+        "error": "",
+    }
+    try:
+        import dti_stage2_lookup_solver as _dti_stage2_lookup_solver  # noqa: F401
+        status["solver_module"] = "available"
+    except Exception as exc:
+        status["error"] = f"{type(exc).__name__}: {exc}"
+    return status
+
+
+def _dti_stage2_lookup_solver_status_panel_v1(st):
+    """Render a bounded, fail-closed Stage 2 lookup-solver status panel."""
+    status = _dti_stage2_lookup_solver_binding_status_v1()
+    try:
+        with st.expander("Stage 2 lookup solver binding status", expanded=False):
+            st.write("Solver module:", status["solver_module"])
+            st.write("Lookup assets:", status["lookup_assets"])
+            st.write("Interpolation:", status["interpolation"])
+            st.write("Lookup numeric values:", status["lookup_numeric_values"])
+            st.write("Likelihood/posterior/MCMC:", status["likelihood_posterior_mcmc"])
+            st.write("Raw DESI DR2 parse:", status["raw_parse"])
+            st.write("Loader execution:", status["loader_execution"])
+            if status["error"]:
+                st.caption("Fail-closed import diagnostic: " + status["error"])
+            st.caption(
+                "Infrastructure status only. Not model evidence, not likelihood evidence, "
+                "not posterior evidence, not MCMC evidence, and not manuscript evidence."
+            )
+    except Exception:
+        return status
+    return status
+# DTI_STAGE2_LOOKUP_SOLVER_API_BINDING_STATUS_END
