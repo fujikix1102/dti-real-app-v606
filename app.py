@@ -15955,3 +15955,46 @@ with st.sidebar.expander("Provenance / boundary status", expanded=False):
     )
 # DTI_SECTION13_PUBLIC_UI_PROVENANCE_COMPRESSION_V1_END
 
+# --- DESI_DR2_UI_STATUS_PANEL_BEGIN_V1 ---
+# --- DESI_DR2_UI_STATUS_PANEL_CONSTANTS_BEGIN_V1 ---
+_DTI_UI_STATUS_PANEL_SOURCE_GATE_V1 = "UI_IMPLEMENTATION_DESIGN_FREEZE_V1_PASS"
+_DTI_UI_STATUS_PANEL_SOURCE_ROOT_V1 = "/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_UI_IMPLEMENTATION_DESIGN_FREEZE_V1_20260624_141802"
+_DTI_UI_STATUS_PANEL_SOURCE_ZIP_SHA256_V1 = "0d804d707e5e155d42d40dca6ca77fa6cdfc7db2281ee9d889dd0559b74b280e"
+_DTI_UI_STATUS_PANEL_BASE_APP_SHA256_V1 = "ce1fa1621619acb13accfc0167c56b8f6949e2b956a0ba6a32548166c4a96b09"
+_DTI_UI_STATUS_PANEL_BASE_APP_LINES_V1 = "15957"
+# --- DESI_DR2_UI_STATUS_PANEL_CONSTANTS_END_V1 ---
+
+with st.expander("DESI DR2 UI status panel — frozen implementation boundary", expanded=False):
+    st.markdown(
+        """
+        **Source gate:** UI_IMPLEMENTATION_DESIGN_FREEZE_V1_PASS
+
+        **Panel status:** static metadata display only.
+
+        **Readiness summary**
+
+        | Layer | Status | Boundary |
+        |---|---:|---|
+        | Metadata identity | READY | Frozen source identity only |
+        | Semantic quarantine | READY | Name-recognition boundary only |
+        | Raw loader execution | NOT_READY | No raw chain parse or loader run |
+        | Numeric inference | NOT_READY | No numeric cast, statistics, or fit |
+        | Posterior / likelihood | NOT_READY | No posterior, likelihood, chi2, MCMC, or validation claim |
+        | Public app state | LOCAL_PATCH_ONLY | No public update or public observe in this gate |
+
+        **No-claim badges**
+
+        NO RAW PARSE · NO LOADER RUN · NO NUMERIC INFERENCE · NO POSTERIOR SEMANTICS · NO LIKELIHOOD/MCMC · NO PUBLIC UPDATE · NO MANUSCRIPT/POINTER
+
+        **Patch boundary**
+
+        This panel renders frozen audit-status text only. It does not read DESI DR2 files, parse chains, run a loader, call an API, create buttons, create downloads, compute values, or promote any physical/cosmological claim.
+        """
+    )
+    st.caption(
+        "Frozen provenance: "
+        + _DTI_UI_STATUS_PANEL_SOURCE_GATE_V1
+        + " / zip sha256 "
+        + _DTI_UI_STATUS_PANEL_SOURCE_ZIP_SHA256_V1
+    )
+# --- DESI_DR2_UI_STATUS_PANEL_END_V1 ---
