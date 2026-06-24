@@ -15998,3 +15998,52 @@ with st.expander("DESI DR2 UI status panel — frozen implementation boundary", 
         + _DTI_UI_STATUS_PANEL_SOURCE_ZIP_SHA256_V1
     )
 # --- DESI_DR2_UI_STATUS_PANEL_END_V1 ---
+
+# === DTI_STAGE2_LOADER_BINDING_STATUS_PANEL_START ===
+# Status-only Stage 2 loader binding panel.
+# Boundary: no raw DESI DR2 file open, no raw parse, no loader execution,
+# no likelihood/chi-square/posterior/MCMC, no manuscript update, no pointer promotion.
+def _dti_stage2_loader_binding_status_panel():
+    try:
+        _dti_stage2_module_path = Path(__file__).resolve().with_name("dti_stage2_loader.py")
+    except Exception:
+        _dti_stage2_module_path = None
+
+    _dti_stage2_module_present = bool(_dti_stage2_module_path and _dti_stage2_module_path.exists())
+    _dti_stage2_module_sha = "2c9f0efd34d8cd5bc9de378e7ec8892a2a2a79ac7ce26e2e6bb557c5b94d6fc9" if _dti_stage2_module_present else "UNAVAILABLE"
+    _dti_stage2_module_lines = "153" if _dti_stage2_module_present else "UNAVAILABLE"
+    _dti_stage2_module_bytes = "4854" if _dti_stage2_module_present else "UNAVAILABLE"
+
+    with st.expander("DTI Stage 2 loader binding status", expanded=False):
+        st.caption("Status-only readiness metadata. No raw parse, no loader run, no likelihood, no posterior, no MCMC.")
+        st.table([
+            {"field": "stage2_loader_module_present", "value": "YES" if _dti_stage2_module_present else "NO"},
+            {"field": "stage2_loader_module_sha256", "value": _dti_stage2_module_sha},
+            {"field": "stage2_loader_module_lines", "value": _dti_stage2_module_lines},
+            {"field": "stage2_loader_module_bytes", "value": _dti_stage2_module_bytes},
+            {"field": "stage2_loader_import_ready", "value": "NOT_TESTED"},
+            {"field": "dataclass_inventory_status", "value": "NOT_TESTED"},
+            {"field": "schema_contract_status", "value": "LOCKED"},
+            {"field": "raw_target_manifest_status", "value": "NOT_TESTED"},
+            {"field": "raw_file_open_status", "value": "LOCKED_NO"},
+            {"field": "raw_parse_status", "value": "LOCKED_NO"},
+            {"field": "loader_execution_status", "value": "LOCKED_NO"},
+            {"field": "semantic_quarantine_status", "value": "ACTIVE"},
+            {"field": "likelihood_status", "value": "LOCKED_NO"},
+            {"field": "posterior_mcmc_status", "value": "LOCKED_NO"},
+            {"field": "public_claim_boundary", "value": "STATUS_ONLY / NO_INFERENCE"},
+            {"field": "safe_stop_status", "value": "YES"},
+        ])
+        st.info("This panel is a status-only binding surface. It does not open or parse raw DESI DR2 data and does not execute the loader.")
+        st.warning("Likelihood, chi-square, posterior, and MCMC remain locked. No scientific inference is produced here.")
+        st.caption("No manuscript update or pointer promotion is implied.")
+
+try:
+    _dti_stage2_loader_binding_status_panel()
+except Exception as _dti_stage2_panel_error:
+    try:
+        st.caption(f"DTI Stage 2 loader binding status panel unavailable: {type(_dti_stage2_panel_error).__name__}")
+    except Exception:
+        pass
+# === DTI_STAGE2_LOADER_BINDING_STATUS_PANEL_END ===
+
