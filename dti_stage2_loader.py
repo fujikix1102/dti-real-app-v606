@@ -151,3 +151,36 @@ __all__ = [
     "LoaderResult",
     "DTIStage2Loader",
 ]
+
+
+def dti_stage2_loader_contract_metadata():
+    """
+    Safe metadata-only contract surface for audit gates.
+
+    Boundary:
+    - no raw file open
+    - no raw parse
+    - no loader execution
+    - no numeric instantiation
+    - no external process/network
+    """
+    return {
+        "version": "v1",
+        "status": "metadata_only",
+        "boundary": {
+            "raw_file_open": False,
+            "raw_parse": False,
+            "loader_execution": False,
+            "numeric_instantiation": False,
+            "likelihood": False,
+            "posterior": False,
+            "mcmc": False,
+        },
+        "entrypoints": {
+            "contract_metadata": "dti_stage2_loader_contract_metadata",
+        },
+        "raw_parse": "not_executed",
+        "loader_execution": "not_executed",
+        "numeric_instantiation": "not_executed",
+    }
+
