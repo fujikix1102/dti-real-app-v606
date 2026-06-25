@@ -16097,3 +16097,28 @@ def _dti_stage2_lookup_solver_status_panel_v1(st):
         return status
     return status
 # DTI_STAGE2_LOOKUP_SOLVER_API_BINDING_STATUS_END
+
+# --- STAGE3 UI/Solver live-binding static boundary panel V1 BEGIN ---
+# Added by STAGE3_UI_SOLVER_LIVE_BINDING_APP_PATCH_EXECUTE_V1.
+# Scope: static UI boundary only. No live solver execution, no raw parse, no numeric inference.
+try:
+    if "st" in globals():
+        st.markdown("---")
+        st.subheader("Stage 3 — UI/Solver live-binding status")
+        st.caption(
+            "Stage 3 design lane is visible, but live solver execution, raw parsing, "
+            "posterior inference, likelihood evaluation, and claim upgrades remain disabled."
+        )
+        st.markdown(
+            """
+            **Current binding state:** design/visibility lane only  
+            **Live solver:** unavailable in this public UI lane  
+            **Loader execution:** disabled  
+            **Raw DESI DR2 parse:** disabled  
+            **Numeric instantiation:** disabled  
+            **Claim status:** no posterior, likelihood, or physics-claim upgrade
+            """
+        )
+except Exception:
+    pass
+# --- STAGE3 UI/Solver live-binding static boundary panel V1 END ---
