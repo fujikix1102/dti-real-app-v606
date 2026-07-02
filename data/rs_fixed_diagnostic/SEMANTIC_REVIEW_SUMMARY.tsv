@@ -1,0 +1,9 @@
+check	status	detail
+mean_rows_13	PASS	13
+mean_observable_pattern_expected	PASS	DV_over_rs,DM_over_rs,DH_over_rs,DM_over_rs,DH_over_rs,DM_over_rs,DH_over_rs,DM_over_rs,DH_over_rs,DM_over_rs,DH_over_rs,DH_over_rs,DM_over_rs
+mean_has_one_DV	PASS	{'DM_over_rs': 6, 'DH_over_rs': 6, 'DV_over_rs': 1}
+mean_has_six_DM	PASS	{'DM_over_rs': 6, 'DH_over_rs': 6, 'DV_over_rs': 1}
+mean_has_six_DH	PASS	{'DM_over_rs': 6, 'DH_over_rs': 6, 'DV_over_rs': 1}
+case_count_10	PASS	10
+all_cases_row_order_pass	PASS	{'PASS': 10}
+all_scf0_pairs_pass	PASS	{'PASS': 5}

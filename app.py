@@ -16221,3 +16221,101 @@ try:
 except Exception:
     pass
 # --- STAGE3 UI/Solver live-binding static boundary panel V1 END ---
+
+
+# === RS_FIXED_DIAGNOSTIC_PANEL_V1_BEGIN ===
+def _render_rs_fixed_diagnostic_panel_v1():
+    """
+    Static diagnostic display only.
+    No likelihood, posterior, MCMC, K2, CLASS/AxiCLASS, backend, or public mutation.
+    """
+    try:
+        import streamlit as st
+        import pandas as pd
+        import json
+        from pathlib import Path
+
+        base = Path(__file__).resolve().parent / "data" / "rs_fixed_diagnostic"
+
+        results_path = base / "RS_FIXED_EXPLICIT_COV_RESULTS.tsv"
+        summary_path = base / "RS_FIXED_EXPLICIT_COV_SUMMARY.tsv"
+        manifest_path = base / "RS_FIXED_EXPLICIT_COV_MANIFEST.json"
+        semantic_path = base / "SEMANTIC_REVIEW_SUMMARY.tsv"
+        claim_path = base / "CLAIM_PROMOTION_READINESS_REVIEW.tsv"
+        language_path = base / "ALLOWED_AND_FORBIDDEN_LANGUAGE.tsv"
+
+        st.divider()
+        st.header("RS-fixed BAO diagnostic")
+        st.caption(
+            "Static diagnostic panel. GLS-quadratic numeric record only; "
+            "not likelihood, not posterior, not MCMC, not K2."
+        )
+
+        missing = [str(p) for p in [
+            results_path, summary_path, manifest_path, semantic_path, claim_path, language_path
+        ] if not p.exists()]
+        if missing:
+            st.warning("RS-fixed diagnostic files are not fully available.")
+            st.code("\n".join(missing))
+            return
+
+        results = pd.read_csv(results_path, sep="\t")
+        summary = pd.read_csv(summary_path, sep="\t")
+        semantic = pd.read_csv(semantic_path, sep="\t")
+        claim = pd.read_csv(claim_path, sep="\t", header=None, names=["key", "value"])
+        language = pd.read_csv(language_path, sep="\t")
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("A native rs", "H0=72.6 favored", "+11.65 to +11.70")
+        c2.metric("B fixed rs=147", "H0=67 favored", "-835.60 to -835.83")
+        c3.metric("C1 global alpha", "H0=72.6 favored", "+8.23 to +8.24")
+        c4.metric("C2 two-group alpha", "H0=72.6 favored", "+4.13 to +4.14")
+
+        st.markdown(
+            """
+            **Bounded interpretation.** BAO branch preference is strongly sensitive to
+            absolute `rs` normalization. Common-`rs` rescaling reverses the native
+            branch preference. Global and two-group alpha marginalization retain a
+            residual H0=72.6 preference. Therefore this is **not pure shape-only
+            evidence** and **not an rs-only artifact**.
+            """
+        )
+
+        st.warning(
+            "Boundary: this panel is diagnostic support only. "
+            "It is not a likelihood result, posterior result, MCMC result, K2 claim, "
+            "manuscript claim, or public scientific claim."
+        )
+
+        with st.expander("Summary table"):
+            st.dataframe(summary, use_container_width=True)
+
+        with st.expander("Full rs-fixed results"):
+            st.dataframe(results, use_container_width=True)
+
+        with st.expander("Row-order / semantic review"):
+            st.dataframe(semantic, use_container_width=True)
+
+        with st.expander("Claim-promotion readiness"):
+            st.dataframe(claim, use_container_width=True)
+
+        with st.expander("Allowed / forbidden language"):
+            st.dataframe(language, use_container_width=True)
+
+        with st.expander("Manifest / provenance"):
+            st.json(manifest)
+
+    except Exception as e:
+        try:
+            import streamlit as st
+            st.warning(f"RS-fixed diagnostic panel failed safely: {e}")
+        except Exception:
+            pass
+
+
+try:
+    _render_rs_fixed_diagnostic_panel_v1()
+except Exception:
+    pass
+# === RS_FIXED_DIAGNOSTIC_PANEL_V1_END ===

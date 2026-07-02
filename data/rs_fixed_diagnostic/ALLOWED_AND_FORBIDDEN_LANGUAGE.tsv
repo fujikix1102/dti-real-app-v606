@@ -1,0 +1,16 @@
+type	phrase	status
+allowed	rs-normalization sensitivity diagnostic	YES
+allowed	GLS-quadratic diagnostic only	YES
+allowed	dominant exposure condition	YES
+allowed	residual alpha-marginalized H0=72.6 preference remains	YES
+allowed	not pure shape-only evidence	YES
+allowed	not reducible to rs-only artifact	YES
+forbidden	likelihood result	NO
+forbidden	posterior result	NO
+forbidden	MCMC result	NO
+forbidden	K2 claim	NO
+forbidden	proof of fEDE shape-only effect	NO
+forbidden	proof of physical mechanism	NO
+forbidden	manuscript-level conclusion	NO
+forbidden	public result claim	NO
+forbidden	solved Hubble tension	NO
