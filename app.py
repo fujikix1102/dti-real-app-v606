@@ -15323,6 +15323,103 @@ _dti_render_cache_stub_diagnostic_viewer_v1()
 # === DTI CACHE/STUB DIAGNOSTIC VIEWER V1 END ===
 
 # === DTI STREAMLIT BACKEND RUNTIME ADAPTER V1 BEGIN ===
+
+
+def _dti_render_bao_covariance_likelihood_adapter_readiness_v1():
+    """Render readiness-only status for bao_covariance_likelihood.py; no likelihood execution."""
+    try:
+        import streamlit as st
+        import pandas as pd
+    except Exception:
+        return
+
+    st.markdown("#### BAO covariance likelihood adapter — readiness only")
+    st.caption(
+        "Readiness display only. This panel checks whether the local helper module is importable. "
+        "It does not load DESI BAO files, does not parse covariance, does not compute chi2, "
+        "does not evaluate likelihood, does not run MCMC, and does not make posterior or K2 claims."
+    )
+
+    rows = []
+
+    module_status = "UNAVAILABLE"
+    module_error = ""
+    has_load_desi_bao = "NO"
+    has_theory_vector = "NO"
+    has_chi2_gls = "NO"
+
+    try:
+        from bao_covariance_likelihood import (
+            load_desi_bao,
+            theory_vector_from_callables,
+            chi2_gls,
+        )
+
+        module_status = "IMPORT_PASS"
+        has_load_desi_bao = "YES" if callable(load_desi_bao) else "NO"
+        has_theory_vector = "YES" if callable(theory_vector_from_callables) else "NO"
+        has_chi2_gls = "YES" if callable(chi2_gls) else "NO"
+
+    except Exception as exc:
+        module_status = "IMPORT_FAIL"
+        module_error = f"{type(exc).__name__}: {exc}"
+
+    rows.extend([
+        {
+            "item": "bao_covariance_likelihood module",
+            "status": module_status,
+            "detail": module_error,
+        },
+        {
+            "item": "load_desi_bao",
+            "status": has_load_desi_bao,
+            "detail": "function availability only; not called",
+        },
+        {
+            "item": "theory_vector_from_callables",
+            "status": has_theory_vector,
+            "detail": "function availability only; not called",
+        },
+        {
+            "item": "chi2_gls",
+            "status": has_chi2_gls,
+            "detail": "function availability only; not called",
+        },
+        {
+            "item": "BAO data vector path",
+            "status": "NOT_DECLARED",
+            "detail": "no load_desi_bao execution",
+        },
+        {
+            "item": "BAO covariance path",
+            "status": "NOT_DECLARED",
+            "detail": "no covariance parse or inversion",
+        },
+        {
+            "item": "theory vector provider",
+            "status": "NOT_BOUND",
+            "detail": "no AxiCLASS/Class callable bound here",
+        },
+        {
+            "item": "chi2 / likelihood execution",
+            "status": "DISABLED",
+            "detail": "readiness-only; no chi2_gls call",
+        },
+        {
+            "item": "posterior / MCMC / K2",
+            "status": "NO",
+            "detail": "outside this adapter",
+        },
+    ])
+
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    st.info(
+        "This readiness adapter is only a wiring check. "
+        "A future execution path would require explicit local data-vector and covariance paths, "
+        "a theory-vector provider, and a separate user-triggered execution boundary."
+    )
+
 def _dti_render_backend_runtime_adapter_v1():
     """Optional local callable adapter over backend_runtime; diagnostic-only."""
     try:
@@ -15414,6 +15511,8 @@ def _dti_render_backend_runtime_adapter_v1():
 
     st.markdown("#### Fixed safe request")
     st.json(safe_request)
+
+    _dti_render_bao_covariance_likelihood_adapter_readiness_v1()
 
     st.caption(
         "Adapter result is local diagnostic-only. It does not create an API server and does not evaluate "
