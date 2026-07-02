@@ -16319,3 +16319,109 @@ try:
 except Exception:
     pass
 # === RS_FIXED_DIAGNOSTIC_PANEL_V1_END ===
+
+
+
+
+# === R3_RESTRICTED_SCAN_PANEL_V2_BEGIN ===
+def _render_r3_restricted_scan_panel_v2():
+    """
+    Static R3 restricted scan diagnostic panel.
+    No likelihood, posterior, MCMC, K2, CLASS/AxiCLASS, backend mutation, or claim promotion.
+    """
+    try:
+        import streamlit as st
+        import pandas as pd
+        from pathlib import Path
+
+        base = Path(__file__).resolve().parent / "data" / "r3_restricted_scan"
+
+        paths = {
+            "summary": base / "R3_RESTRICTED_SCAN_SUMMARY.tsv",
+            "pairs": base / "R3_RESTRICTED_SCAN_PAIR_DELTAS.tsv",
+            "cases": base / "R3_RESTRICTED_SCAN_CASE_VALUES.tsv",
+            "alignment": base / "R3_ROW_ALIGNMENT.tsv",
+            "source": base / "R3_SOURCE_IDENTITY.tsv",
+            "record": base / "R3_RESTRICTED_SCAN_RECORD_SUMMARY.tsv",
+            "freeze": base / "R3_RECORDS_FINAL_FREEZE.tsv",
+            "cause": base / "R3_TWO_GROUP_ALPHA_FINAL_DIFFERENCE_CAUSE_RECORD.tsv",
+        }
+
+        missing = [str(p) for p in paths.values() if not p.exists()]
+
+        st.divider()
+        st.header("R3 restricted scan diagnostic")
+        st.caption(
+            "Static GLS-quadratic diagnostic support only. "
+            "Not likelihood, not posterior, not MCMC, not K2."
+        )
+
+        if missing:
+            st.warning("R3 restricted scan panel source files are missing.")
+            st.code("\n".join(missing))
+            return
+
+        summary = pd.read_csv(paths["summary"], sep="\t")
+        pairs = pd.read_csv(paths["pairs"], sep="\t")
+        cases = pd.read_csv(paths["cases"], sep="\t")
+        alignment = pd.read_csv(paths["alignment"], sep="\t")
+        source = pd.read_csv(paths["source"], sep="\t")
+        record = pd.read_csv(paths["record"], sep="\t", header=None, names=["key", "value"])
+        freeze = pd.read_csv(paths["freeze"], sep="\t", header=None, names=["key", "value"])
+        cause = pd.read_csv(paths["cause"], sep="\t", header=None, names=["key", "value"])
+
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("common rs=147", "H0=67 favored", "-835.83 to -835.60")
+        c2.metric("native rs", "H0=72.6 favored", "+11.65 to +11.70")
+        c3.metric("global alpha", "H0=72.6 favored", "+8.23 to +8.24")
+        c4.metric("two-group alpha", "H0=72.6 favored", "+4.19 to +4.20")
+
+        st.markdown(
+            """
+            **Bounded reading.** R3 keeps the RS-fixed diagnostic pattern:
+            common `rs=147` reverses preference toward H0=67, while native,
+            global-alpha, and two-group-alpha proxy treatments retain residual
+            H0=72.6 preference.
+            """
+        )
+
+        st.warning(
+            "Boundary: diagnostic support only. This is not a likelihood result, "
+            "posterior result, MCMC result, K2 claim, manuscript claim, or public scientific claim."
+        )
+
+        with st.expander("R3 summary"):
+            st.dataframe(summary, use_container_width=True)
+
+        with st.expander("R3 pair deltas"):
+            st.dataframe(pairs, use_container_width=True)
+
+        with st.expander("R3 case values"):
+            st.dataframe(cases, use_container_width=True)
+
+        with st.expander("Row alignment and source identity"):
+            st.dataframe(alignment, use_container_width=True)
+            st.dataframe(source, use_container_width=True)
+
+        with st.expander("R3 final freeze record"):
+            st.dataframe(freeze, use_container_width=True)
+
+        with st.expander("Two-group alpha final difference cause record"):
+            st.dataframe(cause, use_container_width=True)
+
+        with st.expander("Record summary"):
+            st.dataframe(record, use_container_width=True)
+
+    except Exception as e:
+        try:
+            import streamlit as st
+            st.warning(f"R3 restricted scan panel failed safely: {e}")
+        except Exception:
+            pass
+
+
+try:
+    _render_r3_restricted_scan_panel_v2()
+except Exception:
+    pass
+# === R3_RESTRICTED_SCAN_PANEL_V2_END ===

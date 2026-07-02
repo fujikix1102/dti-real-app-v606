@@ -1,0 +1,5 @@
+rs_mode	alpha_mode	n_scf0	delta_min	delta_max	preferences	has_sign_change_over_scf0	boundary_flag
+common_rs_147	none	5	-835.8250884164614	-835.5961506698258	NEG_H67_FAVORED	False	diagnostic_only
+native	global_alpha	5	8.233109486931824	8.23693127770867	POS_H726_FAVORED	False	diagnostic_only
+native	none	5	11.652380255542653	11.703181063994009	POS_H726_FAVORED	False	diagnostic_only
+native	two_group_alpha_proxy	5	4.19441410411644	4.196144929733226	POS_H726_FAVORED	False	diagnostic_only

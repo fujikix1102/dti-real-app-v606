@@ -1,0 +1,15 @@
+decision	R3_RESTRICTED_SCAN_EXECUTION_PASS
+classification	GLS_QUADRATIC_DIAGNOSTIC_ONLY_NO_LIKELIHOOD_NO_POSTERIOR_NO_MCMC_NO_K2
+out	/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_R3_RESTRICTED_SCAN_EXECUTION_20260703_004019
+case_count	10
+pair_delta_rows	20
+summary_rows	4
+row_alignment	PASS
+likelihood_claim	NO
+posterior	NO
+MCMC	NO
+K2_claim	NO
+app_py_modify	NO
+git	NO
+public_update	NO
+recommended_next	STOP_OR_R3_RESTRICTED_SCAN_RECORD_SUMMARY
