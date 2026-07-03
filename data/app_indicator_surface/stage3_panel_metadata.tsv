@@ -1,0 +1,15 @@
+key	value
+panel_title	Live AxiCLASS diagnostic lineage and bounded claim status
+panel_subtitle	Stage2_FIX1 and Stage3 independent-seed diagnostic confirmation
+implementation_type	static_readonly_panel
+new_compute	NO
+backend_call	NO
+AxiCLASS_runtime_call_from_app	NO
+likelihood_recompute	NO
+MCMC_from_app	NO
+posterior_claim	NO
+scientific_inference_claim	NO
+K2_claim	NO
+manuscript_claim	NO
+formal_convergence_claim	REVIEWABLE
+must_preserve	no_false_NO_when_bounded_YES_satisfied

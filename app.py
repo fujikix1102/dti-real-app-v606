@@ -16576,3 +16576,81 @@ except Exception as _dti_asset_panel_exc:
     st.error("Frozen likelihood asset panel failed closed.")
     st.code(f"{type(_dti_asset_panel_exc).__name__}: {_dti_asset_panel_exc}")
 # END APP_READ_ONLY_ASSET_BINDING_PANEL_V1
+
+# APP_INDICATOR_SURFACE_LOCAL_PATCH_V1_BEGIN
+def _dti_app_indicator_surface_stage3_v1():
+    """Static, read-only Stage3 indicator panel. No backend, no AxiCLASS, no likelihood, no MCMC."""
+    from pathlib import Path
+    import pandas as pd
+    import streamlit as st
+
+    base = Path(__file__).resolve().parent
+    data_dir = base / "data" / "app_indicator_surface"
+
+    claim_path = data_dir / "stage3_claim_status.tsv"
+    rhat_path = data_dir / "stage3_rhat_ess_table.tsv"
+    hashes_path = data_dir / "stage3_source_hashes.tsv"
+    copy_path = data_dir / "stage3_reviewer_safe_copy.tsv"
+    meta_path = data_dir / "stage3_panel_metadata.tsv"
+
+    required = [claim_path, rhat_path, hashes_path, copy_path, meta_path]
+    missing = [str(p) for p in required if not p.exists()]
+    if missing:
+        st.warning("Stage3 indicator panel assets are not available.")
+        st.caption("Missing static assets: " + "; ".join(missing))
+        return
+
+    claim_df = pd.read_csv(claim_path, sep="\t")
+    rhat_df = pd.read_csv(rhat_path, sep="\t")
+    hashes_df = pd.read_csv(hashes_path, sep="\t")
+    copy_df = pd.read_csv(copy_path, sep="\t")
+    meta_df = pd.read_csv(meta_path, sep="\t")
+
+    meta = dict(zip(meta_df["key"], meta_df["value"]))
+    copy = dict(zip(copy_df["copy_id"], copy_df["text"]))
+
+    st.markdown("---")
+    st.markdown("### Live AxiCLASS diagnostic lineage and bounded claim status")
+    st.caption("Stage2_FIX1 and Stage3 independent-seed diagnostic confirmation")
+
+    st.warning(
+        "Boundary: this panel reports diagnostic reproducibility and source-locked computation status only. "
+        "It does not claim posterior constraints, K2, physical proof, global optimum, or manuscript-ready evidence."
+    )
+
+    st.markdown(copy.get(
+        "summary_one_line",
+        "Stage3 independently reproduces the Stage2 near-stable live AxiCLASS diagnostic behavior."
+    ))
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Live AxiCLASS", "YES_SOURCE_LOCKED")
+    with col2:
+        st.metric("No lookup / interpolation", "YES_SOURCE_LOCKED")
+    with col3:
+        st.metric("Stage2/Stage3 reproducibility", "YES_REPRODUCIBILITY")
+
+    st.markdown("#### Bounded claim status")
+    st.table(claim_df[["display_label", "display_status", "user_facing_meaning"]])
+
+    st.markdown("#### Rhat / ESS diagnostic table")
+    st.table(rhat_df)
+
+    with st.expander("Source-locked hashes and frozen asset lineage"):
+        st.table(hashes_df)
+        st.caption(copy.get(
+            "lineage_one_line",
+            "The displayed values are linked to frozen Stage3 assets, source files, and SHA256 identities."
+        ))
+
+    with st.expander("Panel metadata and hard boundaries"):
+        st.table(meta_df)
+
+    st.caption(copy.get(
+        "boundary_one_line",
+        "This is a diagnostic reproducibility and stability-support panel, not a posterior-constraint, K2, physical-proof, or manuscript-ready claim."
+    ))
+
+_dti_app_indicator_surface_stage3_v1()
+# APP_INDICATOR_SURFACE_LOCAL_PATCH_V1_END

@@ -1,0 +1,4 @@
+copy_id	text	status
+summary_one_line	Stage3 independently reproduces the Stage2 near-stable live AxiCLASS diagnostic behavior, with source-locked hashes and no frozen-grid lookup or interpolation.	APPROVED_DESIGN_COPY
+boundary_one_line	This is a diagnostic reproducibility and stability-support panel, not a posterior-constraint, K2, physical-proof, or manuscript-ready claim.	APPROVED_DESIGN_COPY
+lineage_one_line	The displayed values are linked to frozen Stage3 assets, source files, and SHA256 identities.	APPROVED_DESIGN_COPY
