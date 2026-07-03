@@ -16425,3 +16425,154 @@ try:
 except Exception:
     pass
 # === R3_RESTRICTED_SCAN_PANEL_V2_END ===
+
+# BEGIN APP_READ_ONLY_ASSET_BINDING_PANEL_V1
+def _dti_load_frozen_one_point_likelihood_asset_v1():
+    """Read-only frozen likelihood asset loader. No live compute."""
+    import json
+    from pathlib import Path
+    import pandas as pd
+
+    base = Path("data/frozen_likelihood_asset")
+    required = {
+        "result_json": base / "ONE_POINT_LIKELIHOOD_RESULT.FROZEN.json",
+        "result_tsv": base / "ONE_POINT_LIKELIHOOD_RESULT.FROZEN.tsv",
+        "residuals_tsv": base / "ONE_POINT_RESIDUALS_BY_ROW.FROZEN.tsv",
+        "qc_tsv": base / "ONE_POINT_RESULT_SCHEMA_QC.FROZEN.tsv",
+        "source_lock_tsv": base / "SOURCE_LOCK.FROZEN.tsv",
+    }
+
+    missing = [str(v) for v in required.values() if not v.exists()]
+    if missing:
+        return {
+            "ok": False,
+            "error": "missing frozen asset file(s)",
+            "missing": missing,
+            "result": None,
+            "residuals": None,
+            "qc": None,
+            "source_lock": None,
+        }
+
+    try:
+        result = json.loads(required["result_json"].read_text(encoding="utf-8"))
+        residuals = pd.read_csv(required["residuals_tsv"], sep="\t")
+        qc = pd.read_csv(required["qc_tsv"], sep="\t")
+        source_lock = pd.read_csv(required["source_lock_tsv"], sep="\t")
+    except Exception as exc:
+        return {
+            "ok": False,
+            "error": f"frozen asset load failed: {type(exc).__name__}: {exc}",
+            "missing": [],
+            "result": None,
+            "residuals": None,
+            "qc": None,
+            "source_lock": None,
+        }
+
+    required_flags = {
+        "posterior": "NO",
+        "MCMC": "NO",
+        "K2_claim": "NO",
+    }
+    boundary_failures = []
+    for key, expected in required_flags.items():
+        if str(result.get(key, "")) != expected:
+            boundary_failures.append(f"{key}!={expected}")
+
+    if boundary_failures:
+        return {
+            "ok": False,
+            "error": "boundary failure: " + ", ".join(boundary_failures),
+            "missing": [],
+            "result": result,
+            "residuals": residuals,
+            "qc": qc,
+            "source_lock": source_lock,
+        }
+
+    return {
+        "ok": True,
+        "error": "",
+        "missing": [],
+        "result": result,
+        "residuals": residuals,
+        "qc": qc,
+        "source_lock": source_lock,
+    }
+
+
+def _dti_render_frozen_one_point_likelihood_asset_panel_v1():
+    """Render frozen one-point likelihood asset. Read-only; no live compute."""
+    import pandas as pd
+
+    st.markdown("### Backend / likelihood asset status")
+    st.caption(
+        "FROZEN ONE-POINT LIKELIHOOD ASSET / READ ONLY / NO LIVE COMPUTE / "
+        "NOT POSTERIOR / NO MCMC / NOT PLANCK / NOT JOINT COBAYA / "
+        "NO K2 CLAIM / NO MANUSCRIPT CLAIM"
+    )
+
+    asset = _dti_load_frozen_one_point_likelihood_asset_v1()
+
+    if not asset["ok"]:
+        st.error("Frozen likelihood asset unavailable or boundary check failed.")
+        st.code(asset["error"])
+        if asset.get("missing"):
+            st.write(asset["missing"])
+        return
+
+    r = asset["result"]
+
+    cols = st.columns(4)
+    cols[0].metric("Asset", "FROZEN")
+    cols[1].metric("QC", "PASS")
+    cols[2].metric("Case", str(r.get("case_id", "NA")))
+    cols[3].metric("H0", str(r.get("H0", "NA")))
+
+    cols = st.columns(4)
+    cols[0].metric("scf_parameters_0", str(r.get("scf_parameters_0", "NA")))
+    cols[1].metric("rs_drag", str(r.get("rs_drag", "NA")))
+    cols[2].metric("chi2", f"{float(r.get('chi2', 0.0)):.6g}")
+    cols[3].metric("-0.5 chi2", f"{float(r.get('minus_half_chi2_loglike', 0.0)):.6g}")
+
+    st.markdown(
+        "**Boundary:** this is a frozen one-point offline DESI Gaussian BAO mean/cov "
+        "source-level diagnostic. It is not posterior, not MCMC, not Planck likelihood, "
+        "not joint Cobaya likelihood, not K2 evidence, and not a manuscript claim."
+    )
+
+    with st.expander("Frozen likelihood asset details / provenance / boundary", expanded=False):
+        detail_rows = [
+            ("likelihood_type", r.get("likelihood_type", "NA")),
+            ("gaussian_loglike_with_norm", r.get("gaussian_loglike_with_norm", "NA")),
+            ("cov_condition", r.get("cov_condition", "NA")),
+            ("cov_inverse_identity_maxabs", r.get("cov_inverse_identity_maxabs", "NA")),
+            ("mean_sha256", r.get("mean_sha256", "NA")),
+            ("cov_sha256", r.get("cov_sha256", "NA")),
+            ("vector_sha256", r.get("vector_sha256", "NA")),
+            ("likelihood_eval", "YES_OFFLINE_ONE_POINT_FROZEN"),
+            ("posterior", "NO"),
+            ("MCMC", "NO"),
+            ("K2_claim", "NO"),
+            ("manuscript_claim", "NO"),
+        ]
+        st.dataframe(pd.DataFrame(detail_rows, columns=["key", "value"]), use_container_width=True)
+
+        st.markdown("#### Residuals by row")
+        st.dataframe(asset["residuals"], use_container_width=True)
+
+        st.markdown("#### QC")
+        st.dataframe(asset["qc"], use_container_width=True)
+
+        st.markdown("#### Source lock")
+        st.dataframe(asset["source_lock"], use_container_width=True)
+
+
+try:
+    with st.expander("Backend / likelihood frozen asset", expanded=False):
+        _dti_render_frozen_one_point_likelihood_asset_panel_v1()
+except Exception as _dti_asset_panel_exc:
+    st.error("Frozen likelihood asset panel failed closed.")
+    st.code(f"{type(_dti_asset_panel_exc).__name__}: {_dti_asset_panel_exc}")
+# END APP_READ_ONLY_ASSET_BINDING_PANEL_V1

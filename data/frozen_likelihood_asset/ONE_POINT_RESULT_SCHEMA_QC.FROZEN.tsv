@@ -1,0 +1,14 @@
+check	status	detail
+json_loaded	PASS	json parse ok
+tsv_row_count	PASS	rows=1
+residual_row_count	PASS	rows=13
+required_tsv_columns	PASS	all present
+case_id_matches_json	PASS	tsv=S003 json=S003
+H0_numeric	PASS	tsv=67.0 json=67.0
+scf_numeric	PASS	tsv=0.05 json=0.05
+rs_drag_numeric	PASS	tsv=142.881667507 json=142.881667507
+chi2_numeric	PASS	tsv=91.17688565570316 json=91.17688565570315
+posterior_no	PASS	posterior=NO
+mcmc_no	PASS	MCMC=NO
+k2_no	PASS	K2=NO
+raw_tsv_field_count	PASS	header=22 data=22
