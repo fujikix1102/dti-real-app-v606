@@ -16218,6 +16218,12 @@ try:
             **Claim status:** no posterior, likelihood, or physics-claim upgrade
             """
         )
+        st.info(
+            "Stage3 status: bounded diagnostic interpretation supported by source-locked recompute, "
+            "BAO likelihood-output identity, and internal resampling stability. "
+            "No independent DESI likelihood reproduction, no CLASS/AxiCLASS physical validation, "
+            "no mechanism proof, and no Hubble-tension-resolution claim."
+        )
 except Exception:
     pass
 # --- STAGE3 UI/Solver live-binding static boundary panel V1 END ---
