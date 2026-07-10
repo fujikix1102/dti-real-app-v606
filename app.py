@@ -16203,26 +16203,26 @@ def _dti_stage2_lookup_solver_status_panel_v1(st):
 try:
     if "st" in globals():
         st.markdown("---")
-        st.subheader("Stage 3 — UI/Solver live-binding status")
+        st.subheader("Stage 3 — bounded diagnostic status")
         st.caption(
-            "Stage 3 design lane is visible, but live solver execution, raw parsing, "
-            "posterior inference, likelihood evaluation, and claim upgrades remain disabled."
+            "Stage 3 design/status information is visible in this public UI, but live solver execution, "
+            "raw parsing, posterior inference, likelihood evaluation, and claim upgrades remain disabled."
         )
         st.markdown(
             """
-            **Current binding state:** design/visibility lane only  
-            **Live solver:** unavailable in this public UI lane  
+            **Current public state:** bounded diagnostic display only  
+            **Live solver execution:** disabled in this public UI lane  
             **Loader execution:** disabled  
-            **Raw DESI DR2 parse:** disabled  
+            **Raw DESI DR2 parsing:** disabled  
             **Numeric instantiation:** disabled  
-            **Claim status:** no posterior, likelihood, or physics-claim upgrade
+            **Claim status:** no posterior result, no independent likelihood reproduction, and no physics-claim upgrade
             """
         )
         st.info(
             "Stage3 status: bounded diagnostic interpretation supported by source-locked recompute, "
             "BAO likelihood-output identity, and internal resampling stability. "
-            "No independent DESI likelihood reproduction, no CLASS/AxiCLASS physical validation, "
-            "no mechanism proof, and no Hubble-tension-resolution claim."
+            "This is not an independent DESI likelihood reproduction, not CLASS/AxiCLASS physical validation, "
+            "not a mechanism proof, and not a Hubble-tension-resolution claim."
         )
 except Exception:
     pass
