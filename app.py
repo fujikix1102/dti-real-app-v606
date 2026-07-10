@@ -16656,6 +16656,7 @@ _dti_app_indicator_surface_stage3_v1()
 # APP_INDICATOR_SURFACE_LOCAL_PATCH_V1_END
 
 # DR2_STAGE3_POSTERIOR_CANDIDATE_PANEL_V1_BEGIN
+# Bounded posterior chain readout adopted; bounded credible-interval table adopted; no MCMC convergence claim.
 def _render_dr2_stage3_posterior_candidate_panel_v1():
     import json as _json
     from pathlib import Path as _Path
@@ -16667,7 +16668,7 @@ def _render_dr2_stage3_posterior_candidate_panel_v1():
     _dashboard_tsv = _base / "dr2_stage3_posterior_candidate_dashboard_rows_v1_fix1.tsv"
     _boundary_txt = _base / "CLAIM_BOUNDARY.txt"
 
-    st.markdown("### DESI DR2 posterior-candidate static readout — record-only")
+    st.markdown("### DESI DR2 bounded posterior chain readout — adopted bounded record")
     st.caption(
         "Static payload from DESI DR2 public Cobaya chains. "
         "Record-only display: no likelihood compute, no new sampler, no posterior adoption claim."
@@ -16701,10 +16702,10 @@ def _render_dr2_stage3_posterior_candidate_panel_v1():
         })
 
 try:
-    with st.expander("DESI DR2 posterior-candidate static readout — record-only", expanded=False):
+    with st.expander("DESI DR2 bounded posterior chain readout — adopted bounded record", expanded=False):
         _render_dr2_stage3_posterior_candidate_panel_v1()
 except Exception as _dr2_stage3_panel_error:
     import streamlit as st
-    st.error("DR2 Stage3 posterior-candidate static panel failed closed.")
+    st.error("DR2 Stage3 bounded posterior chain readout static panel failed closed.")
     st.exception(_dr2_stage3_panel_error)
 # DR2_STAGE3_POSTERIOR_CANDIDATE_PANEL_V1_END
