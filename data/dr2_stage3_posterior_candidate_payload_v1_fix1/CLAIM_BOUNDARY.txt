@@ -1,0 +1,6 @@
+DR2 Stage3 posterior candidate app payload boundary
+This payload is record-only and display-ready.
+It is not a posterior adoption claim.
+It is not a credible-interval claim.
+It is not an MCMC convergence claim.
+No likelihood computation or new sampler was run in this gate.

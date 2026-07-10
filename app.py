@@ -16654,3 +16654,57 @@ def _dti_app_indicator_surface_stage3_v1():
 
 _dti_app_indicator_surface_stage3_v1()
 # APP_INDICATOR_SURFACE_LOCAL_PATCH_V1_END
+
+# DR2_STAGE3_POSTERIOR_CANDIDATE_PANEL_V1_BEGIN
+def _render_dr2_stage3_posterior_candidate_panel_v1():
+    import json as _json
+    from pathlib import Path as _Path
+    import pandas as _pd
+    import streamlit as st
+
+    _base = _Path(__file__).resolve().parent / "data" / "dr2_stage3_posterior_candidate_payload_v1_fix1"
+    _payload_json = _base / "dr2_stage3_posterior_candidate_app_payload_v1_fix1.json"
+    _dashboard_tsv = _base / "dr2_stage3_posterior_candidate_dashboard_rows_v1_fix1.tsv"
+    _boundary_txt = _base / "CLAIM_BOUNDARY.txt"
+
+    st.markdown("### DESI DR2 posterior-candidate static readout — record-only")
+    st.caption(
+        "Static payload from DESI DR2 public Cobaya chains. "
+        "Record-only display: no likelihood compute, no new sampler, no posterior adoption claim."
+    )
+
+    if not _payload_json.exists() or not _dashboard_tsv.exists() or not _boundary_txt.exists():
+        st.error("DR2 Stage3 static payload is missing. Panel is fail-closed.")
+        return
+
+    _payload = _json.loads(_payload_json.read_text(encoding="utf-8"))
+    _df = _pd.read_csv(_dashboard_tsv, sep="\t")
+
+    _summary = _payload.get("freeze_summary", {})
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Rows", _summary.get("row_count_total", "NA"))
+    c2.metric("Total weight", _summary.get("total_weight", "NA"))
+    c3.metric("Status", _payload.get("status", "NA"))
+
+    st.dataframe(_df, use_container_width=True)
+
+    with st.expander("Claim boundary — mandatory"):
+        st.code(_boundary_txt.read_text(encoding="utf-8"))
+        st.write(_payload.get("boundary", {}))
+
+    with st.expander("Source identity"):
+        st.write({
+            "payload_id": _payload.get("payload_id"),
+            "source": _payload.get("source"),
+            "payload_path": str(_payload_json),
+            "dashboard_path": str(_dashboard_tsv),
+        })
+
+try:
+    with st.expander("DESI DR2 posterior-candidate static readout — record-only", expanded=False):
+        _render_dr2_stage3_posterior_candidate_panel_v1()
+except Exception as _dr2_stage3_panel_error:
+    import streamlit as st
+    st.error("DR2 Stage3 posterior-candidate static panel failed closed.")
+    st.exception(_dr2_stage3_panel_error)
+# DR2_STAGE3_POSTERIOR_CANDIDATE_PANEL_V1_END
