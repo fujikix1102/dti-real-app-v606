@@ -16656,7 +16656,7 @@ _dti_app_indicator_surface_stage3_v1()
 # APP_INDICATOR_SURFACE_LOCAL_PATCH_V1_END
 
 # DR2_STAGE3_POSTERIOR_CANDIDATE_PANEL_V1_BEGIN
-# Bounded posterior chain readout adopted; bounded credible-interval table adopted; no MCMC convergence claim.
+# Bounded posterior chain readout adopted; bounded credible-interval table adopted; bounded MCMC diagnostic convergence support adopted.
 def _render_dr2_stage3_posterior_candidate_panel_v1():
     import json as _json
     from pathlib import Path as _Path
