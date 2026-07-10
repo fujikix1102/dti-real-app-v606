@@ -16709,3 +16709,54 @@ except Exception as _dr2_stage3_panel_error:
     st.error("DR2 Stage3 bounded posterior chain readout static panel failed closed.")
     st.exception(_dr2_stage3_panel_error)
 # DR2_STAGE3_POSTERIOR_CANDIDATE_PANEL_V1_END
+
+
+# --- DTI_PUBLIC_STAGE3_POINTER_DISPLAY_V1_BEGIN ---
+# Display-only public pointer panel for the Stage3 derived package.
+# Boundary: no numeric recomputation, no likelihood evaluation, no sampler execution,
+# no physical-model validation, and no claim upgrade.
+try:
+    import streamlit as st  # already available in the public app runtime
+
+    st.markdown("---")
+    with st.expander("Stage3 derived package pointers / display-only", expanded=False):
+        st.caption(
+            "DISPLAY ONLY / SOURCE-LOCKED / NOT A NEW LIKELIHOOD / "
+            "NO SAMPLER RUN / NO PHYSICAL-MODEL VALIDATION"
+        )
+
+        st.markdown(
+            """
+**Stage3 package status**
+
+- Derived Stage3 claim PDF: source-locked and frozen.
+- Canonical derived PDF pointer: promoted and observed.
+- Release note: tracked and remote-observed.
+- Response-ready note: tracked and remote-observed.
+- Final index: tracked and remote-observed.
+- Submission response draft: tracked and remote-observed.
+
+**Current repository anchor**
+
+- MAXOMEGA remote: `https://github.com/fujikix1102/MAXOMEGA`
+- Final Stage3 package index pointer:
+  `_paper_journal/paper_20260305_102018_audit_sensitivity/CURRENT_FINAL_INDEX_STAGE3_PACKAGE_V1_POINTER.txt`
+- Submission response draft pointer:
+  `_paper_journal/paper_20260305_102018_audit_sensitivity/CURRENT_MANUSCRIPT_SUBMISSION_RESPONSE_DRAFT_V1_POINTER.txt`
+
+**Core frozen artifact**
+
+- `current_best_with_stage3_claim.FROZEN.pdf`
+- SHA256: `1521e01aa6bc76a670325800e22dfb18606c2cc29c637665aecadc428f2ed03d`
+- Pages: `112`
+
+**Boundary**
+
+This app panel is a pointer display only. It does not perform a likelihood evaluation, sampler execution, numeric recomputation, physical-model validation, public-data parsing, or claim upgrade.
+"""
+        )
+except Exception:
+    # The public app must not fail because of an informational pointer panel.
+    pass
+# --- DTI_PUBLIC_STAGE3_POINTER_DISPLAY_V1_END ---
+
