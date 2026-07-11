@@ -16644,7 +16644,7 @@ def _dti_app_indicator_surface_stage3_v1():
     st.markdown("#### Rhat / ESS diagnostic table")
     st.table(rhat_df)
 
-    with st.expander("Source-locked hashes and frozen asset lineage"):
+    with st.expander("Frozen token/header records and package-hash lineage"):
         st.table(hashes_df)
         st.caption(copy.get(
             "lineage_one_line",
@@ -16675,7 +16675,7 @@ def _render_dr2_stage3_posterior_candidate_panel_v1():
     _dashboard_tsv = _base / "dr2_stage3_posterior_candidate_dashboard_rows_v1_fix1.tsv"
     _boundary_txt = _base / "CLAIM_BOUNDARY.txt"
 
-    st.markdown("### DESI DR2 bounded posterior chain readout — adopted bounded record")
+    st.markdown("### DESI DR2 bounded chain-token record — display only")
     st.caption(
         "Static payload from DESI DR2 public Cobaya chains. "
         "Record-only display: no likelihood compute, no new sampler, no posterior adoption claim."
@@ -16709,7 +16709,7 @@ def _render_dr2_stage3_posterior_candidate_panel_v1():
         })
 
 try:
-    with st.expander("DESI DR2 bounded posterior chain readout — adopted bounded record", expanded=False):
+    with st.expander("DESI DR2 bounded chain-token record — display only", expanded=False):
         _render_dr2_stage3_posterior_candidate_panel_v1()
 except Exception as _dr2_stage3_panel_error:
     import streamlit as st
