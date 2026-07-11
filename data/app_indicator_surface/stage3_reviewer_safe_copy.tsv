@@ -1,4 +1,4 @@
 copy_id	text	status
-summary_one_line	Stage3 independently reproduces the Stage2 near-stable live AxiCLASS diagnostic behavior, with source-locked hashes and no frozen-grid lookup or interpolation.	APPROVED_DESIGN_COPY
-boundary_one_line	This is a diagnostic reproducibility and stability-support panel, not a posterior-constraint, K2, physical-proof, or manuscript-ready claim.	APPROVED_DESIGN_COPY
-lineage_one_line	The displayed values are linked to frozen Stage3 assets, source files, and SHA256 identities.	APPROVED_DESIGN_COPY
+summary_one_line	Stage3 preserves bounded token-level likelihood-output evidence from the audited chain-header and schema lineage. Source-code object identity remains local absent/unresolved; no independent DESI likelihood reproduction, BAO likelihood recomputation, Cobaya likelihood-object validation, posterior constraint, or claim upgrade is asserted.	APPROVED_DESIGN_COPY
+boundary_one_line	This panel reports bounded token-level likelihood-output evidence only. It is not source-code object validation, likelihood reproduction, BAO recomputation, posterior inference, physical proof, or manuscript-ready evidence.	APPROVED_DESIGN_COPY
+lineage_one_line	The displayed evidence is linked to frozen Stage3 token/header records and package SHA256 identities; source-code object identity remains local absent/unresolved.	APPROVED_DESIGN_COPY

@@ -16219,10 +16219,11 @@ try:
             """
         )
         st.info(
-            "Stage3 status: bounded diagnostic interpretation supported by source-locked recompute, "
-            "BAO likelihood-output identity, and internal resampling stability. "
-            "This is not an independent DESI likelihood reproduction, not CLASS/AxiCLASS physical validation, "
-            "not a mechanism proof, and not a Hubble-tension-resolution claim."
+            "Stage3 preserves bounded token-level likelihood-output evidence from the audited "
+            "chain-header and schema lineage. Source-code object identity remains local absent/unresolved. "
+            "This is not an independent DESI likelihood reproduction, BAO likelihood recomputation, "
+            "Cobaya likelihood-object validation, posterior constraint, mechanism proof, "
+            "or Hubble-tension-resolution claim."
         )
 except Exception:
     pass
@@ -16616,26 +16617,26 @@ def _dti_app_indicator_surface_stage3_v1():
     copy = dict(zip(copy_df["copy_id"], copy_df["text"]))
 
     st.markdown("---")
-    st.markdown("### Live AxiCLASS diagnostic lineage and bounded claim status")
-    st.caption("Stage2_FIX1 and Stage3 independent-seed diagnostic confirmation")
+    st.markdown("### Stage3 bounded evidence status")
+    st.caption("Stage2_FIX1 diagnostic lineage and Stage3 bounded evidence status")
 
     st.warning(
-        "Boundary: this panel reports diagnostic reproducibility and source-locked computation status only. "
+        "Boundary: this panel reports frozen diagnostic lineage and bounded token-level evidence only. "
         "It does not claim posterior constraints, K2, physical proof, global optimum, or manuscript-ready evidence."
     )
 
     st.markdown(copy.get(
         "summary_one_line",
-        "Stage3 independently reproduces the Stage2 near-stable live AxiCLASS diagnostic behavior."
+        "Stage3 records bounded diagnostic lineage from frozen assets; it does not independently reproduce or validate live AxiCLASS behavior."
     ))
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Live AxiCLASS", "YES_SOURCE_LOCKED")
+        st.metric("Likelihood evidence", "TOKEN_LEVEL_ONLY")
     with col2:
-        st.metric("No lookup / interpolation", "YES_SOURCE_LOCKED")
+        st.metric("Source-code object identity", "LOCAL_ABSENT_UNRESOLVED")
     with col3:
-        st.metric("Stage2/Stage3 reproducibility", "YES_REPRODUCIBILITY")
+        st.metric("Stage3 evidence boundary", "TOKEN_LEVEL_ONLY")
 
     st.markdown("#### Bounded claim status")
     st.table(claim_df[["display_label", "display_status", "user_facing_meaning"]])
@@ -16735,7 +16736,7 @@ try:
             """
 **Stage3 package status**
 
-- Derived Stage3 claim PDF: source-locked and frozen.
+- Derived Stage3 bounded-evidence PDF: source-locked and frozen; no claim upgrade.
 - Canonical derived PDF pointer: promoted and observed.
 - Release note: tracked and remote-observed.
 - Response-ready note: tracked and remote-observed.
