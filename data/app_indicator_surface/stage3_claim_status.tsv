@@ -1,12 +1,12 @@
 status_key	display_status	display_label	user_facing_meaning	display_class
-live_AxiCLASS_execution_claim	YES_SOURCE_LOCKED	Live AxiCLASS source locked	The diagnostic values are tied to live AxiCLASS/classy evaluations and frozen source records.	success
-no_lookup_no_interpolation_claim	YES_SOURCE_LOCKED	No lookup / no interpolation	The Stage3 route is not frozen-grid lookup and not interpolation.	success
-Stage3_execution_claim	YES_DIAGNOSTIC_ONLY	Stage3 diagnostic complete	Stage3 completed as a diagnostic confirmation run, not as a posterior-constraint claim.	success
-source_lineage_claim	YES_SOURCE_LOCKED	Source lineage locked	Source files, frozen assets, and hashes are traceable.	success
-Stage2_Stage3_reproducibility_claim	YES_REPRODUCIBILITY	Stage2/Stage3 reproducibility	Independent Stage3 reproduces Stage2 near-stable diagnostic behavior within the audited domain.	success
-Rhat_ESS_diagnostic_support	YES_DIAGNOSTIC_ONLY	Rhat/ESS diagnostic support	Rhat/ESS support bounded diagnostic stability in the audited Stage3 domain.	success
-formal_convergence_claim	REVIEWABLE	Formal convergence reviewable	Formal convergence wording requires a separate review gate.	warning
-posterior_claim	NO	No posterior claim	This panel does not claim posterior constraints.	neutral
-scientific_inference_claim	NO	No scientific inference claim	This panel does not claim physical proof or scientific inference.	neutral
-K2_claim	NO	No K2 claim	K2 is not claimed in this route.	neutral
-manuscript_claim	NO	No manuscript claim	This is not yet manuscript-ready evidence wording.	neutral
+live_AxiCLASS_execution_claim	TOKEN_LEVEL_ONLY	Likelihood evidence level	Only bounded likelihood-output token evidence is retained. This does not establish live AxiCLASS source-object identity, source-code validation, or independent likelihood reproduction.	success
+no_lookup_no_interpolation_claim	NOT_ESTABLISHED_BY_THIS_LANE	Computation-route validation	The token-level evidence freeze does not validate a live solver, lookup, interpolation, or recomputation route.	success
+Stage3_execution_claim	RESOLVED_TOKEN_LEVEL_ONLY	Stage3 evidence resolution	Stage3 is resolved only as bounded token/header evidence. No posterior constraint, source-object validation, or physical claim is established.	success
+source_lineage_claim	LOCAL_ABSENT_UNRESOLVED	Source-code object identity	Token/header and package-hash lineage are retained, while the source-code object identity remains local absent/unresolved.	success
+Stage2_Stage3_reproducibility_claim	NO	Independent reproduction	Independent Stage2/Stage3 likelihood or AxiCLASS reproduction is not established by the current Stage3 evidence lane.	success
+Rhat_ESS_diagnostic_support	DISPLAY_ONLY_DIAGNOSTIC	Rhat/ESS table status	The displayed Rhat/ESS values are retained as bounded diagnostic records only and are not promoted to posterior constraints.	success
+formal_convergence_claim	NOT_ASSERTED	Formal convergence claim	No formal convergence, posterior, or sampler-validation claim is asserted by this token-level evidence freeze.	warning
+posterior_claim	NO	Posterior constraints	No posterior constraints are asserted.	neutral
+scientific_inference_claim	NO	Physical or cosmological inference	No physical proof or cosmological inference is asserted.	neutral
+K2_claim	NO	K2 claim	K2 is not claimed in this route.	neutral
+manuscript_claim	NO	Manuscript evidence promotion	This public display does not promote Stage3 token-level evidence to manuscript-ready scientific evidence.	neutral
