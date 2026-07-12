@@ -5317,8 +5317,190 @@ def _dti_correlated_boundary_score_v1(h0, s8, omega_cdm=None, f_ede=None):
         "not_claim": "not likelihood evaluation; not posterior comparison; not Planck validation; not physical-discontinuity proof",
     }
 
+# --- FIXED_H0_BAO_R1_STATIC_UI_V1_BEGIN ---
+def _dti_render_fixed_h0_bao_r1_static_audit_v1() -> None:
+    """Render a static, bounded fixed-H0 BAO conditional-coordinate audit."""
+    try:
+        from dti_fixed_h0_bao_r1_loader_v1 import (
+            FixedH0BAOAssetError,
+            load_fixed_h0_bao_r1_assets,
+        )
+    except Exception as exc:
+        st.error(
+            "Fixed-H0 BAO static asset loader is unavailable. "
+            f"No partial or silent fallback is shown: {exc}"
+        )
+        return
+
+    app_root = Path(__file__).resolve().parent
+
+    try:
+        assets = load_fixed_h0_bao_r1_assets(app_root)
+    except FixedH0BAOAssetError as exc:
+        st.error(
+            "Fixed-H0 BAO static audit assets failed identity or "
+            f"schema validation: {exc}"
+        )
+        return
+    except Exception as exc:
+        st.error(
+            "Fixed-H0 BAO static audit panel is unavailable. "
+            f"No partial or silent fallback is shown: {exc}"
+        )
+        return
+
+    points_df = pd.DataFrame(assets.points)
+    repeatability_df = pd.DataFrame(assets.repeatability)
+    extension_df = pd.DataFrame(assets.extension)
+    claims_df = pd.DataFrame(assets.claims)
+    profile_df = pd.DataFrame(assets.profile_design)
+    provenance_df = pd.DataFrame(assets.provenance)
+
+    st.subheader("Fixed-H0 BAO conditional-coordinate audit")
+    st.caption(
+        "Static DESI BAO-only conditional-coordinate record. "
+        "This is not a continuous likelihood profile, posterior, "
+        "MCMC result, Planck result, or manuscript claim."
+    )
+    st.warning(
+        "Recorded-domain boundary: H0=85.0 has the lowest chi-square "
+        "only among the 27 recorded points and is also the upper "
+        "recorded endpoint. No preferred-H0 or global-minimum claim."
+    )
+
+    metric_columns = st.columns(4)
+    metric_columns[0].metric(
+        "Recorded points",
+        int(assets.summary["point_count"]),
+    )
+    metric_columns[1].metric(
+        "H0 range",
+        (
+            f'{assets.summary["recorded_H0_min"]:.1f}'
+            "–"
+            f'{assets.summary["recorded_H0_max"]:.1f}'
+        ),
+    )
+    metric_columns[2].metric(
+        "Recorded minimum H0",
+        f'{assets.summary["recorded_minimum_H0"]:.1f}',
+    )
+    metric_columns[3].metric(
+        "Recorded minimum chi-square",
+        f'{assets.summary["recorded_minimum_chi2"]:.9f}',
+    )
+
+    tab_chi2, tab_delta, tab_parameters, tab_audit = st.tabs(
+        [
+            "Chi-square record",
+            "Delta chi-square",
+            "Conditional parameters",
+            "Numerical audit",
+        ]
+    )
+
+    with tab_chi2:
+        st.line_chart(
+            points_df.set_index("H0")[["chi2"]]
+        )
+        st.caption(
+            "Discrete recorded coordinates only; not a continuous "
+            "profile likelihood."
+        )
+
+    with tab_delta:
+        st.line_chart(
+            points_df.set_index("H0")[
+                ["delta_chi2_from_recorded_minimum"]
+            ]
+        )
+        st.caption(
+            "Delta chi-square is relative to the recorded endpoint "
+            "minimum. No confidence-level interpretation."
+        )
+
+    with tab_parameters:
+        parameter_tabs = st.tabs(
+            ["omega_b", "omega_cdm", "rdrag"]
+        )
+
+        with parameter_tabs[0]:
+            st.line_chart(
+                points_df.set_index("H0")[["omega_b"]]
+            )
+
+        with parameter_tabs[1]:
+            st.line_chart(
+                points_df.set_index("H0")[["omega_cdm"]]
+            )
+
+        with parameter_tabs[2]:
+            st.line_chart(
+                points_df.set_index("H0")[["rdrag_Mpc"]]
+            )
+
+        st.caption(
+            "Conditional coordinate paths only; no posterior or "
+            "physical-mechanism interpretation."
+        )
+
+    with tab_audit:
+        st.markdown(
+            "**Representative repeatability and tolerance audit**"
+        )
+        st.dataframe(
+            repeatability_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        st.markdown("**Bounded high-H0 extension record**")
+        st.dataframe(
+            extension_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    st.info(
+        "Bounded profile-grid design: available as a design record. "
+        "Execution remains NO."
+    )
+
+    with st.expander(
+        "Profile-grid design record",
+        expanded=False,
+    ):
+        st.dataframe(
+            profile_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    with st.expander(
+        "Claim boundary — allowed and forbidden wording",
+        expanded=False,
+    ):
+        st.dataframe(
+            claims_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    with st.expander(
+        "Asset provenance and identity",
+        expanded=False,
+    ):
+        st.dataframe(
+            provenance_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+# --- FIXED_H0_BAO_R1_STATIC_UI_V1_END ---
+
+
 def _dti_render_correlated_boundary_triage_v1():
     st.markdown("### Correlated-boundary triage proxy")
+    _dti_render_fixed_h0_bao_r1_static_audit_v1()
 # DTI_APP_PUBLIC_UI_ROUTE_SECTION17_ACTUAL_LOADER_STATUS_V1_BEGIN
 # Static bounded public UI status panel. No compute. No backend/API. No app-session execution.
 try:
