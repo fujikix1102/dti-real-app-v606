@@ -1,0 +1,16 @@
+claim_id	status	display_text	technical_boundary
+CLAIM_RECORDED_POINT_COUNT	ALLOWED	27 recorded fixed-H0 DESI BAO-only conditional coordinates.	Discrete audited coordinates only.
+CLAIM_RECORDED_H0_RANGE	ALLOWED	Recorded H0 range: 59.5 to 85.0.	No statement beyond the recorded domain.
+CLAIM_MONOTONIC_RECORDED_SEQUENCE	ALLOWED	Chi2 decreases across all adjacent recorded coordinates.	No continuous-profile interpretation.
+CLAIM_H0_85_RECORDED_MINIMUM	ALLOWED_BOUNDED	H0=85.0 is the lowest chi2 among the recorded points.	H0=85.0 is also the upper recorded endpoint.
+CLAIM_REPEATABILITY	ALLOWED	Representative numerical repeatability and optimizer-tolerance audit passed.	Audit was performed at four representative H0 values.
+CLAIM_PROFILE_GRID_DESIGN	ALLOWED_BOUNDED	A bounded H0 profile-grid design exists.	The 51-point grid has not been executed.
+CLAIM_PREFERRED_H0	FORBIDDEN	Do not state that H0=85 is preferred.	No statistically calibrated preference.
+CLAIM_RESOLVED_OPTIMUM	FORBIDDEN	Do not state that a resolved optimum was found.	Recorded minimum occurs at the upper boundary.
+CLAIM_CONTINUOUS_PROFILE	FORBIDDEN	Do not call the record a continuous profile likelihood.	The bounded profile grid remains design-only.
+CLAIM_GLOBAL_MINIMUM	FORBIDDEN	Do not claim a validated global minimum.	No complete-domain global search.
+CLAIM_POSTERIOR_MCMC	FORBIDDEN	Do not describe the record as posterior or MCMC output.	No sampler was executed.
+CLAIM_PLANCK	FORBIDDEN	Do not describe the record as Planck or joint Planck+BAO.	DESI BAO-only conditional objective.
+CLAIM_EDE_MECHANISM	FORBIDDEN	Do not describe the record as an EDE or physical-mechanism result.	No EDE inference or mechanism validation.
+CLAIM_MANUSCRIPT	FORBIDDEN	Do not promote the record to a manuscript result.	No manuscript review or promotion.
+CLAIM_30_06	FORBIDDEN	30.06 must not be presented as a solver, likelihood, chi2, posterior, or manuscript result.	Permanently excluded.
