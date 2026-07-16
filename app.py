@@ -1,3 +1,12 @@
+
+# --- DTI SIMPLE PUBLIC ENTRYPOINT V1 BEGIN ---
+# Default public rendering uses the audited simple entrypoint.
+# The complete legacy audit workspace remains preserved below.
+import simple_app as _dti_simple_public_entrypoint
+import streamlit as _dti_public_streamlit
+_dti_public_streamlit.stop()
+# --- DTI SIMPLE PUBLIC ENTRYPOINT V1 END ---
+
 import json
 import math
 import re
