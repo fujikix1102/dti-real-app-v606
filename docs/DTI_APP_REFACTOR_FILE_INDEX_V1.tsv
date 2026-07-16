@@ -1,0 +1,15 @@
+path	role	runtime_active
+tools/dti_app_inventory_v1.py	reusable full app.py inventory generator	NO
+docs/DTI_APP_REFACTOR_ARCHITECTURE_V1.md	refactor architecture and invariants	NO
+docs/DTI_APP_FUNCTION_PRESERVATION_MANIFEST_V1.tsv	frozen source definition inventory	NO
+docs/DTI_APP_REFACTOR_FILE_INDEX_V1.tsv	refactor file index	NO
+dti_ui_v1/__init__.py	additive refactor package root	NO
+dti_ui_v1/components/__init__.py	component namespace	NO
+dti_ui_v1/components/formatting.py	shared finite-number formatter	NO
+dti_ui_v1/contracts/__init__.py	preservation contract namespace	NO
+dti_ui_v1/contracts/preservation.py	function migration preservation records	NO
+dti_ui_v1/pages/__init__.py	page namespace	NO
+dti_ui_v1/pages/legacy_workspace.py	legacy workspace migration boundary	NO
+dti_ui_v1/pages/physical_bao.py	future modular physical BAO page	NO
+dti_ui_v1/services/__init__.py	service namespace	NO
+dti_ui_v1/services/api_client.py	shared no-auto-retry API client	NO
