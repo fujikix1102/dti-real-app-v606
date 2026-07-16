@@ -1,0 +1,27 @@
+key	value
+record_id	DESI_DR2_BAO_PUBLIC_LIKELIHOOD_PROVENANCE_EXTERNAL_CONFIRMATION_V1
+record_date	2026-07-16
+source_type	DESI Data Q&A response
+question_title	Provenance of the external Cobaya likelihood used for the public DESI DR2 cosmology chains
+question_id	182
+answer_id	183
+responder	seshnadathur
+source_url	https://help.desi.lbl.gov/index.php?qa=182&qa_1=provenance-external-cobaya-likelihood-public-cosmology-chains&show=183#a183
+likelihood_name	desi_bao_all
+source_binding	desi_y3_cosmo_bindings
+public_cobaya_likelihood	bao.desi_dr2.desi_bao_all
+likelihood_identity	IDENTICAL_CONFIRMED_BY_DESI_RESPONSE
+measurement_file_identity	BYTE_IDENTICAL_CONFIRMED_BY_DESI_RESPONSE
+covariance_file_identity	BYTE_IDENTICAL_CONFIRMED_BY_DESI_RESPONSE
+yaml_path_difference	EXECUTION_CLUSTER_PATH_DIFFERENCE_ONLY
+same_input_data_used_across_clusters	YES
+additional_private_likelihood_required	NO
+additional_likelihood_release_planned	NO
+posterior_reproduction	NOT_CLAIMED
+full_chain_identity	NOT_CLAIMED
+sampler_reproduction	NOT_CLAIMED
+prior_configuration_identity	NOT_CLAIMED
+theory_configuration_identity	NOT_CLAIMED
+independent_likelihood_numerical_reproduction	NOT_CLAIMED
+scientific_or_cosmological_validation	NOT_CLAIMED
+scope	LIKELIHOOD_INPUT_PROVENANCE_ONLY
