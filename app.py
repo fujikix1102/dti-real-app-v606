@@ -16949,3 +16949,233 @@ except Exception:
     pass
 # --- DTI_PUBLIC_STAGE3_POINTER_DISPLAY_V1_END ---
 
+# === DTI_PUBLIC_AXICLASS_DESI_DR2_BAO_PANEL_V1 ===
+def _dti_physical_bao_public_endpoint_v1():
+    import os
+
+    default = (
+        "https://dti-class-api.onrender.com"
+        "/axiclass/desi-dr2-bao"
+    )
+
+    env_value = os.environ.get(
+        "DTI_PUBLIC_PHYSICAL_BAO_API_URL",
+        "",
+    ).strip()
+
+    if env_value:
+        return env_value
+
+    try:
+        secret_value = str(
+            st.secrets.get(
+                "DTI_PUBLIC_PHYSICAL_BAO_API_URL",
+                "",
+            )
+        ).strip()
+
+        if secret_value:
+            return secret_value
+    except Exception:
+        pass
+
+    return default
+
+
+def _dti_render_public_physical_bao_panel_v1():
+    import requests
+    import time
+
+    endpoint = (
+        _dti_physical_bao_public_endpoint_v1()
+    )
+
+    st.markdown(
+        "### Physical AxiCLASS + DESI DR2 BAO runtime"
+    )
+
+    st.info(
+        "This panel calls the bounded Linux AxiCLASS "
+        "and Cobaya physical-provider endpoint. "
+        "It uses the locked Planck-2018-baseline-like "
+        "parameter contract only."
+    )
+
+    st.caption(
+        "Boundary: this is a single locked-baseline "
+        "physical BAO evaluation. It is not a sampler, "
+        "posterior, MCMC, historical-chain reproduction, "
+        "normalized likelihood, Planck likelihood, "
+        "or EDE-branch result. The value 30.06 remains forbidden."
+    )
+
+    st.code(
+        endpoint,
+        language="text",
+    )
+
+    run_clicked = st.button(
+        "Run locked physical AxiCLASS + DESI DR2 BAO check",
+        key="dti_public_physical_bao_run_v1",
+        type="primary",
+        width="stretch",
+    )
+
+    if not run_clicked:
+        return
+
+    started = time.time()
+
+    try:
+        with st.spinner(
+            "Calling Linux AxiCLASS backend. "
+            "Render cold start may take several minutes."
+        ):
+            response = requests.post(
+                endpoint,
+                json={
+                    "use_locked_baseline": True,
+                },
+                timeout=300,
+            )
+
+        elapsed = round(
+            time.time() - started,
+            3,
+        )
+
+        try:
+            body = response.json()
+        except Exception:
+            body = {
+                "status": "non_json_response",
+                "text": response.text[:8000],
+            }
+
+        if not response.ok:
+            st.error(
+                f"Backend HTTP {response.status_code}"
+            )
+            dom_safe_json_box(
+                body,
+                "Backend response",
+            )
+            return
+
+        status = body.get(
+            "status",
+            "unknown",
+        )
+
+        if status == "ok":
+            st.success(
+                "Physical provider runtime PASS"
+            )
+        elif status == "busy":
+            st.warning(
+                "Backend is busy. Retry after the active "
+                "solver request completes."
+            )
+        else:
+            st.error(
+                f"Physical provider runtime status: {status}"
+            )
+
+        result = body.get(
+            "result",
+            {},
+        )
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.metric(
+                "rdrag [Mpc]",
+                result.get(
+                    "rdrag_Mpc",
+                    "n/a",
+                ),
+            )
+
+        with col2:
+            st.metric(
+                "BAO log-likelihood",
+                result.get(
+                    "model_loglike",
+                    "n/a",
+                ),
+            )
+
+        with col3:
+            st.metric(
+                "BAO chi-square",
+                result.get(
+                    "model_chi2",
+                    "n/a",
+                ),
+            )
+
+        with col4:
+            st.metric(
+                "Runtime [s]",
+                body.get(
+                    "runtime_sec",
+                    elapsed,
+                ),
+            )
+
+        st.markdown(
+            "#### Runtime identity and checks"
+        )
+
+        dom_safe_json_box(
+            {
+                "status": status,
+                "checks": body.get(
+                    "checks",
+                    {},
+                ),
+                "failed_checks": body.get(
+                    "failed_checks",
+                    [],
+                ),
+                "identity": body.get(
+                    "identity",
+                    {},
+                ),
+                "boundary": body.get(
+                    "boundary",
+                    {},
+                ),
+            },
+            "Physical runtime review",
+        )
+
+        vector = result.get(
+            "theory_vector",
+            [],
+        )
+
+        if vector:
+            _dti_arrow_safe_df_v1(
+                pd.DataFrame(vector)
+            )
+
+    except requests.Timeout:
+        st.warning(
+            "Backend timeout. This is infrastructure state, "
+            "not evidence for or against a cosmological model."
+        )
+    except Exception as exc:
+        st.error(
+            "Physical backend request failed."
+        )
+        st.code(
+            repr(exc),
+            language="text",
+        )
+
+
+_dti_render_public_physical_bao_panel_v1()
+# === END DTI_PUBLIC_AXICLASS_DESI_DR2_BAO_PANEL_V1 ===
+
