@@ -2,8 +2,14 @@
 # --- DTI SIMPLE PUBLIC ENTRYPOINT V1 BEGIN ---
 # Default public rendering uses the audited simple entrypoint.
 # The complete legacy audit workspace remains preserved below.
-import simple_app as _dti_simple_public_entrypoint
+import runpy as _dti_public_runpy
+from pathlib import Path as _dti_public_Path
 import streamlit as _dti_public_streamlit
+
+_dti_public_runpy.run_path(
+    str(_dti_public_Path(__file__).with_name("simple_app.py")),
+    run_name="__main__",
+)
 _dti_public_streamlit.stop()
 # --- DTI SIMPLE PUBLIC ENTRYPOINT V1 END ---
 
