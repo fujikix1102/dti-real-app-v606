@@ -104,7 +104,7 @@ def render() -> None:
                     "Value": "None",
                 },
             ],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -145,6 +145,6 @@ def render() -> None:
                 "Migration": "Framework available",
             },
         ],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )

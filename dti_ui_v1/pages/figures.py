@@ -130,7 +130,7 @@ def render() -> None:
 
             st.dataframe(
                 ledger[summary_columns],
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
 
@@ -192,6 +192,6 @@ def render() -> None:
         else:
             st.dataframe(
                 ledger,
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )

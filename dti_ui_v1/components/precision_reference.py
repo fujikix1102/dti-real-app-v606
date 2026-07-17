@@ -123,7 +123,7 @@ def render_precision_reference() -> None:
 
         st.dataframe(
             baseline_rows,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config={
                 "Parameter": st.column_config.TextColumn(
@@ -176,7 +176,7 @@ def render_precision_reference() -> None:
 
         st.dataframe(
             pd.DataFrame(rows),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 

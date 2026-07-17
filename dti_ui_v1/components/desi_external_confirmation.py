@@ -199,7 +199,7 @@ def render_desi_external_confirmation(
 
     st.dataframe(
         _confirmed_rows(record),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -215,7 +215,7 @@ def render_desi_external_confirmation(
 
     st.dataframe(
         _not_claimed_rows(),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -295,7 +295,7 @@ def render_desi_evidence_chain() -> None:
 
     st.altair_chart(
         chart + labels,
-        use_container_width=True,
+        width="stretch",
     )
 
     st.caption(

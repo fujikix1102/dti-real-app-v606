@@ -320,7 +320,7 @@ def _line_chart(
 
     st.altair_chart(
         chart + zc_rules,
-        use_container_width=True,
+        width="stretch",
     )
 
 
@@ -414,7 +414,7 @@ def _render_dz_dependence(
 
         st.altair_chart(
             chart,
-            use_container_width=True,
+            width="stretch",
         )
 
     with first_row_right:
@@ -455,7 +455,7 @@ def _render_dz_dependence(
 
         st.altair_chart(
             chart,
-            use_container_width=True,
+            width="stretch",
         )
 
     second_row_left, second_row_right = st.columns(2)
@@ -497,7 +497,7 @@ def _render_dz_dependence(
 
         st.altair_chart(
             chart,
-            use_container_width=True,
+            width="stretch",
         )
 
     with second_row_right:
@@ -537,12 +537,12 @@ def _render_dz_dependence(
 
         st.altair_chart(
             chart,
-            use_container_width=True,
+            width="stretch",
         )
 
     st.dataframe(
         dependence,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -708,7 +708,7 @@ def render_jump_discontinuity_diagnostics() -> None:
 
         st.dataframe(
             pd.DataFrame(rows),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -751,7 +751,7 @@ def render_jump_discontinuity_diagnostics() -> None:
 
         st.dataframe(
             pd.DataFrame(rows),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -781,7 +781,7 @@ def render_jump_discontinuity_diagnostics() -> None:
 
         st.dataframe(
             pd.DataFrame(rows),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -873,7 +873,7 @@ def render_jump_discontinuity_diagnostics() -> None:
 
         st.altair_chart(
             chart,
-            use_container_width=True,
+            width="stretch",
         )
 
         switches = identity[
@@ -889,7 +889,7 @@ def render_jump_discontinuity_diagnostics() -> None:
 
         st.dataframe(
             switches,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 

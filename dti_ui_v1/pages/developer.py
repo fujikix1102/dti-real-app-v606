@@ -62,7 +62,7 @@ def render() -> None:
                     "Responsibility": "Navigation and dispatch",
                 },
             ],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 

@@ -346,7 +346,7 @@ def render_monitor_status() -> None:
 
         st.dataframe(
             _current_session_rows(),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config={
                 "Item": st.column_config.TextColumn(
@@ -379,7 +379,7 @@ def render_monitor_status() -> None:
 
         st.dataframe(
             _backend_request_rows(),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config={
                 "Layer": st.column_config.TextColumn(
@@ -411,7 +411,7 @@ def render_monitor_status() -> None:
 
         st.dataframe(
             _recent_event_rows(),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -458,7 +458,7 @@ def render_monitor_status() -> None:
 
         st.dataframe(
             display,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config={
                 "Record": st.column_config.TextColumn(
@@ -487,7 +487,7 @@ def render_monitor_status() -> None:
         with st.expander("Full evidence identities"):
             st.dataframe(
                 evidence,
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
 

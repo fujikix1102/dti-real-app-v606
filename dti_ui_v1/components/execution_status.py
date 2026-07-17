@@ -234,7 +234,7 @@ def _render_pipeline() -> None:
 
     st.dataframe(
         pipeline_display,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "Step": st.column_config.TextColumn(
@@ -262,7 +262,7 @@ def _render_execution_log() -> None:
 
     st.dataframe(
         SESSION_STATUS,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "Item": st.column_config.TextColumn(
@@ -326,7 +326,7 @@ def render_execution_status() -> None:
 
     st.dataframe(
         BACKEND_CONTRACT,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "Component": st.column_config.TextColumn(

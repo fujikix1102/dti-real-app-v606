@@ -232,7 +232,7 @@ def render_parameter_status_panel() -> None:
                     }
                 ]
             ),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -280,7 +280,7 @@ def render_parameter_status_panel() -> None:
 
         st.dataframe(
             primary_frame,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config={
                 "Parameter": st.column_config.TextColumn(
@@ -346,7 +346,7 @@ def render_parameter_status_panel() -> None:
 
         st.dataframe(
             technical_frame,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config={
                 "Key": st.column_config.TextColumn(
@@ -386,7 +386,7 @@ def render_parameter_status_panel() -> None:
 
         st.dataframe(
             output_display,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config={
                 "Output": st.column_config.TextColumn(
@@ -407,7 +407,7 @@ def render_parameter_status_panel() -> None:
         with st.expander("Output contract"):
             st.dataframe(
                 output_frame,
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
 
@@ -416,7 +416,7 @@ def render_parameter_status_panel() -> None:
 
         st.dataframe(
             _route_matrix(),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 

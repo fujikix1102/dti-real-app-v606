@@ -46,7 +46,7 @@ def render() -> None:
                     "Status": "Available",
                 },
             ],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -122,7 +122,7 @@ The interface itself does not:
                     "Status": "Pending",
                 },
             ],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 

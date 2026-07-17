@@ -202,7 +202,7 @@ def _render_chart(
 
     st.altair_chart(
         chart,
-        use_container_width=True,
+        width="stretch",
     )
 
 
@@ -337,7 +337,7 @@ def render_fixed_h0_bao_charts() -> None:
 
         st.dataframe(
             points[display_columns],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 

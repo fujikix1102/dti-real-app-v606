@@ -72,7 +72,7 @@ def _render_overview() -> None:
                 "Value": "No active result",
             },
         ],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
