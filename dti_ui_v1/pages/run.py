@@ -18,6 +18,7 @@ from dti_ui_v1.components.perfect_fit_compute_panel import (
 from dti_ui_v1.components.precision_reference import (
     render_precision_reference,
 )
+from dti_ui_v1.components.general_class_compute_panel import render_general_class_compute_panel
 
 def render() -> None:
     st.title("Compute")
@@ -93,6 +94,9 @@ def render() -> None:
         render_execution_status()
         st.divider()
         render_perfect_fit_compute_panel()
+
+        st.divider()
+        render_general_class_compute_panel()
 
 
     with monitor_tab:

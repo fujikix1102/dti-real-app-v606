@@ -6,6 +6,8 @@ scientific inputs, backend payloads, stored results, or source records.
 
 from __future__ import annotations
 
+import math
+
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -82,3 +84,19 @@ def number_input_kwargs(key: str) -> dict[str, Any]:
         "step": contract.input_step,
         "format": f"%.{contract.input_places}f",
     }
+
+def finite_float(value: Any) -> float | None:
+    """Return a finite float, otherwise None."""
+
+    if value is None or isinstance(value, bool):
+        return None
+
+    try:
+        result = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+
+    if not math.isfinite(result):
+        return None
+
+    return result
