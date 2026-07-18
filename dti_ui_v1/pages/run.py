@@ -12,6 +12,9 @@ from dti_ui_v1.components.parameter_status import (
 
 from dti_ui_v1.components.execution_status import render_execution_status
 from dti_ui_v1.components.monitor_status import render_monitor_status
+from dti_ui_v1.components.perfect_fit_compute_panel import (
+    render_perfect_fit_compute_panel,
+)
 from dti_ui_v1.components.precision_reference import (
     render_precision_reference,
 )
@@ -88,6 +91,8 @@ def render() -> None:
 
     with execution_tab:
         render_execution_status()
+        st.divider()
+        render_perfect_fit_compute_panel()
 
 
     with monitor_tab:
