@@ -22,6 +22,7 @@ from dti_ui_v1.components.general_class_compute_panel import render_general_clas
 
 def render() -> None:
     st.title("Compute")
+    st.caption("Junichi Fujiki · jun@fujikix.com")
     st.caption("Scientific configuration, execution, and monitoring")
 
     setup_tab, parameters_tab, execution_tab, monitor_tab = st.tabs(
