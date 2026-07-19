@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from math import isfinite
 import os
 from typing import Any, Callable, Mapping
@@ -28,7 +28,10 @@ def resolve_class_endpoint() -> str:
     return secret_endpoint or PUBLIC_CLASS_ENDPOINT
 
 
-DEFAULT_CLASS_ENDPOINT = resolve_class_endpoint()
+# Compatibility constant only. Runtime requests resolve the endpoint
+# at call time so environment variables and Streamlit secrets are not
+# frozen during module import.
+DEFAULT_CLASS_ENDPOINT = PUBLIC_CLASS_ENDPOINT
 
 
 @dataclass(frozen=True)
@@ -133,14 +136,19 @@ def build_general_class_payload(
 def execute_general_class_compute(
     request: GeneralClassRequest,
     *,
-    endpoint: str = DEFAULT_CLASS_ENDPOINT,
+    endpoint: str | None = None,
     post: Callable[..., Any] = requests.post,
 ) -> GeneralClassResult:
     payload = build_general_class_payload(request)
+    resolved_endpoint = (
+        endpoint.strip()
+        if isinstance(endpoint, str) and endpoint.strip()
+        else resolve_class_endpoint()
+    )
 
     try:
         response = post(
-            endpoint,
+            resolved_endpoint,
             json=payload,
             headers={
                 "Accept": "application/json",
@@ -152,7 +160,7 @@ def execute_general_class_compute(
         return GeneralClassResult(
             status="timeout",
             accepted=False,
-            endpoint=endpoint,
+            endpoint=resolved_endpoint,
             submitted_payload=payload,
             response_payload={},
             detail=str(exc),
@@ -161,7 +169,7 @@ def execute_general_class_compute(
         return GeneralClassResult(
             status="request_error",
             accepted=False,
-            endpoint=endpoint,
+            endpoint=resolved_endpoint,
             submitted_payload=payload,
             response_payload={},
             detail=str(exc),
@@ -184,7 +192,7 @@ def execute_general_class_compute(
         and body.get("status") == "ok"
     )
 
-    return GeneralClassResult(
+    _parsed_result = GeneralClassResult(
         status=(
             "accepted"
             if accepted
@@ -203,4 +211,8 @@ def execute_general_class_compute(
             if accepted
             else "Backend rejected or failed the request."
         ),
+    )
+    return replace(
+        _parsed_result,
+        endpoint=resolved_endpoint,
     )

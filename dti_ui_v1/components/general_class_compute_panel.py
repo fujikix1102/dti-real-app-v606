@@ -166,7 +166,7 @@ def render_general_class_compute_panel() -> None:
     st.caption(
         "Runs the backend /class/compute route with six editable "
         "ΛCDM-like parameters plus f_EDE and z_c, then evaluates the "
-        "same model against verified DESI DR2, Planck 2018, and Pantheon+ data."
+        "submitted point against the installed, source-identified DESI DR2 BAO, ""Planck 2018, and Pantheon+ likelihood components."
     )
 
     st.info(
@@ -201,7 +201,7 @@ def render_general_class_compute_panel() -> None:
         )
 
         f_EDE = st.number_input(
-            "f_EDE",
+            "Requested f_EDE",
             min_value=0.0,
             max_value=0.5,
             value=0.082,
@@ -232,7 +232,7 @@ def render_general_class_compute_panel() -> None:
         )
 
         z_c = st.number_input(
-            "z_c",
+            "Requested z_c",
             min_value=10.0,
             max_value=100000.0,
             value=3500.0,
@@ -261,6 +261,12 @@ def render_general_class_compute_panel() -> None:
             format="%.8f",
             key="perfect_fit_general_class_tau_reio_v1",
         )
+
+    st.warning(
+        "Boundary: this is single-point forward propagation and "
+        "single-point likelihood evaluation. It is not a posterior sample, "
+        "parameter constraint, Bayesian evidence, EDE detection, or DTI detection."
+    )
 
     run_requested = st.button(
         "Run CLASS / AxiCLASS computation",
@@ -624,7 +630,7 @@ def render_general_class_compute_panel() -> None:
 
     st.caption(
         "Boundary: this panel performs direct CLASS/AxiCLASS physical "
-        "propagation and evaluates verified DESI DR2 BAO, Planck 2018, and "
+        "propagation and evaluates installed, source-identified DESI DR2 BAO, ""Planck 2018, and "
         "Pantheon+ likelihood components at one parameter point. It does not "
         "run posterior inference or MCMC."
     )
