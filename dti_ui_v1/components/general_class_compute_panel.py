@@ -164,10 +164,10 @@ def render_general_class_compute_panel() -> None:
     st.subheader("General CLASS / AxiCLASS compute")
 
     st.caption(
-        "Runs the backend /class/compute route with six editable "
-        "ΛCDM-like parameters plus f_EDE and z_c, then evaluates the "
-        "submitted point against the installed, source-identified DESI DR2 BAO, "
-        "Planck 2018, and Pantheon+ likelihood components."
+        "Runs the deployed /class/compute route for single-point "
+        "CLASS/AxiCLASS forward propagation. The deployed minimal public "
+        "backend returns deterministic solver-derived quantities and spectra. "
+        "It does not return DESI DR2, Planck 2018, or Pantheon+ likelihood results."
     )
 
     st.info(
@@ -264,9 +264,11 @@ def render_general_class_compute_panel() -> None:
         )
 
     st.warning(
-        "Boundary: this is single-point forward propagation and "
-        "single-point likelihood evaluation. It is not a posterior sample, "
-        "parameter constraint, Bayesian evidence, EDE detection, or DTI detection."
+        "Boundary: this is single-point CLASS/AxiCLASS forward propagation. "
+        "The deployed minimal public backend does not provide DESI DR2, "
+        "Planck 2018, or Pantheon+ likelihood evaluation. It is not a "
+        "posterior sample, parameter constraint, Bayesian evidence, "
+        "EDE detection, or DTI detection."
     )
 
     run_requested = st.button(
@@ -341,8 +343,8 @@ def render_general_class_compute_panel() -> None:
             "rs_drag",
         ),
         ("Age [Gyr]", "age_Gyr_CLASS", "age_Gyr", "age"),
-        ("f_EDE achieved", "f_EDE_AxiCLASS"),
-        ("z_c achieved", "z_c_AxiCLASS"),
+        ("Achieved f_EDE, when reported by backend", "f_EDE_AxiCLASS"),
+        ("Achieved z_c, when reported by backend", "z_c_AxiCLASS"),
     )
 
     metrics = []
@@ -522,8 +524,8 @@ def render_general_class_compute_panel() -> None:
                     ("S8", "S8_CLASS"),
                     ("r_drag [Mpc]", "rs_drag_Mpc_CLASS"),
                     ("Age [Gyr]", "age_Gyr_CLASS"),
-                    ("f_EDE achieved", "f_EDE_AxiCLASS"),
-                    ("z_c achieved", "z_c_AxiCLASS"),
+                    ("Achieved f_EDE, when reported by backend", "f_EDE_AxiCLASS"),
+                    ("Achieved z_c, when reported by backend", "z_c_AxiCLASS"),
                 )
                 delta_rows = []
 
@@ -631,7 +633,8 @@ def render_general_class_compute_panel() -> None:
 
     st.caption(
         "Boundary: this panel performs direct CLASS/AxiCLASS physical "
-        "propagation and evaluates installed, source-identified DESI DR2 BAO, "
-        "Planck 2018, and Pantheon+ likelihood components at one parameter point. "
-        "It does not run posterior inference or MCMC."
+        "propagation at one submitted parameter point. The deployed minimal "
+        "public backend does not currently return DESI DR2, Planck 2018, or "
+        "Pantheon+ likelihood coordinates, and it does not run posterior "
+        "inference or MCMC."
     )
