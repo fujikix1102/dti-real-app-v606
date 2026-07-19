@@ -14,18 +14,11 @@ from dti_ui_v1.contracts.display_contract import (
     DEFAULT_PAGE,
     NAVIGATION_ITEMS,
 )
-from dti_ui_v1.pages import (
-    compare,
-    dashboard,
-    developer,
-    evidence,
-    figures,
-    results,
-    run,
-)
+from dti_ui_v1.pages import audit_dti, atlas, compare, dashboard, developer, evidence, figures, hubble_consistency, results, run
 
 
 PageRenderer = Callable[[], None]
+APP_NAVIGATION = tuple(NAVIGATION_ITEMS[:4]) + ("Atlas", "Consistency", "Audit DTI") + tuple(NAVIGATION_ITEMS[4:])
 
 
 def page_registry() -> dict[str, PageRenderer]:
@@ -34,6 +27,9 @@ def page_registry() -> dict[str, PageRenderer]:
         "Compute": run.render,
         "Results": results.render,
         "Compare": compare.render,
+        "Atlas": atlas.render,
+        "Consistency": hubble_consistency.render,
+        "Audit DTI": audit_dti.render,
         "Figures": figures.render,
         "Evidence": evidence.render,
         "Developer": developer.render,
@@ -41,40 +37,33 @@ def page_registry() -> dict[str, PageRenderer]:
 
 
 def render_sidebar() -> str:
-    requested = st.session_state.pop(
-        "perfect_fit_navigation_request",
-        None,
-    )
-
-    if requested in NAVIGATION_ITEMS:
-        st.session_state[
-            "perfect_fit_primary_navigation"
-        ] = requested
+    requested = st.session_state.pop("perfect_fit_navigation_request", None)
+    if requested in APP_NAVIGATION:
+        st.session_state["perfect_fit_primary_navigation"] = requested
 
     with st.sidebar:
         st.markdown(f"## {APP_TITLE}")
         st.caption(APP_SUBTITLE)
-
         selected = st.radio(
             "Navigation",
-            options=NAVIGATION_ITEMS,
-            index=NAVIGATION_ITEMS.index(DEFAULT_PAGE),
+            options=APP_NAVIGATION,
+            index=APP_NAVIGATION.index(DEFAULT_PAGE),
             label_visibility="collapsed",
             key="perfect_fit_primary_navigation",
         )
-
         st.divider()
-
-        st.caption("Scientific backend: locked")
-        st.caption("Public application: frozen")
-        st.caption("Current route: independent clone")
-
+        st.caption("General solver: local CLASS / AxiCLASS")
+        st.caption("Joint likelihood: DESI DR2 + Planck 2018 + relative Pantheon+")
+        st.caption("Local ladder: overlap-safe summary comparison")
+        st.caption("Inference: deterministic single-point scoring; no MCMC")
         with st.expander("Interface boundaries"):
             st.write(
-                "This workbench reorganizes existing functionality. "
-                "Scientific computation remains bound to verified routes."
+                "General AxiCLASS propagation is evaluated against DESI DR2 BAO; "
+                "the fixed baseline remains a separately verified contract. "
+                "The General route also evaluates local official Planck and Pantheon+ "
+                "assets. Published local-ladder summaries remain comparison-only because "
+                "they overlap supernova information. No route is presented as a posterior."
             )
-
     return selected
 
 
@@ -85,6 +74,5 @@ def render_app() -> None:
         layout=APP_LAYOUT,
         initial_sidebar_state="expanded",
     )
-
     selected = render_sidebar()
     page_registry()[selected]()

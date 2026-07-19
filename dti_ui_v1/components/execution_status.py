@@ -1,357 +1,221 @@
-"""Route-aware execution status for the PERFECT FIT application.
-
-This component describes the current execution contract without starting
-a backend, CLASS/AxiCLASS, Cobaya, likelihood, posterior, or MCMC run.
-"""
+"""Live execution-contract status for supported compute routes."""
 
 from __future__ import annotations
 
+from typing import Any, Mapping
+
 import pandas as pd
+import requests
 import streamlit as st
 
-
-CURRENT_ROUTE_ID = "LOCKED_BASELINE_DIAGNOSTIC"
-CURRENT_ROUTE_LABEL = "Locked baseline diagnostic"
-
-
-STATUS_CARDS = (
-    (
-        "Execution mode",
-        "LOCKED",
-        "No executable route selected",
-        "Current route is display-only.",
-    ),
-    (
-        "Backend",
-        "OFFLINE",
-        "No backend request binding",
-        "No verified backend request contract.",
-    ),
-    (
-        "Likelihood",
-        "DISABLED",
-        "No likelihood execution",
-        "No likelihood request was issued.",
-    ),
-    (
-        "Posterior",
-        "DISABLED",
-        "No posterior or MCMC",
-        "No sampler contract is active.",
-    ),
+from dti_ui_v1.services.general_class_compute_service import (
+    DEFAULT_CLASS_ENDPOINT,
+    LOCAL_CLASS_ENDPOINT,
 )
 
 
-BACKEND_CONTRACT = pd.DataFrame(
-    [
-        {
-            "Component": "Current route",
-            "Status": CURRENT_ROUTE_ID,
-            "Reason": "Locked recorded baseline display route",
-        },
-        {
-            "Component": "Backend API",
-            "Status": "NOT BOUND",
-            "Reason": "No verified request contract is active",
-        },
-        {
-            "Component": "CLASS / AxiCLASS",
-            "Status": "NOT EXECUTED",
-            "Reason": "No physical solver request was issued",
-        },
-        {
-            "Component": "Cobaya",
-            "Status": "NOT EXECUTED",
-            "Reason": "No Cobaya configuration was submitted",
-        },
-        {
-            "Component": "Likelihood",
-            "Status": "DISABLED",
-            "Reason": "Likelihood execution is outside the current route",
-        },
-        {
-            "Component": "Posterior / MCMC",
-            "Status": "DISABLED",
-            "Reason": "No sampler or posterior contract is active",
-        },
-    ]
+HISTORY_KEY = "general_class_compute_history_v1"
+HEALTH_ENDPOINT = DEFAULT_CLASS_ENDPOINT.replace(
+    "/class/compute",
+    "/health",
 )
+BACKEND_LABEL = "Local backend" if DEFAULT_CLASS_ENDPOINT == LOCAL_CLASS_ENDPOINT else "Compute backend"
 
 
-EXECUTION_PIPELINE = pd.DataFrame(
-    [
-        {
-            "Step": "01",
-            "Stage": "Parameter validation",
-            "Purpose": "Validate UI values against a route contract",
-            "Current status": "PENDING CONTRACT",
-        },
-        {
-            "Step": "02",
-            "Stage": "Backend translation",
-            "Purpose": "Translate validated UI values into a backend request",
-            "Current status": "NOT BOUND",
-        },
-        {
-            "Step": "03",
-            "Stage": "Physical solver",
-            "Purpose": "Execute CLASS or AxiCLASS where explicitly supported",
-            "Current status": "DISABLED",
-        },
-        {
-            "Step": "04",
-            "Stage": "Likelihood evaluation",
-            "Purpose": "Evaluate a verified likelihood contract",
-            "Current status": "DISABLED",
-        },
-        {
-            "Step": "05",
-            "Stage": "Posterior / MCMC",
-            "Purpose": "Run sampling only for an approved sampler route",
-            "Current status": "DISABLED",
-        },
-        {
-            "Step": "06",
-            "Stage": "Result export",
-            "Purpose": "Export validated results and provenance records",
-            "Current status": "PENDING CONTRACT",
-        },
-    ]
-)
+@st.cache_data(ttl=5, show_spinner=False)
+def _backend_health() -> dict[str, Any]:
+    try:
+        response = requests.get(HEALTH_ENDPOINT, timeout=1.5)
+        body = response.json()
+    except Exception as exc:
+        return {
+            "online": False,
+            "status": "unreachable",
+            "detail": str(exc),
+        }
+
+    return {
+        "online": response.ok and body.get("status") == "ok",
+        "status": body.get("status", f"http_{response.status_code}"),
+        "version": body.get("version"),
+        "classy_available": body.get("classy_available"),
+        "detail": body.get("classy_import_error", ""),
+    }
 
 
-SESSION_STATUS = pd.DataFrame(
-    [
-        {
-            "Item": "Session state",
-            "Value": "IDLE",
-        },
-        {
-            "Item": "Reason",
-            "Value": "Execution intentionally disabled for the current route",
-        },
-        {
-            "Item": "Backend request",
-            "Value": "NOT SENT",
-        },
-        {
-            "Item": "Physical solver",
-            "Value": "NOT EXECUTED",
-        },
-        {
-            "Item": "Likelihood",
-            "Value": "NOT EXECUTED",
-        },
-        {
-            "Item": "Posterior",
-            "Value": "NOT EXECUTED",
-        },
-        {
-            "Item": "MCMC",
-            "Value": "NOT EXECUTED",
-        },
-        {
-            "Item": "Result artifact",
-            "Value": "NONE",
-        },
-    ]
-)
+def _latest_general_run() -> Mapping[str, Any] | None:
+    history = st.session_state.get(HISTORY_KEY, [])
+
+    if not isinstance(history, list) or not history:
+        return None
+
+    latest = history[-1]
+    return latest if isinstance(latest, Mapping) else None
 
 
-SAFETY_BOUNDARIES = (
-    ("Backend", "Execution disabled"),
-    ("Likelihood", "Execution disabled"),
-    ("Posterior / MCMC", "Execution disabled"),
-    ("Scientific recomputation", "Disabled"),
-)
-
-
-def _render_status_cards() -> None:
-    columns = st.columns(len(STATUS_CARDS))
-
-    for column, (
-        label,
-        value,
-        help_text,
-        caption,
-    ) in zip(
-        columns,
-        STATUS_CARDS,
-    ):
-        with column:
-            st.metric(
-                label,
-                value,
-                help=help_text,
-            )
-            st.caption(caption)
-
-
-def _render_pipeline() -> None:
-    st.subheader("Planned execution pipeline")
-
-    st.caption(
-        "The pipeline is defined in advance, but no stage is executable "
-        "until its backend contract has been verified."
-    )
-
-    pipeline_display = EXECUTION_PIPELINE.copy()
-
-    # execution_stage_human_labels_v1
-    pipeline_display["Stage"] = (
-        pipeline_display["Stage"].replace(
-            {
-                "Parameter validation": "① Validate parameters",
-                "Backend translation": "② Translate request",
-                "Physical solver": "③ Physical solver",
-                "Likelihood evaluation": "④ Likelihood",
-                "Posterior / MCMC": "⑤ Posterior / MCMC",
-                "Result export": "⑥ Export results",
-            }
-        )
-    )
-
-
-    pipeline_display["Status"] = (
-        pipeline_display["Current status"]
-        .map(
-            {
-                "PENDING CONTRACT": "🟡 Pending contract",
-                "NOT BOUND": "⚪ Not bound",
-                "DISABLED": "🔴 Disabled",
-                "READY": "🟢 Ready",
-                "RUNNING": "🔵 Running",
-                "SUCCESS": "🟢 Success",
-                "FAILED": "🔴 Failed",
-            }
-        )
-        .fillna(pipeline_display["Current status"])
-    )
-
-    pipeline_display = pipeline_display.drop(
-        columns=["Current status"]
-    )
-
-    st.dataframe(
-        pipeline_display,
-        width="stretch",
-        hide_index=True,
-        column_config={
-            "Step": st.column_config.TextColumn(
-                "Step",
-                width="small",
-            ),
-            "Stage": st.column_config.TextColumn(
-                "Stage",
-                width="medium",
-            ),
-            "Purpose": st.column_config.TextColumn(
-                "Purpose",
-                width="large",
-            ),
-            "Status": st.column_config.TextColumn(
-                "Status",
-                width="medium",
-            ),
-        },
-    )
-
-
-def _render_execution_log() -> None:
-    st.subheader("Current session")
-
-    st.dataframe(
-        SESSION_STATUS,
-        width="stretch",
-        hide_index=True,
-        column_config={
-            "Item": st.column_config.TextColumn(
-                "Item",
-                width="medium",
-            ),
-            "Value": st.column_config.TextColumn(
-                "Value",
-                width="large",
-            ),
-        },
-    )
-
-    with st.expander("Raw execution log"):
-        st.code(
-            "\n".join(
-                [
-                    f"route_id={CURRENT_ROUTE_ID}",
-                    "session_state=IDLE",
-                    "execution_authorized=NO",
-                    "backend_request_sent=NO",
-                    "class_execution=NO",
-                    "axiclass_execution=NO",
-                    "cobaya_execution=NO",
-                    "likelihood_execution=NO",
-                    "posterior_execution=NO",
-                    "mcmc_execution=NO",
-                    "scientific_recomputation=NO",
-                    "result_artifact=NONE",
-                ]
-            ),
-            language="text",
-        )
-
-
-def _render_safety_boundary() -> None:
-    st.subheader("Safety boundary")
-
-    columns = st.columns(2)
-
-    for index, (label, value) in enumerate(
-        SAFETY_BOUNDARIES
-    ):
-        with columns[index % 2]:
-            st.success(f"✓ **{label}** — {value}")
-
-    st.caption(
-        "These statuses report the current session only. They do not "
-        "assert scientific validation or future backend capability."
-    )
+def _display_value(value: Any) -> str:
+    if value is None:
+        return "—"
+    if isinstance(value, bool):
+        return "YES" if value else "NO"
+    if isinstance(value, float):
+        return f"{value:.8g}"
+    return str(value)
 
 
 def render_execution_status() -> None:
+    health = _backend_health()
+    latest = _latest_general_run()
+    online = bool(health.get("online"))
+    latest_response = latest.get("response", {}) if latest else {}
+    if not isinstance(latest_response, Mapping):
+        latest_response = {}
+    component_statuses = []
+    for key in ("desi_dr2_bao", "planck_2018", "pantheon_plus"):
+        component = latest_response.get(key, {})
+        component_statuses.append(component.get("status") if isinstance(component, Mapping) else None)
+    likelihood_ok_count = sum(status == "ok" for status in component_statuses)
+
     st.header("Execution contract")
-
-    _render_status_cards()
-
-    st.divider()
-
-    st.subheader("Backend contract")
-
-    st.dataframe(
-        BACKEND_CONTRACT,
-        width="stretch",
-        hide_index=True,
-        column_config={
-            "Component": st.column_config.TextColumn(
-                "Component",
-                width="medium",
-            ),
-            "Status": st.column_config.TextColumn(
-                "Status",
-                width="medium",
-            ),
-            "Reason": st.column_config.TextColumn(
-                "Reason",
-                width="large",
-            ),
-        },
+    st.caption(
+        "Live status for two verified execution routes. The locked baseline "
+        "remains separate; the general route reports a three-component "
+        "single-point likelihood."
     )
 
-    st.divider()
+    cards = st.columns(4)
+    cards[0].metric(
+        BACKEND_LABEL,
+        "ONLINE" if online else "OFFLINE",
+        help=HEALTH_ENDPOINT,
+    )
+    cards[1].metric(
+        "General solver",
+        "AXICLASS EDE" if online else "UNAVAILABLE",
+        help="f_EDE > 0 activates the axion-like scalar-field branch.",
+    )
+    cards[2].metric(
+        "General likelihoods",
+        f"{likelihood_ok_count}/3 OK" if latest else ("READY" if online else "UNAVAILABLE"),
+        help="DESI DR2 BAO, Planck 2018, and Pantheon+ are independently status-checked.",
+    )
+    cards[3].metric(
+        "Posterior / MCMC",
+        "DISABLED",
+        help="No sampler contract is active.",
+    )
 
-    _render_pipeline()
+    st.subheader("Verified route contracts")
+    contracts = pd.DataFrame(
+        [
+            {
+                "Route": "General CLASS / AxiCLASS",
+                "Endpoint": DEFAULT_CLASS_ENDPOINT,
+                "State": "READY" if online else "OFFLINE",
+                "Physical solver": "AxiCLASS EDE when f_EDE > 0; LCDM-like when f_EDE = 0",
+                "Likelihood": "DESI DR2 BAO + Planck 2018 + Pantheon+",
+                "Posterior": "None",
+            },
+            {
+                "Route": "Locked baseline DESI DR2 BAO",
+                "Endpoint": "https://dti-class-api.onrender.com/axiclass/desi-dr2-bao",
+                "State": "LOCKED VERIFIED CONTRACT",
+                "Physical solver": "Fixed LCDM-like baseline",
+                "Likelihood": "Fixed DESI DR2 BAO component",
+                "Posterior": "None",
+            },
+        ]
+    )
+    st.dataframe(contracts, hide_index=True, use_container_width=True)
 
-    st.divider()
+    st.subheader("Execution pipeline")
+    general_completed = latest is not None
+    if not general_completed:
+        general_likelihood_state = "READY" if online else "BLOCKED"
+    elif likelihood_ok_count == 3:
+        general_likelihood_state = "SUCCESS — 3/3"
+    else:
+        general_likelihood_state = f"PARTIAL — {likelihood_ok_count}/3"
+    pipeline = pd.DataFrame(
+        [
+            {
+                "Stage": "① Validate parameters",
+                "General AxiCLASS": "READY" if online else "BLOCKED",
+                "Locked BAO": "LOCKED",
+            },
+            {
+                "Stage": "② Submit backend request",
+                "General AxiCLASS": "SUCCESS" if general_completed else ("READY" if online else "BLOCKED"),
+                "Locked BAO": "AVAILABLE",
+            },
+            {
+                "Stage": "③ Physical solver",
+                "General AxiCLASS": "SUCCESS" if general_completed else ("READY" if online else "BLOCKED"),
+                "Locked BAO": "FIXED BASELINE",
+            },
+            {
+                "Stage": "④ Likelihood",
+                "General AxiCLASS": general_likelihood_state,
+                "Locked BAO": "FIXED DESI DR2 BAO",
+            },
+            {
+                "Stage": "⑤ Posterior / MCMC",
+                "General AxiCLASS": "DISABLED",
+                "Locked BAO": "DISABLED",
+            },
+            {
+                "Stage": "⑥ Export results",
+                "General AxiCLASS": "READY" if general_completed else "AFTER RUN",
+                "Locked BAO": "JSON RESPONSE",
+            },
+        ]
+    )
+    st.dataframe(pipeline, hide_index=True, use_container_width=True)
 
-    _render_execution_log()
+    st.subheader("Current session")
 
-    st.divider()
+    if latest is None:
+        st.info("No General AxiCLASS calculation has been recorded in this browser session yet.")
+    else:
+        response = latest.get("response", {})
+        submitted = latest.get("submitted_payload", {})
+        derived = response.get("derived", {}) if isinstance(response, Mapping) else {}
+        boundary = response.get("boundary", {}) if isinstance(response, Mapping) else {}
+        bao = response.get("desi_dr2_bao", {}) if isinstance(response, Mapping) else {}
+        planck = response.get("planck_2018", {}) if isinstance(response, Mapping) else {}
+        pantheon = response.get("pantheon_plus", {}) if isinstance(response, Mapping) else {}
+        joint = response.get("joint_likelihood", {}) if isinstance(response, Mapping) else {}
+        session = pd.DataFrame(
+            [
+                {"Item": "Backend status", "Value": response.get("status")},
+                {"Item": "Engine", "Value": response.get("engine")},
+                {"Item": "Requested f_EDE", "Value": submitted.get("f_EDE")},
+                {"Item": "Achieved f_EDE", "Value": derived.get("f_EDE_AxiCLASS")},
+                {"Item": "Requested z_c", "Value": submitted.get("z_c")},
+                {"Item": "Achieved z_c", "Value": derived.get("z_c_AxiCLASS")},
+                {
+                    "Item": "EDE microphysics activated",
+                    "Value": boundary.get("ede_microphysics_activated"),
+                },
+                {"Item": "DESI DR2 BAO status", "Value": bao.get("status") if isinstance(bao, Mapping) else None},
+                {"Item": "DESI DR2 BAO chi-square", "Value": bao.get("chi2") if isinstance(bao, Mapping) else None},
+                {"Item": "Planck 2018 status", "Value": planck.get("status") if isinstance(planck, Mapping) else None},
+                {"Item": "Planck effective chi-square", "Value": planck.get("chi2_effective") if isinstance(planck, Mapping) else None},
+                {"Item": "Pantheon+ status", "Value": pantheon.get("status") if isinstance(pantheon, Mapping) else None},
+                {"Item": "Pantheon+ chi-square", "Value": pantheon.get("chi2") if isinstance(pantheon, Mapping) else None},
+                {"Item": "Joint component count", "Value": joint.get("component_count") if isinstance(joint, Mapping) else None},
+                {"Item": "Joint effective chi-square", "Value": joint.get("chi2_effective_sum") if isinstance(joint, Mapping) else None},
+                {"Item": "Posterior / MCMC", "Value": "NOT EXECUTED"},
+            ]
+        )
+        session["Value"] = session["Value"].map(_display_value)
+        st.dataframe(session, hide_index=True, use_container_width=True)
 
-    _render_safety_boundary()
+    with st.expander("Backend health details", expanded=False):
+        st.json(health)
+
+    st.subheader("Safety boundary")
+    st.success("✓ General AxiCLASS physical recomputation — enabled on the local route")
+    st.success("✓ DESI DR2 BAO likelihood — general AxiCLASS and verified locked-baseline contracts")
+    st.success("✓ Planck 2018 and Pantheon+ — verified single-point likelihoods on the general route")
+    st.info("Posterior inference, MCMC, Bayesian evidence, and discovery significance remain outside this application's installed scientific contract.")

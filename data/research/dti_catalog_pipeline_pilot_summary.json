@@ -1,0 +1,77 @@
+{
+  "schema_version": "dti-catalog-pipeline-pilot-summary-v1",
+  "generated_utc": "2026-07-19T07:28:57.082928+00:00",
+  "status": "complete",
+  "production_equivalent": false,
+  "condition_count": 3,
+  "execution_totals": {
+    "paired_catalogs": 336,
+    "data_objects_processed": 1044211,
+    "random_objects_processed": 2184000,
+    "correlation_functions": 672,
+    "bao_template_fits": 84
+  },
+  "conditions": [
+    {
+      "fractional_H_step": 0.05,
+      "z_transition": 0.934,
+      "width": 0.03,
+      "alpha_rmse": 0.02362869255643952,
+      "alpha_maximum_absolute_error": 0.056157009492994514,
+      "compressed_relative_rmse": 0.025373172742901583,
+      "compressed_maximum_absolute_relative_error": 0.05896485996762667,
+      "QSO_target_alpha_parallel": 0.9523809523809523,
+      "QSO_recovered_alpha_parallel": 0.9897519555134122,
+      "QSO_alpha_parallel_error": 0.03737100313245989,
+      "LYA_target_alpha_parallel": 0.9523809523809523,
+      "LYA_recovered_alpha_parallel": 0.9716277931130718,
+      "LYA_alpha_parallel_error": 0.019246840732119463
+    },
+    {
+      "fractional_H_step": 0.1,
+      "z_transition": 0.934,
+      "width": 0.03,
+      "alpha_rmse": 0.04334034352766902,
+      "alpha_maximum_absolute_error": 0.1200814437604949,
+      "compressed_relative_rmse": 0.04928483189873962,
+      "compressed_maximum_absolute_relative_error": 0.13208958813646937,
+      "QSO_target_alpha_parallel": 0.909090909090909,
+      "QSO_recovered_alpha_parallel": 1.0088755759960215,
+      "QSO_alpha_parallel_error": 0.09978466690511256,
+      "LYA_target_alpha_parallel": 0.9090909090909091,
+      "LYA_recovered_alpha_parallel": 0.9332393331168323,
+      "LYA_alpha_parallel_error": 0.02414842402592321
+    },
+    {
+      "fractional_H_step": 0.2,
+      "z_transition": 0.934,
+      "width": 0.03,
+      "alpha_rmse": 0.040055782181208845,
+      "alpha_maximum_absolute_error": 0.12206132042305129,
+      "compressed_relative_rmse": 0.04920049776059061,
+      "compressed_maximum_absolute_relative_error": 0.14647358450766157,
+      "QSO_target_alpha_parallel": 0.8333333333333334,
+      "QSO_recovered_alpha_parallel": 0.9553946537563847,
+      "QSO_alpha_parallel_error": 0.12206132042305129,
+      "LYA_target_alpha_parallel": 0.8333333333333334,
+      "LYA_recovered_alpha_parallel": 0.8939802489782681,
+      "LYA_alpha_parallel_error": 0.06064691564493474
+    }
+  ],
+  "source_artifacts": [
+    {
+      "path": "/Users/fujikijunichi/Documents/Codex/2026-07-19/referenced-chatgpt-conversation-this-is-untrusted/dti_catalog_pipeline_pilot_amp005.json",
+      "sha256": "9c9bb075b7b8583086406623903ebbf6cf702064f87c16d2d835ddb1a0e2714d"
+    },
+    {
+      "path": "/Users/fujikijunichi/Documents/Codex/2026-07-19/referenced-chatgpt-conversation-this-is-untrusted/dti_catalog_pipeline_pilot.json",
+      "sha256": "86d0396fc1ddfe5c4b1cde8e147c16842667c9fc1babd58e4fc8f85c5c8d06cb"
+    },
+    {
+      "path": "/Users/fujikijunichi/Documents/Codex/2026-07-19/referenced-chatgpt-conversation-this-is-untrusted/dti_catalog_pipeline_pilot_amp020.json",
+      "sha256": "0beeff33cee6ed6077e01bd999edf84b97abb3fb0d8444d40c6b06d27b046bc7"
+    }
+  ],
+  "result": "All catalog-level stage boundaries executed for 5%, 10%, and 20% permanent H(z) steps. Recovery is incomplete and tracer-dependent; QSO radial recovery remains a blind spot in this synthetic survey-shaped pilot.",
+  "claim_boundary": "This aggregate summarizes deterministic synthetic-catalog controls. It is not the official DESI mock ensemble, production reconstruction, official covariance, or an observational transition probability."
+}

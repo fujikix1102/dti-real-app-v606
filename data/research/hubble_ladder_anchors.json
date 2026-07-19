@@ -1,0 +1,93 @@
+{
+  "schema_version": "hubble-ladder-summary-contract-v1",
+  "generated_date": "2026-07-19",
+  "unit": "km s^-1 Mpc^-1",
+  "claim_boundary": "Published Gaussian summary coordinates for comparison only. These are not the underlying calibrator, host-galaxy, supernova, or covariance likelihoods and must not be multiplied with Pantheon+ as if independent.",
+  "combination_rule": "Select exactly one anchor at a time. Entries sharing a correlation_group are alternative summaries of overlapping data and must never be multiplied together.",
+  "context_references": [
+    {
+      "id": "planck_2018_base_lcdm",
+      "label": "Planck 2018 base-LambdaCDM",
+      "H0": 67.4,
+      "sigma_total": 0.5,
+      "model_dependency": "Inferred under spatially flat six-parameter base-LambdaCDM.",
+      "source_title": "Planck 2018 results. VI. Cosmological parameters",
+      "source_url": "https://arxiv.org/abs/1807.06209"
+    }
+  ],
+  "anchors": [
+    {
+      "id": "shoes_2022_cepheid_sn",
+      "label": "SH0ES 2022 Cepheid + SN Ia",
+      "method": "Cepheid-calibrated Type Ia supernova distance ladder",
+      "H0": 73.04,
+      "sigma_total": 1.04,
+      "correlation_group": "SH0ES_PANTHEONPLUS_2022",
+      "overlaps_pantheon_plus": true,
+      "joint_use_allowed": false,
+      "source_title": "A Comprehensive Measurement of the Local Value of the Hubble Constant with 1 km/s/Mpc Uncertainty from the Hubble Space Telescope and the SH0ES Team",
+      "source_url": "https://arxiv.org/abs/2112.04510",
+      "note": "Baseline published Gaussian summary. The underlying Pantheon+/SH0ES data overlap the app's Pantheon+ compilation."
+    },
+    {
+      "id": "cchp_2024_combined",
+      "label": "CCHP 2024 combined JWST ladder",
+      "method": "Flat-prior combination of TRGB, JAGB, and Cepheid JWST calibrations",
+      "H0": 69.96,
+      "sigma_stat": 1.05,
+      "sigma_sys": 1.12,
+      "sigma_total": 1.5352198539622917,
+      "correlation_group": "CCHP_JWST_2024",
+      "overlaps_pantheon_plus": true,
+      "joint_use_allowed": false,
+      "source_title": "Status Report on the Chicago-Carnegie Hubble Program: Three Independent Astrophysical Determinations of the Hubble Constant Using the James Webb Space Telescope",
+      "source_url": "https://arxiv.org/abs/2408.06153",
+      "note": "Statistical and systematic uncertainties are combined in quadrature for the displayed pull only."
+    },
+    {
+      "id": "cchp_2024_trgb",
+      "label": "CCHP 2024 JWST TRGB",
+      "method": "Tip of the Red Giant Branch calibrated Type Ia supernova ladder",
+      "H0": 69.85,
+      "sigma_stat": 1.75,
+      "sigma_sys": 1.54,
+      "sigma_total": 2.33111561274854,
+      "correlation_group": "CCHP_JWST_2024",
+      "overlaps_pantheon_plus": true,
+      "joint_use_allowed": false,
+      "source_title": "Status Report on the Chicago-Carnegie Hubble Program: Three Independent Astrophysical Determinations of the Hubble Constant Using the James Webb Space Telescope",
+      "source_url": "https://arxiv.org/abs/2408.06153",
+      "note": "Alternative CCHP calibration; do not combine with other CCHP rows."
+    },
+    {
+      "id": "cchp_2024_jagb",
+      "label": "CCHP 2024 JWST JAGB",
+      "method": "J-region Asymptotic Giant Branch calibrated Type Ia supernova ladder",
+      "H0": 67.96,
+      "sigma_stat": 1.85,
+      "sigma_sys": 1.9,
+      "sigma_total": 2.651886121235224,
+      "correlation_group": "CCHP_JWST_2024",
+      "overlaps_pantheon_plus": true,
+      "joint_use_allowed": false,
+      "source_title": "Status Report on the Chicago-Carnegie Hubble Program: Three Independent Astrophysical Determinations of the Hubble Constant Using the James Webb Space Telescope",
+      "source_url": "https://arxiv.org/abs/2408.06153",
+      "note": "Alternative CCHP calibration; do not combine with other CCHP rows."
+    },
+    {
+      "id": "cchp_2024_cepheid",
+      "label": "CCHP 2024 JWST Cepheid",
+      "method": "JWST Cepheid calibrated Type Ia supernova ladder",
+      "H0": 72.05,
+      "sigma_stat": 1.86,
+      "sigma_sys": 3.1,
+      "sigma_total": 3.6151901748040864,
+      "correlation_group": "CCHP_JWST_2024",
+      "overlaps_pantheon_plus": true,
+      "joint_use_allowed": false,
+      "source_title": "Status Report on the Chicago-Carnegie Hubble Program: Three Independent Astrophysical Determinations of the Hubble Constant Using the James Webb Space Telescope",
+      "source_url": "https://arxiv.org/abs/2408.06153",
+      "note": "Alternative CCHP calibration; do not combine with other CCHP rows."
+    }
+  ]
+}

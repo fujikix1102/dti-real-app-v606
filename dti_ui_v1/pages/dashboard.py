@@ -1,150 +1,56 @@
-"""Scientific workspace landing page."""
-
 from __future__ import annotations
 
+import requests
 import streamlit as st
 
-from dti_ui_v1.components.status_cards import (
-    StatusItem,
-    render_status_row,
+from dti_ui_v1.services.general_class_compute_service import (
+    DEFAULT_CLASS_ENDPOINT,
+    LOCAL_CLASS_ENDPOINT,
 )
-from dti_ui_v1.contracts.display_contract import WORKSPACE_MODES
+from dti_ui_v1.services.run_store import list_run_artifacts
+
+
+HEALTH_ENDPOINT = DEFAULT_CLASS_ENDPOINT.replace("/class/compute", "/health")
+BACKEND_LABEL = "Local backend" if DEFAULT_CLASS_ENDPOINT == LOCAL_CLASS_ENDPOINT else "Compute backend"
+
+
+def _backend_status() -> tuple[str, str]:
+    try:
+        response = requests.get(HEALTH_ENDPOINT, timeout=2)
+        body = response.json()
+        if response.ok and body.get("status") == "ok":
+            return "ONLINE", str(body.get("version", "unknown"))
+    except Exception:
+        pass
+    return "OFFLINE", "unreachable"
 
 
 def render() -> None:
     st.title("MAXOMEGA / DTI")
-    st.caption("Scientific computation and diagnostic workbench")
-
-    render_status_row(
-        (
-            StatusItem("Backend", "Locked"),
-            StatusItem("Compute engine", "Preserved"),
-            StatusItem("Active task", "None"),
-            StatusItem("Environment", "Local clone"),
-        )
-    )
-
-    st.markdown("## Scientific workspace")
-
-    selected_mode = st.selectbox(
-        "Workspace mode",
-        options=WORKSPACE_MODES,
-        index=0,
-        key="perfect_fit_workspace_mode",
-    )
-
-    mode_descriptions = {
-        "Scientific computation": (
-            "Configure and execute supported model calculations using the "
-            "existing scientific backend."
-        ),
-        "Branch comparison": (
-            "Compare fixed-H0 branches, configurations, likelihood components, "
-            "and derived diagnostics."
-        ),
-        "Profile analysis": (
-            "Inspect parameter scans, profile structure, minima, and "
-            "branch-dependent response."
-        ),
-        "Diagnostic audit": (
-            "Review convergence, seed stability, source identity, response "
-            "integrity, and calculation boundaries."
-        ),
-    }
-
-    st.write(mode_descriptions[selected_mode])
-
-    col_compute, col_compare, col_results, col_audit = st.columns(4)
-
-    with col_compute:
-        with st.container(border=True):
-            st.subheader("Compute")
-            st.write("Configure scientific inputs and run supported calculations.")
-            st.caption("Advanced settings remain available.")
-
-    with col_compare:
-        with st.container(border=True):
-            st.subheader("Compare")
-            st.write("Evaluate branches, models, and likelihood contributions.")
-            st.caption("Matched comparisons and profiles.")
-
-    with col_results:
-        with st.container(border=True):
-            st.subheader("Analyze")
-            st.write("Inspect tables, plots, minima, and derived diagnostics.")
-            st.caption("Summary and full-detail views.")
-
-    with col_audit:
-        with st.container(border=True):
-            st.subheader("Audit")
-            st.write("Verify provenance, stability, contracts, and raw outputs.")
-            st.caption("Evidence remains traceable.")
-
-    st.markdown("## Session workspace")
-
-    left, right = st.columns((2, 1))
-
-    with left:
-        st.dataframe(
-            [
-                {
-                    "Task": "Selected mode",
-                    "Value": selected_mode,
-                },
-                {
-                    "Task": "Active configuration",
-                    "Value": "Not loaded",
-                },
-                {
-                    "Task": "Current execution",
-                    "Value": "Idle",
-                },
-                {
-                    "Task": "Loaded result",
-                    "Value": "None",
-                },
-            ],
-            width="stretch",
-            hide_index=True,
-        )
-
-    with right:
-        with st.container(border=True):
-            st.subheader("Calculation status")
-            st.metric("Queue", "0")
-            st.metric("Completed", "0")
-            st.metric("Failed", "0")
-
-    st.markdown("## Capability areas")
-
+    st.caption("AxiCLASS propagation, joint observational scoring, comparison, and audit")
+    backend, version = _backend_status()
+    artifacts = list_run_artifacts()
+    general = st.session_state.get("general_class_compute_history_v1", [])
+    locked = st.session_state.get("perfect_fit_locked_compute_result")
+    columns = st.columns(4)
+    columns[0].metric(BACKEND_LABEL, backend)
+    columns[1].metric("Backend version", version)
+    columns[2].metric("Saved run artifacts", len(artifacts))
+    columns[3].metric("Session results", len(general) + int(isinstance(locked, dict)))
+    st.markdown("## Executable scope")
     st.dataframe(
         [
-            {
-                "Area": "Model configuration",
-                "Purpose": "Scientific and nuisance parameter setup",
-                "Migration": "Source mapping required",
-            },
-            {
-                "Area": "Backend execution",
-                "Purpose": "Locked scientific calculation",
-                "Migration": "Client module available",
-            },
-            {
-                "Area": "Branch analysis",
-                "Purpose": "Fixed-H0 and matched-condition comparison",
-                "Migration": "Pending structured migration",
-            },
-            {
-                "Area": "Profile diagnostics",
-                "Purpose": "Minima, scans, likelihood components",
-                "Migration": "Pending structured migration",
-            },
-            {
-                "Area": "Evidence audit",
-                "Purpose": "Sources, hashes, raw responses, boundaries",
-                "Migration": "Framework available",
-            },
+            {"Route": "General CLASS / AxiCLASS", "Physics": "LCDM or axion-like EDE", "Likelihood": "DESI DR2 + Planck 2018 + Pantheon+", "State": "Executable"},
+            {"Route": "Locked baseline", "Physics": "Frozen LCDM-like baseline", "Likelihood": "DESI DR2 BAO", "State": "Executable"},
+            {"Route": "Hubble Tension Atlas", "Physics": "Same-run propagation and residuals", "Likelihood": "Component and Δχ² views", "State": "Executable"},
+            {"Route": "Hubble Consistency Engine", "Physics": "Cross-dataset trade-off audit", "Likelihood": "3 independent backend rails + 1 overlap-safe ladder comparison", "State": "Executable"},
+            {"Route": "Posterior / MCMC", "Physics": "Requires joint likelihood and priors", "Likelihood": "Not claimed", "State": "Excluded from this application"},
         ],
-        width="stretch",
         hide_index=True,
+        use_container_width=True,
     )
+    st.markdown("## Recent durable runs")
+    if artifacts:
+        st.dataframe(artifacts, hide_index=True, use_container_width=True)
+    else:
+        st.info("No saved run artifact yet. Execute either compute route.")

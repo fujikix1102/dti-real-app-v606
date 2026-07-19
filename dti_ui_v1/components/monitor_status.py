@@ -1,506 +1,222 @@
-"""Session and provenance monitor for the PERFECT FIT application.
-
-This component observes local UI, file, and execution-contract state.
-It does not execute a backend, CLASS/AxiCLASS, Cobaya, likelihood,
-posterior, MCMC, or scientific recomputation.
-"""
+"""Live session monitor for the two supported compute routes."""
 
 from __future__ import annotations
 
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Mapping
 
 import pandas as pd
+import requests
 import streamlit as st
 
+from dti_ui_v1.services.general_class_compute_service import (
+    DEFAULT_CLASS_ENDPOINT,
+    LOCAL_CLASS_ENDPOINT,
+)
+from dti_ui_v1.services.run_store import list_run_artifacts
 
-CURRENT_ROUTE_ID = "LOCKED_BASELINE_DIAGNOSTIC"
-CURRENT_ROUTE_LABEL = "Locked baseline diagnostic"
 
+GENERAL_HISTORY_KEY = "general_class_compute_history_v1"
+LOCKED_RESULT_KEY = "perfect_fit_locked_compute_result"
+LOCKED_ERROR_KEY = "perfect_fit_locked_compute_error"
+HEALTH_ENDPOINT = DEFAULT_CLASS_ENDPOINT.replace("/class/compute", "/health")
+BACKEND_LABEL = "Local backend" if DEFAULT_CLASS_ENDPOINT == LOCAL_CLASS_ENDPOINT else "Compute backend"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-
-    with path.open("rb") as handle:
-        for chunk in iter(
-            lambda: handle.read(1024 * 1024),
-            b"",
-        ):
-            digest.update(chunk)
-
-    return digest.hexdigest()
-
-
-def _relative(path: Path) -> str:
+@st.cache_data(ttl=5, show_spinner=False)
+def _health() -> dict[str, Any]:
     try:
-        return str(path.relative_to(REPO_ROOT))
-    except ValueError:
-        return str(path)
+        response = requests.get(HEALTH_ENDPOINT, timeout=1.5)
+        body = response.json()
+    except Exception as exc:
+        return {"online": False, "status": "unreachable", "detail": str(exc)}
+
+    return {
+        "online": response.ok and body.get("status") == "ok",
+        "status": body.get("status", f"http_{response.status_code}"),
+        "version": body.get("version"),
+        "classy_available": body.get("classy_available"),
+        "detail": body.get("classy_import_error", ""),
+    }
 
 
-def _current_session_rows() -> pd.DataFrame:
-    return pd.DataFrame(
-        [
-            {
-                "Item": "Application state",
-                "Value": "READY",
-                "Meaning": "Local PERFECT FIT application is available",
-            },
-            {
-                "Item": "Selected route",
-                "Value": CURRENT_ROUTE_ID,
-                "Meaning": CURRENT_ROUTE_LABEL,
-            },
-            {
-                "Item": "Execution state",
-                "Value": "IDLE",
-                "Meaning": "No calculation is active",
-            },
-            {
-                "Item": "Backend state",
-                "Value": "OFFLINE",
-                "Meaning": "No verified backend request contract",
-            },
-            {
-                "Item": "Working-copy binding",
-                "Value": "NOT BOUND",
-                "Meaning": "Editable UI values are not sent to a backend",
-            },
-            {
-                "Item": "Active request",
-                "Value": "NONE",
-                "Meaning": "No request identifier exists",
-            },
-            {
-                "Item": "Loaded result",
-                "Value": "NONE",
-                "Meaning": "No newly executed result is loaded",
-            },
-        ]
-    )
-
-
-def _backend_request_rows() -> pd.DataFrame:
-    return pd.DataFrame(
-        [
-            {
-                "Layer": "UI parameter validation",
-                "State": "PENDING CONTRACT",
-                "Request": "NONE",
-                "Reason": "No executable route contract is active",
-            },
-            {
-                "Layer": "Backend translation",
-                "State": "NOT BOUND",
-                "Request": "NONE",
-                "Reason": "UI values have not been translated",
-            },
-            {
-                "Layer": "CLASS / AxiCLASS",
-                "State": "NOT EXECUTED",
-                "Request": "NONE",
-                "Reason": "No physical-solver request was issued",
-            },
-            {
-                "Layer": "Cobaya",
-                "State": "NOT EXECUTED",
-                "Request": "NONE",
-                "Reason": "No Cobaya configuration was submitted",
-            },
-            {
-                "Layer": "Likelihood",
-                "State": "NOT EXECUTED",
-                "Request": "NONE",
-                "Reason": "Likelihood execution is disabled",
-            },
-            {
-                "Layer": "Posterior / MCMC",
-                "State": "NOT EXECUTED",
-                "Request": "NONE",
-                "Reason": "No sampler contract is active",
-            },
-        ]
-    )
-
-
-def _recent_event_rows() -> pd.DataFrame:
-    return pd.DataFrame(
-        [
-            {
-                "Sequence": "01",
-                "Event": "Application source loaded",
-                "Status": "PASS",
-                "Effect": "UI available",
-            },
-            {
-                "Sequence": "02",
-                "Event": "Locked baseline contract loaded",
-                "Status": "PASS",
-                "Effect": "Six locked values available",
-            },
-            {
-                "Sequence": "03",
-                "Event": "Parameter contract evaluated",
-                "Status": "PASS",
-                "Effect": "Backend-active input count remains zero",
-            },
-            {
-                "Sequence": "04",
-                "Event": "Execution contract evaluated",
-                "Status": "LOCKED",
-                "Effect": "No calculation authorized",
-            },
-            {
-                "Sequence": "05",
-                "Event": "Backend request check",
-                "Status": "NONE",
-                "Effect": "No request sent",
-            },
-            {
-                "Sequence": "06",
-                "Event": "Scientific recomputation check",
-                "Status": "NONE",
-                "Effect": "No recomputation performed",
-            },
-        ]
-    )
+def _general_history() -> list[Mapping[str, Any]]:
+    value = st.session_state.get(GENERAL_HISTORY_KEY, [])
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, Mapping)]
 
 
 def _evidence_candidates() -> tuple[tuple[str, Path], ...]:
     return (
-        (
-            "DESI DR2 external confirmation JSON",
-            REPO_ROOT
-            / "data/evidence/"
-            "desi_dr2_bao_external_confirmation_v1.json",
-        ),
-        (
-            "DESI DR2 external confirmation TSV",
-            REPO_ROOT
-            / "data/evidence/"
-            "desi_dr2_bao_external_confirmation_v1.tsv",
-        ),
-        (
-            "DESI DR2 confirmation identity",
-            REPO_ROOT
-            / "data/evidence/"
-            "desi_dr2_bao_external_confirmation_v1.sha256.tsv",
-        ),
-        (
-            "Fixed-H0 BAO manifest",
-            REPO_ROOT
-            / "assets/fixed_h0_bao_r1/v1/"
-            "fixed_h0_bao_r1_asset_manifest_v1.tsv",
-        ),
-        (
-            "Fixed-H0 BAO point record",
-            REPO_ROOT
-            / "assets/fixed_h0_bao_r1/v1/"
-            "fixed_h0_bao_r1_27_point_record_v1.tsv",
-        ),
-        (
-            "Graph migration ledger",
-            REPO_ROOT
-            / "graph_migration/"
-            "GRAPH_MIGRATION_LEDGER.tsv",
-        ),
+        ("DESI DR2 confirmation JSON", REPO_ROOT / "data/evidence/desi_dr2_bao_external_confirmation_v1.json"),
+        ("DESI DR2 confirmation TSV", REPO_ROOT / "data/evidence/desi_dr2_bao_external_confirmation_v1.tsv"),
+        ("Fixed-H0 BAO manifest", REPO_ROOT / "assets/fixed_h0_bao_r1/v1/fixed_h0_bao_r1_asset_manifest_v1.tsv"),
+        ("Graph migration ledger", REPO_ROOT / "graph_migration/GRAPH_MIGRATION_LEDGER.tsv"),
+        ("Hubble ladder comparison contract", REPO_ROOT / "data/research/hubble_ladder_anchors.json"),
     )
+
+
+def _component_status(response: Mapping[str, Any], key: str) -> str:
+    component = response.get(key, {})
+    if not isinstance(component, Mapping):
+        return "UNAVAILABLE"
+    return str(component.get("status", "unavailable")).upper()
+
+
+def _display_value(value: Any) -> str:
+    if value is None:
+        return "—"
+    if isinstance(value, bool):
+        return "YES" if value else "NO"
+    if isinstance(value, float):
+        return f"{value:.8g}"
+    return str(value)
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _evidence_rows() -> pd.DataFrame:
-    rows: list[dict[str, object]] = []
-
-    for record, path in _evidence_candidates():
+    rows = []
+    for label, path in _evidence_candidates():
         exists = path.is_file()
-
         rows.append(
             {
-                "Record": record,
-                "Status": (
-                    "AVAILABLE"
-                    if exists
-                    else "MISSING"
-                ),
-                "Bytes": (
-                    path.stat().st_size
-                    if exists
-                    else None
-                ),
-                "SHA256": (
-                    _sha256(path)
-                    if exists
-                    else ""
-                ),
-                "Relative path": _relative(path),
+                "Record": label,
+                "Status": "AVAILABLE" if exists else "MISSING",
+                "Bytes": path.stat().st_size if exists else None,
+                "SHA256": _sha256(path) if exists else "",
+                "Path": str(path.relative_to(REPO_ROOT)) if exists else str(path),
             }
         )
-
     return pd.DataFrame(rows)
 
 
-def _audit_text() -> str:
-    rendered_at = datetime.now(
-        timezone.utc
-    ).isoformat()
-
-    evidence = _evidence_rows()
-    available_count = int(
-        (evidence["Status"] == "AVAILABLE").sum()
-    )
-    missing_count = int(
-        (evidence["Status"] == "MISSING").sum()
-    )
-
-    return "\n".join(
-        [
-            f"rendered_at_utc={rendered_at}",
-            f"route_id={CURRENT_ROUTE_ID}",
-            f"route_label={CURRENT_ROUTE_LABEL}",
-            "application_state=READY",
-            "execution_state=IDLE",
-            "backend_state=OFFLINE",
-            "working_copy_backend_binding=NO",
-            "backend_request_count=0",
-            "class_execution=NO",
-            "axiclass_execution=NO",
-            "cobaya_execution=NO",
-            "likelihood_execution=NO",
-            "posterior_execution=NO",
-            "mcmc_execution=NO",
-            "scientific_recomputation=NO",
-            "new_result_artifact=NONE",
-            f"evidence_available_count={available_count}",
-            f"evidence_missing_count={missing_count}",
-            "public_update=NO",
-        ]
-    )
-
-
 def render_monitor_status() -> None:
-    st.header("Session monitor")
-
-    st.caption(
-        "Current-session state, backend-request visibility, "
-        "recent events, evidence identity, and audit boundaries."
-    )
-
+    health = _health()
+    history = _general_history()
+    latest = history[-1] if history else None
+    latest_response = latest.get("response", {}) if latest else {}
+    if not isinstance(latest_response, Mapping):
+        latest_response = {}
+    locked = st.session_state.get(LOCKED_RESULT_KEY)
+    locked_error = st.session_state.get(LOCKED_ERROR_KEY)
+    online = bool(health.get("online"))
+    completed = int(latest is not None) + int(isinstance(locked, Mapping))
     evidence = _evidence_rows()
-    evidence_available = int(
-        (evidence["Status"] == "AVAILABLE").sum()
-    )
-    evidence_missing = int(
-        (evidence["Status"] == "MISSING").sum()
-    )
+    artifacts = list_run_artifacts()
+    missing = int((evidence["Status"] == "MISSING").sum())
 
-    card1, card2, card3, card4 = st.columns(4)
+    st.header("Session monitor")
+    st.caption("Live state for this browser session and the two isolated routes.")
 
-    with card1:
-        st.metric(
-            "Session",
-            "READY",
-            help="The local application is available.",
-        )
+    cards = st.columns(4)
+    cards[0].metric(BACKEND_LABEL, "ONLINE" if online else "OFFLINE")
+    cards[1].metric("Completed routes", completed)
+    cards[2].metric("General runs retained", len(history))
+    cards[3].metric("Saved run artifacts", len(artifacts))
 
-    with card2:
-        st.metric(
-            "Execution",
-            "IDLE",
-            help="No calculation is active.",
-        )
-
-    with card3:
-        st.metric(
-            "📨 Backend requests",
-            "0",
-            help="No backend request has been sent.",
-        )
-
-    with card4:
-        st.metric(
-            "Missing evidence",
-            evidence_missing,
-            help="Local evidence records not currently found.",
-        )
-
-    (
-        session_tab,
-        requests_tab,
-        events_tab,
-        evidence_tab,
-        audit_tab,
-    ) = st.tabs(
-        (
-            "🟢 Current session",
-            "Backend requests",
-            "🕒 Recent events",
-            "🗂 Evidence records",
-            "📜 Audit log",
-        )
+    session_tab, routes_tab, evidence_tab, audit_tab = st.tabs(
+        ("Current session", "Route activity", "Evidence records", "Audit log")
     )
 
     with session_tab:
-        st.subheader("Current session")
-
         st.dataframe(
-            _current_session_rows(),
-            width="stretch",
+            [
+                {"Item": "General CLASS / AxiCLASS backend", "Value": "ONLINE" if online else "OFFLINE"},
+                {"Item": "General calculation", "Value": "SUCCESS" if latest else "NOT RUN IN THIS SESSION"},
+                {"Item": "Locked baseline calculation", "Value": "SUCCESS" if isinstance(locked, Mapping) else ("FAILED" if locked_error else "NOT RUN IN THIS SESSION")},
+                {"Item": "DESI DR2 likelihood", "Value": _component_status(latest_response, "desi_dr2_bao") if latest else "NOT RUN IN THIS SESSION"},
+                {"Item": "Planck 2018 likelihood", "Value": _component_status(latest_response, "planck_2018") if latest else "NOT RUN IN THIS SESSION"},
+                {"Item": "Pantheon+ likelihood", "Value": _component_status(latest_response, "pantheon_plus") if latest else "NOT RUN IN THIS SESSION"},
+                {"Item": "Posterior / MCMC", "Value": "NOT EXECUTED"},
+            ],
             hide_index=True,
-            column_config={
-                "Item": st.column_config.TextColumn(
-                    "Item",
-                    width="medium",
-                ),
-                "Value": st.column_config.TextColumn(
-                    "Value",
-                    width="medium",
-                ),
-                "Meaning": st.column_config.TextColumn(
-                    "Meaning",
-                    width="large",
-                ),
-            },
+            use_container_width=True,
         )
 
-        st.info(
-            "The current route is display-only. Editable working-copy "
-            "values are not bound to a scientific backend."
-        )
+        if latest:
+            response = latest_response
+            submitted = latest.get("submitted_payload", {})
+            derived = response.get("derived", {}) if isinstance(response, Mapping) else {}
+            boundary = response.get("boundary", {}) if isinstance(response, Mapping) else {}
+            st.markdown("**Latest General CLASS / AxiCLASS run**")
+            latest_frame = pd.DataFrame(
+                [
+                    {"Item": "Engine", "Value": response.get("engine")},
+                    {"Item": "Requested f_EDE", "Value": submitted.get("f_EDE")},
+                    {"Item": "Achieved f_EDE", "Value": derived.get("f_EDE_AxiCLASS")},
+                    {"Item": "Requested z_c", "Value": submitted.get("z_c")},
+                    {"Item": "Achieved z_c", "Value": derived.get("z_c_AxiCLASS")},
+                    {"Item": "EDE microphysics", "Value": boundary.get("ede_microphysics_activated")},
+                ]
+            )
+            latest_frame["Value"] = latest_frame["Value"].map(_display_value)
+            st.dataframe(
+                latest_frame,
+                hide_index=True,
+                use_container_width=True,
+            )
 
-    with requests_tab:
-        st.subheader("Backend requests")
-
-        st.info(
-            "No backend, solver, likelihood, posterior, or MCMC "
-            "request has been created or sent."
-        )
-
+    with routes_tab:
         st.dataframe(
-            _backend_request_rows(),
-            width="stretch",
+            [
+                {
+                    "Route": "General CLASS / AxiCLASS",
+                    "Backend": "ONLINE" if online else "OFFLINE",
+                    "Session result": "SUCCESS" if latest else "NONE",
+                    "Likelihood": (
+                        f"DESI={_component_status(latest_response, 'desi_dr2_bao')} · "
+                        f"Planck={_component_status(latest_response, 'planck_2018')} · "
+                        f"Pantheon+={_component_status(latest_response, 'pantheon_plus')}"
+                        if latest else "NOT RUN"
+                    ),
+                },
+                {
+                    "Route": "Locked baseline DESI DR2 BAO",
+                    "Backend": "REMOTE FIXED CONTRACT",
+                    "Session result": "SUCCESS" if isinstance(locked, Mapping) else "NONE",
+                    "Likelihood": "FIXED DESI DR2 BAO",
+                },
+            ],
             hide_index=True,
-            column_config={
-                "Layer": st.column_config.TextColumn(
-                    "Layer",
-                    width="medium",
-                ),
-                "State": st.column_config.TextColumn(
-                    "State",
-                    width="medium",
-                ),
-                "Request": st.column_config.TextColumn(
-                    "Request",
-                    width="small",
-                ),
-                "Reason": st.column_config.TextColumn(
-                    "Reason",
-                    width="large",
-                ),
-            },
+            use_container_width=True,
         )
-
-    with events_tab:
-        st.subheader("Recent events")
-
-        st.caption(
-            "These are current-render contract events, not a "
-            "persistent scientific execution history."
-        )
-
-        st.dataframe(
-            _recent_event_rows(),
-            width="stretch",
-            hide_index=True,
-        )
+        with st.expander("Backend health details", expanded=False):
+            st.json(health)
 
     with evidence_tab:
-        st.subheader("Evidence records")
-
-        metric1, metric2, metric3 = st.columns(3)
-
-        with metric1:
-            st.metric(
-                "Checked records",
-                len(evidence),
-            )
-
-        with metric2:
-            st.metric(
-                "Available",
-                evidence_available,
-            )
-
-        with metric3:
-            st.metric(
-                "Missing",
-                evidence_missing,
-            )
-
         display = evidence.copy()
-
-        display["Bytes"] = display["Bytes"].map(
-            lambda value: (
-                ""
-                if pd.isna(value)
-                else f"{int(value):,}"
-            )
-        )
-
-        display["SHA256"] = display["SHA256"].map(
-            lambda value: (
-                value
-                if not value
-                else f"{value[:16]}…{value[-8:]}"
-            )
-        )
-
-        st.dataframe(
-            display,
-            width="stretch",
-            hide_index=True,
-            column_config={
-                "Record": st.column_config.TextColumn(
-                    "Record",
-                    width="large",
-                ),
-                "Status": st.column_config.TextColumn(
-                    "Status",
-                    width="small",
-                ),
-                "Bytes": st.column_config.TextColumn(
-                    "Bytes",
-                    width="small",
-                ),
-                "SHA256": st.column_config.TextColumn(
-                    "SHA256",
-                    width="medium",
-                ),
-                "Relative path": st.column_config.TextColumn(
-                    "Relative path",
-                    width="large",
-                ),
-            },
-        )
-
-        with st.expander("Full evidence identities"):
-            st.dataframe(
-                evidence,
-                width="stretch",
-                hide_index=True,
-            )
+        display["Bytes"] = display["Bytes"].map(lambda value: "" if pd.isna(value) else f"{int(value):,}")
+        display["SHA256"] = display["SHA256"].map(lambda value: value if not value else f"{value[:16]}…{value[-8:]}")
+        st.dataframe(display, hide_index=True, use_container_width=True)
+        if artifacts:
+            st.markdown("**Durable run artifacts**")
+            st.dataframe(artifacts, hide_index=True, use_container_width=True)
 
     with audit_tab:
-        st.subheader("Audit log")
-
-        st.code(
-            _audit_text(),
-            language="text",
-        )
-
-        st.success(
-            "No backend execution, likelihood evaluation, "
-            "posterior computation, MCMC, or scientific "
-            "recomputation occurred in this session."
-        )
+        latest_boundary = latest_response.get("boundary", {}) if isinstance(latest_response, Mapping) else {}
+        lines = [
+            f"rendered_at_utc={datetime.now(timezone.utc).isoformat()}",
+            f"local_backend_online={'YES' if online else 'NO'}",
+            f"general_run_count_retained={len(history)}",
+            f"general_axiclass_execution={'YES' if latest else 'NO'}",
+            f"ede_microphysics_activated={latest_boundary.get('ede_microphysics_activated', 'NOT_RUN')}",
+            f"general_desi_bao_likelihood={'YES' if _component_status(latest_response, 'desi_dr2_bao') == 'OK' else 'NO'}",
+            f"planck_likelihood_execution={'YES' if _component_status(latest_response, 'planck_2018') == 'OK' else 'NO'}",
+            f"pantheon_plus_likelihood_execution={'YES' if _component_status(latest_response, 'pantheon_plus') == 'OK' else 'NO'}",
+            f"locked_bao_execution={'YES' if isinstance(locked, Mapping) else 'NO'}",
+            "posterior_execution=NO",
+            "mcmc_execution=NO",
+        ]
+        st.code("\n".join(lines), language="text")
+        st.success("The monitor now reports actual session execution instead of a fixed offline placeholder.")
