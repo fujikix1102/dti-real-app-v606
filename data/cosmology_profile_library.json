@@ -1,0 +1,37 @@
+{
+  "schema_version": "cosmology-profile-library-v1",
+  "profiles": [
+    {
+      "id": "fujiki_dti_candidate",
+      "label": "FUJIKI DTI candidate",
+      "kind": "USER_REGISTERED_VALUE",
+      "source": "Legacy v6.0.6 registered candidate; calculation must be rerun in the current backend",
+      "note": "High-H0 AxiCLASS audit starting point. These are inputs, not fitted or posterior values.",
+      "parameters": {"H0": 72.9, "omega_b": 0.0244, "omega_cdm": 0.127, "n_s": 0.9847, "ln10_10_As": 3.058, "tau_reio": 0.0511, "f_EDE": 0.082, "z_c": 3500.0}
+    },
+    {
+      "id": "ede_audit_h067",
+      "label": "EDE audit · H0 67",
+      "kind": "APP_AUDIT_COORDINATE",
+      "source": "Current application comparison coordinate",
+      "note": "Changes H0 only relative to the registered candidate to support controlled comparisons.",
+      "parameters": {"H0": 67.0, "omega_b": 0.0244, "omega_cdm": 0.127, "n_s": 0.9847, "ln10_10_As": 3.058, "tau_reio": 0.0511, "f_EDE": 0.082, "z_c": 3500.0}
+    },
+    {
+      "id": "ede_audit_h063",
+      "label": "EDE audit · H0 63",
+      "kind": "APP_AUDIT_COORDINATE",
+      "source": "Current application comparison coordinate",
+      "note": "Changes H0 only; useful for immediate previous-run comparison and response inspection.",
+      "parameters": {"H0": 63.0, "omega_b": 0.0244, "omega_cdm": 0.127, "n_s": 0.9847, "ln10_10_As": 3.058, "tau_reio": 0.0511, "f_EDE": 0.082, "z_c": 3500.0}
+    },
+    {
+      "id": "lcdm_control_h067",
+      "label": "LCDM-like control · H0 67",
+      "kind": "APP_CONTROL_COORDINATE",
+      "source": "Current application null-branch control",
+      "note": "f_EDE=0 control for comparing the same base inputs without the configured EDE branch.",
+      "parameters": {"H0": 67.0, "omega_b": 0.0244, "omega_cdm": 0.127, "n_s": 0.9847, "ln10_10_As": 3.058, "tau_reio": 0.0511, "f_EDE": 0.0, "z_c": 3500.0}
+    }
+  ]
+}

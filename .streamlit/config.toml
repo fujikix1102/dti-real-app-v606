@@ -1,6 +1,6 @@
 [server]
 headless = true
-enableCORS = false
+enableCORS = true
 enableXsrfProtection = true
 
 [browser]
@@ -8,3 +8,11 @@ gatherUsageStats = false
 
 [theme]
 base = "dark"
+
+[theme.sidebar]
+primaryColor = "#FF4B4B"
+backgroundColor = "#262730"
+secondaryBackgroundColor = "#0E1117"
+textColor = "#FAFAFA"
+borderColor = "#464B5C"
+showWidgetBorder = true

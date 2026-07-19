@@ -1,0 +1,549 @@
+{
+  "schema_version": "dti-catalog-pipeline-pilot-v1",
+  "generated_utc": "2026-07-19T07:25:28.992356+00:00",
+  "status": "complete",
+  "execution_class": "catalog_level_synthetic_end_to_end_pilot",
+  "production_equivalent": false,
+  "official_resource_audit": {
+    "packages": {
+      "pycorr": false,
+      "pypower": false,
+      "pyrecon": false,
+      "desilike": false,
+      "mockfactory": false,
+      "cosmoprimo": false,
+      "fitsio": false
+    },
+    "official_stack_ready": false,
+    "declared_mock_catalog": null,
+    "declared_mock_catalog_exists": false,
+    "production_mode_available": false
+  },
+  "injection": {
+    "model": "permanent_tanh_step_in_H_of_z",
+    "fractional_H_step": 0.05,
+    "z_transition": 0.934,
+    "width": 0.03
+  },
+  "configuration": {
+    "replicates_per_tracer": 8,
+    "bao_pairs_per_catalog": 1800,
+    "random_objects_per_catalog": 6500,
+    "seed": 20260719,
+    "box_size_Mpc_over_h": 800.0,
+    "bao_scale_Mpc_over_h": 105.0,
+    "separation_bins": 30,
+    "mu_bins": 5
+  },
+  "executed_pipeline": [
+    "survey-shaped synthetic object catalog generation",
+    "known H(z) transition injection before fiducial coordinate conversion",
+    "anisotropic transverse/radial coordinate dilation",
+    "FFT-smoothed displacement-field reconstruction",
+    "Landy-Szalay xi(s,mu) correlation estimation",
+    "anisotropic shifted-BAO template fit with per-mu broadband nuisance",
+    "published DESI DR2 13-observable ordering and compression"
+  ],
+  "execution_counts": {
+    "paired_catalogs": 112,
+    "data_objects_processed": 348151,
+    "random_objects_processed": 728000,
+    "correlation_functions": 224,
+    "bao_template_fits": 28,
+    "compressed_values": 13
+  },
+  "tracers": [
+    {
+      "tracer": "BGS",
+      "z_eff": 0.295,
+      "target_alpha_perpendicular": 1.0,
+      "target_alpha_parallel": 1.0,
+      "recovered_pre_alpha_perpendicular": 1.0,
+      "recovered_pre_alpha_parallel": 1.0,
+      "recovered_post_alpha_perpendicular": 1.0,
+      "recovered_post_alpha_parallel": 1.0,
+      "post_error_alpha_perpendicular": 0.0,
+      "post_error_alpha_parallel": 0.0,
+      "baseline_pre_sigma_peak": 12.214337081418693,
+      "baseline_post_sigma_peak": 12.532311077232174,
+      "mean_reconstruction_rms": 4.373038473250847,
+      "fits": {
+        "baseline_pre": {
+          "alpha_perpendicular_raw": 1.0111581711642492,
+          "alpha_parallel_raw": 0.9400063614677538,
+          "sigma_peak": 12.214337081418693,
+          "success": true,
+          "cost": 15.530083997586125,
+          "evaluations": 12
+        },
+        "injected_pre": {
+          "alpha_perpendicular_raw": 1.0111581711642492,
+          "alpha_parallel_raw": 0.9400063614677538,
+          "sigma_peak": 12.214337081418693,
+          "success": true,
+          "cost": 15.530083997586125,
+          "evaluations": 12
+        },
+        "baseline_post": {
+          "alpha_perpendicular_raw": 0.9855180932775345,
+          "alpha_parallel_raw": 0.9458986938778495,
+          "sigma_peak": 12.532311077232174,
+          "success": true,
+          "cost": 14.168592317446327,
+          "evaluations": 23
+        },
+        "injected_post": {
+          "alpha_perpendicular_raw": 0.9855180932775345,
+          "alpha_parallel_raw": 0.9458986938778495,
+          "sigma_peak": 12.532311077232174,
+          "success": true,
+          "cost": 14.168592317446327,
+          "evaluations": 23
+        }
+      }
+    },
+    {
+      "tracer": "LRG1",
+      "z_eff": 0.51,
+      "target_alpha_perpendicular": 0.9999999999999993,
+      "target_alpha_parallel": 0.9999999999999735,
+      "recovered_pre_alpha_perpendicular": 1.0,
+      "recovered_pre_alpha_parallel": 1.0,
+      "recovered_post_alpha_perpendicular": 1.0,
+      "recovered_post_alpha_parallel": 1.0,
+      "post_error_alpha_perpendicular": 6.661338147750939e-16,
+      "post_error_alpha_parallel": 2.653433028854124e-14,
+      "baseline_pre_sigma_peak": 6.783924344727501,
+      "baseline_post_sigma_peak": 6.2199684261805,
+      "mean_reconstruction_rms": 4.547914765788832,
+      "fits": {
+        "baseline_pre": {
+          "alpha_perpendicular_raw": 0.9815987950189906,
+          "alpha_parallel_raw": 0.9963356780875091,
+          "sigma_peak": 6.783924344727501,
+          "success": true,
+          "cost": 17.459948227332458,
+          "evaluations": 21
+        },
+        "injected_pre": {
+          "alpha_perpendicular_raw": 0.9815987950189906,
+          "alpha_parallel_raw": 0.9963356780875091,
+          "sigma_peak": 6.783924344727501,
+          "success": true,
+          "cost": 17.459948227332458,
+          "evaluations": 21
+        },
+        "baseline_post": {
+          "alpha_perpendicular_raw": 0.959001057211412,
+          "alpha_parallel_raw": 0.993619030075884,
+          "sigma_peak": 6.2199684261805,
+          "success": true,
+          "cost": 20.82218507533752,
+          "evaluations": 22
+        },
+        "injected_post": {
+          "alpha_perpendicular_raw": 0.959001057211412,
+          "alpha_parallel_raw": 0.993619030075884,
+          "sigma_peak": 6.2199684261805,
+          "success": true,
+          "cost": 20.82218507533752,
+          "evaluations": 22
+        }
+      }
+    },
+    {
+      "tracer": "LRG2",
+      "z_eff": 0.706,
+      "target_alpha_perpendicular": 0.9999999997839049,
+      "target_alpha_parallel": 0.9999999874772411,
+      "recovered_pre_alpha_perpendicular": 0.9999982161341758,
+      "recovered_pre_alpha_parallel": 1.0000055408875146,
+      "recovered_post_alpha_perpendicular": 0.9999998117860491,
+      "recovered_post_alpha_parallel": 1.0000001031714112,
+      "post_error_alpha_perpendicular": -1.8799785572731764e-07,
+      "post_error_alpha_parallel": 1.156941701330183e-07,
+      "baseline_pre_sigma_peak": 4.959105984123528,
+      "baseline_post_sigma_peak": 3.286886037461676,
+      "mean_reconstruction_rms": 4.508484083669387,
+      "fits": {
+        "baseline_pre": {
+          "alpha_perpendicular_raw": 0.9701388336558378,
+          "alpha_parallel_raw": 1.0946968774066927,
+          "sigma_peak": 4.959105984123528,
+          "success": true,
+          "cost": 16.48163654013855,
+          "evaluations": 23
+        },
+        "injected_pre": {
+          "alpha_perpendicular_raw": 0.9701371030583277,
+          "alpha_parallel_raw": 1.094702942998953,
+          "sigma_peak": 4.959194208689187,
+          "success": true,
+          "cost": 16.48180300757396,
+          "evaluations": 23
+        },
+        "baseline_post": {
+          "alpha_perpendicular_raw": 0.9736675751690016,
+          "alpha_parallel_raw": 1.0452134275758214,
+          "sigma_peak": 3.286886037461676,
+          "success": true,
+          "cost": 19.999900007819846,
+          "evaluations": 18
+        },
+        "injected_post": {
+          "alpha_perpendicular_raw": 0.9736673919111805,
+          "alpha_parallel_raw": 1.0452135354119656,
+          "sigma_peak": 3.2869142105841616,
+          "success": true,
+          "cost": 20.002437264730354,
+          "evaluations": 18
+        }
+      }
+    },
+    {
+      "tracer": "LRG3ELG1",
+      "z_eff": 0.934,
+      "target_alpha_perpendicular": 0.9995858699910679,
+      "target_alpha_parallel": 0.9756097630769534,
+      "recovered_pre_alpha_perpendicular": 1.018147619995981,
+      "recovered_pre_alpha_parallel": 0.9557645474484414,
+      "recovered_post_alpha_perpendicular": 1.0345805985445125,
+      "recovered_post_alpha_parallel": 0.9575914926263527,
+      "post_error_alpha_perpendicular": 0.03499472855344454,
+      "post_error_alpha_parallel": -0.01801827045060067,
+      "baseline_pre_sigma_peak": 10.099145968213207,
+      "baseline_post_sigma_peak": 8.429649831791739,
+      "mean_reconstruction_rms": 4.56646914944789,
+      "fits": {
+        "baseline_pre": {
+          "alpha_perpendicular_raw": 0.985035285462284,
+          "alpha_parallel_raw": 0.9706232207822275,
+          "sigma_peak": 10.099145968213207,
+          "success": true,
+          "cost": 16.317683088971215,
+          "evaluations": 14
+        },
+        "injected_pre": {
+          "alpha_perpendicular_raw": 1.002911331505486,
+          "alpha_parallel_raw": 0.9276872633538743,
+          "sigma_peak": 7.94534592021495,
+          "success": true,
+          "cost": 20.310553564201182,
+          "evaluations": 18
+        },
+        "baseline_post": {
+          "alpha_perpendicular_raw": 0.9952158777396274,
+          "alpha_parallel_raw": 0.9250850784787495,
+          "sigma_peak": 8.429649831791739,
+          "success": true,
+          "cost": 16.27634660324408,
+          "evaluations": 14
+        },
+        "injected_post": {
+          "alpha_perpendicular_raw": 1.029631038472866,
+          "alpha_parallel_raw": 0.8858536011068324,
+          "sigma_peak": 2.00000000000007,
+          "success": true,
+          "cost": 18.511085394588882,
+          "evaluations": 36
+        }
+      }
+    },
+    {
+      "tracer": "ELG2",
+      "z_eff": 1.321,
+      "target_alpha_perpendicular": 0.9896469119782646,
+      "target_alpha_parallel": 0.9523809523812353,
+      "recovered_pre_alpha_perpendicular": 1.0024490629465546,
+      "recovered_pre_alpha_parallel": 0.9573883851958224,
+      "recovered_post_alpha_perpendicular": 1.0196395110052894,
+      "recovered_post_alpha_parallel": 1.0085379618742298,
+      "post_error_alpha_perpendicular": 0.02999259902702478,
+      "post_error_alpha_parallel": 0.056157009492994514,
+      "baseline_pre_sigma_peak": 7.559331941256314,
+      "baseline_post_sigma_peak": 7.404178764585034,
+      "mean_reconstruction_rms": 4.420806220737353,
+      "fits": {
+        "baseline_pre": {
+          "alpha_perpendicular_raw": 0.9800099392462198,
+          "alpha_parallel_raw": 0.9295160205667877,
+          "sigma_peak": 7.559331941256314,
+          "success": true,
+          "cost": 19.524300224008073,
+          "evaluations": 17
+        },
+        "injected_pre": {
+          "alpha_perpendicular_raw": 0.982410045275683,
+          "alpha_parallel_raw": 0.8899078419440837,
+          "sigma_peak": 8.512375254133008,
+          "success": true,
+          "cost": 15.090666339389694,
+          "evaluations": 15
+        },
+        "baseline_post": {
+          "alpha_perpendicular_raw": 0.9554828593668544,
+          "alpha_parallel_raw": 0.9089156150331558,
+          "sigma_peak": 7.404178764585034,
+          "success": true,
+          "cost": 19.102117907444658,
+          "evaluations": 32
+        },
+        "injected_post": {
+          "alpha_perpendicular_raw": 0.974248075498755,
+          "alpha_parallel_raw": 0.916675901901201,
+          "sigma_peak": 8.089952294098982,
+          "success": true,
+          "cost": 19.25525001627082,
+          "evaluations": 16
+        }
+      }
+    },
+    {
+      "tracer": "QSO",
+      "z_eff": 1.484,
+      "target_alpha_perpendicular": 0.9869455739764048,
+      "target_alpha_parallel": 0.9523809523809523,
+      "recovered_pre_alpha_perpendicular": 1.0059803055520224,
+      "recovered_pre_alpha_parallel": 0.906551962084611,
+      "recovered_post_alpha_perpendicular": 1.0076185132040936,
+      "recovered_post_alpha_parallel": 0.9897519555134122,
+      "post_error_alpha_perpendicular": 0.020672939227688758,
+      "post_error_alpha_parallel": 0.03737100313245989,
+      "baseline_pre_sigma_peak": 21.21530226172606,
+      "baseline_post_sigma_peak": 7.829915361221817,
+      "mean_reconstruction_rms": 4.433525847689177,
+      "fits": {
+        "baseline_pre": {
+          "alpha_perpendicular_raw": 0.958994799175735,
+          "alpha_parallel_raw": 1.2999999999999998,
+          "sigma_peak": 21.21530226172606,
+          "success": true,
+          "cost": 26.180407783694267,
+          "evaluations": 42
+        },
+        "injected_pre": {
+          "alpha_perpendicular_raw": 0.9647298810976064,
+          "alpha_parallel_raw": 1.178517550709994,
+          "sigma_peak": 12.148468682582482,
+          "success": true,
+          "cost": 19.772068398048695,
+          "evaluations": 47
+        },
+        "baseline_post": {
+          "alpha_perpendicular_raw": 1.0202449233893207,
+          "alpha_parallel_raw": 0.9032254692046396,
+          "sigma_peak": 7.829915361221817,
+          "success": true,
+          "cost": 17.562360946224523,
+          "evaluations": 20
+        },
+        "injected_post": {
+          "alpha_perpendicular_raw": 1.0280176728095718,
+          "alpha_parallel_raw": 0.8939691744148114,
+          "sigma_peak": 7.1984309736207885,
+          "success": true,
+          "cost": 18.571432429809214,
+          "evaluations": 21
+        }
+      }
+    },
+    {
+      "tracer": "LYA",
+      "z_eff": 2.33,
+      "target_alpha_perpendicular": 0.9790860142189715,
+      "target_alpha_parallel": 0.9523809523809523,
+      "recovered_pre_alpha_perpendicular": 0.9674720277717872,
+      "recovered_pre_alpha_parallel": 0.9619003820712014,
+      "recovered_post_alpha_perpendicular": 0.9835079582674193,
+      "recovered_post_alpha_parallel": 0.9716277931130718,
+      "post_error_alpha_perpendicular": 0.004421944048447868,
+      "post_error_alpha_parallel": 0.019246840732119463,
+      "baseline_pre_sigma_peak": 9.120937910595053,
+      "baseline_post_sigma_peak": 7.920015499567237,
+      "mean_reconstruction_rms": 4.4629319233821745,
+      "fits": {
+        "baseline_pre": {
+          "alpha_perpendicular_raw": 0.9904076922898326,
+          "alpha_parallel_raw": 0.9406482850082661,
+          "sigma_peak": 9.120937910595053,
+          "success": true,
+          "cost": 18.23076194268443,
+          "evaluations": 18
+        },
+        "injected_pre": {
+          "alpha_perpendicular_raw": 0.9581917383804206,
+          "alpha_parallel_raw": 0.9048099447440716,
+          "sigma_peak": 9.840555844923966,
+          "success": true,
+          "cost": 21.22375147205149,
+          "evaluations": 17
+        },
+        "baseline_post": {
+          "alpha_perpendicular_raw": 0.9754762684215584,
+          "alpha_parallel_raw": 0.95547228669758,
+          "sigma_peak": 7.920015499567237,
+          "success": true,
+          "cost": 20.056868822161498,
+          "evaluations": 19
+        },
+        "injected_post": {
+          "alpha_perpendicular_raw": 0.959388673093608,
+          "alpha_parallel_raw": 0.9283634293046699,
+          "sigma_peak": 6.667828162656366,
+          "success": true,
+          "cost": 18.61819823729334,
+          "evaluations": 14
+        }
+      }
+    }
+  ],
+  "compression": {
+    "metadata": [
+      {
+        "redshift": 0.295,
+        "value": 7.94167639,
+        "observable": "DV_over_rs"
+      },
+      {
+        "redshift": 0.51,
+        "value": 13.58758434,
+        "observable": "DM_over_rs"
+      },
+      {
+        "redshift": 0.51,
+        "value": 21.86294686,
+        "observable": "DH_over_rs"
+      },
+      {
+        "redshift": 0.706,
+        "value": 17.35069094,
+        "observable": "DM_over_rs"
+      },
+      {
+        "redshift": 0.706,
+        "value": 19.45534918,
+        "observable": "DH_over_rs"
+      },
+      {
+        "redshift": 0.934,
+        "value": 21.57563956,
+        "observable": "DM_over_rs"
+      },
+      {
+        "redshift": 0.934,
+        "value": 17.64149464,
+        "observable": "DH_over_rs"
+      },
+      {
+        "redshift": 1.321,
+        "value": 27.60085612,
+        "observable": "DM_over_rs"
+      },
+      {
+        "redshift": 1.321,
+        "value": 14.17602155,
+        "observable": "DH_over_rs"
+      },
+      {
+        "redshift": 1.484,
+        "value": 30.51190063,
+        "observable": "DM_over_rs"
+      },
+      {
+        "redshift": 1.484,
+        "value": 12.81699964,
+        "observable": "DH_over_rs"
+      },
+      {
+        "redshift": 2.33,
+        "value": 8.631545674846294,
+        "observable": "DH_over_rs"
+      },
+      {
+        "redshift": 2.33,
+        "value": 38.988973961958784,
+        "observable": "DM_over_rs"
+      }
+    ],
+    "official_baseline": [
+      7.94167639,
+      13.58758434,
+      21.86294686,
+      17.35069094,
+      19.45534918,
+      21.57563956,
+      17.64149464,
+      27.60085612,
+      14.17602155,
+      30.51190063,
+      12.81699964,
+      8.631545674846294,
+      38.988973961958784
+    ],
+    "target_injected_vector": [
+      7.94167639,
+      13.58758433999999,
+      21.862946859999422,
+      17.3506909362506,
+      19.45534893636535,
+      21.5667044401963,
+      17.211214406053745,
+      27.315102027114385,
+      13.500972904765916,
+      30.113585280386378,
+      12.206666323809523,
+      8.220519690329803,
+      38.17355911490149
+    ],
+    "recovered_post_reconstruction_vector": [
+      7.94167639,
+      13.58758434,
+      21.86294686,
+      17.350687674357907,
+      19.45535118723583,
+      22.32173808996546,
+      16.8933451844774,
+      28.14292343752415,
+      14.29705588152216,
+      30.744355947831647,
+      12.685650457504702,
+      8.386649675205584,
+      38.34596617626766
+    ],
+    "relative_error": [
+      0.0,
+      6.536691125334541e-16,
+      2.648738678059875e-14,
+      -1.8799785586139748e-07,
+      1.156941716947372e-07,
+      0.03500922692490369,
+      -0.018468727079742835,
+      0.030306363475707563,
+      0.05896485996762667,
+      0.020946382224905757,
+      0.039239553289082955,
+      0.02020918276872537,
+      0.004516399973270275
+    ],
+    "relative_rmse": 0.025373172742901583,
+    "maximum_absolute_relative_error": 0.05896485996762667
+  },
+  "recovery_summary": {
+    "alpha_rmse": 0.02362869255643952,
+    "alpha_maximum_absolute_error": 0.056157009492994514,
+    "pipeline_completed": true,
+    "transition_recovery_scientifically_calibrated": false
+  },
+  "input_identity": {
+    "mean_path": "/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_EXISTING_RENDER_DTI_CLASS_API_SOURCE_MATERIALIZATION_V1_20260716_102303/clones/dti-class-api/app/data/desi_dr2_bao/OFFICIAL_DESI_DR2_MEAN.txt",
+    "mean_sha256": "9ac154ab583ce759c0f7eef3c978c7c70a6ead2d18774caceadf1a350a640585"
+  },
+  "claim_boundary": "This is an executed catalog-level end-to-end pilot with real coordinate conversion, FFT reconstruction, pair counting, correlation estimation, template fitting, and 13-value compression. Its object catalog and mask are deterministic synthetic controls, not an official DESI EZmock/Abacus/DR2 production catalog. It calibrates implementation and information transfer only; it is not an observational DTI detection or exclusion.",
+  "next_production_replacement_contract": [
+    "replace synthetic catalog loader with declared official DESI mock FITS catalog",
+    "replace internal FFT reconstruction with official pyrecon configuration",
+    "replace internal pair counter with official pycorr configuration",
+    "replace Gaussian BAO shell template with official desilike BAO model",
+    "run null and injected ensembles with declared survey covariance and global calibration"
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "schema_version": "assumption-neutral-dti-audit-v1",
+  "generated_utc": "2026-07-19T07:46:06.611349+00:00",
+  "status": "complete",
+  "decision_rule": {
+    "observed_product": "report response-shape selection under four monotonic coordinate encodings",
+    "detectability": "report minimum/median/maximum recovery without converting non-detection into continuity",
+    "physical_interpretation_used_as_input": false
+  },
+  "observed_compressed_product": {
+    "representations_tested": 4,
+    "results": [
+      {
+        "encoding": "linear_coordinate",
+        "winner_family": "smooth_polynomial",
+        "winner_complexity": 3,
+        "winner_bic": 137.94642979823257,
+        "bic_margin": 151.76129815297716,
+        "multi_segment_selected": false
+      },
+      {
+        "encoding": "log_coordinate",
+        "winner_family": "smooth_polynomial",
+        "winner_complexity": 3,
+        "winner_bic": 160.96199004539685,
+        "bic_margin": 106.4303937257242,
+        "multi_segment_selected": false
+      },
+      {
+        "encoding": "reciprocal_coordinate",
+        "winner_family": "smooth_polynomial",
+        "winner_complexity": 3,
+        "winner_bic": 174.8470102588572,
+        "bic_margin": 66.62493687906121,
+        "multi_segment_selected": false
+      },
+      {
+        "encoding": "ordinal_coordinate",
+        "winner_family": "smooth_polynomial",
+        "winner_complexity": 3,
+        "winner_bic": 137.94642979823257,
+        "bic_margin": 151.76129815297716,
+        "multi_segment_selected": false
+      }
+    ],
+    "multi_segment_winner_count": 0,
+    "representation_stable_no_segment_winner": true
+  },
+  "injection_recovery": {
+    "conditions": 72,
+    "null_replicates": 10000,
+    "injected_replicates": 72000,
+    "by_amplitude": [
+      {
+        "fractional_step": 0.005,
+        "minimum": 0.0,
+        "median": 0.002,
+        "maximum": 0.005
+      },
+      {
+        "fractional_step": 0.01,
+        "minimum": 0.001,
+        "median": 0.0035,
+        "maximum": 0.006
+      },
+      {
+        "fractional_step": 0.02,
+        "minimum": 0.001,
+        "median": 0.005,
+        "maximum": 0.01
+      },
+      {
+        "fractional_step": 0.05,
+        "minimum": 0.002,
+        "median": 0.0245,
+        "maximum": 0.067
+      },
+      {
+        "fractional_step": 0.1,
+        "minimum": 0.011,
+        "median": 0.21800000000000003,
+        "maximum": 0.574
+      },
+      {
+        "fractional_step": 0.2,
+        "minimum": 0.087,
+        "median": 0.9285000000000001,
+        "maximum": 1.0
+      }
+    ],
+    "minimum_recovery_at_largest_tested_step": 0.087
+  },
+  "catalog_pipeline": {
+    "conditions": 3,
+    "correlation_functions": 672,
+    "template_fits": 84,
+    "alpha_rmse_range": [
+      0.02362869255643952,
+      0.04334034352766902
+    ],
+    "production_equivalent": false
+  },
+  "machine_conclusion": {
+    "compressed_product_requires_segmented_response": false,
+    "compressed_product_proves_underlying_continuity": false,
+    "upstream_information_loss_empirically_possible": true,
+    "observational_transition_detected": false
+  },
+  "claim_boundary": "The installed compressed DESI DR2 response does not select a segmented winner under any tested monotonic coordinate encoding. Injection tests nevertheless show non-unit and condition-dependent recovery, so this numerical result cannot be promoted to proof of underlying continuity. The catalog pilot is not production-equivalent.",
+  "source_identity": {
+    "audit_dti_dr2_latest.json": "72947c61ded016f4e0ea88adde70472059e205edd3bf7a1ae65cff260395dc36",
+    "dti_transition_injection_recovery.json": "24e068587f7d5fd800ef118d06d3f6667ddd7098757c8a0c0ffe7990fc3e0dee",
+    "dti_catalog_pipeline_pilot_summary.json": "b349a7fbd768bb613a6c86d49adeee8bef36ac1ec4ef316f7ddde38c2177ba5a"
+  },
+  "artifact_sha256": "0c02f93e3c68823364f6f7d592d1f8fa4c3de2601cb2d384e3615b9ba611b1c7"
+}
