@@ -23,7 +23,7 @@ class FakeResponse:
 
 
 class GeneralClassComputeServiceTests(unittest.TestCase):
-    def test_payload_forwards_six_active_parameters(self) -> None:
+    def test_payload_forwards_submitted_compute_parameters(self) -> None:
         payload = build_general_class_payload(
             GeneralClassRequest(
                 H0=73.0,

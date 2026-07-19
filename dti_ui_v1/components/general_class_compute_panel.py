@@ -166,7 +166,8 @@ def render_general_class_compute_panel() -> None:
     st.caption(
         "Runs the backend /class/compute route with six editable "
         "ΛCDM-like parameters plus f_EDE and z_c, then evaluates the "
-        "submitted point against the installed, source-identified DESI DR2 BAO, ""Planck 2018, and Pantheon+ likelihood components."
+        "submitted point against the installed, source-identified DESI DR2 BAO, "
+        "Planck 2018, and Pantheon+ likelihood components."
     )
 
     st.info(
@@ -630,7 +631,7 @@ def render_general_class_compute_panel() -> None:
 
     st.caption(
         "Boundary: this panel performs direct CLASS/AxiCLASS physical "
-        "propagation and evaluates installed, source-identified DESI DR2 BAO, ""Planck 2018, and "
-        "Pantheon+ likelihood components at one parameter point. It does not "
-        "run posterior inference or MCMC."
+        "propagation and evaluates installed, source-identified DESI DR2 BAO, "
+        "Planck 2018, and Pantheon+ likelihood components at one parameter point. "
+        "It does not run posterior inference or MCMC."
     )
