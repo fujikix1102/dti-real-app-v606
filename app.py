@@ -1,7 +1,11 @@
 """Public Streamlit entrypoint for the MAXOMEGA / DTI PERFECT FIT application."""
 
+import os
 from pathlib import Path
 import runpy
+
+# Public deployment must always use the PERFECT FIT interface.
+os.environ["DTI_PERFECT_FIT_MODE"] = "perfect-fit"
 
 TARGET = Path(__file__).with_name("perfect_fit_app.py")
 
