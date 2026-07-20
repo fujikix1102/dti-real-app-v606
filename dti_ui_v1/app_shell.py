@@ -6,6 +6,10 @@ from collections.abc import Callable
 
 import streamlit as st
 
+
+from dti_ui_v1.components.evidence_layer.gtds_dashboard_entry import render_gtds_dashboard_entry
+
+
 from dti_ui_v1.contracts.display_contract import (
     APP_ICON,
     APP_LAYOUT,
@@ -76,3 +80,6 @@ def render_app() -> None:
     )
     selected = render_sidebar()
     page_registry()[selected]()
+
+    if selected == "Evidence":
+        render_gtds_dashboard_entry()
