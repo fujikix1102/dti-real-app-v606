@@ -1,12 +1,290 @@
 from __future__ import annotations
 
 import streamlit as st
+from dti_ui_v1.components.evidence_layer.evidence_chain_snapshot_dashboard import render_evidence_chain_snapshot_dashboard
+
+from dti_ui_v1.services.evidence_registry.evidence_chain_freeze_reader import load_freeze_record
+from dti_ui_v1.components.evidence_layer.evidence_chain_freeze_view_panel import render_freeze_view
+
+from dti_ui_v1.services.evidence_registry.evidence_chain_reproducibility_report import build_reproducibility_report
+from dti_ui_v1.components.evidence_layer.evidence_chain_reproducibility_report_panel import render_reproducibility_report
+
+from dti_ui_v1.services.evidence_registry.evidence_chain_integrity_scorecard import build_integrity_scorecard
+from dti_ui_v1.components.evidence_layer.evidence_chain_integrity_scorecard_panel import render_integrity_scorecard
+
+from dti_ui_v1.services.evidence_registry.source_identity_registry import build_source_identity_registry
+from dti_ui_v1.services.evidence_registry.evidence_chain_validator import validate_evidence_registry
+from dti_ui_v1.services.evidence_registry.evidence_chain_failure_report import build_failure_report
+from dti_ui_v1.services.evidence_registry.evidence_manifest_reader import load_manifest_summary
+from dti_ui_v1.services.evidence_registry.evidence_chain_audit_timeline import build_audit_timeline
+from dti_ui_v1.components.evidence_layer.evidence_chain_audit_timeline_panel import render_evidence_chain_audit_timeline
+from dti_ui_v1.services.evidence_registry.evidence_export_package_summary import build_export_package_summary
+from dti_ui_v1.components.evidence_layer.evidence_export_package_view_panel import render_evidence_export_package_view
+
+from dti_ui_v1.components.evidence_layer.evidence_chain_final_dashboard import render_evidence_chain_final_dashboard
+from dti_ui_v1.services.evidence_registry.evidence_manifest_reader import load_manifest_summary
+from dti_ui_v1.services.evidence_registry.evidence_chain_validator import validate_evidence_registry
+from dti_ui_v1.services.evidence_registry.source_identity_registry import build_source_identity_registry
+from dti_ui_v1.services.evidence_registry.evidence_manifest_reader import load_manifest_summary
+from dti_ui_v1.components.evidence_layer.evidence_manifest_export_panel import render_evidence_manifest_export
+from dti_ui_v1.services.evidence_registry.section8_schema_normalizer import normalize_section8_schema
+from dti_ui_v1.components.evidence_layer.normalized_evidence_workbench_panel import render_normalized_evidence_workbench
+import pandas as pd
+from dti_ui_v1.services.evidence_registry.evidence_chain_failure_report import build_failure_report
+from dti_ui_v1.components.evidence_layer.evidence_chain_failure_report_panel import render_evidence_chain_failure_report
+from dti_ui_v1.services.evidence_registry.evidence_chain_validator import validate_evidence_registry
+from dti_ui_v1.components.evidence_layer.evidence_chain_validation_panel import render_evidence_chain_validation_panel
+from dti_ui_v1.components.evidence_layer.evidence_chain_status_matrix import render_evidence_chain_status_matrix
+from dti_ui_v1.services.evidence_registry.source_identity_registry import build_source_identity_registry
+from dti_ui_v1.components.evidence_layer.source_identity_registry_panel import render_source_identity_registry
 
 from dti_ui_v1.services.run_store import list_run_artifacts
 
 
 def render() -> None:
     st.title("Evidence")
+
+    with st.expander(
+        "Evidence Chain Snapshot Dashboard",
+        expanded=False,
+    ):
+        from dti_ui_v1.services.evidence_registry.evidence_chain_snapshot_reader import (
+            load_readiness_snapshot,
+        )
+
+        snapshot = load_readiness_snapshot()
+
+        render_evidence_chain_snapshot_dashboard(
+            snapshot
+        )
+
+
+
+    with st.expander(
+        "Evidence Chain Freeze Record",
+        expanded=False,
+    ):
+        freeze_record = load_freeze_record()
+        render_freeze_view(
+            freeze_record
+        )
+
+
+
+    with st.expander(
+        "Evidence Chain Reproducibility Report",
+        expanded=False,
+    ):
+        _report_registry = build_source_identity_registry()
+        _report_validation = validate_evidence_registry(
+            _report_registry
+        )
+        _report_failure = build_failure_report(
+            _report_validation
+        )
+        _report_manifest = load_manifest_summary()
+
+        _report_timeline = build_audit_timeline(
+            _report_registry,
+            _report_validation,
+            _report_failure,
+            _report_manifest,
+        )
+
+        _report_scorecard = build_integrity_scorecard(
+            _report_registry,
+            _report_validation,
+            _report_failure,
+            _report_manifest,
+            _report_timeline,
+        )
+
+        _report = build_reproducibility_report(
+            _report_scorecard
+        )
+
+        render_reproducibility_report(
+            _report
+        )
+
+
+
+    with st.expander(
+        "Evidence Chain Integrity Scorecard",
+        expanded=False,
+    ):
+        _scorecard_registry = build_source_identity_registry()
+        _scorecard_validation = validate_evidence_registry(
+            _scorecard_registry
+        )
+        _scorecard_failure = build_failure_report(
+            _scorecard_validation
+        )
+        _scorecard_manifest = load_manifest_summary()
+
+        _scorecard_timeline = build_audit_timeline(
+            _scorecard_registry,
+            _scorecard_validation,
+            _scorecard_failure,
+            _scorecard_manifest,
+        )
+
+        _scorecard = build_integrity_scorecard(
+            _scorecard_registry,
+            _scorecard_validation,
+            _scorecard_failure,
+            _scorecard_manifest,
+            _scorecard_timeline,
+        )
+
+        render_integrity_scorecard(
+            _scorecard
+        )
+
+
+
+    with st.expander(
+        "Evidence Chain Audit Timeline",
+        expanded=False,
+    ):
+        _registry = build_source_identity_registry()
+        _validation = validate_evidence_registry(_registry)
+        _failure = build_failure_report(_validation)
+        _manifest = load_manifest_summary()
+
+        _timeline = build_audit_timeline(
+            _registry,
+            _validation,
+            _failure,
+            _manifest,
+        )
+
+        render_evidence_chain_audit_timeline(
+            _timeline
+        )
+
+
+
+    with st.expander(
+        "Evidence Export Package View",
+        expanded=False,
+    ):
+        package_summary = build_export_package_summary()
+        render_evidence_export_package_view(
+            package_summary
+        )
+
+
+
+    with st.expander(
+        "Evidence Chain Final Dashboard",
+        expanded=False,
+    ):
+
+        registry = build_source_identity_registry()
+
+        validation = validate_evidence_registry(
+            registry
+        )
+
+        manifest_summary = load_manifest_summary()
+
+        render_evidence_chain_final_dashboard(
+            registry,
+            validation,
+            manifest_summary,
+            "PASS",
+        )
+
+
+
+    with st.expander(
+        "Evidence Manifest Export",
+        expanded=False,
+    ):
+
+        manifest_summary = load_manifest_summary()
+
+        render_evidence_manifest_export(
+            manifest_summary
+        )
+
+
+
+    with st.expander(
+        "Normalized Evidence Workbench",
+        expanded=False,
+    ):
+
+        import pandas as pd
+
+        primary = pd.read_csv(
+            "data/section8_source_record/section8_primary_comparison_graph_normalized.tsv",
+            sep="\t",
+            dtype=str,
+        )
+
+        secondary = pd.read_csv(
+            "data/section8_source_record/section8_secondary_summary_panel_normalized.tsv",
+            sep="\t",
+            dtype=str,
+        )
+
+        primary = normalize_section8_schema(
+            primary,
+            "primary",
+        )
+
+        secondary = normalize_section8_schema(
+            secondary,
+            "secondary",
+        )
+
+        render_normalized_evidence_workbench(
+            primary,
+            secondary,
+        )
+
+
+
+    with st.expander(
+        "Evidence Chain Failure Report",
+        expanded=False,
+    ):
+        registry = build_source_identity_registry()
+        validation = validate_evidence_registry(registry)
+        failure_report = build_failure_report(validation)
+        render_evidence_chain_failure_report(failure_report)
+
+
+
+    with st.expander(
+        "Evidence Chain Validation",
+        expanded=False,
+    ):
+        registry = build_source_identity_registry()
+        validation = validate_evidence_registry(registry)
+        render_evidence_chain_validation_panel(validation)
+
+
+
+    with st.expander(
+        "Evidence Chain Status Matrix",
+        expanded=False,
+    ):
+        registry = build_source_identity_registry()
+        render_evidence_chain_status_matrix(registry)
+
+
+
+    with st.expander(
+        "Source Identity Registry",
+        expanded=False,
+    ):
+        registry = build_source_identity_registry()
+        render_source_identity_registry(registry)
+
+
     st.caption("Durable run identities, scientific contracts, and interpretation limits")
     artifacts = list_run_artifacts()
     source_tab, run_tab, boundary_tab = st.tabs(("Source contracts", "Run artifacts", "Boundaries"))
@@ -25,7 +303,17 @@ def render() -> None:
         )
     with run_tab:
         if artifacts:
-            st.dataframe(artifacts, hide_index=True, use_container_width=True)
+            artifact_df = (
+                pd.DataFrame(artifacts)
+                .fillna("")
+                .astype(str)
+            )
+
+            st.dataframe(
+                artifact_df,
+                hide_index=True,
+                use_container_width=True,
+            )
         else:
             st.info("No durable evidence record exists yet.")
     with boundary_tab:
