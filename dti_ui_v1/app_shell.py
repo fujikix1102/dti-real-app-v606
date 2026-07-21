@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import importlib
 
 import streamlit as st
 
 
-from dti_ui_v1.components.evidence_layer.gtds_dashboard_entry import render_gtds_dashboard_entry
 
 
 from dti_ui_v1.contracts.display_contract import (
@@ -18,26 +18,33 @@ from dti_ui_v1.contracts.display_contract import (
     DEFAULT_PAGE,
     NAVIGATION_ITEMS,
 )
-from dti_ui_v1.pages import audit_dti, atlas, compare, dashboard, developer, evidence, figures, hubble_consistency, results, run
 
 
 PageRenderer = Callable[[], None]
 APP_NAVIGATION = tuple(NAVIGATION_ITEMS[:4]) + ("Atlas", "Consistency", "Audit DTI") + tuple(NAVIGATION_ITEMS[4:])
 
 
-def page_registry() -> dict[str, PageRenderer]:
+def page_registry() -> dict[str, tuple[str, str]]:
     return {
-        "Workspace": dashboard.render,
-        "Compute": run.render,
-        "Results": results.render,
-        "Compare": compare.render,
-        "Atlas": atlas.render,
-        "Consistency": hubble_consistency.render,
-        "Audit DTI": audit_dti.render,
-        "Figures": figures.render,
-        "Evidence": evidence.render,
-        "Developer": developer.render,
+        "Workspace": ("dti_ui_v1.pages.dashboard", "render"),
+        "Compute": ("dti_ui_v1.pages.run", "render"),
+        "Results": ("dti_ui_v1.pages.results", "render"),
+        "Compare": ("dti_ui_v1.pages.compare", "render"),
+        "Atlas": ("dti_ui_v1.pages.atlas", "render"),
+        "Consistency": ("dti_ui_v1.pages.hubble_consistency", "render"),
+        "Audit DTI": ("dti_ui_v1.pages.audit_dti", "render"),
+        "Figures": ("dti_ui_v1.pages.figures", "render"),
+        "Evidence": ("dti_ui_v1.pages.evidence", "render"),
+        "Developer": ("dti_ui_v1.pages.developer", "render"),
     }
+
+
+def resolve_page_renderer(page_name: str) -> PageRenderer:
+    module_name, function_name = page_registry()[page_name]
+
+    module = importlib.import_module(module_name)
+
+    return getattr(module, function_name)
 
 
 def render_sidebar() -> str:
@@ -48,6 +55,12 @@ def render_sidebar() -> str:
     with st.sidebar:
         st.markdown(f"## {APP_TITLE}")
         st.caption(APP_SUBTITLE)
+
+        from dti_ui_v1.components.deployment_identity import (
+            render_deployment_identity
+        )
+
+        render_deployment_identity()
         selected = st.radio(
             "Navigation",
             options=APP_NAVIGATION,
@@ -79,7 +92,12 @@ def render_app() -> None:
         initial_sidebar_state="expanded",
     )
     selected = render_sidebar()
-    page_registry()[selected]()
+
+    renderer = resolve_page_renderer(selected)
+    renderer()
 
     if selected == "Evidence":
+        from dti_ui_v1.components.evidence_layer.gtds_dashboard_entry import (
+            render_gtds_dashboard_entry
+        )
         render_gtds_dashboard_entry()
