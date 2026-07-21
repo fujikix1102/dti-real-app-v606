@@ -110,6 +110,7 @@ def parse_locked_bao_response(
             ("result", "rdrag"),
             ("result", "r_drag"),
             ("result", "rs_drag"),
+            ("result", "rdrag_Mpc"),
         ),
     )
 
@@ -123,6 +124,7 @@ def parse_locked_bao_response(
             ("result", "loglike"),
             ("result", "log_likelihood"),
             ("result", "bao_loglike"),
+            ("result", "model_loglike"),
         ),
     )
 
@@ -136,6 +138,7 @@ def parse_locked_bao_response(
             ("result", "chi2"),
             ("result", "chi_square"),
             ("result", "bao_chi2"),
+            ("result", "model_chi2"),
         ),
     )
 
@@ -148,6 +151,7 @@ def parse_locked_bao_response(
             ("elapsed_seconds",),
             ("result", "runtime_seconds"),
             ("result", "runtime"),
+            ("runtime_sec",),
             ("result", "elapsed_seconds"),
         ),
     )
@@ -157,10 +161,9 @@ def parse_locked_bao_response(
             "runtime_seconds must be non-negative"
         )
 
-    failed_checks = _required_nonnegative_integer(
+    failed_raw = _first_present(
         payload,
-        label="failed_checks",
-        paths=(
+        (
             ("failed_checks",),
             ("failed_check_count",),
             ("result", "failed_checks"),
@@ -168,6 +171,21 @@ def parse_locked_bao_response(
             ("validation", "failed_checks"),
         ),
     )
+
+    if isinstance(failed_raw, list):
+        failed_checks = len(failed_raw)
+    else:
+        failed_checks = _required_nonnegative_integer(
+            payload,
+            label="failed_checks",
+            paths=(
+                ("failed_checks",),
+                ("failed_check_count",),
+                ("result", "failed_checks"),
+                ("result", "failed_check_count"),
+                ("validation", "failed_checks"),
+            ),
+        )
 
     return LockedBaoResult(
         rdrag=rdrag,

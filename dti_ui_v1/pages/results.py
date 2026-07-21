@@ -2,11 +2,28 @@
 
 from __future__ import annotations
 
+from dti_ui_v1.components.backend_bao_result import render_backend_bao_result
+
 from typing import Any, Mapping
 
 import altair as alt
 import pandas as pd
 import streamlit as st
+from dti_ui_v1.components.section8_comparison_chart_panel import render_section8_comparison_chart
+from dti_ui_v1.components.scientific_diagnostic_filter_panel import render_scientific_diagnostic_filter_panel
+from dti_ui_v1.components.scientific_diagnostic_summary_panel import render_scientific_diagnostic_summary
+from dti_ui_v1.services.scientific_diagnostic_summary import build_diagnostic_summary
+from dti_ui_v1.components.scientific_payload_metadata_panel import render_scientific_payload_metadata
+from dti_ui_v1.components.scientific_payload_table_panel import render_scientific_payload_table
+
+from dti_ui_v1.components.scientific_result_live_attach import (
+    build_live_scientific_result_context,
+)
+
+from dti_ui_v1.components.scientific_result_live_panel import (
+    render_live_scientific_result_panel,
+)
+from dti_ui_v1.components.scientific_result_page_bridge import get_scientific_result_page_context
 
 from dti_ui_v1.components.fixed_h0_bao_charts import render_fixed_h0_bao_charts
 
@@ -133,7 +150,55 @@ def _render_cmb(response: Mapping[str, Any] | None) -> None:
 
 
 def render() -> None:
+
+    try:
+        scientific_bridge_payload = get_scientific_result_page_context(
+            "LOCAL_DIAGNOSTIC_SOURCE"
+        )
+        st.caption(
+            "Scientific Result Bridge: "
+            + scientific_bridge_payload.get("status", "UNKNOWN")
+        )
+    except Exception as exc:
+        st.caption("Scientific Result Bridge unavailable: " + str(exc))
+
     st.title("Results")
+
+    with st.expander(
+        "Scientific Diagnostic Interaction",
+        expanded=False,
+    ):
+        render_scientific_diagnostic_filter_panel()
+
+
+
+    with st.expander("Section 8: Primary Comparison Graph", expanded=False):
+        render_section8_comparison_chart("data/section8_source_record/section8_primary_comparison_graph_normalized.tsv")
+
+    with st.expander("Scientific Diagnostic Summary", expanded=False):
+
+        diagnostic_summary = build_diagnostic_summary(
+            "data/desi_dr2_cosmology_products/diagnostic_numeric_summary.tsv"
+        )
+
+        render_scientific_diagnostic_summary(
+            diagnostic_summary
+        )
+
+
+
+    with st.expander("Scientific Payload Metadata", expanded=False):
+        render_scientific_payload_metadata(
+            "data/desi_dr2_cosmology_products/diagnostic_numeric_summary.tsv"
+        )
+
+
+
+    with st.expander("Scientific Payload Table", expanded=False):
+        render_scientific_payload_table(
+            "data/desi_dr2_cosmology_products/diagnostic_numeric_summary.tsv"
+        )
+
     st.caption("Results retained in the current browser session")
     response = _latest_response()
     locked = st.session_state.get(LOCKED_RESULT_KEY)
@@ -161,3 +226,7 @@ def render() -> None:
             st.json(dict(locked))
         if response is None and not isinstance(locked, Mapping):
             st.info("No session result is loaded.")
+
+
+# Local backend BAO adapter route
+render_backend_bao_result()
