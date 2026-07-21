@@ -96,6 +96,29 @@ def render_app() -> None:
     renderer = resolve_page_renderer(selected)
     renderer()
 
+
+    # ROUTE_C_DIAGNOSTIC_AUDIT
+    # DISPLAY ONLY
+    # NO LIKELIHOOD
+    # NO POSTERIOR
+    # NO MCMC
+    # NO_CLAIM
+
+    try:
+        from route_c_adapter import get_route_c_status
+
+        st.divider()
+        st.subheader("Route C diagnostic audit")
+
+        route_c_status = get_route_c_status()
+
+        for k, v in route_c_status.items():
+            st.write(f"{k}: {v}")
+
+    except Exception:
+        pass
+
+
     if selected == "Evidence":
         from dti_ui_v1.components.evidence_layer.gtds_dashboard_entry import (
             render_gtds_dashboard_entry

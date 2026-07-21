@@ -335,8 +335,15 @@ def render_fixed_h0_bao_charts() -> None:
             if column in points.columns
         ]
 
+        display_df = (
+            points[display_columns]
+            .copy()
+            .fillna("")
+            .astype(str)
+        )
+
         st.dataframe(
-            points[display_columns],
+            display_df,
             width="stretch",
             hide_index=True,
         )
