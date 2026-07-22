@@ -40,6 +40,11 @@ from dti_ui_v1.components.evidence_layer.source_identity_registry_panel import r
 
 from dti_ui_v1.services.run_store import list_run_artifacts
 
+from dti_ui_v1.components.route_c.route_c_dashboard import (
+    render_route_c_dashboard,
+)
+
+
 
 def render() -> None:
     st.title("Evidence")
@@ -337,3 +342,12 @@ def render() -> None:
             "- Posterior/MCMC remains outside scope until priors and convergence criteria are declared.\n"
             "- The toy transition laboratory is mathematical UI validation, not an EDE model."
         )
+
+
+
+
+    with st.expander(
+        "Route C Diagnostic Adapter",
+        expanded=False,
+    ):
+        render_route_c_dashboard()
