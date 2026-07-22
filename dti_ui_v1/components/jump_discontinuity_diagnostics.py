@@ -23,6 +23,21 @@ class JumpBranch:
     amplitude: float
 
 
+
+def _arrow_safe_display(df):
+    """Normalize mixed object columns before Streamlit Arrow serialization."""
+    if not isinstance(df, pd.DataFrame):
+        return df
+
+    out = df.copy()
+
+    for col in out.columns:
+        if str(out[col].dtype) == "object":
+            out[col] = out[col].astype(str)
+
+    return out
+
+
 BRANCH_ORDER: tuple[str, ...] = (
     "Strategy A",
     "Hybrid A+B",
@@ -416,7 +431,7 @@ def _render_dz_dependence(
         )
 
     st.dataframe(
-        dependence,
+        _arrow_safe_display(dependence),
         use_container_width=True,
         hide_index=True,
     )
@@ -572,7 +587,7 @@ def render_jump_discontinuity_diagnostics() -> None:
             )
 
         st.dataframe(
-            pd.DataFrame(rows),
+            _arrow_safe_display(pd.DataFrame(rows)),
             use_container_width=True,
             hide_index=True,
         )
@@ -615,7 +630,7 @@ def render_jump_discontinuity_diagnostics() -> None:
             )
 
         st.dataframe(
-            pd.DataFrame(rows),
+            _arrow_safe_display(pd.DataFrame(rows)),
             use_container_width=True,
             hide_index=True,
         )
@@ -645,7 +660,7 @@ def render_jump_discontinuity_diagnostics() -> None:
             )
 
         st.dataframe(
-            pd.DataFrame(rows),
+            _arrow_safe_display(pd.DataFrame(rows)),
             use_container_width=True,
             hide_index=True,
         )
@@ -753,7 +768,7 @@ def render_jump_discontinuity_diagnostics() -> None:
         ]
 
         st.dataframe(
-            switches,
+            _arrow_safe_display(switches),
             use_container_width=True,
             hide_index=True,
         )
