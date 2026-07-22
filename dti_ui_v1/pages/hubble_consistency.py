@@ -86,7 +86,7 @@ def _render_anchor_chart(contract: Mapping[str, Any], model_h0: float | None) ->
             tooltip=[alt.Tooltip("model_H0:Q", title="Submitted model H₀", format=".3f")],
         )
         chart = chart + model_rule
-    st.altair_chart(chart.properties(height=310, title="Published local-ladder summary coordinates"), width="stretch")
+    st.altair_chart(chart.properties(height=310, title="Published local-ladder summary coordinates"), use_container_width=True)
 
 
 def render() -> None:
@@ -119,7 +119,7 @@ def render() -> None:
 
     st.markdown("### Published ladder contract")
     ladder_table = _anchor_frame(contract)[["label", "method", "H0", "sigma", "source"]]
-    st.dataframe(ladder_table, hide_index=True, width="stretch")
+    st.dataframe(ladder_table, hide_index=True, use_container_width=True)
 
     if not history or current_h0 is None:
         st.info("Compute → ExecutionでCLASS / AxiCLASSを実行すると、赤い縦線と整合性診断が表示されます。")
@@ -141,7 +141,7 @@ def render() -> None:
 
         component_frame = pd.DataFrame(likelihood_component_rows(response))
         st.markdown("### Same-model observational rails")
-        st.dataframe(component_frame, hide_index=True, width="stretch")
+        st.dataframe(component_frame, hide_index=True, use_container_width=True)
         unavailable = component_frame[component_frame["status"] != "ok"]
         if len(unavailable):
             st.warning("One or more official likelihood components are unavailable; no cross-dataset consistency claim is made.")
@@ -170,8 +170,8 @@ def render() -> None:
                     color=alt.condition("datum.delta_chi2 <= 0", alt.value("#20B2AA"), alt.value("#E76F51")),
                     tooltip=["rail:N", alt.Tooltip("delta_chi2:Q", format="+.5f"), "combination:N"],
                 ).properties(height=330)
-                st.altair_chart(delta_chart, width="stretch")
-                st.dataframe(delta_frame, hide_index=True, width="stretch")
+                st.altair_chart(delta_chart, use_container_width=True)
+                st.dataframe(delta_frame, hide_index=True, use_container_width=True)
 
     st.markdown("### Reconciliation claim gate")
     st.dataframe(
@@ -184,7 +184,7 @@ def render() -> None:
             {"Requirement": "Bayesian evidence / model comparison", "Current state": "NOT EXECUTED", "Required for final claim": "Yes"},
         ],
         hide_index=True,
-        width="stretch",
+        use_container_width=True,
     )
     st.info(
         "Current verdict: this page can expose agreement, tension, and cross-dataset trade-offs at submitted points. "
@@ -196,5 +196,5 @@ def render() -> None:
         data=json.dumps(contract, ensure_ascii=False, indent=2),
         file_name="hubble_ladder_anchors.json",
         mime="application/json",
-        width="stretch",
+        use_container_width=True,
     )

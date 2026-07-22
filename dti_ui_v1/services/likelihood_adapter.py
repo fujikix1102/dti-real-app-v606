@@ -19,6 +19,8 @@ def build_likelihood_response(
         engine="FROZEN_LIKELIHOOD_ADAPTER",
         metadata={
             "case_id": point.identity.case_id,
+            "source_type": "FROZEN_LIKELIHOOD",
+            "inference_boundary": "diagnostic_only",
             "provenance": {
                 "mean_sha256": point.identity.mean_sha256,
                 "cov_sha256": point.identity.cov_sha256,

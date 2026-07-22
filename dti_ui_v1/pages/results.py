@@ -27,6 +27,14 @@ from dti_ui_v1.components.scientific_result_page_bridge import get_scientific_re
 
 from dti_ui_v1.components.fixed_h0_bao_charts import render_fixed_h0_bao_charts
 
+from dti_ui_v1.components.likelihood_page_binding import (
+    build_page_likelihood_section,
+)
+
+from dti_ui_v1.services.likelihood_binding_service import (
+    load_likelihood_binding_payload,
+)
+
 
 HISTORY_KEY = "general_class_compute_history_v1"
 LOCKED_RESULT_KEY = "perfect_fit_locked_compute_result"
@@ -202,8 +210,14 @@ def render() -> None:
     st.caption("Results retained in the current browser session")
     response = _latest_response()
     locked = st.session_state.get(LOCKED_RESULT_KEY)
-    overview_tab, cmb_tab, locked_tab, raw_tab = st.tabs(
-        ("Overview", "General CMB", "Locked DESI DR2 BAO", "Raw")
+    overview_tab, cmb_tab, locked_tab, likelihood_tab, raw_tab = st.tabs(
+        (
+            "Overview",
+            "General CMB",
+            "Locked DESI DR2 BAO",
+            "Frozen Likelihood",
+            "Raw",
+        )
     )
     with overview_tab:
         _render_overview(response)
@@ -217,6 +231,70 @@ def render() -> None:
             st.info("No locked-baseline result is loaded in this session.")
         st.divider()
         render_fixed_h0_bao_charts()
+    with likelihood_tab:
+        st.caption(
+            "Frozen likelihood diagnostic payload only. "
+            "No posterior inference. No MCMC."
+        )
+
+        likelihood_payload = load_likelihood_binding_payload(
+            "data/frozen_likelihood_asset/ONE_POINT_LIKELIHOOD_RESULT.FROZEN.json"
+        )
+
+        likelihood_display = build_page_likelihood_section(
+            likelihood_payload
+        )
+
+        st.markdown("### Frozen Likelihood Diagnostic Summary")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric(
+                "Case ID",
+                str(likelihood_display.get("case_id", "N/A"))
+            )
+            st.metric(
+                "r_s drag",
+                str(likelihood_display.get("rs_drag", "N/A"))
+            )
+
+        with col2:
+            st.metric(
+                "chi2",
+                str(likelihood_display.get("chi2", "N/A"))
+            )
+            st.metric(
+                "loglike",
+                str(likelihood_display.get("loglike", "N/A"))
+            )
+
+        st.markdown("### Provenance")
+
+        st.dataframe(
+            {
+                "field": list(
+                    likelihood_display.get(
+                        "checksum_summary",
+                        {}
+                    ).keys()
+                ),
+                "sha256": list(
+                    likelihood_display.get(
+                        "checksum_summary",
+                        {}
+                    ).values()
+                ),
+            },
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        st.info(
+            "Frozen likelihood diagnostic payload only. "
+            "No posterior inference. No MCMC."
+        )
+
     with raw_tab:
         if response is not None:
             st.markdown("**General CLASS / AxiCLASS response**")

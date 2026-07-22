@@ -25,6 +25,11 @@ def build_frozen_likelihood_display_payload(
         "rs_drag": derived.get("rs_drag"),
         "chi2": desi.get("chi2"),
         "loglike": desi.get("loglike"),
+        "checksum_summary": (
+            metadata.get("provenance", {})
+            if isinstance(metadata, dict)
+            else {}
+        ),
         "posterior": (
             "WOC_DTI_MUTED"
             if payload.get("posterior") in (None, "NO")
