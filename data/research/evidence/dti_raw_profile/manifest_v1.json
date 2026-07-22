@@ -1,0 +1,15 @@
+{
+  "asset": "GTDS_120_POINT_PROFILE",
+  "points": 120,
+  "format": "ordered_tsv",
+  "status": "placeholder_test_only",
+  "claim_boundary": "diagnostic_only",
+  "assets": [
+    {
+      "path": "data/frozen_likelihood_asset/raw_injection/RAW_PROFILE_ORDERED_SET.tsv",
+      "sha256": "0e8c5d6ccf1325c75643e295cdb600dc847b8080c8506fb3a4ba3187c1fc35c3"
+    }
+  ],
+  "created": "2026-07-22 14:02:14.148769",
+  "adapter_role": "selector_compatibility_manifest_only"
+}
