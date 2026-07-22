@@ -11,5 +11,6 @@
     }
   ],
   "created": "2026-07-22 14:02:14.148769",
-  "adapter_role": "selector_compatibility_manifest_only"
+  "adapter_role": "selector_compatibility_manifest_only",
+  "checksum": "0e8c5d6ccf1325c75643e295cdb600dc847b8080c8506fb3a4ba3187c1fc35c3"
 }
