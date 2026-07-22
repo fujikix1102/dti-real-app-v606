@@ -1,0 +1,17 @@
+GTDS ROUTE A INPUT
+
+ACTIVE:
+data/frozen_likelihood_asset/raw_injection/RAW_PROFILE_ORDERED_SET.tsv
+
+ROLE:
+120 point ordered numeric profile
+
+NOT ACTIVE:
+data/frozen_likelihood_asset/raw_injection/DESI_DR2_ROUTE_A_PROFILE.tsv
+
+ROLE:
+DESI provenance metadata only
+
+No likelihood reconstruction.
+No posterior inference.
+No detection claim.

@@ -1,0 +1,7 @@
+{
+ "asset":"GTDS_120_POINT_PROFILE",
+ "points":120,
+ "format":"ordered_tsv",
+ "status":"placeholder_test_only",
+ "claim_boundary":"diagnostic_only"
+}
