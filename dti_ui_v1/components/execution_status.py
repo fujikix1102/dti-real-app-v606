@@ -128,7 +128,7 @@ def render_execution_status() -> None:
     )
     st.dataframe(contracts, hide_index=True, use_container_width=True)
 
-    st.subheader("Execution pipeline")
+    st.subheader("Solver / Likelihood Runtime Pipeline")
     general_completed = latest is not None
     if not general_completed:
         general_likelihood_state = "READY" if online else "BLOCKED"
