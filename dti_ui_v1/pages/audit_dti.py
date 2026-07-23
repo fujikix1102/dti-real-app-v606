@@ -108,7 +108,7 @@ def render() -> None:
             "No physical narrative is supplied to this decision rule. The same finite numerical response "
             "is compared after linear, logarithmic, reciprocal, and ordinal coordinate encodings."
         )
-        st.dataframe(pd.DataFrame(observed["results"]), hide_index=True, width="stretch")
+        st.dataframe(pd.DataFrame(observed["results"]), hide_index=True)
         st.warning(neutral["claim_boundary"])
     else:
         st.warning("The assumption-neutral audit artifact has not been installed.")
@@ -172,7 +172,7 @@ def render() -> None:
                 alt.Tooltip("maximum_percent:Q", title="Maximum recovery [%]", format=".1f"),
             ],
         ).properties(height=330, title="Recovery after DESI-like window mixing and 13-value compression")
-        st.altair_chart(recovery_chart, width="stretch")
+        st.altair_chart(recovery_chart)
         st.dataframe(
             robust[["step_percent", "minimum_percent", "median_percent", "maximum_percent"]].rename(
                 columns={
@@ -183,7 +183,6 @@ def render() -> None:
                 }
             ),
             hide_index=True,
-            width="stretch",
         )
         st.caption(
             "Independent transfer surrogate, not the DESI production pipeline: fine-z H(z) injection → "
@@ -243,7 +242,7 @@ def render() -> None:
             )
             .properties(height=310, title="Catalog-pipeline recovery error")
         )
-        st.altair_chart(catalog_chart, width="stretch")
+        st.altair_chart(catalog_chart)
         st.dataframe(
             catalog_conditions[
                 [
@@ -265,7 +264,6 @@ def render() -> None:
                 }
             ),
             hide_index=True,
-            width="stretch",
         )
         st.caption(catalog_summary["claim_boundary"])
     else:
@@ -286,7 +284,7 @@ def render() -> None:
             alt.Tooltip("profile_chi2:Q", title="χ²", format=".5f"),
         ],
     ).properties(height=390, title="DESI DR2 finite-grid profile")
-    st.altair_chart(profile_chart, width="stretch")
+    st.altair_chart(profile_chart)
 
     c1, c2 = st.columns(2)
     with c1:
@@ -295,7 +293,7 @@ def render() -> None:
             y=alt.Y("profile_f_EDE:Q", title="Selected finite-grid f_EDE"),
             tooltip=["H0:Q", "profile_f_EDE:Q"],
         ).properties(height=300, title="Profile branch selected at each H0")
-        st.altair_chart(f_chart, width="stretch")
+        st.altair_chart(f_chart)
         st.caption("Steps reflect the discrete f_EDE grid and are not interpreted as physical discontinuities.")
     with c2:
         quantiles = bootstrap["best_H0_quantiles"]
@@ -316,7 +314,7 @@ def render() -> None:
         ), axis=1,
     )
     candidates["ΔBIC"] = candidates["bic"] - candidates["bic"].min()
-    st.dataframe(candidates[["model", "parameter_count", "rss", "bic", "ΔBIC"]], hide_index=True, width="stretch")
+    st.dataframe(candidates[["model", "parameter_count", "rss", "bic", "ΔBIC"]], hide_index=True)
     st.caption(
         f"Winner: smooth polynomial degree {selected['order']}; BIC margin to runner-up "
         f"{selected['delta_bic_to_runner_up']:.3f}. Parameter counting includes segment boundaries. "
@@ -335,23 +333,23 @@ def render() -> None:
     d1, d2 = st.columns(2)
     d1.download_button(
         "Download complete Audit-DTI JSON", RESULT_PATH.read_bytes(),
-        file_name="audit_dti_dr2_latest.json", mime="application/json", width="stretch",
+        file_name="audit_dti_dr2_latest.json", mime="application/json",
     )
     if PROFILE_PATH.exists():
         d2.download_button(
             "Download profile CSV", PROFILE_PATH.read_bytes(),
-            file_name="audit_dti_dr2_profile.csv", mime="text/csv", width="stretch",
+            file_name="audit_dti_dr2_profile.csv", mime="text/csv",
         )
     if INJECTION_PATH.exists():
         d3, d4 = st.columns(2)
         d3.download_button(
             "Download injection/recovery JSON", INJECTION_PATH.read_bytes(),
-            file_name="dti_transition_injection_recovery.json", mime="application/json", width="stretch",
+            file_name="dti_transition_injection_recovery.json", mime="application/json",
         )
         if INJECTION_SUMMARY_PATH.exists():
             d4.download_button(
                 "Download injection/recovery CSV", INJECTION_SUMMARY_PATH.read_bytes(),
-                file_name="dti_transition_injection_recovery_summary.csv", mime="text/csv", width="stretch",
+                file_name="dti_transition_injection_recovery_summary.csv", mime="text/csv",
             )
     if CATALOG_PILOT_SUMMARY_PATH.exists():
         d5, d6 = st.columns(2)
@@ -360,7 +358,6 @@ def render() -> None:
             CATALOG_PILOT_SUMMARY_PATH.read_bytes(),
             file_name="dti_catalog_pipeline_pilot_summary.json",
             mime="application/json",
-            width="stretch",
         )
         if CATALOG_PILOT_CSV_PATH.exists():
             d6.download_button(
@@ -368,5 +365,4 @@ def render() -> None:
                 CATALOG_PILOT_CSV_PATH.read_bytes(),
                 file_name="dti_catalog_pipeline_pilot_summary.csv",
                 mime="text/csv",
-                width="stretch",
             )
