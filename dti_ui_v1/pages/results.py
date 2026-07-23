@@ -233,8 +233,10 @@ def render() -> None:
         render_fixed_h0_bao_charts()
     with likelihood_tab:
         st.caption(
-            "Frozen likelihood diagnostic payload only. "
-            "No posterior inference. No MCMC."
+            "❄ Frozen Likelihood Diagnostic Payload\n\n"
+            "Provenance: FROZEN LIKELIHOOD ASSET\n\n"
+            "Evaluation: RECORDED SINGLE POINT\n\n"
+            "Boundary: NO POSTERIOR / NO MCMC / NO PHYSICAL CLAIM"
         )
 
         likelihood_payload = load_likelihood_binding_payload(
@@ -291,8 +293,8 @@ def render() -> None:
         )
 
         st.info(
-            "Frozen likelihood diagnostic payload only. "
-            "No posterior inference. No MCMC."
+            "Diagnostic payload only. "
+            "No posterior inference. No MCMC. No physical claim."
         )
 
     with raw_tab:
