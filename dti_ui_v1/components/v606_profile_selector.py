@@ -14,6 +14,8 @@ from dti_ui_v1.services.v606_profile_runtime_binding import (
     queue_runtime_binding,
 )
 
+# DTI_V606_PUBLIC_PROFILE_REPO_FALLBACK_V1
+
 
 DEFAULT_PUBLIC_PROFILE_PATH = Path(
     r"/Users/fujikijunichi/Desktop/MAXOMEGA/_paper_journal/paper_20260305_102018_audit_sensitivity/_OLD_V606_PROFILE_LIBRARY_LAYER_EXPORT_EXECUTE_V1_20260724/export/PUBLIC_PROFILE_LIBRARY_EXPORT.tsv"
@@ -27,7 +29,16 @@ EXPECTED_PUBLIC_PROFILE_COUNT = 87
 
 
 def _resolve_public_profile_path() -> Path:
-    configured = os.environ.get("DTI_V606_PROFILE_PUBLIC_TSV", "").strip()
+    configured = os.environ.get(
+        "DTI_V606_PROFILE_PUBLIC_TSV",
+        str(
+            Path(__file__).resolve().parents[2]
+            / "data"
+            / "frozen_profile_library"
+            / "v606"
+            / "PUBLIC_PROFILE_LIBRARY_EXPORT.tsv"
+        ),
+    ).strip()
 
     if configured:
         return Path(configured).expanduser()
