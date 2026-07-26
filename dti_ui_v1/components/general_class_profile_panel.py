@@ -12,6 +12,10 @@ import streamlit as st
 from dti_ui_v1.services.general_class_compute_service import GeneralClassRequest, execute_general_class_compute
 from dti_ui_v1.services.run_store import save_run_artifact
 
+from dti_ui_v1.components.v606_profile_selector import (
+    render_v606_profile_selector,
+)
+
 
 COMPONENTS = (
     ("DESI DR2 BAO", "desi_dr2_bao", "chi2"),
@@ -169,3 +173,6 @@ def render_general_class_profile_panel() -> None:
         "The displayed sum assumes only the three backend components."
     )
     st.caption(f"Audit artifact SHA-256 {artifact['artifact_sha256']} · {artifact['path']}")
+
+    # DTI_V606_PROFILE_SELECTOR_INTEGRATION_V1
+    render_v606_profile_selector()

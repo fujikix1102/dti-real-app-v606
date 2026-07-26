@@ -9,6 +9,14 @@ import streamlit as st
 
 from dti_ui_v1.contracts.numeric_precision import BASELINE_CONTRACTS
 
+from dti_ui_v1.components.v606_profile_selector import (
+    render_v606_profile_selector,
+)
+
+from dti_ui_v1.services.v606_profile_runtime_binding import (
+    consume_pending_runtime_binding,
+)
+
 
 HISTORY_KEY = "general_class_compute_history_v1"
 
@@ -45,6 +53,9 @@ def _general_working_rows() -> pd.DataFrame:
 
 
 def render_parameter_status_panel() -> None:
+    # DTI_V606_PARAMETER_STATUS_PENDING_CONSUME_V1
+    consume_pending_runtime_binding(st.session_state)
+
     latest = _latest()
     latest_response = latest.get("response", {}) if latest else {}
     if not isinstance(latest_response, Mapping):
@@ -114,3 +125,6 @@ def render_parameter_status_panel() -> None:
             hide_index=True,
             use_container_width=True,
         )
+
+    # DTI_V606_PROFILE_SELECTOR_RENDER_PATH_FIX_V1
+    render_v606_profile_selector()

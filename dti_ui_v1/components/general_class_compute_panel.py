@@ -18,6 +18,10 @@ from dti_ui_v1.services.general_class_compute_service import (
 )
 from dti_ui_v1.services.run_store import save_run_artifact
 
+from dti_ui_v1.services.v606_profile_runtime_binding import (
+    consume_pending_runtime_binding,
+)
+
 
 def _first_value(
     payload: Mapping[str, Any],
@@ -161,6 +165,9 @@ def _comparison_chart(frame: pd.DataFrame) -> None:
 
 
 def render_general_class_compute_panel() -> None:
+    # DTI_V606_PENDING_APPLY_CONSUME_V1
+    consume_pending_runtime_binding(st.session_state)
+
     st.subheader("General CLASS / AxiCLASS compute")
 
     st.caption(
