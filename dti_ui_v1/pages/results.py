@@ -157,7 +157,30 @@ def _render_cmb(response: Mapping[str, Any] | None) -> None:
         st.altair_chart(chart, use_container_width=True)
 
 
+def _render_perfect_fit_artifact_extensions():
+    from dti_ui_v1.components.perfect_fit_artifact_viewer import (
+        render_perfect_fit_artifact_viewer,
+    )
+    from dti_ui_v1.components.ab_route_comparison_panel import (
+        render_ab_route_comparison_panel,
+    )
+
+    with st.expander(
+        "PERFECT FIT Artifact Viewer",
+        expanded=False,
+    ):
+        render_perfect_fit_artifact_viewer()
+
+    with st.expander(
+        "A/B Route Contract Comparison",
+        expanded=False,
+    ):
+        render_ab_route_comparison_panel()
+
+
 def render() -> None:
+
+    _render_perfect_fit_artifact_extensions()
 
     try:
         scientific_bridge_payload = get_scientific_result_page_context(
