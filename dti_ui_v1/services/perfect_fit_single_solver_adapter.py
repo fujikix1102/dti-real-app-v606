@@ -449,3 +449,21 @@ def execute_locked_baseline(
         endpoint=endpoint,
         detail="locked_baseline_response_validated",
     )
+
+
+# runtime_solver_bridge_integration
+# isolated future solver bridge entry
+# existing locked baseline path preserved
+
+def build_runtime_solver_bridge_payload(parameters):
+    return parameters
+
+
+
+# FULL_RUNTIME_SOLVER_ENABLE
+# Runtime bridge activation layer.
+# Existing locked baseline validation preserved.
+
+def runtime_solver_bridge_enabled():
+    return True
+
