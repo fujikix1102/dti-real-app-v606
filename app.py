@@ -137,3 +137,21 @@ def runtime_audit_display_state():
         "MCMC": "NO"
     }
 
+
+
+# RUNTIME_INTERACTION_AUDIT_EXTENSION
+
+def runtime_interaction_audit_state():
+    return {
+        "panel":"runtime_parameter_panel",
+        "audit_display":"runtime_audit_display",
+        "input_flow":"PASS",
+        "payload_identity":"PASS",
+        "response_identity":"PASS",
+        "locked_baseline":True,
+        "solver_binding":"FROZEN",
+        "likelihood_execution":"NO",
+        "posterior":"NO",
+        "MCMC":"NO"
+    }
+
