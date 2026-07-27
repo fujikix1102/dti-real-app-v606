@@ -98,3 +98,22 @@ def runtime_parameter_panel_payload():
         ],
     }
 
+
+
+# RUNTIME_UI_IMPROVEMENT_LAYER
+# isolated extension layer
+# existing runtime solver path preserved
+
+def runtime_ui_improvement_state():
+    return {
+        "locked_baseline": True,
+        "parameters":[
+            "H0",
+            "f_EDE",
+            "z_c",
+            "omega_b",
+            "omega_cdm",
+        ],
+        "solver_binding":"FROZEN",
+    }
+
