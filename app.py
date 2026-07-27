@@ -117,3 +117,23 @@ def runtime_ui_improvement_state():
         "solver_binding":"FROZEN",
     }
 
+
+
+# RUNTIME_AUDIT_DISPLAY_EXTENSION
+
+def runtime_audit_display_state():
+    return {
+        "locked_baseline": True,
+        "parameters": [
+            "H0",
+            "f_EDE",
+            "z_c",
+            "omega_b",
+            "omega_cdm"
+        ],
+        "solver_binding": "FROZEN",
+        "likelihood_execution": "NO",
+        "posterior": "NO",
+        "MCMC": "NO"
+    }
+
