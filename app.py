@@ -80,3 +80,21 @@ def dti_render_runtime_status_compact():
     )
 
 # /DTI_RUNTIME_STATUS_COMPACT_V2
+
+
+# RUNTIME_PARAMETER_PANEL_ADDED
+# Isolated runtime parameter exposure layer.
+# Locked baseline path preserved.
+
+def runtime_parameter_panel_payload():
+    return {
+        "locked_baseline": True,
+        "parameters": [
+            "f_EDE",
+            "z_c",
+            "H0",
+            "omega_b",
+            "omega_cdm",
+        ],
+    }
+
