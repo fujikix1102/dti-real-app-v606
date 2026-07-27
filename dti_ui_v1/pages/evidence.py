@@ -274,6 +274,21 @@ def render() -> None:
 
 
     with st.expander(
+        "Runtime Lineage Timeline",
+        expanded=False,
+    ):
+        st.write(
+            [
+                "Input Identity",
+                "Payload Identity",
+                "Response Identity",
+                "Display Identity",
+                "Evidence Summary",
+            ]
+        )
+
+
+    with st.expander(
         "Runtime Provenance Map",
         expanded=False,
     ):
