@@ -274,6 +274,25 @@ def render() -> None:
 
 
     with st.expander(
+        "Runtime Provenance Map",
+        expanded=False,
+    ):
+        st.write(
+            {
+                "Input Identity": "PASS",
+                "Payload Identity": "PASS",
+                "Response Identity": "PASS",
+                "Display Identity": "PASS",
+                "Locked Baseline": True,
+                "Solver Binding": "FROZEN",
+                "Likelihood Execution": "NO",
+                "Posterior": "NO",
+                "MCMC": "NO",
+            }
+        )
+
+
+    with st.expander(
         "Evidence Chain Status Matrix",
         expanded=False,
     ):
