@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import runpy
+import streamlit as st
 
 # Public deployment always opens the PERFECT FIT interface.
 os.environ["DTI_PERFECT_FIT_MODE"] = "perfect-fit"
@@ -173,4 +174,71 @@ def runtime_validation_panel_audit_state():
         "posterior":"NO",
         "MCMC":"NO"
     }
+
+
+
+# DTI_PERFECT_FIT_GTDS_MCMC_DIAGNOSTIC_DELTA_VIEW_V1
+# Frozen diagnostic display only.
+# No chain read.
+# No MCMC.
+# No likelihood/posterior computation.
+
+with st.expander("GTDS MCMC Diagnostic Delta View (Frozen Diagnostic)", expanded=False):
+
+    st.caption(
+        "Frozen diagnostic summary display only. "
+        "No chain samples are opened. "
+        "No Rhat/ESS recomputation is performed."
+    )
+
+    st.markdown("### D02 Rhat Delta")
+    st.caption("Definition: secondary - primary Rhat")
+
+    d02_data = {
+        "parameter": [
+            "tau",
+            "ombh2",
+            "omch2"
+        ],
+        "delta_rhat": [
+            -0.01936362604,
+            -0.0189940063,
+            -0.01550829411
+        ]
+    }
+
+    st.dataframe(d02_data)
+
+    st.markdown("Largest |ΔRhat|")
+    st.write("tau : 0.0193636260399999")
+
+
+    st.markdown("### D03 ESS Delta")
+    st.caption("Definition: secondary - primary ess_conservative_sum")
+
+    d03_data = {
+        "parameter": [
+            "As",
+            "gal545_A_217",
+            "ps_A_217_217"
+        ],
+        "delta_ess": [
+            18876.82925395,
+            10627.4262707,
+            10036.60317894
+        ]
+    }
+
+    st.dataframe(d03_data)
+
+    st.markdown("Largest |ΔESS|")
+    st.write("As : 18876.82925395")
+
+
+    st.markdown("### Boundary")
+    st.caption(
+        "Diagnostic view only. "
+        "No sample parsing, no sampler execution, "
+        "no posterior or physical interpretation."
+    )
 
