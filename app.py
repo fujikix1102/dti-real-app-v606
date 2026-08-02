@@ -11022,3 +11022,25 @@ with st.expander("Paper / APJ conversion status", expanded=False):
         """
     )
 # --- END PAPER/APJ STATUS PANEL ---
+
+
+# DTI_UI_V1_ATTACHMENT_DISPLAY_ONLY_BLOCK_START
+
+st.divider()
+st.subheader("Frozen Statistics Attachment (Reference Only)")
+
+st.caption(
+    "This panel displays frozen reference statistics only. "
+    "No recomputation, inference update, or likelihood evaluation is performed."
+)
+
+st.json(
+    {
+        "Rhat": "REFERENCE_ONLY",
+        "N_eff": "REFERENCE_ONLY",
+        "Delta_chi2": "REFERENCE_ONLY",
+        "provenance": "FROZEN_ATTACHMENT"
+    }
+)
+
+# DTI_UI_V1_ATTACHMENT_DISPLAY_ONLY_BLOCK_END
