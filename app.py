@@ -242,3 +242,27 @@ with st.expander("GTDS MCMC Diagnostic Delta View (Frozen Diagnostic)", expanded
         "no posterior or physical interpretation."
     )
 
+
+
+# DTI PERFECT FIT reference attachment display
+# DISPLAY_ONLY / REFERENCE_ONLY
+try:
+    import streamlit as st
+
+    st.divider()
+    st.markdown("### Reference Attachment")
+    st.caption(
+        "Reference-only information display. "
+        "No recomputation, likelihood evaluation, or inference update is performed."
+    )
+
+    with st.expander("Attachment provenance", expanded=False):
+        st.write(
+            "Role: REFERENCE_ONLY\n"
+            "Display: DISPLAY_ONLY\n"
+            "Compute: NOT EXECUTED"
+        )
+
+except Exception:
+    pass
+
