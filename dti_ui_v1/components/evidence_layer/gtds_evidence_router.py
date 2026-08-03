@@ -28,7 +28,7 @@ def render_gtds_evidence_router():
         "GTDS Evidence Diagnostics"
     )
 
-    tab1, tab2, tab3, tab4 = st.tabs(
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(
         [
             "Manifest",
             "Run Scan",
