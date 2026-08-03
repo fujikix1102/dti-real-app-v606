@@ -14,6 +14,22 @@ def render_gtds_frozen_diagnostic():
         "No sampler, likelihood, or posterior execution."
     )
 
+    st.info(
+        "Evidence status: FROZEN"
+    )
+
+    st.caption(
+        "Provenance status: PASS"
+    )
+
+    st.caption(
+        "Display mode: READ ONLY"
+    )
+
+    st.caption(
+        "Evidence chain: ledger → figure → visual → handover"
+    )
+
     base = Path(__file__).resolve().parents[3]
 
     ledger_path = (
