@@ -266,3 +266,60 @@ try:
 except Exception:
     pass
 
+
+
+# GTDS_MCMC_DIAGNOSTIC_DISPLAY_BLOCK_V1
+# Diagnostic-only display from frozen ledger.
+# No sampler, likelihood, or posterior execution.
+
+from pathlib import Path
+import csv
+
+ledger_path = Path("_GTDS_MCMC_FINAL_STATE_LEDGER_FREEZE_V1_20260803/ledger/GTDS_MCMC_FINAL_STATE_LEDGER.tsv")
+
+if ledger_path.exists():
+    ledger = {}
+    with ledger_path.open() as f:
+        for row in csv.DictReader(f, delimiter="\t"):
+            ledger[row["key"]] = row["value"]
+
+    st.subheader("GTDS-MCMC Diagnostic Status")
+
+    st.caption("Source: frozen GTDS MCMC final state ledger")
+
+    c1, c2, c3 = st.columns(3)
+
+    c1.metric("Chains", ledger.get("chain_count", "N/A"))
+    c2.metric("Max Rhat", ledger.get("max_rhat", "N/A"))
+    c3.metric("Worst parameter", ledger.get("worst_parameter", "N/A"))
+
+    st.info(
+        "Diagnostic-only display. "
+        "No MCMC rerun, likelihood recomputation, or posterior recomputation."
+    )
+
+
+# DTI_PERFECT_FIT_GTDS_MCMC_FIGURE_BINDING_V1
+# Display-only diagnostic figure binding.
+# Frozen GTDS-MCMC source only.
+# No sampler / likelihood / posterior execution.
+
+from pathlib import Path
+
+_dti_diag_figure_source = Path(
+    "_PARAMETER_RESPONSE_VISUALIZATION_FIGURE_FREEZE_V1_20260803"
+)
+
+if _dti_diag_figure_source.exists():
+    st.subheader("GTDS-MCMC Diagnostic Visualization")
+
+    st.caption(
+        "Source: frozen GTDS-MCMC diagnostic visualization. "
+        "Display only; no recomputation."
+    )
+
+    st.info(
+        "Parameter response, correlation structure, "
+        "branch structure, and nuisance response figures "
+        "are linked from frozen diagnostic assets."
+    )
