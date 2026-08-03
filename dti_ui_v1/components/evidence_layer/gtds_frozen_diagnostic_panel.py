@@ -26,6 +26,7 @@ def render_gtds_frozen_diagnostic():
     figure_path = (
         base
         / "_PARAMETER_RESPONSE_VISUALIZATION_FIGURE_FREEZE_V1_20260803"
+        / "render"
     )
 
     if ledger_path.exists():
