@@ -77,7 +77,7 @@ def render_gtds_frozen_diagnostic():
 
         render_root = (
             Path(__file__).resolve().parents[3]
-            / "_DTI_PERFECT_FIT_GTDS_FROZEN_DIAGNOSTIC_FIGURE_RENDER_EXECUTE_V1_20260803"
+            / "_PARAMETER_RESPONSE_VISUALIZATION_FIGURE_FREEZE_V1_20260803"
             / "render"
         )
 
