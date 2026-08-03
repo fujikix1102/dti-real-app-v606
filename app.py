@@ -275,7 +275,9 @@ except Exception:
 from pathlib import Path
 import csv
 
-ledger_path = Path("_GTDS_MCMC_FINAL_STATE_LEDGER_FREEZE_V1_20260803/ledger/GTDS_MCMC_FINAL_STATE_LEDGER.tsv")
+BASE_DIR = Path(__file__).resolve().parent
+
+ledger_path = BASE_DIR / "_GTDS_MCMC_FINAL_STATE_LEDGER_FREEZE_V1_20260803" / "ledger" / "GTDS_MCMC_FINAL_STATE_LEDGER.tsv"
 
 if ledger_path.exists():
     ledger = {}
@@ -306,9 +308,7 @@ if ledger_path.exists():
 
 from pathlib import Path
 
-_dti_diag_figure_source = Path(
-    "_PARAMETER_RESPONSE_VISUALIZATION_FIGURE_FREEZE_V1_20260803"
-)
+_dti_diag_figure_source = BASE_DIR / "_PARAMETER_RESPONSE_VISUALIZATION_FIGURE_FREEZE_V1_20260803"
 
 if _dti_diag_figure_source.exists():
     st.subheader("GTDS-MCMC Diagnostic Visualization")
