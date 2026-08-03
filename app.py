@@ -323,3 +323,12 @@ if _dti_diag_figure_source.exists():
         "branch structure, and nuisance response figures "
         "are linked from frozen diagnostic assets."
     )
+
+# DESI DR2 BAO evidence layer entrypoint
+# display-only integration
+try:
+    from dti_ui_v1.components.evidence_layer.dti_desi_bao_panel import (
+        render_desi_bao_panel,
+    )
+except Exception:
+    render_desi_bao_panel = None
