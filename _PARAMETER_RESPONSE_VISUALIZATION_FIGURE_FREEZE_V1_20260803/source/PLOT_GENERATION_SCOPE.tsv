@@ -1,0 +1,12 @@
+key	value
+task	PARAMETER_RESPONSE_VISUALIZATION_PLOT_GENERATION
+source	GTDS_MCMC_FINAL_STATE_LEDGER_FREEZE_V1_20260803
+chain_count	10
+input_type	FROZEN_CHAIN_SUMMARY
+plot_asset_generation	PLANNED
+inference_change	NO
+mcmc_rerun	NO
+likelihood_compute	NO
+posterior_compute	NO
+new_sampling	NO
+claim_upgrade	NO

@@ -1,0 +1,6 @@
+key	value
+figure	CORRELATION_STRUCTURE_MAP
+purpose	parameter coupling visualization
+targets	cosmology-cosmology,cosmology-nuisance,nuisance-nuisance
+data_source	frozen summaries
+status	DESIGN_READY

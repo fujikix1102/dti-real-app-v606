@@ -1,0 +1,15 @@
+PARAMETER RESPONSE VISUALIZATION PLOT GENERATION DESIGN
+
+Allowed:
+- create plots from frozen existing summaries
+- prepare figure assets
+
+Forbidden:
+- sampler execution
+- likelihood recomputation
+- posterior recomputation
+- new chain generation
+- physical mechanism claim
+
+Current state:
+DESIGN_ONLY

@@ -1,0 +1,6 @@
+key	value
+figure	PARAMETER_RESPONSE_OVERVIEW
+purpose	parameter distribution overview
+targets	ombh2,omch2,ns,As,tau,A_planck
+data_source	frozen summaries
+status	DESIGN_READY

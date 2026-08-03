@@ -1,0 +1,11 @@
+PARAMETER RESPONSE VISUALIZATION PLOT GENERATION
+
+Generated:
+- figure preparation assets from frozen summaries
+
+Not performed:
+- sampler rerun
+- likelihood recomputation
+- posterior recomputation
+- new chain generation
+- physical mechanism claim

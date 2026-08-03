@@ -1,0 +1,13 @@
+key	value
+source	FROZEN_GTDS_MCMC_LEDGER
+chain_count	10
+max_rhat	1.03516090252
+worst_parameter	tau
+figure_A	GENERATED_FROM_FROZEN_SUMMARY
+figure_B	GENERATED_FROM_FROZEN_SUMMARY
+figure_C	GENERATED_FROM_FROZEN_SUMMARY
+figure_D	GENERATED_FROM_FROZEN_SUMMARY
+new_samples	NO
+mcmc_rerun	NO
+likelihood_compute	NO
+posterior_compute	NO

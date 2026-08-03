@@ -1,0 +1,10 @@
+key	value
+decision	DTI_PERFECT_FIT_GTDS_MCMC_CONVERGENCE_INTERPRETATION_FREEZE_V1_PASS
+classification	EXISTING_10CHAIN_DIAGNOSTIC_FREEZE_ONLY_NO_RERUN_NO_LIKELIHOOD_NO_POSTERIOR_RECOMPUTE
+chain_count	10
+rhat_ess_readback	PASS
+mcmc_rerun	NO
+likelihood_compute	NO
+posterior_compute	NO
+app_modify	NO
+git_change	NO

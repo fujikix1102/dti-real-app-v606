@@ -1,0 +1,6 @@
+key	value
+figure	NUISANCE_RESPONSE_PANEL
+purpose	nuisance parameter response display
+targets	A_planck,calibration,foreground
+data_source	frozen summaries
+status	DESIGN_READY

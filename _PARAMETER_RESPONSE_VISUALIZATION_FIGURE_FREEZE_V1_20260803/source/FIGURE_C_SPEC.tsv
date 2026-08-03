@@ -1,0 +1,6 @@
+key	value
+figure	BRANCH_STRUCTURE_PROJECTION
+purpose	structural projection of existing chains
+data_source	frozen summaries
+new_posterior	NO
+status	DESIGN_READY

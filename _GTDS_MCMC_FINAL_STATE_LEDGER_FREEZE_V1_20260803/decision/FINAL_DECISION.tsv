@@ -1,0 +1,12 @@
+key	value
+decision	GTDS_MCMC_FINAL_STATE_LEDGER_FREEZE_V1_PASS
+classification	FINAL_LEDGER_FREEZE_ONLY_NO_COMPUTE_NO_UI_CHANGE
+source	DTI_PERFECT_FIT_GTDS_MCMC_CONVERGENCE_HANDOVER_PACKAGE_V1_20260803
+chain_count	10
+rhat_ess	FROZEN
+readback	FROZEN
+mcmc_rerun	NO
+likelihood_compute	NO
+posterior_compute	NO
+app_modify	NO
+git_change	NO

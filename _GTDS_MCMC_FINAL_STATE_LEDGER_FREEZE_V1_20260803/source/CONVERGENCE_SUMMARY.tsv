@@ -1,0 +1,9 @@
+metric	value
+parameter_count	20
+max_rhat	1.03516090252
+worst_parameter	tau
+chain_count	10
+posterior_recompute	NO
+likelihood_recompute	NO
+mcmc_rerun	NO
+status	DIAGNOSTIC_READBACK_FREEZE

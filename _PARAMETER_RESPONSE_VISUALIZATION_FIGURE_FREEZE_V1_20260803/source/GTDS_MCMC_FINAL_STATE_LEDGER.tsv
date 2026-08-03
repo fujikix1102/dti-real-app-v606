@@ -1,0 +1,14 @@
+key	value
+state	GTDS_MCMC_FINAL_STATE_LEDGER_FREEZE
+chain_count	10
+diagnostic_source	EXISTING_READBACK_FREEZE
+rhat_ess_status	FROZEN
+max_rhat	1.03516090252
+worst_parameter	tau
+chain_readback_status	FROZEN
+posterior_recompute	NO
+likelihood_recompute	NO
+mcmc_rerun	NO
+app_modify	NO
+git_change	NO
+claim_upgrade	NO

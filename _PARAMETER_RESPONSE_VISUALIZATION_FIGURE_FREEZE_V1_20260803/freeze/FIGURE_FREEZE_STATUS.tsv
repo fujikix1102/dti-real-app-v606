@@ -1,0 +1,16 @@
+key	value
+figure_freeze	PASS
+visual_review	PASS
+figure_A	FROZEN
+figure_B	FROZEN
+figure_C	FROZEN
+figure_D	FROZEN
+plot_generation_record	FROZEN
+chain_source	FROZEN
+mcmc_rerun	NO
+likelihood_compute	NO
+posterior_compute	NO
+new_sampling	NO
+claim_upgrade	NO
+manuscript_update	NO
+public_update	NO
