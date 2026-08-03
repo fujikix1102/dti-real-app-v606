@@ -338,3 +338,29 @@ except Exception:
 # display-only integration
 if render_desi_bao_panel is not None:
     desi_bao_display_record = render_desi_bao_panel()
+
+
+# DESI DR2 BAO Evidence Layer UI
+# DISPLAY_ONLY
+try:
+    if render_desi_bao_panel is not None:
+        import streamlit as st
+
+        with st.expander(
+            "DESI DR2 BAO Evidence Layer",
+            expanded=False
+        ):
+            st.caption(
+                "DISPLAY_ONLY: source identity and geometric reference layer only"
+            )
+
+            desi_record = render_desi_bao_panel()
+
+            st.json(desi_record)
+
+            st.caption(
+                "No likelihood / posterior / MCMC execution"
+            )
+
+except Exception:
+    pass
