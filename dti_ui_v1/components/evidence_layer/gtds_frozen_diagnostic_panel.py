@@ -71,8 +71,8 @@ def render_gtds_frozen_diagnostic():
         )
 
         st.caption(
-            "Parameter response visualization from frozen diagnostic asset. "
-            "Display only; no recomputation."
+            "Parameter-response diagnostic visualization from frozen GTDS asset. "
+            "Display only; no recomputation or posterior evaluation."
         )
 
         render_root = (
@@ -83,7 +83,7 @@ def render_gtds_frozen_diagnostic():
 
         png = (
             render_root
-            / "GTDS_FROZEN_DIAGNOSTIC_PARAMETER_RESPONSE.png"
+            / "GTDS_FROZEN_DIAGNOSTIC_PARAMETER_RESPONSE_AXIS_REFINED.png"
         )
 
         if png.exists():
