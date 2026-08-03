@@ -65,9 +65,42 @@ def render_gtds_frozen_diagnostic():
 
     if figure_path.exists():
 
-        st.info(
-            "Parameter response visualization asset available."
+        st.subheader(
+            "GTDS Frozen Diagnostic Visualization"
         )
+
+        st.caption(
+            "Parameter response visualization from frozen diagnostic asset. "
+            "Display only; no recomputation."
+        )
+
+        render_root = (
+            Path(__file__).resolve().parents[3]
+            / "_DTI_PERFECT_FIT_GTDS_FROZEN_DIAGNOSTIC_FIGURE_RENDER_EXECUTE_V1_20260803"
+            / "render"
+        )
+
+        png = (
+            render_root
+            / "GTDS_FROZEN_DIAGNOSTIC_PARAMETER_RESPONSE.png"
+        )
+
+        if png.exists():
+
+            st.image(
+                str(png),
+                use_container_width=True
+            )
+
+            st.caption(
+                f"Source: {png}"
+            )
+
+        else:
+
+            st.warning(
+                "Frozen rendered figure not found."
+            )
 
     else:
 
