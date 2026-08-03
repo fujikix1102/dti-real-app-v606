@@ -17,6 +17,10 @@ from dti_ui_v1.components.evidence_layer.gtds_route_a_display_panel import (
     render_gtds_route_a_display
 )
 
+from dti_ui_v1.components.evidence_layer.gtds_frozen_diagnostic_panel import (
+    render_gtds_frozen_diagnostic
+)
+
 
 def render_gtds_evidence_router():
 
@@ -29,7 +33,8 @@ def render_gtds_evidence_router():
             "Manifest",
             "Run Scan",
             "Route A",
-            "History"
+            "History",
+            "Frozen Diagnostic"
         ]
     )
 
@@ -60,3 +65,8 @@ def render_gtds_evidence_router():
     with tab4:
 
         render_gtds_result_history()
+
+
+    with tab5:
+
+        render_gtds_frozen_diagnostic()
