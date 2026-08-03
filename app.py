@@ -332,3 +332,9 @@ try:
     )
 except Exception:
     render_desi_bao_panel = None
+
+
+# DESI DR2 BAO Evidence Layer
+# display-only integration
+if render_desi_bao_panel is not None:
+    desi_bao_display_record = render_desi_bao_panel()
