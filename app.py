@@ -341,7 +341,43 @@ import pandas as pd
 
 # 
 
-# MODEL_COMPARISON_DASHBOARD_V1
+# 
+
+# EVALUATION_CONTRACT_REGISTRY_DISPLAY_V1
+# Contract display only.
+# No solver execution.
+# No likelihood.
+# No inference.
+
+_evaluation_contract_file = (
+    BASE_DIR
+    / "data"
+    / "model_registry"
+    / "EVALUATION_CONTRACT_REGISTRY.tsv"
+)
+
+if _evaluation_contract_file.exists():
+
+    with st.expander(
+        "Evaluation Contract Registry",
+        expanded=False
+    ):
+        st.caption(
+            "Evaluation pathway definitions only. "
+            "No computation or scientific conclusion is performed."
+        )
+
+        _evaluation_contract = pd.read_csv(
+            _evaluation_contract_file,
+            sep="\t"
+        )
+
+        st.dataframe(
+            _evaluation_contract,
+            use_container_width=True
+        )
+
+MODEL_COMPARISON_DASHBOARD_V1
 # Registry comparison display only.
 # No computation.
 # No likelihood.

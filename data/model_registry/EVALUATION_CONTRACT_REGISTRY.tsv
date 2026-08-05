@@ -1,0 +1,5 @@
+model_id	evaluation_stage	solver	likelihood	inference	status	claim_boundary
+lcdm	baseline_forward	CLASS	optional	none	available	reference_model_only
+ede	forward_evaluation	AxiCLASS	optional	none	available	evaluation_candidate_only
+woc_dti	effective_ansatz_forward	AxiCLASS_extension	planned	none	design_registered	no_physical_claim
+custom	user_defined	external	optional	none	registered	user_evaluation_only
