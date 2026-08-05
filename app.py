@@ -343,7 +343,43 @@ import pandas as pd
 
 # 
 
-# EVALUATION_CONTRACT_REGISTRY_DISPLAY_V1
+# 
+
+# RESEARCH_EXTENSION_REGISTRY_DISPLAY_V1
+# Registry display only.
+# No solver execution.
+# No likelihood.
+# No inference.
+
+_research_extension_file = (
+    BASE_DIR
+    / "data"
+    / "model_registry"
+    / "RESEARCH_EXTENSION_REGISTRY.tsv"
+)
+
+if _research_extension_file.exists():
+
+    with st.expander(
+        "Research Extension Registry",
+        expanded=False
+    ):
+        st.caption(
+            "Research extension tracking only. "
+            "Validation status is not a scientific confirmation."
+        )
+
+        _research_extension = pd.read_csv(
+            _research_extension_file,
+            sep="\t"
+        )
+
+        st.dataframe(
+            _research_extension,
+            use_container_width=True
+        )
+
+EVALUATION_CONTRACT_REGISTRY_DISPLAY_V1
 # Contract display only.
 # No solver execution.
 # No likelihood.

@@ -1,0 +1,5 @@
+extension_id	name	type	current_stage	solver_target	status	claim_boundary
+woc_dti	WOC-DTI Effective Ansatz	effective_ansatz	design	AxiCLASS_extension	registered	no_physical_claim
+ede	Early Dark Energy	physical_extension	forward_evaluation	AxiCLASS	registered	evaluation_candidate_only
+rs_geom	Acoustic scale modification	hypothesis_parameter	independent_test	CLASS_interface	registered	independent_parameter_only
+woc_dti_rs	WOC-DTI + rs combined	combined_hypothesis	future_evaluation	AxiCLASS_extension	planned	no_claim_before_validation
