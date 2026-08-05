@@ -493,7 +493,7 @@ if _research_extension_file.exists():
             use_container_width=True
         )
 
-EVALUATION_CONTRACT_REGISTRY_DISPLAY_V1
+# EVALUATION_CONTRACT_REGISTRY_DISPLAY_V1
 # Contract display only.
 # No solver execution.
 # No likelihood.
@@ -562,7 +562,7 @@ if _model_compare_file.exists():
             use_container_width=True
         )
 
-PARAMETER_REGISTRY_DISPLAY_V1
+# PARAMETER_REGISTRY_DISPLAY_V1
 # Registry display only.
 # No parameter execution.
 # No solver.
@@ -597,7 +597,7 @@ if _parameter_registry_file.exists():
             use_container_width=True
         )
 
-MODEL_REGISTRY_DISPLAY_V1
+# MODEL_REGISTRY_DISPLAY_V1
 # Registry display only.
 # No solver execution.
 # No likelihood.
