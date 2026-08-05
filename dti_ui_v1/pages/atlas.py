@@ -141,6 +141,150 @@ def render() -> None:
     )
 
 
+
+    # GTDS_MCMC_DIAGNOSTIC_DISPLAY_BLOCK_V2
+    # Frozen diagnostic display only.
+    # No sampler execution.
+    # No likelihood recomputation.
+    # No posterior update.
+
+    gtds_root = (
+        Path(__file__).resolve()
+        .parents[2]
+        / "_GTDS_MCMC_FINAL_STATE_LEDGER_FREEZE_V1_20260803"
+    )
+
+    ledger_path = (
+        gtds_root
+        / "ledger"
+        / "GTDS_MCMC_FINAL_STATE_LEDGER.tsv"
+    )
+
+    if ledger_path.exists():
+
+        import csv
+
+        ledger = {}
+
+        with ledger_path.open() as f:
+            for row in csv.DictReader(f, delimiter="\t"):
+                ledger[row["key"]] = row["value"]
+
+        st.divider()
+
+        st.subheader("GTDS-MCMC Diagnostic Status")
+
+        st.caption(
+            "Source: frozen GTDS MCMC final state ledger"
+        )
+
+        c1, c2, c3 = st.columns(3)
+
+        c1.metric(
+            "Chains",
+            ledger.get("chain_count", "N/A")
+        )
+
+        c2.metric(
+            "Max Rhat",
+            ledger.get("max_rhat", "N/A")
+        )
+
+        c3.metric(
+            "Worst parameter",
+            ledger.get("worst_parameter", "N/A")
+        )
+
+        st.info(
+            "Diagnostic-only display. "
+            "No MCMC rerun, likelihood recomputation, "
+            "or posterior recomputation."
+        )
+
+
+    # GTDS_MCMC_10CHAIN_DIAGNOSTIC_ARCHIVE_V1
+    # Frozen diagnostic artifact display only.
+
+    archive_root = (
+        Path(__file__).resolve()
+        .parents[2]
+        / "data"
+        / "gtds_mcmc_diagnostic_archive_v1"
+    )
+
+    if archive_root.exists():
+
+        st.subheader(
+            "GTDS MCMC 10-Chain Diagnostic Archive"
+        )
+
+        st.caption(
+            "Frozen diagnostic artifact display only. "
+            "No sampler execution, likelihood recomputation, "
+            "or posterior recomputation."
+        )
+
+        archive_files = [
+            (
+                "10 Chain Mode Occupancy",
+                archive_root
+                / "occupancy"
+                / "MODE_OCCUPANCY_LAST20PERCENT.tsv"
+            ),
+            (
+                "Acceptance Proxy Summary",
+                archive_root
+                / "acceptance"
+                / "ACCEPTANCE_PROXY_SUMMARY.tsv"
+            ),
+            (
+                "Mode Transition Analysis",
+                archive_root
+                / "transition"
+                / "MODE_TRANSITION_ANALYSIS.tsv"
+            ),
+            (
+                "Cluster Stability Phase Distance",
+                archive_root
+                / "stability"
+                / "CLUSTER_STABILITY_PHASE_DISTANCE.tsv"
+            ),
+        ]
+
+        for title, file in archive_files:
+
+            with st.expander(title, expanded=False):
+
+                if file.exists():
+                    st.dataframe(
+                        pd.read_csv(
+                            file,
+                            sep="\t"
+                        ),
+                        use_container_width=True
+                    )
+
+
+        st.markdown(
+            "### GTDS MCMC Diagnostic Summary"
+        )
+
+        a, b, c, d = st.columns(4)
+
+        a.metric("Chains", "10")
+        b.metric("Steps / Chain", "10000")
+        c.metric("Artifact", "Frozen")
+        d.metric("Compute", "Display Only")
+
+        st.info(
+            "Interpretation boundary: "
+            "Frozen diagnostic artifact only. "
+            "Not a posterior result, likelihood evaluation, "
+            "or physical inference update."
+        )
+
+
+
     st.markdown("## 4. 科学的境界" if japanese else "## 4. Scientific boundary")
     st.success(
         "実計算済み: AxiCLASS物理伝播、Planck 2018、Pantheon+、DESI DR2の単一点尤度。"
