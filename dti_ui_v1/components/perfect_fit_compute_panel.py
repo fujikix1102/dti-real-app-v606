@@ -6,6 +6,12 @@ import streamlit as st
 
 from dti_ui_v1.services.perfect_fit_compute_service import compute_perfect_fit
 from dti_ui_v1.services.perfect_fit_single_solver_adapter import LockedBaselineRequest
+from dti_ui_v1.services.perfect_fit_runtime_parameter_adapter import RuntimeParameterRequest
+
+from dti_ui_v1.services.general_class_compute_service import (
+    GeneralClassRequest,
+    execute_general_class_compute,
+)
 from dti_ui_v1.services.run_store import save_run_artifact
 
 _RESULT_KEY = "perfect_fit_locked_compute_result"
@@ -59,15 +65,15 @@ def render_perfect_fit_compute_panel() -> None:
         st.json(st.session_state[_ERROR_KEY])
 
     result = st.session_state.get(_RESULT_KEY)
-    if not isinstance(result, dict):
-        return
-    st.success(f"Adapter status: {result.get('status', 'UNSPECIFIED')}")
-    response = result.get("validated_payload", {}).get("response", {})
-    if isinstance(response, dict):
-        columns = st.columns(3)
-        columns[0].metric("DESI log likelihood", f"{float(response.get('model_loglike', 0)):.6f}")
-        columns[1].metric("DESI chi-square", f"{float(response.get('model_chi2', 0)):.6f}")
-        columns[2].metric("r_drag [Mpc]", f"{float(response.get('rdrag_Mpc', 0)):.6f}")
+
+    if isinstance(result, dict):
+        st.success(f"Adapter status: {result.get('status', 'UNSPECIFIED')}")
+        response = result.get("validated_payload", {}).get("response", {})
+        if isinstance(response, dict):
+            columns = st.columns(3)
+            columns[0].metric("DESI log likelihood", f"{float(response.get('model_loglike', 0)):.6f}")
+            columns[1].metric("DESI chi-square", f"{float(response.get('model_chi2', 0)):.6f}")
+            columns[2].metric("r_drag [Mpc]", f"{float(response.get('rdrag_Mpc', 0)):.6f}")
     artifact = st.session_state.get("perfect_fit_locked_artifact")
     if isinstance(artifact, dict):
         st.caption(

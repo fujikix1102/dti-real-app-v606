@@ -79,8 +79,9 @@ def render_execution_status() -> None:
     st.header("Execution contract")
     st.caption(
         "Live status for two verified execution routes. The locked baseline "
-        "remains separate; the general route reports a three-component "
-        "single-point likelihood."
+        "remains separate; the general route reports deterministic "
+        "single-point solver outputs and optional forward-evaluation "
+        "components."
     )
 
     cards = st.columns(4)
@@ -95,7 +96,7 @@ def render_execution_status() -> None:
         help="f_EDE > 0 activates the axion-like scalar-field branch.",
     )
     cards[2].metric(
-        "General likelihoods",
+        "General single-point compute",
         f"{likelihood_ok_count}/3 OK" if latest else ("READY" if online else "UNAVAILABLE"),
         help="DESI DR2 BAO, Planck 2018, and Pantheon+ are independently status-checked.",
     )
@@ -217,5 +218,5 @@ def render_execution_status() -> None:
     st.subheader("Safety boundary")
     st.success("✓ General AxiCLASS physical recomputation — enabled on the local route")
     st.success("✓ DESI DR2 BAO likelihood — general AxiCLASS and verified locked-baseline contracts")
-    st.success("✓ Planck 2018 and Pantheon+ — verified single-point likelihoods on the general route")
+    st.success("✓ Planck 2018 and Pantheon+ — available as single-point forward-evaluation components on the general route")
     st.info("Posterior inference, MCMC, Bayesian evidence, and discovery significance remain outside this application's installed scientific contract.")
