@@ -339,7 +339,44 @@ import pandas as pd
 
 # 
 
-# PARAMETER_REGISTRY_DISPLAY_V1
+# 
+
+# MODEL_COMPARISON_DASHBOARD_V1
+# Registry comparison display only.
+# No computation.
+# No likelihood.
+# No posterior.
+# No MCMC.
+
+_model_compare_file = (
+    BASE_DIR
+    / "data"
+    / "model_registry"
+    / "MODEL_COMPARISON_REGISTRY.tsv"
+)
+
+if _model_compare_file.exists():
+
+    with st.expander(
+        "Model Comparison Dashboard",
+        expanded=False
+    ):
+        st.caption(
+            "Registered model comparison space only. "
+            "No model preference or scientific conclusion is inferred."
+        )
+
+        _model_compare = pd.read_csv(
+            _model_compare_file,
+            sep="\t"
+        )
+
+        st.dataframe(
+            _model_compare,
+            use_container_width=True
+        )
+
+PARAMETER_REGISTRY_DISPLAY_V1
 # Registry display only.
 # No parameter execution.
 # No solver.

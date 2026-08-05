@@ -1,0 +1,5 @@
+model_id	model_name	computation	status	interpretation_boundary
+lcdm	ΛCDM baseline	CLASS	available	reference_model_only
+ede	Early Dark Energy	AxiCLASS	available	evaluation_candidate_only
+woc_dti	WOC-DTI Effective Ansatz	AxiCLASS extension	design_registered	no_physical_claim
+custom	Custom model	external	registered	user_defined_evaluation_only
