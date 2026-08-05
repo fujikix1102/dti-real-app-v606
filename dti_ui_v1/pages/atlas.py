@@ -130,13 +130,6 @@ def render() -> None:
         "No sampler execution, likelihood recomputation, or posterior update."
     )
 
-    gtds_col1, gtds_col2, gtds_col3, gtds_col4 = st.columns(4)
-
-    gtds_col1.metric("Chains", "10")
-    gtds_col2.metric("Steps / Chain", "10000")
-    gtds_col3.metric("Max Rhat", "1.03516090252")
-    gtds_col4.metric("Worst parameter", "tau")
-
     st.caption(
         "Diagnostic-only display. Frozen artifact reference; not a posterior result."
         if not japanese else
