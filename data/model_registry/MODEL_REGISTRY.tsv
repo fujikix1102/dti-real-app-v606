@@ -1,0 +1,5 @@
+model_id	model_name	category	solver	status	claim_boundary
+lcdm	ΛCDM baseline	baseline	CLASS	available	reference model only
+ede	Early Dark Energy	extension	AxiCLASS	available	evaluation candidate
+woc_dti	WOC-DTI Effective Ansatz	effective_ansatz	AxiCLASS extension	design_registered	no physical claim
+custom	Custom model	user_defined	external	registered	user evaluation only

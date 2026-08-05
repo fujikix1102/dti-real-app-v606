@@ -335,6 +335,46 @@ if _dti_diag_figure_source.exists():
 from pathlib import Path
 import pandas as pd
 
+
+
+# MODEL_REGISTRY_DISPLAY_V1
+# Registry display only.
+# No solver execution.
+# No likelihood.
+# No posterior.
+# No MCMC.
+
+_model_registry_file = (
+    BASE_DIR
+    / "data"
+    / "model_registry"
+    / "MODEL_REGISTRY.tsv"
+)
+
+if _model_registry_file.exists():
+
+    st.divider()
+
+    with st.expander(
+        "Cosmology Model Registry",
+        expanded=False
+    ):
+        st.caption(
+            "Registered comparison models only. "
+            "No scientific preference, likelihood result, "
+            "or posterior interpretation is inferred."
+        )
+
+        _model_registry = pd.read_csv(
+            _model_registry_file,
+            sep="\t"
+        )
+
+        st.dataframe(
+            _model_registry,
+            use_container_width=True
+        )
+
 _gtds_archive_root = BASE_DIR / "data" / "gtds_mcmc_diagnostic_archive_v1"
 
 if _gtds_archive_root.exists():
