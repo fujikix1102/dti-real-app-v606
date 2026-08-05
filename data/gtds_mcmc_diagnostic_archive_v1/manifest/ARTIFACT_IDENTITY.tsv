@@ -1,0 +1,10 @@
+key	value
+artifact	GTDS_MCMC_DIAGNOSTIC_ARCHIVE
+version	V1
+type	FROZEN_DIAGNOSTIC_ASSET
+source	CHAIN01_10_DIAGNOSTIC_REPORTS
+posterior_recompute	NO
+likelihood_recompute	NO
+new_sampling	NO
+app_change	NO
+git_change	NO

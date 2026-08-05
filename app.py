@@ -324,6 +324,212 @@ if _dti_diag_figure_source.exists():
         "are linked from frozen diagnostic assets."
     )
 
+
+
+# GTDS_MCMC_10CHAIN_DIAGNOSTIC_ARCHIVE_V1
+# Frozen diagnostic artifact display only.
+# No raw chain parsing.
+# No MCMC execution.
+# No likelihood/posterior recomputation.
+
+from pathlib import Path
+import pandas as pd
+
+_gtds_archive_root = BASE_DIR / "data" / "gtds_mcmc_diagnostic_archive_v1"
+
+if _gtds_archive_root.exists():
+
+    st.divider()
+
+    st.subheader("GTDS MCMC 10-Chain Diagnostic Archive")
+
+    st.caption(
+        "Frozen diagnostic artifact display only. "
+        "No sampler execution, likelihood recomputation, "
+        "or posterior recomputation."
+    )
+
+    occupancy_file = (
+        _gtds_archive_root
+        / "occupancy"
+        / "MODE_OCCUPANCY_LAST20PERCENT.tsv"
+    )
+
+    acceptance_file = (
+        _gtds_archive_root
+        / "acceptance"
+        / "ACCEPTANCE_PROXY_SUMMARY.tsv"
+    )
+
+    transition_file = (
+        _gtds_archive_root
+        / "transition"
+        / "MODE_TRANSITION_ANALYSIS.tsv"
+    )
+
+    stability_file = (
+        _gtds_archive_root
+        / "stability"
+        / "CLUSTER_STABILITY_PHASE_DISTANCE.tsv"
+    )
+
+    with st.expander("10 Chain Mode Occupancy", expanded=False):
+        if occupancy_file.exists():
+            st.dataframe(
+                pd.read_csv(
+                    occupancy_file,
+                    sep="\t"
+                )
+            )
+
+    with st.expander("Acceptance Proxy Summary", expanded=False):
+        if acceptance_file.exists():
+            st.dataframe(
+                pd.read_csv(
+                    acceptance_file,
+                    sep="\t"
+                )
+            )
+
+    with st.expander("Mode Transition Analysis", expanded=False):
+        if transition_file.exists():
+            st.dataframe(
+                pd.read_csv(
+                    transition_file,
+                    sep="\t"
+                )
+            )
+
+    with st.expander("Cluster Stability Phase Distance", expanded=False):
+        if stability_file.exists():
+            st.dataframe(
+                pd.read_csv(
+                    stability_file,
+                    sep="\t"
+                )
+            )
+
+    st.info(
+        "Interpretation boundary: "
+        "This panel visualizes frozen MCMC diagnostic artifacts. "
+        "It is not a new posterior result, likelihood evaluation, "
+        "or physical inference update."
+    )
+
+
+    st.markdown("### GTDS MCMC Diagnostic Summary")
+
+    s1, s2, s3, s4 = st.columns(4)
+
+    s1.metric("Chains", "10")
+    s2.metric("Steps / Chain", "10000")
+    s3.metric("Artifact", "Frozen")
+    s4.metric("Compute", "Display Only")
+
+
+    st.markdown("### 10 Independent Chains: Terminal H0 Occupancy (Last 20% Frozen Draws)")
+
+    if occupancy_file.exists():
+        _occ = pd.read_csv(
+            occupancy_file,
+            sep="\t"
+        )
+
+        _h0 = _occ[
+            _occ["parameter"] == "H0"
+        ][
+            [
+                "chain",
+                "mean_last20pct",
+                "std_last20pct"
+            ]
+        ]
+
+        st.markdown("#### Terminal H0 Position by Chain")
+
+        try:
+            import plotly.express as px
+
+            _fig = px.scatter(
+                _h0,
+                x="mean_last20pct",
+                y="chain",
+                error_x="std_last20pct",
+                labels={
+                    "mean_last20pct": "Terminal H0 mean (last 20%)",
+                    "chain": "Independent chain"
+                }
+            )
+
+            _fig.update_layout(
+                height=420
+            )
+
+            st.plotly_chart(
+                _fig,
+                use_container_width=True
+            )
+
+        except Exception:
+            st.warning(
+                "Plot rendering unavailable. Showing table only."
+            )
+
+        st.dataframe(_h0)
+
+
+        st.markdown("### Chain Dispersion Summary")
+
+        try:
+            _h0_values = _h0["mean_last20pct"].astype(float)
+
+            d1, d2, d3 = st.columns(3)
+
+            d1.metric(
+                "Minimum terminal H0 mean",
+                f"{_h0_values.min():.3f}"
+            )
+
+            d2.metric(
+                "Maximum terminal H0 mean",
+                f"{_h0_values.max():.3f}"
+            )
+
+            d3.metric(
+                "Terminal H0 spread",
+                f"{(_h0_values.max()-_h0_values.min()):.3f}"
+            )
+
+        except Exception:
+            st.info("H0 dispersion summary unavailable.")
+
+        st.caption(
+            "The displayed separation reflects chain-level terminal occupancy. "
+            "It does not by itself establish posterior multimodality "
+            "or physical attractors."
+        )
+
+
+    st.markdown("### Artifact Identity")
+
+    identity_file = (
+        _gtds_archive_root
+        / "manifest"
+        / "ARTIFACT_IDENTITY.tsv"
+    )
+
+    if identity_file.exists():
+        st.dataframe(
+            pd.read_csv(
+                identity_file,
+                sep="\t",
+                header=None,
+                names=["key","value"]
+            )
+        )
+
+
+
 # DESI DR2 BAO evidence layer entrypoint
 # display-only integration
 try:
@@ -340,27 +546,34 @@ if render_desi_bao_panel is not None:
     desi_bao_display_record = render_desi_bao_panel()
 
 
-# DESI DR2 BAO Evidence Layer UI
-# DISPLAY_ONLY
-try:
-    if render_desi_bao_panel is not None:
-        import streamlit as st
 
-        with st.expander(
-            "DESI DR2 BAO Evidence Layer",
-            expanded=False
-        ):
-            st.caption(
-                "DISPLAY_ONLY: source identity and geometric reference layer only"
-            )
 
-            desi_record = render_desi_bao_panel()
+# DTI_AXICLASS_BINDING_V1
 
-            st.json(desi_record)
+def dti_axiclass_runtime_binding_preview(
+    H0,
+    omega_b,
+    omega_cdm,
+    f_EDE,
+    z_c
+):
+    """
+    Local binding preview only.
 
-            st.caption(
-                "No likelihood / posterior / MCMC execution"
-            )
+    No likelihood.
+    No posterior.
+    No MCMC.
+    """
 
-except Exception:
-    pass
+    from dti_ui_v1.services.perfect_fit_axiclass_parameter_mapper import (
+        map_dti_to_axiclass
+    )
+
+    return map_dti_to_axiclass(
+        H0=H0,
+        omega_b=omega_b,
+        omega_cdm=omega_cdm,
+        f_EDE=f_EDE,
+        z_c=z_c,
+    )
+
