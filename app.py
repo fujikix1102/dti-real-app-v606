@@ -337,7 +337,44 @@ import pandas as pd
 
 
 
-# MODEL_REGISTRY_DISPLAY_V1
+# 
+
+# PARAMETER_REGISTRY_DISPLAY_V1
+# Registry display only.
+# No parameter execution.
+# No solver.
+# No likelihood.
+# No inference.
+
+_parameter_registry_file = (
+    BASE_DIR
+    / "data"
+    / "model_registry"
+    / "PARAMETER_REGISTRY.tsv"
+)
+
+if _parameter_registry_file.exists():
+
+    with st.expander(
+        "Model Parameter Registry",
+        expanded=False
+    ):
+        st.caption(
+            "Registered parameter definitions only. "
+            "No parameter scan or inference is performed."
+        )
+
+        _parameter_registry = pd.read_csv(
+            _parameter_registry_file,
+            sep="\t"
+        )
+
+        st.dataframe(
+            _parameter_registry,
+            use_container_width=True
+        )
+
+MODEL_REGISTRY_DISPLAY_V1
 # Registry display only.
 # No solver execution.
 # No likelihood.

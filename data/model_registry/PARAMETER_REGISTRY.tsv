@@ -1,0 +1,7 @@
+model_id	parameter	role	range	status	claim_boundary
+woc_dti	z_c	transition_redshift	500-5000	design_registered	evaluation_parameter_only
+woc_dti	f_DTI	effective_amplitude	0.0-0.20	design_registered	evaluation_parameter_only
+woc_dti	delta_z_c	smoothing_width	fixed_candidate	design_registered	numerical_design_parameter_only
+woc_dti	rs_geom_free	acoustic_scale_parameter	130-160	design_registered	independent_hypothesis_parameter
+ede	f_EDE	early_dark_energy_fraction	registered	existing_model	evaluation_candidate_only
+lcdm	standard_parameters	baseline_parameters	reference	available	baseline_reference_only
