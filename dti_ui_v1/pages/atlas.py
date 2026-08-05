@@ -36,17 +36,15 @@ def render() -> None:
         else "How early-universe physics propagates into sound horizons, distances, and observed fit"
     )
     history = _history()
-    if not history:
-        st.info("Compute → ExecutionでCLASS / AxiCLASSを実行してください。" if japanese else "Run CLASS / AxiCLASS from Compute → Execution.")
-        return
 
-    current_item = history[-1]
+    current_item = history[-1] if history else {}
     current = _response(current_item)
-    request = current_item.get("submitted_payload", {})
+    request = current_item.get("submitted_payload", {}) if isinstance(current_item, Mapping) else {}
     derived = current.get("derived", {})
     joint = current.get("joint_likelihood", {})
 
-    st.markdown("## 1. 仮説から観測まで" if japanese else "## 1. From hypothesis to observation")
+    if history:
+        st.markdown("## 1. 仮説から観測まで" if japanese else "## 1. From hypothesis to observation")
     chain = pd.DataFrame(
         [
             {"stage": "H₀", "value": request.get("H0"), "unit": "km s⁻¹ Mpc⁻¹"},
