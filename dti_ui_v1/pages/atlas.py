@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+import csv
 from typing import Any, Mapping
 
 import altair as alt
@@ -28,6 +30,7 @@ def _value(response: Mapping[str, Any], key: str) -> Any:
 
 
 def render() -> None:
+    ATLAS_BASE_DIR = Path(__file__).resolve().parents[2]
     language = st.segmented_control("Language / 言語", ("日本語", "English"), default="日本語")
     japanese = language != "English"
     st.title("Hubble Tension Atlas")
@@ -162,8 +165,7 @@ def render() -> None:
 
     if ledger_path.exists():
 
-        import csv
-
+    
         ledger = {}
 
         with ledger_path.open() as f:
