@@ -424,7 +424,7 @@ if _evidence_lineage_v2_file.exists():
             use_container_width=True
         )
 
-EVIDENCE_LINEAGE_REGISTRY_DISPLAY_V1
+# EVIDENCE_LINEAGE_REGISTRY_DISPLAY_V1
 # Evidence lineage display only.
 # No computation.
 # No solver.
