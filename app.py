@@ -347,7 +347,45 @@ import pandas as pd
 
 # 
 
-# EVIDENCE_LINEAGE_REGISTRY_DISPLAY_V1
+# 
+
+# EVIDENCE_LINEAGE_REGISTRY_V2_DISPLAY_V1
+# Extended provenance display only.
+# No computation.
+# No solver.
+# No likelihood.
+# No inference.
+
+_evidence_lineage_v2_file = (
+    BASE_DIR
+    / "data"
+    / "model_registry"
+    / "EVIDENCE_LINEAGE_REGISTRY_V2.tsv"
+)
+
+if _evidence_lineage_v2_file.exists():
+
+    with st.expander(
+        "Evidence Lineage Registry V2",
+        expanded=False
+    ):
+        st.caption(
+            "Extended provenance mapping. "
+            "Tracks source identity and runtime layer only. "
+            "No scientific validation is inferred."
+        )
+
+        _evidence_lineage_v2 = pd.read_csv(
+            _evidence_lineage_v2_file,
+            sep="\t"
+        )
+
+        st.dataframe(
+            _evidence_lineage_v2,
+            use_container_width=True
+        )
+
+EVIDENCE_LINEAGE_REGISTRY_DISPLAY_V1
 # Evidence lineage display only.
 # No computation.
 # No solver.
