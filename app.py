@@ -527,7 +527,7 @@ if _evaluation_contract_file.exists():
             use_container_width=True
         )
 
-MODEL_COMPARISON_DASHBOARD_V1
+# MODEL_COMPARISON_DASHBOARD_V1
 # Registry comparison display only.
 # No computation.
 # No likelihood.
