@@ -349,7 +349,46 @@ import pandas as pd
 
 # 
 
-# EVIDENCE_LINEAGE_REGISTRY_V2_DISPLAY_V1
+# 
+
+# RESEARCH_OVERVIEW_PANEL_V1
+# Overview display only.
+# No computation.
+# No solver.
+# No likelihood.
+# No inference.
+
+_research_overview_file = (
+    BASE_DIR
+    / "data"
+    / "model_registry"
+    / "RESEARCH_OVERVIEW.tsv"
+)
+
+if _research_overview_file.exists():
+
+    st.divider()
+
+    with st.expander(
+        "MAXOMEGA / DTI Research Overview",
+        expanded=False
+    ):
+        st.caption(
+            "Framework status overview. "
+            "This panel does not represent scientific confirmation."
+        )
+
+        _research_overview = pd.read_csv(
+            _research_overview_file,
+            sep="\t"
+        )
+
+        st.dataframe(
+            _research_overview,
+            use_container_width=True
+        )
+
+EVIDENCE_LINEAGE_REGISTRY_V2_DISPLAY_V1
 # Extended provenance display only.
 # No computation.
 # No solver.

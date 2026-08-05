@@ -1,0 +1,10 @@
+item	status	description
+framework	ACTIVE	MAXOMEGA / DTI Effective Ansatz evaluation framework
+baseline	AVAILABLE	LCDM reference model
+extension_ede	AVAILABLE	EDE candidate evaluation space
+extension_woc_dti	REGISTERED	WOC-DTI Effective Ansatz design space
+forward_compute	AVAILABLE	Deterministic forward evaluation
+likelihood_evaluation	CONTROLLED	Requires separate validation path
+posterior_inference	DISABLED	No posterior claim
+mcmc	DISABLED	No inference update
+physical_confirmation	NOT_ESTABLISHED	Requires future validation
