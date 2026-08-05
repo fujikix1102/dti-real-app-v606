@@ -118,6 +118,30 @@ def render() -> None:
             st.altair_chart(chart, use_container_width=True)
             st.dataframe(delta, hide_index=True, use_container_width=True)
 
+    st.markdown("## GTDS-MCMC Frozen Diagnostic Reference")
+
+    st.info(
+        "凍結済みGTDS-MCMC診断アーティファクトの参照表示です。"
+        "サンプラー実行、尤度再計算、事後分布更新は行いません。"
+        if japanese else
+        "Frozen GTDS-MCMC diagnostic artifact reference only. "
+        "No sampler execution, likelihood recomputation, or posterior update."
+    )
+
+    gtds_col1, gtds_col2, gtds_col3, gtds_col4 = st.columns(4)
+
+    gtds_col1.metric("Chains", "10")
+    gtds_col2.metric("Steps / Chain", "10000")
+    gtds_col3.metric("Max Rhat", "1.03516090252")
+    gtds_col4.metric("Worst parameter", "tau")
+
+    st.caption(
+        "Diagnostic-only display. Frozen artifact reference; not a posterior result."
+        if not japanese else
+        "Diagnostic-only display. Frozen artifact reference; not a posterior result."
+    )
+
+
     st.markdown("## 4. 科学的境界" if japanese else "## 4. Scientific boundary")
     st.success(
         "実計算済み: AxiCLASS物理伝播、Planck 2018、Pantheon+、DESI DR2の単一点尤度。"
