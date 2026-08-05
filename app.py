@@ -345,7 +345,44 @@ import pandas as pd
 
 # 
 
-# RESEARCH_EXTENSION_REGISTRY_DISPLAY_V1
+# 
+
+# EVIDENCE_LINEAGE_REGISTRY_DISPLAY_V1
+# Evidence lineage display only.
+# No computation.
+# No solver.
+# No likelihood.
+# No inference.
+
+_evidence_lineage_file = (
+    BASE_DIR
+    / "data"
+    / "model_registry"
+    / "EVIDENCE_LINEAGE_REGISTRY.tsv"
+)
+
+if _evidence_lineage_file.exists():
+
+    with st.expander(
+        "Evidence Lineage Registry",
+        expanded=False
+    ):
+        st.caption(
+            "Artifact provenance tracking only. "
+            "No scientific conclusion is generated."
+        )
+
+        _evidence_lineage = pd.read_csv(
+            _evidence_lineage_file,
+            sep="\t"
+        )
+
+        st.dataframe(
+            _evidence_lineage,
+            use_container_width=True
+        )
+
+RESEARCH_EXTENSION_REGISTRY_DISPLAY_V1
 # Registry display only.
 # No solver execution.
 # No likelihood.
