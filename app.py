@@ -459,7 +459,7 @@ if _evidence_lineage_file.exists():
             use_container_width=True
         )
 
-RESEARCH_EXTENSION_REGISTRY_DISPLAY_V1
+# RESEARCH_EXTENSION_REGISTRY_DISPLAY_V1
 # Registry display only.
 # No solver execution.
 # No likelihood.
