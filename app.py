@@ -388,7 +388,7 @@ if _research_overview_file.exists():
             use_container_width=True
         )
 
-EVIDENCE_LINEAGE_REGISTRY_V2_DISPLAY_V1
+# EVIDENCE_LINEAGE_REGISTRY_V2_DISPLAY_V1
 # Extended provenance display only.
 # No computation.
 # No solver.
