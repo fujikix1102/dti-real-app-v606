@@ -44,7 +44,6 @@ def render() -> None:
     joint = current.get("joint_likelihood", {})
 
     if history:
-        if history:
         st.markdown("## 1. 仮説から観測まで" if japanese else "## 1. From hypothesis to observation")
         chain = pd.DataFrame(
             [
