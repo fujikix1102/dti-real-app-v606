@@ -215,7 +215,7 @@ def render() -> None:
             )
 
 
-    with st.expander("GTDS Diagnostic Graphs", expanded=True):
+    with st.expander("GTDS H0 Mean Summary", expanded=True):
 
         if occupancy_file.exists():
             occupancy = pd.read_csv(
@@ -269,63 +269,11 @@ def render() -> None:
             m2.metric("Maximum chain mean", f"{h0['mean_last20pct'].max():.3f}")
             m3.metric("Chain spread", f"{spread:.3f}")
 
-            points = (
-                alt.Chart(h0)
-                .mark_point(
-                    filled=True,
-                    size=140,
-                    color="#FFD166"
-                )
-                .encode(
-                    x=alt.X(
-                        "mean_last20pct:Q",
-                        title="Terminal H0 mean, last 20% frozen draws",
-                        scale=alt.Scale(domain=[66.5, 70.8])
-                    ),
-                    y=alt.Y(
-                        "chain:N",
-                        title="Independent chain",
-                        sort=[
-                            "CHAIN10",
-                            "CHAIN09",
-                            "CHAIN08",
-                            "CHAIN07",
-                            "CHAIN06",
-                            "CHAIN05",
-                            "CHAIN04",
-                            "CHAIN03",
-                            "CHAIN02",
-                            "CHAIN01",
-                        ],
-                    ),
-                    tooltip=[
-                        "chain:N",
-                        alt.Tooltip("mean_last20pct:Q", format=".4f"),
-                        alt.Tooltip("min:Q", format=".4f"),
-                        alt.Tooltip("max:Q", format=".4f"),
-                        alt.Tooltip("std_last20pct:Q", format=".4f"),
-                        alt.Tooltip("tail_draws:Q"),
-                    ],
-                )
-            )
 
-            median_line = (
-                alt.Chart(pd.DataFrame({"median_h0": [center]}))
-                .mark_rule(
-                    strokeDash=[6, 4],
-                    color="#FFFFFF",
-                    opacity=0.75
-                )
-                .encode(
-                    x="median_h0:Q"
-                )
-            )
-
-            st.altair_chart(
-                (points + median_line).properties(
-                    height=360
-                ),
-                use_container_width=True,
+            st.caption(
+                "The mean-point chart is not repeated here. "
+                "Use the GTDS H0 Chain Range View below for the visual comparison: "
+                "yellow point = mean_last20pct; blue line = min–max."
             )
 
             st.dataframe(
