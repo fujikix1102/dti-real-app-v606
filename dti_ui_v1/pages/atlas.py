@@ -224,19 +224,27 @@ def render() -> None:
 
             st.markdown("#### Terminal H0 Occupancy")
 
+
             st.altair_chart(
                 alt.Chart(occupancy)
-                .mark_bar()
+                .mark_point(
+                    filled=True,
+                    size=80
+                )
                 .encode(
                     x=alt.X(
-                        occupancy.columns[0],
-                        title="Mode"
+                        occupancy.columns[-1],
+                        title="Terminal H0 mean (last 20%)"
                     ),
                     y=alt.Y(
-                        occupancy.columns[-1],
-                        title="Occupancy"
+                        occupancy.columns[0],
+                        title="Independent chain",
+                        sort="-x"
                     ),
                     tooltip=list(occupancy.columns),
+                )
+                .properties(
+                    height=360
                 ),
                 use_container_width=True,
             )
