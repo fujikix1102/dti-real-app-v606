@@ -256,28 +256,51 @@ def render() -> None:
                 )
             )
 
+            base = alt.Chart(h0_range).encode(
+                y=alt.Y(
+                    f"{chain_col}:N",
+                    title="Independent chain",
+                    sort=[
+                        "CHAIN01",
+                        "CHAIN02",
+                        "CHAIN03",
+                        "CHAIN04",
+                        "CHAIN05",
+                        "CHAIN06",
+                        "CHAIN07",
+                        "CHAIN08",
+                        "CHAIN09",
+                        "CHAIN10",
+                    ]
+                )
+            )
+
             rule = base.mark_rule(
-                strokeWidth=2
+                strokeWidth=6
             ).encode(
                 x=alt.X(
                     "h0_min:Q",
-                    scale=alt.Scale(domain=[66,71]),
-                    title="Terminal H0 mean (last 20%)"
+                    scale=alt.Scale(domain=[66.8,70.8]),
+                    title="Terminal H0 mean (last 20% frozen draws)"
                 ),
-                x2="h0_max:Q"
+                x2="h0_max:Q",
             )
 
             point = base.mark_point(
                 filled=True,
-                size=90
+                size=180,
             ).encode(
                 x="h0_mean:Q",
                 tooltip=[
                     chain_col,
-                    "h0_min",
-                    "h0_mean",
-                    "h0_max",
-                ]
+                    alt.Tooltip("h0_min:Q", format=".3f"),
+                    alt.Tooltip("h0_mean:Q", format=".3f"),
+                    alt.Tooltip("h0_max:Q", format=".3f"),
+                ],
+            )
+
+            st.markdown(
+                "#### GTDS 10 Independent Chains: Terminal H0 Range (Frozen Last 20%)"
             )
 
             st.altair_chart(
