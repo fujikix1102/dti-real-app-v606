@@ -214,6 +214,7 @@ def render() -> None:
                 use_container_width=True,
             )
 
+
     with st.expander("GTDS Diagnostic Graphs", expanded=True):
 
         if occupancy_file.exists():
@@ -222,22 +223,123 @@ def render() -> None:
                 sep="\t"
             )
 
-            st.markdown("#### Terminal H0 Occupancy")
+            h0 = occupancy[
+                occupancy["parameter"] == "H0"
+            ].copy()
 
-            st.altair_chart(
-                alt.Chart(occupancy)
-                .mark_bar()
+            h0["mean_last20pct"] = pd.to_numeric(
+                h0["mean_last20pct"],
+                errors="coerce"
+            )
+            h0["min"] = pd.to_numeric(
+                h0["min"],
+                errors="coerce"
+            )
+            h0["max"] = pd.to_numeric(
+                h0["max"],
+                errors="coerce"
+            )
+            h0["std_last20pct"] = pd.to_numeric(
+                h0["std_last20pct"],
+                errors="coerce"
+            )
+
+            h0 = h0.dropna(
+                subset=[
+                    "chain",
+                    "mean_last20pct",
+                    "min",
+                    "max",
+                ]
+            )
+
+            center = float(h0["mean_last20pct"].median())
+            spread = float(h0["mean_last20pct"].max() - h0["mean_last20pct"].min())
+
+            st.markdown("#### Terminal H0 Mean by Chain")
+
+            st.caption(
+                "This diagnostic view uses H0-only rows from the frozen GTDS last-20% ledger. "
+                "Points show mean_last20pct; the vertical line shows the median across chains. "
+                "This is not a posterior distribution or sampler rerun."
+            )
+
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Minimum chain mean", f"{h0['mean_last20pct'].min():.3f}")
+            m2.metric("Maximum chain mean", f"{h0['mean_last20pct'].max():.3f}")
+            m3.metric("Chain spread", f"{spread:.3f}")
+
+            points = (
+                alt.Chart(h0)
+                .mark_point(
+                    filled=True,
+                    size=140,
+                    color="#FFD166"
+                )
                 .encode(
                     x=alt.X(
-                        occupancy.columns[0],
-                        title="Mode"
+                        "mean_last20pct:Q",
+                        title="Terminal H0 mean, last 20% frozen draws",
+                        scale=alt.Scale(domain=[66.5, 70.8])
                     ),
                     y=alt.Y(
-                        occupancy.columns[-1],
-                        title="Occupancy"
+                        "chain:N",
+                        title="Independent chain",
+                        sort=[
+                            "CHAIN10",
+                            "CHAIN09",
+                            "CHAIN08",
+                            "CHAIN07",
+                            "CHAIN06",
+                            "CHAIN05",
+                            "CHAIN04",
+                            "CHAIN03",
+                            "CHAIN02",
+                            "CHAIN01",
+                        ],
                     ),
-                    tooltip=list(occupancy.columns),
+                    tooltip=[
+                        "chain:N",
+                        alt.Tooltip("mean_last20pct:Q", format=".4f"),
+                        alt.Tooltip("min:Q", format=".4f"),
+                        alt.Tooltip("max:Q", format=".4f"),
+                        alt.Tooltip("std_last20pct:Q", format=".4f"),
+                        alt.Tooltip("tail_draws:Q"),
+                    ],
+                )
+            )
+
+            median_line = (
+                alt.Chart(pd.DataFrame({"median_h0": [center]}))
+                .mark_rule(
+                    strokeDash=[6, 4],
+                    color="#FFFFFF",
+                    opacity=0.75
+                )
+                .encode(
+                    x="median_h0:Q"
+                )
+            )
+
+            st.altair_chart(
+                (points + median_line).properties(
+                    height=360
                 ),
+                use_container_width=True,
+            )
+
+            st.dataframe(
+                h0[
+                    [
+                        "chain",
+                        "tail_draws",
+                        "mean_last20pct",
+                        "std_last20pct",
+                        "min",
+                        "max",
+                    ]
+                ].sort_values("mean_last20pct"),
+                hide_index=True,
                 use_container_width=True,
             )
 
