@@ -259,8 +259,9 @@ def render() -> None:
             st.markdown("#### Terminal H0 Mean by Chain")
 
             st.caption(
-                "This diagnostic view uses H0-only rows from the frozen GTDS last-20% ledger. "
-                "Points show mean_last20pct; the vertical line shows the median across chains. "
+                "This summary uses H0-only rows from the frozen GTDS last-20% ledger. "
+                "It reports chain-level mean_last20pct, min, max, tail_draws, and spread. "
+                "The visual comparison is shown in the GTDS H0 Chain Range View below. "
                 "This is not a posterior distribution or sampler rerun."
             )
 
