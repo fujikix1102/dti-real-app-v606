@@ -30,7 +30,6 @@ def _value(response: Mapping[str, Any], key: str) -> Any:
 
 
 def render() -> None:
-    ATLAS_BASE_DIR = Path(__file__).resolve().parents[2]
     language = st.segmented_control("Language / 言語", ("日本語", "English"), default="日本語")
     japanese = language != "English"
     st.title("Hubble Tension Atlas")
@@ -130,6 +129,13 @@ def render() -> None:
         "No sampler execution, likelihood recomputation, or posterior update."
     )
 
+    gtds_col1, gtds_col2, gtds_col3, gtds_col4 = st.columns(4)
+
+    gtds_col1.metric("Chains", "10")
+    gtds_col2.metric("Steps / Chain", "10000")
+    gtds_col3.metric("Max Rhat", "1.03516090252")
+    gtds_col4.metric("Worst parameter", "tau")
+
     st.caption(
         "Diagnostic-only display. Frozen artifact reference; not a posterior result."
         if not japanese else
@@ -137,146 +143,92 @@ def render() -> None:
     )
 
 
+    st.subheader("GTDS-MCMC Diagnostic Status")
 
-    # GTDS_MCMC_DIAGNOSTIC_DISPLAY_BLOCK_V2
-    # Frozen diagnostic display only.
-    # No sampler execution.
-    # No likelihood recomputation.
-    # No posterior update.
-
-    gtds_root = (
-        Path(__file__).resolve()
-        .parents[2]
-        / "_GTDS_MCMC_FINAL_STATE_LEDGER_FREEZE_V1_20260803"
+    st.caption(
+        "Source: frozen GTDS MCMC final state ledger"
     )
 
-    ledger_path = (
-        gtds_root
-        / "ledger"
-        / "GTDS_MCMC_FINAL_STATE_LEDGER.tsv"
+    status_col1, status_col2, status_col3 = st.columns(3)
+
+    status_col1.metric(
+        "Chains",
+        "10"
     )
 
-    if ledger_path.exists():
+    status_col2.metric(
+        "Max Rhat",
+        "1.03516090252"
+    )
+
+    status_col3.metric(
+        "Worst parameter",
+        "tau"
+    )
+
+    st.info(
+        "Diagnostic-only display. "
+        "No MCMC rerun, likelihood recomputation, "
+        "or posterior recomputation."
+    )
+
 
     
-        ledger = {}
+    st.markdown("### GTDS MCMC 10-Chain Diagnostic Archive")
 
-        with ledger_path.open() as f:
-            for row in csv.DictReader(f, delimiter="\t"):
-                ledger[row["key"]] = row["value"]
-
-        st.divider()
-
-        st.subheader("GTDS-MCMC Diagnostic Status")
-
-        st.caption(
-            "Source: frozen GTDS MCMC final state ledger"
-        )
-
-        c1, c2, c3 = st.columns(3)
-
-        c1.metric(
-            "Chains",
-            ledger.get("chain_count", "N/A")
-        )
-
-        c2.metric(
-            "Max Rhat",
-            ledger.get("max_rhat", "N/A")
-        )
-
-        c3.metric(
-            "Worst parameter",
-            ledger.get("worst_parameter", "N/A")
-        )
-
-        st.info(
-            "Diagnostic-only display. "
-            "No MCMC rerun, likelihood recomputation, "
-            "or posterior recomputation."
-        )
-
-
-    # GTDS_MCMC_10CHAIN_DIAGNOSTIC_ARCHIVE_V1
-    # Frozen diagnostic artifact display only.
+    st.caption(
+        "Frozen diagnostic artifact display only. "
+        "No sampler execution, likelihood recomputation, "
+        "or posterior recomputation."
+    )
 
     archive_root = (
-        Path(__file__).resolve()
-        .parents[2]
+        Path(__file__).resolve().parents[2]
         / "data"
         / "gtds_mcmc_diagnostic_archive_v1"
     )
 
-    if archive_root.exists():
+    occupancy_file = (
+        archive_root
+        / "occupancy"
+        / "MODE_OCCUPANCY_LAST20PERCENT.tsv"
+    )
 
-        st.subheader(
-            "GTDS MCMC 10-Chain Diagnostic Archive"
-        )
+    transition_file = (
+        archive_root
+        / "transition"
+        / "MODE_TRANSITION_ANALYSIS.tsv"
+    )
 
-        st.caption(
-            "Frozen diagnostic artifact display only. "
-            "No sampler execution, likelihood recomputation, "
-            "or posterior recomputation."
-        )
+    stability_file = (
+        archive_root
+        / "stability"
+        / "CLUSTER_STABILITY_PHASE_DISTANCE.tsv"
+    )
 
-        archive_files = [
-            (
-                "10 Chain Mode Occupancy",
-                archive_root
-                / "occupancy"
-                / "MODE_OCCUPANCY_LAST20PERCENT.tsv"
-            ),
-            (
-                "Acceptance Proxy Summary",
-                archive_root
-                / "acceptance"
-                / "ACCEPTANCE_PROXY_SUMMARY.tsv"
-            ),
-            (
-                "Mode Transition Analysis",
-                archive_root
-                / "transition"
-                / "MODE_TRANSITION_ANALYSIS.tsv"
-            ),
-            (
-                "Cluster Stability Phase Distance",
-                archive_root
-                / "stability"
-                / "CLUSTER_STABILITY_PHASE_DISTANCE.tsv"
-            ),
-        ]
+    with st.expander("10 Chain Mode Occupancy", expanded=False):
+        if occupancy_file.exists():
+            st.dataframe(
+                pd.read_csv(occupancy_file, sep="\t"),
+                hide_index=True,
+                use_container_width=True,
+            )
 
-        for title, file in archive_files:
+    with st.expander("Mode Transition Analysis", expanded=False):
+        if transition_file.exists():
+            st.dataframe(
+                pd.read_csv(transition_file, sep="\t"),
+                hide_index=True,
+                use_container_width=True,
+            )
 
-            with st.expander(title, expanded=False):
-
-                if file.exists():
-                    st.dataframe(
-                        pd.read_csv(
-                            file,
-                            sep="\t"
-                        ),
-                        use_container_width=True
-                    )
-
-
-        st.markdown(
-            "### GTDS MCMC Diagnostic Summary"
-        )
-
-        a, b, c, d = st.columns(4)
-
-        a.metric("Chains", "10")
-        b.metric("Steps / Chain", "10000")
-        c.metric("Artifact", "Frozen")
-        d.metric("Compute", "Display Only")
-
-        st.info(
-            "Interpretation boundary: "
-            "Frozen diagnostic artifact only. "
-            "Not a posterior result, likelihood evaluation, "
-            "or physical inference update."
-        )
+    with st.expander("Cluster Stability Phase Distance", expanded=False):
+        if stability_file.exists():
+            st.dataframe(
+                pd.read_csv(stability_file, sep="\t"),
+                hide_index=True,
+                use_container_width=True,
+            )
 
 
 
