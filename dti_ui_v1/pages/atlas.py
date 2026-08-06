@@ -406,6 +406,103 @@ def render() -> None:
             )
 
 
+
+    with st.expander("Frozen GTDS Artifact Identity", expanded=False):
+
+        manifest_file = (
+            archive_root
+            / "manifest"
+            / "ARTIFACT_IDENTITY.tsv"
+        )
+
+        sha_file = (
+            archive_root
+            / "manifest"
+            / "SHA256SUMS.tsv"
+        )
+
+        st.caption(
+            "Reference-only artifact identity. "
+            "This panel records source/provenance metadata for the frozen GTDS diagnostic archive. "
+            "No sampler execution, likelihood recomputation, posterior update, or physical inference update is performed."
+        )
+
+        if manifest_file.exists():
+            st.markdown("#### Artifact identity")
+            st.dataframe(
+                pd.read_csv(manifest_file, sep="\t"),
+                hide_index=True,
+                use_container_width=True,
+            )
+        else:
+            st.info(
+                "Artifact identity manifest is not available in the deployed archive path."
+            )
+
+        if sha_file.exists():
+            st.markdown("#### Archive file checksums")
+            st.dataframe(
+                pd.read_csv(sha_file, sep="\t", header=None),
+                hide_index=True,
+                use_container_width=True,
+            )
+
+        st.info(
+            "Interpretation boundary: frozen diagnostic reference only. "
+            "Not a posterior result, not a convergence proof, not a likelihood evaluation, "
+            "and not evidence for physical attractors by itself."
+        )
+
+
+    with st.expander("All-Parameter Last-20% Frozen Summary", expanded=False):
+
+        if occupancy_file.exists():
+
+            all_params = pd.read_csv(
+                occupancy_file,
+                sep="\t"
+            )
+
+            numeric_cols = [
+                "tail_draws",
+                "mean_last20pct",
+                "std_last20pct",
+                "min",
+                "max",
+            ]
+
+            for col in numeric_cols:
+                if col in all_params.columns:
+                    all_params[col] = pd.to_numeric(
+                        all_params[col],
+                        errors="coerce"
+                    )
+
+            st.caption(
+                "Frozen last-20% diagnostic summary for all recorded parameters. "
+                "This is a chain-level diagnostic table, not posterior statistics."
+            )
+
+            st.dataframe(
+                all_params,
+                hide_index=True,
+                use_container_width=True,
+            )
+
+            if "parameter" in all_params.columns:
+                param_count = all_params["parameter"].nunique()
+                chain_count = all_params["chain"].nunique() if "chain" in all_params.columns else None
+
+                c1, c2 = st.columns(2)
+                c1.metric("Recorded parameters", str(param_count))
+                c2.metric("Recorded chains", str(chain_count) if chain_count is not None else "N/A")
+
+        else:
+            st.info(
+                "All-parameter last-20% summary file is not available in the deployed archive path."
+            )
+
+
     with st.expander("Mode Transition Analysis", expanded=False):
         if transition_file.exists():
             st.dataframe(
