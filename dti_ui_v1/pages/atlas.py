@@ -214,6 +214,33 @@ def render() -> None:
                 use_container_width=True,
             )
 
+    with st.expander("GTDS Diagnostic Graphs", expanded=True):
+
+        if occupancy_file.exists():
+            occupancy = pd.read_csv(
+                occupancy_file,
+                sep="\t"
+            )
+
+            st.markdown("#### Terminal H0 Occupancy")
+
+            st.altair_chart(
+                alt.Chart(occupancy)
+                .mark_bar()
+                .encode(
+                    x=alt.X(
+                        occupancy.columns[0],
+                        title="Mode"
+                    ),
+                    y=alt.Y(
+                        occupancy.columns[-1],
+                        title="Occupancy"
+                    ),
+                    tooltip=list(occupancy.columns),
+                ),
+                use_container_width=True,
+            )
+
     with st.expander("Mode Transition Analysis", expanded=False):
         if transition_file.exists():
             st.dataframe(
