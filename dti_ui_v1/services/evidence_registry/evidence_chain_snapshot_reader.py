@@ -2,18 +2,25 @@ import json
 from pathlib import Path
 
 
+_THIS_FILE = Path(__file__).resolve()
+_REPO_ROOT = _THIS_FILE.parents[3]
+
 SNAPSHOT_CANDIDATE_PATHS = [
-    Path("data/evidence/EVIDENCE_CHAIN_READINESS_SNAPSHOT.json"),
-    Path(
-        "../_ROUTE_B_PHASE24_EVIDENCE_CHAIN_READINESS_SNAPSHOT_EXPORT_V1_20260721_163706/"
-        "snapshot/EVIDENCE_CHAIN_READINESS_SNAPSHOT.json"
-    ),
+    _REPO_ROOT / "data" / "evidence" / "EVIDENCE_CHAIN_READINESS_SNAPSHOT.json",
+    _REPO_ROOT.parent
+    / "_ROUTE_B_PHASE24_EVIDENCE_CHAIN_READINESS_SNAPSHOT_EXPORT_V1_20260721_163706"
+    / "snapshot"
+    / "EVIDENCE_CHAIN_READINESS_SNAPSHOT.json",
 ]
 
 
 def load_readiness_snapshot():
 
+    checked_paths = []
+
     for p in SNAPSHOT_CANDIDATE_PATHS:
+
+        checked_paths.append(str(p))
 
         if not p.exists():
             continue
@@ -36,8 +43,5 @@ def load_readiness_snapshot():
 
     return {
         "status": "SNAPSHOT_NOT_FOUND",
-        "candidate_paths": [
-            str(p)
-            for p in SNAPSHOT_CANDIDATE_PATHS
-        ],
+        "candidate_paths": checked_paths,
     }
