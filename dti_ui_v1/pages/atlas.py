@@ -224,82 +224,20 @@ def render() -> None:
 
             st.markdown("#### Terminal H0 Occupancy")
 
-
-            h0_col = occupancy.columns[-1]
-            chain_col = occupancy.columns[0]
-
-            h0_min = occupancy.groupby(chain_col)[h0_col].min().reset_index()
-            h0_max = occupancy.groupby(chain_col)[h0_col].max().reset_index()
-            h0_mean = occupancy.groupby(chain_col)[h0_col].mean().reset_index()
-
-            h0_range = h0_min.merge(
-                h0_max,
-                on=chain_col,
-                suffixes=("_min", "_max")
-            ).merge(
-                h0_mean,
-                on=chain_col
-            )
-
-            h0_range.columns = [
-                chain_col,
-                "h0_min",
-                "h0_max",
-                "h0_mean"
-            ]
-
-            base = alt.Chart(h0_range).encode(
-                y=alt.Y(
-                    f"{chain_col}:N",
-                    title="Independent chain",
-                    sort="-x"
-                )
-            )
-
-            base = alt.Chart(h0_range).encode(
-                y=alt.Y(
-                    f"{chain_col}:N",
-                    title="Independent chain",
-                    sort="-x"
-                )
-            )
-
-            rule = base.mark_rule(
-                strokeWidth=5,
-                color="#4EA5FF"
-            ).encode(
-                x=alt.X(
-                    "h0_min:Q",
-                    scale=alt.Scale(domain=[66.8,70.8]),
-                    title="Terminal H0 mean (last 20% frozen draws)"
-                ),
-                x2="h0_max:Q",
-            )
-
-            point = base.mark_point(
-                filled=True,
-                size=220,
-                color="#FFD166"
-            ).encode(
-                x="h0_mean:Q",
-                tooltip=[
-                    chain_col,
-                    alt.Tooltip("h0_min:Q", format=".3f"),
-                    alt.Tooltip("h0_mean:Q", format=".3f"),
-                    alt.Tooltip("h0_max:Q", format=".3f"),
-                ],
-            )
-
-            st.markdown(
-                "#### GTDS 10 Independent Chains: Terminal H0 Range (Frozen Last 20%)"
-            )
-
             st.altair_chart(
-                (rule + point)
-                .properties(
-                    height=420
-                )
-                ,
+                alt.Chart(occupancy)
+                .mark_bar()
+                .encode(
+                    x=alt.X(
+                        occupancy.columns[0],
+                        title="Mode"
+                    ),
+                    y=alt.Y(
+                        occupancy.columns[-1],
+                        title="Occupancy"
+                    ),
+                    tooltip=list(occupancy.columns),
+                ),
                 use_container_width=True,
             )
 
