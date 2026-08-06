@@ -260,18 +260,7 @@ def render() -> None:
                 y=alt.Y(
                     f"{chain_col}:N",
                     title="Independent chain",
-                    sort=[
-                        "CHAIN01",
-                        "CHAIN02",
-                        "CHAIN03",
-                        "CHAIN04",
-                        "CHAIN05",
-                        "CHAIN06",
-                        "CHAIN07",
-                        "CHAIN08",
-                        "CHAIN09",
-                        "CHAIN10",
-                    ]
+                    sort="-x"
                 )
             )
 
@@ -310,9 +299,7 @@ def render() -> None:
                 .properties(
                     height=420
                 )
-                .configure_axis(
-                    grid=True
-                ),
+                ,
                 use_container_width=True,
             )
 
