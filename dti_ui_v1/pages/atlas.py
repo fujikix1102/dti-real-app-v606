@@ -225,27 +225,63 @@ def render() -> None:
             st.markdown("#### Terminal H0 Occupancy")
 
 
-            st.altair_chart(
-                alt.Chart(occupancy)
-                .mark_point(
-                    filled=True,
-                    size=80
+            h0_col = occupancy.columns[-1]
+            chain_col = occupancy.columns[0]
+
+            h0_min = occupancy.groupby(chain_col)[h0_col].min().reset_index()
+            h0_max = occupancy.groupby(chain_col)[h0_col].max().reset_index()
+            h0_mean = occupancy.groupby(chain_col)[h0_col].mean().reset_index()
+
+            h0_range = h0_min.merge(
+                h0_max,
+                on=chain_col,
+                suffixes=("_min", "_max")
+            ).merge(
+                h0_mean,
+                on=chain_col
+            )
+
+            h0_range.columns = [
+                chain_col,
+                "h0_min",
+                "h0_max",
+                "h0_mean"
+            ]
+
+            base = alt.Chart(h0_range).encode(
+                y=alt.Y(
+                    f"{chain_col}:N",
+                    title="Independent chain",
+                    sort="-x"
                 )
-                .encode(
-                    x=alt.X(
-                        occupancy.columns[-1],
-                        title="Terminal H0 mean (last 20%)"
-                    ),
-                    y=alt.Y(
-                        occupancy.columns[0],
-                        title="Independent chain",
-                        sort="-x"
-                    ),
-                    tooltip=list(occupancy.columns),
-                )
-                .properties(
-                    height=360
+            )
+
+            rule = base.mark_rule(
+                strokeWidth=2
+            ).encode(
+                x=alt.X(
+                    "h0_min:Q",
+                    scale=alt.Scale(domain=[66,71]),
+                    title="Terminal H0 mean (last 20%)"
                 ),
+                x2="h0_max:Q"
+            )
+
+            point = base.mark_point(
+                filled=True,
+                size=90
+            ).encode(
+                x="h0_mean:Q",
+                tooltip=[
+                    chain_col,
+                    "h0_min",
+                    "h0_mean",
+                    "h0_max",
+                ]
+            )
+
+            st.altair_chart(
+                rule + point,
                 use_container_width=True,
             )
 
