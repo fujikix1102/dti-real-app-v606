@@ -272,8 +272,7 @@ def render() -> None:
 
 
             st.caption(
-                "The mean-point chart is not repeated here. "
-                "Use the GTDS H0 Chain Range View below for the visual comparison: "
+                "For visual comparison, use the GTDS H0 Chain Range View below: "
                 "yellow point = mean_last20pct; blue line = min–max."
             )
 
