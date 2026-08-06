@@ -250,8 +250,12 @@ def render() -> None:
                 sep="\t"
             )
 
-            h0_col = occupancy.columns[-1]
-            chain_col = occupancy.columns[0]
+            occupancy = occupancy[
+                occupancy["parameter"] == "H0"
+            ].copy()
+
+            h0_col = "mean_last20pct"
+            chain_col = "chain"
 
             st.markdown(
                 "#### GTDS 10 Independent Chains: Terminal H0 Position"
