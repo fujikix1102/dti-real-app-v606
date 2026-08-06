@@ -276,7 +276,8 @@ def render() -> None:
             )
 
             rule = base.mark_rule(
-                strokeWidth=6
+                strokeWidth=5,
+                color="#4EA5FF"
             ).encode(
                 x=alt.X(
                     "h0_min:Q",
@@ -288,7 +289,8 @@ def render() -> None:
 
             point = base.mark_point(
                 filled=True,
-                size=180,
+                size=220,
+                color="#FFD166"
             ).encode(
                 x="h0_mean:Q",
                 tooltip=[
@@ -304,7 +306,13 @@ def render() -> None:
             )
 
             st.altair_chart(
-                rule + point,
+                (rule + point)
+                .properties(
+                    height=420
+                )
+                .configure_axis(
+                    grid=True
+                ),
                 use_container_width=True,
             )
 
