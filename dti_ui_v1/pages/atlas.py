@@ -241,6 +241,48 @@ def render() -> None:
                 use_container_width=True,
             )
 
+    with st.expander("GTDS H0 Chain Position View", expanded=True):
+
+        if occupancy_file.exists():
+
+            occupancy = pd.read_csv(
+                occupancy_file,
+                sep="\t"
+            )
+
+            h0_col = occupancy.columns[-1]
+            chain_col = occupancy.columns[0]
+
+            st.markdown(
+                "#### GTDS 10 Independent Chains: Terminal H0 Position"
+            )
+
+            st.altair_chart(
+                alt.Chart(occupancy)
+                .mark_point(
+                    filled=True,
+                    size=120,
+                    color="#FFD166"
+                )
+                .encode(
+                    x=alt.X(
+                        h0_col,
+                        title="Terminal H0 mean (last 20%)",
+                        scale=alt.Scale(domain=[66.5,70.8])
+                    ),
+                    y=alt.Y(
+                        chain_col,
+                        title="Independent chain"
+                    ),
+                    tooltip=list(occupancy.columns),
+                )
+                .properties(
+                    height=320
+                ),
+                use_container_width=True,
+            )
+
+
     with st.expander("Mode Transition Analysis", expanded=False):
         if transition_file.exists():
             st.dataframe(
