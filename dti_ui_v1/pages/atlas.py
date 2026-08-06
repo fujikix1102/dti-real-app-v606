@@ -241,6 +241,7 @@ def render() -> None:
                 use_container_width=True,
             )
 
+
     with st.expander("GTDS H0 Chain Position View", expanded=True):
 
         if occupancy_file.exists():
@@ -250,38 +251,101 @@ def render() -> None:
                 sep="\t"
             )
 
-            occupancy = occupancy[
+            h0 = occupancy[
                 occupancy["parameter"] == "H0"
             ].copy()
 
-            h0_col = "mean_last20pct"
-            chain_col = "chain"
+            h0["mean_last20pct"] = pd.to_numeric(
+                h0["mean_last20pct"],
+                errors="coerce"
+            )
+            h0["min"] = pd.to_numeric(
+                h0["min"],
+                errors="coerce"
+            )
+            h0["max"] = pd.to_numeric(
+                h0["max"],
+                errors="coerce"
+            )
+
+            h0 = h0.dropna(
+                subset=[
+                    "chain",
+                    "mean_last20pct",
+                    "min",
+                    "max",
+                ]
+            )
 
             st.markdown(
-                "#### GTDS 10 Independent Chains: Terminal H0 Position"
+                "#### GTDS 10 Independent Chains: Terminal H0 Range"
+            )
+
+            st.caption(
+                "Frozen diagnostic display only. "
+                "Horizontal line shows min–max within the last 20% frozen draws; "
+                "point shows mean_last20pct. "
+                "No sampler execution, likelihood recomputation, or posterior update."
+            )
+
+            base = alt.Chart(h0).encode(
+                y=alt.Y(
+                    "chain:N",
+                    title="Independent chain",
+                    sort=[
+                        "CHAIN10",
+                        "CHAIN09",
+                        "CHAIN08",
+                        "CHAIN07",
+                        "CHAIN06",
+                        "CHAIN05",
+                        "CHAIN04",
+                        "CHAIN03",
+                        "CHAIN02",
+                        "CHAIN01",
+                    ],
+                )
+            )
+
+            range_line = base.mark_rule(
+                strokeWidth=4,
+                color="#4EA5FF",
+            ).encode(
+                x=alt.X(
+                    "min:Q",
+                    title="Terminal H0 range / mean (last 20% frozen draws)",
+                    scale=alt.Scale(domain=[66.5, 70.8]),
+                ),
+                x2="max:Q",
+                tooltip=[
+                    "chain:N",
+                    alt.Tooltip("mean_last20pct:Q", format=".4f"),
+                    alt.Tooltip("min:Q", format=".4f"),
+                    alt.Tooltip("max:Q", format=".4f"),
+                    alt.Tooltip("std_last20pct:Q", format=".4f"),
+                    alt.Tooltip("tail_draws:Q"),
+                ],
+            )
+
+            mean_point = base.mark_point(
+                filled=True,
+                size=150,
+                color="#FFD166",
+            ).encode(
+                x="mean_last20pct:Q",
+                tooltip=[
+                    "chain:N",
+                    alt.Tooltip("mean_last20pct:Q", format=".4f"),
+                    alt.Tooltip("min:Q", format=".4f"),
+                    alt.Tooltip("max:Q", format=".4f"),
+                    alt.Tooltip("std_last20pct:Q", format=".4f"),
+                    alt.Tooltip("tail_draws:Q"),
+                ],
             )
 
             st.altair_chart(
-                alt.Chart(occupancy)
-                .mark_point(
-                    filled=True,
-                    size=120,
-                    color="#FFD166"
-                )
-                .encode(
-                    x=alt.X(
-                        h0_col,
-                        title="Terminal H0 mean (last 20%)",
-                        scale=alt.Scale(domain=[66.5,70.8])
-                    ),
-                    y=alt.Y(
-                        chain_col,
-                        title="Independent chain"
-                    ),
-                    tooltip=list(occupancy.columns),
-                )
-                .properties(
-                    height=320
+                (range_line + mean_point).properties(
+                    height=360
                 ),
                 use_container_width=True,
             )
