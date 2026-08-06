@@ -242,7 +242,7 @@ def render() -> None:
             )
 
 
-    with st.expander("GTDS H0 Chain Position View", expanded=True):
+    with st.expander("GTDS H0 Chain Range View", expanded=True):
 
         if occupancy_file.exists():
 
@@ -279,6 +279,11 @@ def render() -> None:
 
             st.markdown(
                 "#### GTDS 10 Independent Chains: Terminal H0 Range"
+            )
+
+            st.caption(
+                "Render marker: GTDS_H0_MIN_MAX_RANGE_VIEW_V2. "
+                "This panel uses H0-only rows from MODE_OCCUPANCY_LAST20PERCENT.tsv."
             )
 
             st.caption(
