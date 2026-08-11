@@ -877,3 +877,62 @@ def dti_axiclass_runtime_binding_preview(
         z_c=z_c,
     )
 
+
+# BEGIN APP_READONLY_RUNTIME_SMOKE_PANEL_PATCH_V1
+def render_classy_runtime_smoke_status_panel_v1():
+    """Read-only frozen CLASS/classy runtime smoke status panel.
+
+    Boundary:
+    - No input widgets.
+    - No buttons.
+    - No CLASS call.
+    - No compute().
+    - No get_background().
+    - Frozen record display only.
+    """
+    st.markdown("### CLASS / classy runtime smoke status")
+    st.caption("RUNTIME SMOKE ONLY / NOT LIKELIHOOD / NOT POSTERIOR / NOT CHI2 / NO MCMC")
+
+    identity_rows = [
+        {"key": "work_copy", "value": "/Users/fujikijunichi/Desktop/CLASSY_DIRECT_SETUPPY_FORCE_RECYTHONIZE_V62ENV_BUILD_CHECK_20260810_035254/work/class_public_candidate"},
+        {"key": "pythonpath", "value": "/Users/fujikijunichi/Desktop/CLASSY_DIRECT_SETUPPY_FORCE_RECYTHONIZE_V62ENV_BUILD_CHECK_20260810_035254/work/class_public_candidate/python"},
+        {"key": "classy_so_sha256", "value": "a40752db43ea56f1291d63482a357f000f7345f09402a4e449495f155a6a294f"},
+        {"key": "background_c_sha256", "value": "0134082fdc09dfdff27b4a672e76a76c724bc3ccac63d12ead0053cb4d9854dd"},
+        {"key": "classy_pyx_sha256", "value": "88a794b02c31d29d75fde2665c41d68dcadfdf563a054535e762677383621b1d"},
+        {"key": "setup_py_sha256", "value": "402e35d9cbfbd912b550410c1ea086fa1a2139b2ff4e8b55f11f215aaa03214c"},
+    ]
+
+    frozen_rows = [
+        {"quantity": "rs_drag", "frozen runtime smoke value": "147.11418585917818"},
+        {"quantity": "comov.snd.hrz. first3", "frozen runtime smoke value": "2.6763174645315886e-09, 2.678475245462956e-09, 2.6806347657052576e-09"},
+        {"quantity": "z first3", "frozen runtime smoke value": "99999999999999.12, 99919439973958.83, 99838944847097.22"},
+        {"quantity": "H [1/Mpc] first3", "frozen runtime smoke value": "2.1572562928018544e+22, 2.15378192038101e+22, 2.1503131436160117e+22"},
+    ]
+
+    source_rows = [
+        {"key": "latest_combo_output_root", "value": "/Users/fujikijunichi/Desktop/H_1_PER_MPC_HEAD_FREEZE_AND_BACKGROUND_SMOKE_SUMMARY_COMBO_20260812_063216"},
+        {"key": "latest_combo_zip", "value": "/Users/fujikijunichi/Desktop/H_1_PER_MPC_HEAD_FREEZE_AND_BACKGROUND_SMOKE_SUMMARY_COMBO_20260812_063216.zip"},
+        {"key": "latest_combo_zip_sha256", "value": "8cbf06a6a058a821e805a2bda16d7a09b6de8afc12dce1240454febb06e08228"},
+    ]
+
+    with st.expander("CLASS / classy runtime smoke identity and frozen values", expanded=False):
+        st.caption("Runtime identity")
+        st.table(identity_rows)
+        st.caption("Frozen runtime smoke values")
+        st.table(frozen_rows)
+        st.caption("Source package")
+        st.table(source_rows)
+        st.caption(
+            "These are frozen runtime smoke values from an isolated CLASS/classy work copy. "
+            "They are not likelihood results, not posterior results, not chi2 values, not MCMC output, "
+            "not validation results, and not manuscript claims. WOC-DTI A_DTI is currently fixed at 0.0 "
+            "in source and is not yet externally parameterized. This panel is read-only and performs no CLASS computation."
+        )
+# END APP_READONLY_RUNTIME_SMOKE_PANEL_PATCH_V1
+# BEGIN APP_READONLY_RUNTIME_SMOKE_PANEL_PATCH_V1_CALL
+try:
+    render_classy_runtime_smoke_status_panel_v1()
+except NameError:
+    pass
+# END APP_READONLY_RUNTIME_SMOKE_PANEL_PATCH_V1_CALL
+
