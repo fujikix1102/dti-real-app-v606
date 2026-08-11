@@ -49,6 +49,67 @@ def render() -> None:
         hide_index=True,
         use_container_width=True,
     )
+
+    # BEGIN APP_READONLY_RUNTIME_SMOKE_PANEL_DASHBOARD_V1
+    # Read-only frozen CLASS/classy runtime smoke display.
+    # No input widgets.
+    # No buttons.
+    # No CLASS call.
+    # No compute().
+    # No get_background().
+    # No likelihood/posterior/chi2/MCMC.
+
+    st.divider()
+
+    st.markdown("### CLASS / classy runtime smoke status")
+
+    st.caption(
+        "RUNTIME SMOKE ONLY / NOT LIKELIHOOD / "
+        "NOT POSTERIOR / NOT CHI2 / NO MCMC"
+    )
+
+    with st.expander(
+        "CLASS / classy runtime smoke identity and frozen values",
+        expanded=True
+    ):
+
+        st.caption("Runtime identity")
+
+        st.table([
+            {
+                "key": "classy_so_sha256",
+                "value": "a40752db43ea56f1291d63482a357f000f7345f09402a4e449495f155a6a294f",
+            },
+            {
+                "key": "background_c_sha256",
+                "value": "0134082fdc09dfdff27b4a672e76a76c724bc3ccac63d12ead0053cb4d9854dd",
+            },
+            {
+                "key": "classy_pyx_sha256",
+                "value": "88a794b02c31d29d75fde2665c41d68dcadfdf563a054535e762677383621b1d",
+            },
+        ])
+
+        st.caption("Frozen runtime smoke values")
+
+        st.table([
+            {
+                "quantity": "rs_drag",
+                "value": "147.11418585917818",
+            },
+            {
+                "quantity": "H [1/Mpc] first3",
+                "value": "2.1572562928018544e+22, 2.15378192038101e+22, 2.1503131436160117e+22",
+            },
+        ])
+
+        st.caption(
+            "Display-only frozen runtime smoke record. "
+            "No computation is executed."
+        )
+
+    # END APP_READONLY_RUNTIME_SMOKE_PANEL_DASHBOARD_V1
+
     st.markdown("## Recent durable runs")
     if artifacts:
         st.dataframe(artifacts, hide_index=True, use_container_width=True)
