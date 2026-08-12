@@ -62,6 +62,50 @@ def render() -> None:
             "inference or MCMC. Local ladder summaries are never added to the Pantheon+ joint sum."
         )
 
+
+        st.divider()
+
+        st.subheader("DTI frozen compute result viewer")
+
+        st.caption(
+            "READ ONLY / FROZEN RESULT / "
+            "NOT LIKELIHOOD / NOT POSTERIOR / NO MCMC / "
+            "No recomputation performed."
+        )
+
+        st.dataframe(
+            [
+                {
+                    "dataset": "SN_ONLY",
+                    "H0_EXT": 64.518048,
+                    "H0_LCDM": 64.436316,
+                    "dH0": 0.081732,
+                    "dminuslogpost": 8.88183,
+                },
+                {
+                    "dataset": "BAO_ONLY",
+                    "H0_EXT": 64.508206,
+                    "H0_LCDM": 64.487011,
+                    "dH0": 0.021195,
+                    "dminuslogpost": 8.8818353,
+                },
+                {
+                    "dataset": "LATE_COMBINED",
+                    "H0_EXT": 64.501779,
+                    "H0_LCDM": 64.467088,
+                    "dH0": 0.034691,
+                    "dminuslogpost": 8.88191,
+                },
+            ],
+            hide_index=True,
+        )
+
+        st.caption(
+            "Source: A_DTI_COMPUTE_RESULT_COMPARISON_SUMMARY_V1. "
+            "Display only. No recomputation, likelihood evaluation, "
+            "posterior update, or MCMC execution."
+        )
+
     with parameters_tab:
         render_parameter_status_panel()
 
