@@ -23,6 +23,57 @@ def render() -> None:
     st.caption("Junichi Fujiki · jun@fujikix.com")
     st.caption("Scientific configuration, execution, and monitoring")
 
+
+    # DTI_READONLY_DISPLAY_PANEL_V1
+    st.divider()
+
+    st.subheader("DTI Runtime Evidence Display")
+
+    st.caption(
+        "READ ONLY / DISPLAY ONLY / "
+        "NO COMPUTE / NO LIKELIHOOD / "
+        "NO POSTERIOR / NO MCMC"
+    )
+
+    st.json(
+        {
+            "page_entry": "dti_ui_v1.pages.run.render",
+            "display_mode": "READ_ONLY",
+            "compute_execution": False,
+            "likelihood_evaluation": False,
+            "posterior_inference": False,
+            "mcmc": False,
+        }
+    )
+
+    # /DTI_READONLY_DISPLAY_PANEL_V1
+
+    
+    st.divider()
+
+    st.subheader("Runtime Status Panel")
+
+    st.caption(
+        "DISPLAY ONLY / DEPLOYMENT IDENTITY / "
+        "NO COMPUTE / NO LIKELIHOOD / NO POSTERIOR / NO MCMC"
+    )
+
+    st.info(
+        "Public runtime route confirmed through dti_ui_v1.pages.run.render()."
+    )
+
+    st.json(
+        {
+            "page_entry": "dti_ui_v1.pages.run.render",
+            "display_mode": "READ_ONLY",
+            "compute_execution": False,
+            "likelihood_evaluation": False,
+            "posterior_inference": False,
+            "mcmc": False,
+        }
+    )
+
+
     setup_tab, parameters_tab, execution_tab, monitor_tab = st.tabs(
         ("Configuration", "Parameters", "Execution", "Monitor")
     )
