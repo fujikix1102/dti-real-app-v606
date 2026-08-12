@@ -110,6 +110,32 @@ def render() -> None:
 
     # END APP_READONLY_RUNTIME_SMOKE_PANEL_DASHBOARD_V1
 
+
+    # BEGIN A_DTI_PARAMETER_INPUT_UI_IMPLEMENTATION_V1
+    # Input display only.
+    # No automatic compute.
+    # No likelihood.
+    # No posterior.
+    # No MCMC.
+
+    st.markdown("### A_DTI parameter input")
+
+    a_dti_value = st.number_input(
+        "A_DTI",
+        min_value=0.0,
+        value=0.0,
+        step=1e-8,
+        format="%.8e",
+        help="Parameter input only. No automatic compute execution."
+    )
+
+    st.caption(
+        f"A_DTI current input: {a_dti_value}. "
+        "Baseline reference remains A_DTI=0.0."
+    )
+
+    # END A_DTI_PARAMETER_INPUT_UI_IMPLEMENTATION_V1
+
     st.markdown("## Recent durable runs")
     if artifacts:
         st.dataframe(artifacts, hide_index=True, use_container_width=True)
