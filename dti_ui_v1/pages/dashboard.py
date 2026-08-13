@@ -9,6 +9,7 @@ from dti_ui_v1.services.general_class_compute_service import (
 )
 
 from dti_ui_v1.services.run_store import (
+    get_run_artifact_store_status,
     list_run_artifacts,
 )
 
@@ -18,6 +19,7 @@ from dti_ui_v1.components.workspace_runtime_alignment_panel import (
 
 HEALTH_ENDPOINT = DEFAULT_CLASS_ENDPOINT.replace("/class/compute", "/health")
 BACKEND_LABEL = "Local backend" if DEFAULT_CLASS_ENDPOINT == LOCAL_CLASS_ENDPOINT else "Compute backend"
+A_DTI_INPUT_KEY = "perfect_fit_a_dti_input_v1"
 
 
 def _backend_status() -> tuple[str, str]:
@@ -43,6 +45,7 @@ def render() -> None:
     st.caption("AxiCLASS propagation, joint observational scoring, comparison, and audit")
     backend, version = _backend_status()
     artifacts = list_run_artifacts()
+    store_status = get_run_artifact_store_status()
     general = st.session_state.get("general_class_compute_history_v1", [])
     locked = st.session_state.get("perfect_fit_locked_compute_result")
     columns = st.columns(4)
@@ -60,7 +63,7 @@ def render() -> None:
             {"Route": "Posterior / MCMC", "Physics": "Requires joint likelihood and priors", "Likelihood": "Not claimed", "State": "Excluded from this application"},
         ],
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
     )
 
     # BEGIN APP_READONLY_RUNTIME_SMOKE_PANEL_DASHBOARD_V1
@@ -133,12 +136,14 @@ def render() -> None:
 
     st.markdown("### A_DTI parameter input")
 
+    st.session_state.setdefault(A_DTI_INPUT_KEY, 0.0)
+
     a_dti_value = st.number_input(
         "A_DTI",
         min_value=0.0,
-        value=0.0,
         step=1e-8,
         format="%.8e",
+        key=A_DTI_INPUT_KEY,
         help="Parameter input only. No automatic compute execution."
     )
 
@@ -154,12 +159,14 @@ def render() -> None:
         "Counts are for this running app filesystem only."
     )
     if (
+        store_status.get("persistence")
+        == "ephemeral_streamlit_runtime"
     ):
         st.warning(
             "This public Streamlit runtime store is ephemeral and separate "
             "from any local data/run_artifacts directory."
         )
     if artifacts:
-        st.dataframe(artifacts, hide_index=True, use_container_width=True)
+        st.dataframe(artifacts, hide_index=True, width="stretch")
     else:
         st.info("No run artifact is visible in this runtime store yet.")

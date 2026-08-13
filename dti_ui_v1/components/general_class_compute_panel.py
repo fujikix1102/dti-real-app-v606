@@ -12,6 +12,28 @@ T_CMB_K = 2.7255
 K2_TO_UK2 = 1.0e12
 HISTORY_KEY = "general_class_compute_history_v1"
 
+_GENERAL_CLASS_INPUT_DEFAULTS = {
+    "perfect_fit_general_class_H0_v1": 72.9,
+    "perfect_fit_general_class_omega_b_v1": 0.02440,
+    "perfect_fit_general_class_f_EDE_v2": 0.082,
+    "perfect_fit_general_class_omega_cdm_v1": 0.12700,
+    "perfect_fit_general_class_n_s_v1": 0.9847,
+    "perfect_fit_general_class_z_c_v2": 3500.0,
+    "perfect_fit_general_class_ln10_10_As_v1": 3.058,
+    "perfect_fit_general_class_tau_reio_v1": 0.0511,
+}
+
+_GENERAL_CLASS_REQUEST_FIELDS = {
+    "H0": "perfect_fit_general_class_H0_v1",
+    "omega_b": "perfect_fit_general_class_omega_b_v1",
+    "omega_cdm": "perfect_fit_general_class_omega_cdm_v1",
+    "n_s": "perfect_fit_general_class_n_s_v1",
+    "ln10_10_As": "perfect_fit_general_class_ln10_10_As_v1",
+    "tau_reio": "perfect_fit_general_class_tau_reio_v1",
+    "f_EDE": "perfect_fit_general_class_f_EDE_v2",
+    "z_c": "perfect_fit_general_class_z_c_v2",
+}
+
 from dti_ui_v1.services.general_class_compute_service import (
     GeneralClassRequest,
     execute_general_class_compute,
@@ -92,6 +114,13 @@ def _formatted_metric(value: Any) -> str:
     return f"{number:.4f}"
 
 
+def _general_class_request_payload(state: Mapping[str, Any]) -> dict[str, float]:
+    return {
+        field: float(state[session_key])
+        for field, session_key in _GENERAL_CLASS_REQUEST_FIELDS.items()
+    }
+
+
 def _line_chart(
     frame: pd.DataFrame,
     *,
@@ -126,7 +155,7 @@ def _line_chart(
         )
         .properties(height=320)
     )
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, width="stretch")
 
 
 def _comparison_chart(frame: pd.DataFrame) -> None:
@@ -161,12 +190,14 @@ def _comparison_chart(frame: pd.DataFrame) -> None:
         )
         .properties(height=360)
     )
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, width="stretch")
 
 
 def render_general_class_compute_panel() -> None:
     # DTI_V606_PENDING_APPLY_CONSUME_V1
     consume_pending_runtime_binding(st.session_state)
+    for key, value in _GENERAL_CLASS_INPUT_DEFAULTS.items():
+        st.session_state.setdefault(key, value)
 
     st.subheader("General CLASS / AxiCLASS compute")
 
@@ -188,83 +219,75 @@ def render_general_class_compute_panel() -> None:
     column_1, column_2, column_3 = st.columns(3)
 
     with column_1:
-        H0 = st.number_input(
+        st.number_input(
             "H0",
             min_value=1.0,
             max_value=150.0,
-            value=72.9,
             step=0.1,
             format="%.6f",
             key="perfect_fit_general_class_H0_v1",
         )
 
-        omega_b = st.number_input(
+        st.number_input(
             "omega_b",
             min_value=0.000001,
             max_value=1.0,
-            value=0.02440,
             step=0.00001,
             format="%.8f",
             key="perfect_fit_general_class_omega_b_v1",
         )
 
-        f_EDE = st.number_input(
+        st.number_input(
             "Requested f_EDE",
             min_value=0.0,
             max_value=0.5,
-            value=0.082,
             step=0.001,
             format="%.6f",
             key="perfect_fit_general_class_f_EDE_v2",
         )
 
     with column_2:
-        omega_cdm = st.number_input(
+        st.number_input(
             "omega_cdm",
             min_value=0.000001,
             max_value=2.0,
-            value=0.12700,
             step=0.0001,
             format="%.8f",
             key="perfect_fit_general_class_omega_cdm_v1",
         )
 
-        n_s = st.number_input(
+        st.number_input(
             "n_s",
             min_value=0.1,
             max_value=2.0,
-            value=0.9847,
             step=0.0001,
             format="%.8f",
             key="perfect_fit_general_class_n_s_v1",
         )
 
-        z_c = st.number_input(
+        st.number_input(
             "Requested z_c",
             min_value=10.0,
             max_value=100000.0,
-            value=3500.0,
             step=10.0,
             format="%.3f",
             key="perfect_fit_general_class_z_c_v2",
         )
 
     with column_3:
-        ln10_10_As = st.number_input(
+        st.number_input(
             "ln(10¹⁰ A_s)",
             min_value=0.0,
             max_value=10.0,
-            value=3.058,
             step=0.001,
             format="%.8f",
             key="perfect_fit_general_class_ln10_10_As_v1",
         )
 
-        tau_reio = st.number_input(
+        st.number_input(
             "tau_reio",
             min_value=0.0,
             max_value=1.0,
-            value=0.0511,
             step=0.0001,
             format="%.8f",
             key="perfect_fit_general_class_tau_reio_v1",
@@ -278,25 +301,21 @@ def render_general_class_compute_panel() -> None:
         "EDE detection, or DTI detection."
     )
 
+    current_payload = _general_class_request_payload(st.session_state)
+    with st.expander("Current run input payload", expanded=False):
+        st.json(current_payload)
+
     run_requested = st.button(
         "Run CLASS / AxiCLASS computation",
         type="primary",
         key="perfect_fit_general_class_run_v1",
+        width="stretch",
     )
 
     if not run_requested:
         return
 
-    request = GeneralClassRequest(
-        H0=float(H0),
-        omega_b=float(omega_b),
-        omega_cdm=float(omega_cdm),
-        n_s=float(n_s),
-        ln10_10_As=float(ln10_10_As),
-        tau_reio=float(tau_reio),
-        f_EDE=float(f_EDE),
-        z_c=float(z_c),
-    )
+    request = GeneralClassRequest(**_general_class_request_payload(st.session_state))
 
     with st.spinner("Calling the CLASS backend..."):
         result = execute_general_class_compute(request)
@@ -391,7 +410,7 @@ def render_general_class_compute_panel() -> None:
                     st.dataframe(
                         pd.DataFrame(theory_rows),
                         hide_index=True,
-                        use_container_width=True,
+                        width="stretch",
                     )
                     source_identity = desi_bao.get("source_identity")
                     if isinstance(source_identity, Mapping):
@@ -428,8 +447,8 @@ def render_general_class_compute_panel() -> None:
                 )
                 .properties(height=300)
             )
-            st.altair_chart(waterfall, use_container_width=True)
-            st.dataframe(component_frame, hide_index=True, use_container_width=True)
+            st.altair_chart(waterfall, width="stretch")
+            st.dataframe(component_frame, hide_index=True, width="stretch")
 
     for label, key in (("Planck 2018", "planck_2018"), ("Pantheon+", "pantheon_plus")):
         component = response.get(key, {})
@@ -559,7 +578,7 @@ def render_general_class_compute_panel() -> None:
                     st.dataframe(
                         pd.DataFrame(delta_rows),
                         hide_index=True,
-                        use_container_width=True,
+                        width="stretch",
                     )
 
         export_frame = _spectrum_frame(
@@ -591,7 +610,7 @@ def render_general_class_compute_panel() -> None:
                 file_name="general_class_cmb_spectra.csv",
                 mime="text/csv",
                 key="general_class_spectra_csv_download_v1",
-                use_container_width=True,
+                width="stretch",
             )
 
             summary = {
@@ -624,7 +643,7 @@ def render_general_class_compute_panel() -> None:
                 file_name="general_class_summary.csv",
                 mime="text/csv",
                 key="general_class_summary_csv_download_v1",
-                use_container_width=True,
+                width="stretch",
             )
             download_columns[2].download_button(
                 "Download complete JSON",
@@ -632,7 +651,7 @@ def render_general_class_compute_panel() -> None:
                 file_name="general_class_response.json",
                 mime="application/json",
                 key="general_class_json_download_v1",
-                use_container_width=True,
+                width="stretch",
             )
 
     with st.expander("Complete backend response", expanded=False):

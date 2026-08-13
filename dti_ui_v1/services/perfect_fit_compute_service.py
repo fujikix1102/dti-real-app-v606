@@ -39,6 +39,7 @@ from dti_ui_v1.services.perfect_fit_route_b_general_class_bridge import (
 
 
 _TRANSPORT_PARAMETER = "transport"
+_adapter_entrypoint = _locked_entrypoint
 
 
 def compute_perfect_fit(
@@ -63,7 +64,7 @@ def compute_perfect_fit(
         delegated_kwargs = dict(kwargs)
         delegated_kwargs[_TRANSPORT_PARAMETER] = post_json_transport
 
-        return _locked_entrypoint(
+        return _adapter_entrypoint(
             *args,
             **delegated_kwargs,
         )

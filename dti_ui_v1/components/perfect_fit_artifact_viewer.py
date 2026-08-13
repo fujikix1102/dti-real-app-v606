@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 import streamlit as st
 
+from dti_ui_v1.components.safe_json_display import render_safe_json
+
 
 ROOT = Path(__file__).resolve().parents[2]
 ARTIFACT_DIR = ROOT / "data" / "run_artifacts"
@@ -29,6 +31,13 @@ def _load(path):
 
 def render_perfect_fit_artifact_viewer():
     st.subheader("PERFECT FIT Artifact Viewer")
+
+    st.info(
+        "Workspace runtime notice: this view represents the deployed "
+        "Streamlit runtime. Local development files, backups, and review "
+        "packages are not included. Public runtime storage is separate "
+        "from the local checkout and is not automatically synchronized."
+    )
 
     files = _artifacts()
 
@@ -59,11 +68,13 @@ def render_perfect_fit_artifact_viewer():
 
     st.markdown("### Request")
 
-    st.json(payload.get("request", {}))
+    render_safe_json(payload.get("request", {}))
 
     st.markdown("### Response")
 
     response = payload.get("response", {})
+    if not isinstance(response, dict):
+        response = {}
 
     st.write(
         {
@@ -79,4 +90,4 @@ def render_perfect_fit_artifact_viewer():
         "No posterior, MCMC, evidence, or model preference claim."
     )
 
-    st.json(response.get("boundary", {}))
+    render_safe_json(response.get("boundary", {}))

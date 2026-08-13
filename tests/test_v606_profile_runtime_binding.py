@@ -20,8 +20,14 @@ from dti_ui_v1.services.v606_profile_runtime_binding import (
 class V606ProfileRuntimeBindingTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        source = os.environ["V606_PROFILE_ARCHIVE"]
-        expected_sha = os.environ["V606_PROFILE_ARCHIVE_SHA256"]
+        source = os.environ.get("V606_PROFILE_ARCHIVE")
+        expected_sha = os.environ.get("V606_PROFILE_ARCHIVE_SHA256")
+
+        if not source or not expected_sha:
+            raise unittest.SkipTest(
+                "V606_PROFILE_ARCHIVE and V606_PROFILE_ARCHIVE_SHA256 "
+                "are required for frozen archive binding tests"
+            )
 
         cls.library = load_v606_profile_library(
             Path(source),
