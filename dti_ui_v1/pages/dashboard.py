@@ -9,7 +9,6 @@ from dti_ui_v1.services.general_class_compute_service import (
 )
 
 from dti_ui_v1.services.run_store import (
-    get_run_artifact_store_status,
     list_run_artifacts,
 )
 
