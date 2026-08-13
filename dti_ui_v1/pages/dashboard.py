@@ -12,6 +12,10 @@ from dti_ui_v1.services.run_store import (
     list_run_artifacts,
 )
 
+from dti_ui_v1.components.workspace_runtime_alignment_panel import (
+    render_workspace_runtime_alignment_panel,
+)
+
 
 HEALTH_ENDPOINT = DEFAULT_CLASS_ENDPOINT.replace("/class/compute", "/health")
 BACKEND_LABEL = "Local backend" if DEFAULT_CLASS_ENDPOINT == LOCAL_CLASS_ENDPOINT else "Compute backend"
@@ -30,6 +34,8 @@ def _backend_status() -> tuple[str, str]:
 
 def render() -> None:
     st.title("MAXOMEGA / DTI")
+
+    render_workspace_runtime_alignment_panel()
     st.caption("AxiCLASS propagation, joint observational scoring, comparison, and audit")
     backend, version = _backend_status()
     artifacts = list_run_artifacts()
