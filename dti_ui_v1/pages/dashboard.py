@@ -37,12 +37,12 @@ def render() -> None:
     render_workspace_runtime_alignment_panel()
 
     
+    
 
     
     st.caption("AxiCLASS propagation, joint observational scoring, comparison, and audit")
     backend, version = _backend_status()
     artifacts = list_run_artifacts()
-    artifact_store = get_run_artifact_store_status()
     general = st.session_state.get("general_class_compute_history_v1", [])
     locked = st.session_state.get("perfect_fit_locked_compute_result")
     columns = st.columns(4)
@@ -151,13 +151,9 @@ def render() -> None:
 
     st.markdown("## Recent runtime artifacts")
     st.caption(
-        f"Store: {artifact_store.get('persistence')} · "
-        f"{artifact_store.get('artifact_directory')}. "
         "Counts are for this running app filesystem only."
     )
     if (
-        artifact_store.get("persistence")
-        == "ephemeral_streamlit_runtime"
     ):
         st.warning(
             "This public Streamlit runtime store is ephemeral and separate "
