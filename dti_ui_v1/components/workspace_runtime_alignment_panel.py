@@ -14,24 +14,24 @@ def render_workspace_runtime_alignment_panel() -> None:
 
     st.markdown("### Public runtime includes")
 
-    st.write(
-        [
+    st.table(
+        [{"item": item} for item in (
             "Runtime status",
             "Artifact viewer",
             "Evidence display",
             "Diagnostic display",
-        ]
+        )]
     )
 
     st.markdown("### Local-only items")
 
-    st.write(
-        [
+    st.table(
+        [{"item": item} for item in (
             "Development backups",
             "Review archives",
             "Freeze packages",
             "Temporary patch records",
-        ]
+        )]
     )
 
     st.warning(
