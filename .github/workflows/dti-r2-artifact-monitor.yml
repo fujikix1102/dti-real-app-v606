@@ -17,6 +17,7 @@ jobs:
       R2_BUCKET: ${{ vars.R2_BUCKET || 'dti-perfect-fit-artifacts' }}
       R2_PREFIX: ${{ vars.R2_PREFIX || 'dti-perfect-fit' }}
       PUBLIC_APP_URL: ${{ vars.PUBLIC_APP_URL || 'https://dti-perfect-fit.streamlit.app/' }}
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
