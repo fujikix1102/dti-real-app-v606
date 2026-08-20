@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 import importlib
+import os
 
 import streamlit as st
 
@@ -84,6 +85,26 @@ def render_sidebar() -> str:
     return selected
 
 
+def should_exclude_page_view_counter(
+    query_params: object,
+    *,
+    exclude_token: str | None = None,
+) -> bool:
+    token = (exclude_token or os.getenv("DTI_PAGE_VIEW_EXCLUDE_TOKEN", "")).strip()
+    if not token:
+        return False
+    try:
+        audit_view = query_params.get("audit_view")
+        supplied_token = query_params.get("token")
+    except AttributeError:
+        return False
+    if isinstance(audit_view, list):
+        audit_view = audit_view[-1] if audit_view else None
+    if isinstance(supplied_token, list):
+        supplied_token = supplied_token[-1] if supplied_token else None
+    return str(audit_view) == "1" and str(supplied_token) == token
+
+
 def render_app() -> None:
     st.set_page_config(
         page_title=f"{APP_TITLE} — {APP_SUBTITLE}",
@@ -97,7 +118,10 @@ def render_app() -> None:
         from dti_ui_v1.services.run_store import record_anonymous_page_view
 
         counter_key = f"perfect_fit_page_view_recorded_v1_{selected}"
-        if not st.session_state.get(counter_key):
+        if (
+            not st.session_state.get(counter_key)
+            and not should_exclude_page_view_counter(st.query_params)
+        ):
             identity = collect_identity()
             result = record_anonymous_page_view(
                 selected,
