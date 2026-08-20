@@ -984,3 +984,50 @@ except NameError:
     pass
 # END APP_READONLY_RUNTIME_SMOKE_PANEL_PATCH_V1_CALL
 
+# DTI_INTERNAL_POSTERIOR_READBACK_PLOT_STATUS_PANEL_V1_BEGIN
+with st.expander("Internal posterior-readback plot package status", expanded=False):
+    st.caption("FROZEN_INTERNAL_ONLY — audit/status panel; not a plot viewer.")
+
+    st.markdown(
+        """
+**Purpose.** This records the frozen internal posterior-readback plot package so the
+internal diagnostic result can be preserved, checked, and handed over without being
+misread as a public posterior result.
+
+**Final handover gate.**  
+`DTI_POST_OPTIMIZER_MCMC_POSTERIOR_READBACK_INTERNAL_FINAL_HANDOVER_V1_PASS`
+
+**Final handover ZIP SHA256.**  
+`22f3194eb17524cc92bb01604a53d1b1e13345ec21d33934bbaed01255702b21`
+
+**Frozen internal plot count.**  
+`5`
+
+**Internal selection.**
+- Primary: `P1`, `P2`
+- Secondary: `P3`, `P4`
+- Reference-only: `P5`
+
+**Caption boundaries.**  
+`LOCKED`
+"""
+    )
+
+    st.markdown(
+        """
+| Plot | Internal role | Boundary |
+|---|---|---|
+| P1 | Internal corner-pair geometry sketch | Not a public posterior constraint or confidence region |
+| P2 | Internal correlation heatmap | Not model validation or public posterior evidence |
+| P3 | Internal median/quantile table figure | Not publication confidence intervals or final parameter constraints |
+| P4 | Internal component chi2 distribution figure | Not a likelihood rerun, evidence comparison, or model comparison |
+| P5 | Internal best sampled diagnostic marker figure | Not a global, optimizer, final, or publication best fit |
+"""
+    )
+
+    st.warning(
+        "Internal diagnostic package only. Not public posterior, not publication CI, "
+        "not global best-fit, not model comparison, not manuscript-ready, and not pointer promotion."
+    )
+# DTI_INTERNAL_POSTERIOR_READBACK_PLOT_STATUS_PANEL_V1_END
+
