@@ -126,6 +126,34 @@ def _compact_r2_rows(rows: list[Mapping[str, Any]]) -> pd.DataFrame:
     )
 
 
+def _r2_summary_payload(
+    *,
+    index: Mapping[str, Any],
+    rows: list[Mapping[str, Any]],
+) -> dict[str, Any]:
+    return {
+        "schema_version": "dti-r2-viewer-summary-v1",
+        "backend": index.get("backend"),
+        "bucket": index.get("bucket"),
+        "index_key": index.get("index_key"),
+        "run_count": len(rows),
+        "routes": sorted(
+            {
+                str(row.get("route"))
+                for row in rows
+                if isinstance(row, Mapping) and row.get("route")
+            }
+        ),
+        "runs": list(rows),
+        "boundary": {
+            "mcmc": "NO",
+            "posterior": "NO",
+            "model_comparison_claim": "NO",
+            "manuscript_update": "NO",
+        },
+    }
+
+
 def render_perfect_fit_artifact_viewer():
     st.subheader("PERFECT FIT Artifact Viewer")
 
@@ -151,6 +179,18 @@ def render_perfect_fit_artifact_viewer():
         )
         r2_runs = external_index.get("runs", [])
         if isinstance(r2_runs, list) and r2_runs:
+            status_values = sorted(
+                {
+                    str(row.get("status"))
+                    for row in r2_runs
+                    if isinstance(row, Mapping) and row.get("status")
+                }
+            )
+            search = st.text_input(
+                "R2 search",
+                value="",
+                key="perfect_fit_r2_search_v1",
+            ).strip().lower()
             routes = sorted(
                 {
                     str(row.get("route"))
@@ -163,17 +203,81 @@ def render_perfect_fit_artifact_viewer():
                 ["all", *routes],
                 key="perfect_fit_r2_route_filter_v1",
             )
+            status_filter = st.selectbox(
+                "R2 status filter",
+                ["all", *status_values],
+                key="perfect_fit_r2_status_filter_v1",
+            )
             filtered_runs = [
                 row
                 for row in r2_runs
                 if isinstance(row, Mapping)
                 and (route_filter == "all" or row.get("route") == route_filter)
+                and (status_filter == "all" or row.get("status") == status_filter)
+                and (
+                    not search
+                    or search in json.dumps(row, ensure_ascii=False).lower()
+                )
             ]
             r2_frame = _compact_r2_rows(filtered_runs)
             st.dataframe(
                 r2_frame,
                 hide_index=True,
                 use_container_width=True,
+            )
+            csv_bytes = r2_frame.to_csv(index=False).encode("utf-8")
+            summary_payload = _r2_summary_payload(
+                index=external_index,
+                rows=filtered_runs,
+            )
+            export_columns = st.columns(3)
+            export_columns[0].download_button(
+                "Download R2 runs CSV",
+                data=csv_bytes,
+                file_name="dti_r2_runs.csv",
+                mime="text/csv",
+                key="perfect_fit_r2_runs_csv_download_v1",
+                width="stretch",
+            )
+            export_columns[1].download_button(
+                "Download R2 summary JSON",
+                data=json.dumps(
+                    summary_payload,
+                    ensure_ascii=False,
+                    indent=2,
+                    allow_nan=False,
+                    default=str,
+                ),
+                file_name="dti_r2_runs_summary.json",
+                mime="application/json",
+                key="perfect_fit_r2_summary_json_download_v1",
+                width="stretch",
+            )
+            export_columns[2].download_button(
+                "Download R2 audit JSON",
+                data=json.dumps(
+                    {
+                        "schema_version": "dti-r2-token-audit-v1",
+                        "backend": external_index.get("backend"),
+                        "bucket": external_index.get("bucket"),
+                        "index_key": external_index.get("index_key"),
+                        "configured": bool(external_index.get("configured")),
+                        "last_index_read_error": external_index.get("error"),
+                        "visible_run_count": len(filtered_runs),
+                        "audit_limit": (
+                            "Token scope is verified by successful signed R2 "
+                            "read/write operations; token secret material is "
+                            "never displayed."
+                        ),
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                    allow_nan=False,
+                ),
+                file_name="dti_r2_token_audit.json",
+                mime="application/json",
+                key="perfect_fit_r2_token_audit_download_v1",
+                width="stretch",
             )
             choices = [
                 row
@@ -254,12 +358,21 @@ def render_perfect_fit_artifact_viewer():
                 )
                 if len(comparison) == 2:
                     st.markdown("### R2 run comparison")
+                    comparison_frame = pd.DataFrame(
+                        _parameter_rows(comparison[0], comparison[1])
+                    )
                     st.dataframe(
-                        pd.DataFrame(
-                            _parameter_rows(comparison[0], comparison[1])
-                        ),
+                        comparison_frame,
                         hide_index=True,
                         use_container_width=True,
+                    )
+                    st.download_button(
+                        "Download R2 comparison CSV",
+                        data=comparison_frame.to_csv(index=False).encode("utf-8"),
+                        file_name="dti_r2_run_comparison.csv",
+                        mime="text/csv",
+                        key="perfect_fit_r2_comparison_csv_download_v1",
+                        width="stretch",
                     )
         loaded_r2_error = st.session_state.get(
             "perfect_fit_loaded_r2_artifact_error_v1"
