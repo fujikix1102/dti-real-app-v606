@@ -303,6 +303,94 @@ class RunStoreRuntimePersistenceTests(unittest.TestCase):
         payload = request.call_args_list[-1].kwargs["data"].decode("utf-8")
         self.assertIn("remote_run", payload)
 
+    def test_record_anonymous_page_view_merges_daily_counter(self) -> None:
+        fake_get_response = Mock()
+        fake_get_response.status_code = 200
+        fake_get_response.json.return_value = {
+            "schema_version": "dti-r2-anonymous-page-view-counter-v1",
+            "date": "2026-08-20",
+            "total": 2,
+            "pages": {"Workspace": 1},
+            "commits": {"old": 2},
+        }
+        fake_get_response.raise_for_status.return_value = None
+        fake_put_response = Mock()
+        fake_put_response.status_code = 200
+        fake_put_response.headers = {"ETag": '"abc"'}
+        fake_put_response.raise_for_status.return_value = None
+
+        with patch.dict(
+            os.environ,
+            {
+                "DTI_EXTERNAL_STORAGE_BACKEND": "r2",
+                "R2_ACCOUNT_ID": "account",
+                "R2_ACCESS_KEY_ID": "access",
+                "R2_SECRET_ACCESS_KEY": "secret",
+                "R2_BUCKET": "dti-perfect-fit-artifacts",
+                "R2_PREFIX": "research/dti",
+            },
+            clear=False,
+        ):
+            with patch(
+                "dti_ui_v1.services.run_store.requests.request",
+                side_effect=[fake_get_response, fake_put_response],
+            ) as request:
+                recorded = run_store.record_anonymous_page_view(
+                    "Results",
+                    app_commit="abc1234",
+                )
+
+        self.assertTrue(recorded["recorded"])
+        self.assertEqual(recorded["page"], "Results")
+        payload = request.call_args_list[-1].kwargs["data"].decode("utf-8")
+        self.assertIn('"total": 3', payload)
+        self.assertIn('"Results": 1', payload)
+        self.assertIn('"abc1234": 1', payload)
+
+    def test_get_anonymous_page_view_summary_aggregates_days(self) -> None:
+        first = Mock()
+        first.status_code = 200
+        first.json.return_value = {
+            "schema_version": "dti-r2-anonymous-page-view-counter-v1",
+            "date": "2026-08-20",
+            "total": 3,
+            "pages": {"Workspace": 2, "Results": 1},
+            "commits": {"abc": 3},
+        }
+        first.raise_for_status.return_value = None
+        second = Mock()
+        second.status_code = 200
+        second.json.return_value = {
+            "schema_version": "dti-r2-anonymous-page-view-counter-v1",
+            "date": "2026-08-19",
+            "total": 1,
+            "pages": {"Workspace": 1},
+            "commits": {"abc": 1},
+        }
+        second.raise_for_status.return_value = None
+
+        with patch.dict(
+            os.environ,
+            {
+                "DTI_EXTERNAL_STORAGE_BACKEND": "r2",
+                "R2_ACCOUNT_ID": "account",
+                "R2_ACCESS_KEY_ID": "access",
+                "R2_SECRET_ACCESS_KEY": "secret",
+                "R2_BUCKET": "dti-perfect-fit-artifacts",
+                "R2_PREFIX": "research/dti",
+            },
+            clear=False,
+        ):
+            with patch(
+                "dti_ui_v1.services.run_store.requests.request",
+                side_effect=[first, second],
+            ):
+                summary = run_store.get_anonymous_page_view_summary(days=2)
+
+        self.assertEqual(summary["total"], 4)
+        self.assertEqual(summary["pages"]["Workspace"], 3)
+        self.assertFalse(summary["privacy"]["stores_ip"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,6 +14,7 @@ from dti_ui_v1.services.run_store import (
     build_notebook_export,
     build_reproduction_package,
     build_run_manifest,
+    get_anonymous_page_view_summary,
     get_external_run_index,
     get_run_artifact_store_status,
     load_external_run_artifact,
@@ -168,6 +169,25 @@ def render_perfect_fit_artifact_viewer():
     render_safe_json(get_run_artifact_store_status())
     external_index = get_external_run_index()
     if external_index.get("configured"):
+        metrics = get_anonymous_page_view_summary(days=7)
+        if metrics.get("configured"):
+            st.markdown("### Anonymous page views")
+            metric_columns = st.columns(2)
+            today_total = 0
+            days = metrics.get("days", [])
+            if isinstance(days, list) and days:
+                today_total = int(days[0].get("total") or 0)
+            metric_columns[0].metric("Today views", today_total)
+            metric_columns[1].metric("7d views", int(metrics.get("total") or 0))
+            render_safe_json(
+                {
+                    "schema_version": metrics.get("schema_version"),
+                    "pages": metrics.get("pages"),
+                    "commits": metrics.get("commits"),
+                    "privacy": metrics.get("privacy"),
+                    "error": metrics.get("error"),
+                }
+            )
         st.markdown("### R2 artifact index")
         render_safe_json(
             {

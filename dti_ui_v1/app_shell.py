@@ -92,6 +92,22 @@ def render_app() -> None:
         initial_sidebar_state="expanded",
     )
     selected = render_sidebar()
+    try:
+        from dti_ui_v1.components.deployment_identity import collect_identity
+        from dti_ui_v1.services.run_store import record_anonymous_page_view
+
+        counter_key = f"perfect_fit_page_view_recorded_v1_{selected}"
+        if not st.session_state.get(counter_key):
+            identity = collect_identity()
+            result = record_anonymous_page_view(
+                selected,
+                app_commit=identity.get("Commit"),
+            )
+            st.session_state[counter_key] = bool(result.get("recorded")) or bool(
+                result.get("configured")
+            )
+    except Exception:
+        pass
 
     renderer = resolve_page_renderer(selected)
     renderer()

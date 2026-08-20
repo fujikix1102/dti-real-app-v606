@@ -5,6 +5,7 @@ import hmac
 import json
 import os
 import platform
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +25,7 @@ R2_SECRET_ACCESS_KEY_ENV = "R2_SECRET_ACCESS_KEY"
 R2_BUCKET_ENV = "R2_BUCKET"
 R2_PREFIX_ENV = "R2_PREFIX"
 R2_PUBLIC_BASE_URL_ENV = "R2_PUBLIC_BASE_URL"
+PAGE_VIEW_COUNTER_SCHEMA_VERSION = "dti-r2-anonymous-page-view-counter-v1"
 
 
 def _runtime_identity() -> dict[str, Any]:
@@ -375,6 +377,146 @@ def _r2_index_key() -> str:
     external = _external_storage_context()
     prefix = str(external.get("prefix") or "").strip("/")
     return f"{prefix}/index/runs_manifest.json" if prefix else "index/runs_manifest.json"
+
+
+def _r2_metrics_key(date_label: str) -> str:
+    external = _external_storage_context()
+    prefix = str(external.get("prefix") or "").strip("/")
+    return (
+        f"{prefix}/metrics/page_views/{date_label}.json"
+        if prefix
+        else f"metrics/page_views/{date_label}.json"
+    )
+
+
+def _safe_metric_label(value: str) -> str:
+    compact = re.sub(r"[^A-Za-z0-9_.-]+", "_", value.strip())
+    return compact.strip("_")[:80] or "unknown"
+
+
+def record_anonymous_page_view(
+    page: str,
+    *,
+    app_commit: str | None = None,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    external = _external_storage_context()
+    if not external["configured"] or external["backend"] != "r2":
+        return {"configured": False, "recorded": False, "error": None}
+    checked_at = now or datetime.now(timezone.utc)
+    date_label = checked_at.strftime("%Y-%m-%d")
+    key = _r2_metrics_key(date_label)
+    page_label = _safe_metric_label(page)
+    commit_label = _safe_metric_label(app_commit or "unknown")
+    try:
+        payload = _r2_get_json(key, now=checked_at) or {}
+        if payload.get("schema_version") != PAGE_VIEW_COUNTER_SCHEMA_VERSION:
+            payload = {
+                "schema_version": PAGE_VIEW_COUNTER_SCHEMA_VERSION,
+                "date": date_label,
+                "updated_at_utc": checked_at.isoformat(),
+                "total": 0,
+                "pages": {},
+                "commits": {},
+                "privacy": {
+                    "anonymous": True,
+                    "stores_ip": False,
+                    "stores_user_agent": False,
+                    "stores_cookie": False,
+                    "stores_session_id": False,
+                },
+            }
+        pages = payload.get("pages")
+        if not isinstance(pages, dict):
+            pages = {}
+            payload["pages"] = pages
+        commits = payload.get("commits")
+        if not isinstance(commits, dict):
+            commits = {}
+            payload["commits"] = commits
+        payload["date"] = date_label
+        payload["updated_at_utc"] = checked_at.isoformat()
+        payload["total"] = int(payload.get("total") or 0) + 1
+        pages[page_label] = int(pages.get(page_label) or 0) + 1
+        commits[commit_label] = int(commits.get(commit_label) or 0) + 1
+        upload = _r2_put_json(key, payload, now=checked_at)
+    except Exception as exc:
+        return {
+            "configured": True,
+            "recorded": False,
+            "key": key,
+            "error": str(exc),
+        }
+    return {
+        "configured": True,
+        "recorded": bool(upload.get("uploaded")),
+        "key": key,
+        "date": date_label,
+        "page": page_label,
+        "app_commit": commit_label,
+        "error": None,
+    }
+
+
+def get_anonymous_page_view_summary(
+    *,
+    days: int = 7,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    external = _external_storage_context()
+    if not external["configured"] or external["backend"] != "r2":
+        return {"configured": False, "days": [], "total": 0, "error": None}
+    checked_at = now or datetime.now(timezone.utc)
+    day_payloads: list[dict[str, Any]] = []
+    total = 0
+    pages: dict[str, int] = {}
+    commits: dict[str, int] = {}
+    errors: list[str] = []
+    for offset in range(max(1, days)):
+        date_label = (
+            datetime.fromtimestamp(
+                checked_at.timestamp() - offset * 86400,
+                timezone.utc,
+            ).strftime("%Y-%m-%d")
+        )
+        key = _r2_metrics_key(date_label)
+        try:
+            payload = _r2_get_json(key, now=checked_at)
+        except Exception as exc:
+            errors.append(f"{date_label}:{exc}")
+            continue
+        if not isinstance(payload, dict):
+            continue
+        count = int(payload.get("total") or 0)
+        total += count
+        for name, value in (payload.get("pages") or {}).items():
+            pages[str(name)] = pages.get(str(name), 0) + int(value or 0)
+        for name, value in (payload.get("commits") or {}).items():
+            commits[str(name)] = commits.get(str(name), 0) + int(value or 0)
+        day_payloads.append(
+            {
+                "date": date_label,
+                "total": count,
+                "key": key,
+                "updated_at_utc": payload.get("updated_at_utc"),
+            }
+        )
+    return {
+        "schema_version": PAGE_VIEW_COUNTER_SCHEMA_VERSION,
+        "configured": True,
+        "days": day_payloads,
+        "total": total,
+        "pages": dict(sorted(pages.items())),
+        "commits": dict(sorted(commits.items())),
+        "error": "; ".join(errors) if errors else None,
+        "privacy": {
+            "anonymous": True,
+            "stores_ip": False,
+            "stores_user_agent": False,
+            "stores_cookie": False,
+            "stores_session_id": False,
+        },
+    }
 
 
 def _r2_artifact_key_for_run(run_id: str) -> str:
