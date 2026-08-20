@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -9,6 +10,7 @@ FINAL_HANDOVER_ZIP_SHA256 = (
     "22f3194eb17524cc92bb01604a53d1b1e13345ec21d33934bbaed01255702b21"
 )
 PUBLIC_VIEWER_ASSET_ROOT = Path("assets/posterior_readback_public_viewer")
+PUBLIC_VIEWER_ASSET_MANIFEST = PUBLIC_VIEWER_ASSET_ROOT / "POSTERIOR_READBACK_PUBLIC_ASSET_MANIFEST.json"
 
 
 @dataclass(frozen=True)
@@ -71,8 +73,33 @@ def resolved_asset_path(asset: PosteriorReadbackPlotAsset) -> Path:
     return repository_root() / asset.relative_path
 
 
+def public_asset_manifest() -> dict[str, object]:
+    path = repository_root() / PUBLIC_VIEWER_ASSET_MANIFEST
+    if not path.is_file():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return payload if isinstance(payload, dict) else {}
+
+
+def _manifest_sha_by_plot() -> dict[str, str]:
+    manifest = public_asset_manifest()
+    assets = manifest.get("assets", [])
+    if not isinstance(assets, list):
+        return {}
+    rows: dict[str, str] = {}
+    for item in assets:
+        if not isinstance(item, dict):
+            continue
+        plot_id = item.get("plot_id")
+        sha256 = item.get("sha256")
+        if isinstance(plot_id, str) and isinstance(sha256, str):
+            rows[plot_id] = sha256
+    return rows
+
+
 def public_viewer_rows() -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
+    sha_by_plot = _manifest_sha_by_plot()
     for asset in POSTERIOR_READBACK_PLOTS:
         path = resolved_asset_path(asset)
         rows.append(
@@ -81,6 +108,7 @@ def public_viewer_rows() -> list[dict[str, str]]:
                 "Internal role": asset.internal_role,
                 "Public image bundled": "YES" if path.is_file() else "NO",
                 "Public asset path": str(asset.relative_path),
+                "SHA256": sha_by_plot.get(asset.plot_id, ""),
                 "Boundary": asset.boundary,
             }
         )

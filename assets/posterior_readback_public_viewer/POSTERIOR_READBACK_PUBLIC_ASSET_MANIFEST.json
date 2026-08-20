@@ -1,0 +1,55 @@
+{
+  "asset_manifest_schema": "dti-posterior-readback-public-assets-v1",
+  "source_policy": "generated_from_existing_frozen_readback_assets_no_mcmc_rerun",
+  "boundary": "internal diagnostic readback only; not public posterior; no MCMC; no claim promotion; no manuscript or pointer promotion",
+  "source_files": [
+    "_GTDS_CHAIN01_10_PAIRWISE_MODE_DIAGNOSTIC_V1_20260805/plot/H0_vs_f_ede_CHAIN01_10.png",
+    "_GTDS_CHAIN01_10_PAIRWISE_MODE_DIAGNOSTIC_V1_20260805/plot/H0_vs_log10_z_c_CHAIN01_10.png",
+    "_GTDS_CHAIN01_10_PAIRWISE_MODE_DIAGNOSTIC_V1_20260805/plot/Omega_m_vs_sigma8_CHAIN01_10.png",
+    "_GTDS_CHAIN01_10_PAIRWISE_MODE_DIAGNOSTIC_V1_20260805/plot/f_ede_vs_log10_z_c_CHAIN01_10.png",
+    "_GTDS_MODE_CLUSTER_MAP_REPORT_V1_20260805/plot/H0_vs_f_ede_cluster_map.png",
+    "_GTDS_MODE_CLUSTER_MAP_REPORT_V1_20260805/plot/H0_vs_log10_z_c_cluster_map.png",
+    "_GTDS_MODE_CLUSTER_MAP_REPORT_V1_20260805/plot/Omega_m_vs_sigma8_cluster_map.png",
+    "_GTDS_MODE_CLUSTER_MAP_REPORT_V1_20260805/plot/f_ede_vs_log10_z_c_cluster_map.png",
+    "_DTI_PERFECT_FIT_GTDS_MCMC_READBACK_RHAT_ESS_EXECUTE_V1_COMBO_20260801_105734/readback/PER_CHAIN_READBACK_SUMMARY.tsv",
+    "_DTI_PERFECT_FIT_GTDS_MCMC_READBACK_RHAT_ESS_EXECUTE_V1_COMBO_20260801_105734/readback/WEIGHT_DISTRIBUTION.tsv",
+    "_DTI_PERFECT_FIT_GTDS_MCMC_READBACK_RHAT_ESS_EXECUTE_V1_COMBO_20260801_105734/diagnostics/RHAT_ESS_PRIMARY_FULL_CHAIN.tsv"
+  ],
+  "assets": [
+    {
+      "plot_id": "P1",
+      "role": "primary",
+      "path": "assets/posterior_readback_public_viewer/P1_internal_corner_pair_geometry.png",
+      "sha256": "e88041229249b8099f9d31e86afa74deb21484628f81124da63c6cdeb5ae84ac",
+      "bytes": 283906
+    },
+    {
+      "plot_id": "P2",
+      "role": "primary",
+      "path": "assets/posterior_readback_public_viewer/P2_internal_correlation_heatmap.png",
+      "sha256": "146d7427ba58cfa60dbd1d97ed937da7bc48e47a6bb284582c5d3a59e2fe16aa",
+      "bytes": 245119
+    },
+    {
+      "plot_id": "P3",
+      "role": "secondary",
+      "path": "assets/posterior_readback_public_viewer/P3_internal_median_quantile_table.png",
+      "sha256": "5190cac99e5270c875ec8a16df4e3d98cfb4377d464dfa2ff7444f797e9c3073",
+      "bytes": 165667
+    },
+    {
+      "plot_id": "P4",
+      "role": "secondary",
+      "path": "assets/posterior_readback_public_viewer/P4_internal_component_chi2_distribution.png",
+      "sha256": "5f97c28c6ecc4372e3a0290316b1614af3dcc4b1a83023fb8c0a9d28a6c484d4",
+      "bytes": 86945
+    },
+    {
+      "plot_id": "P5",
+      "role": "reference-only",
+      "path": "assets/posterior_readback_public_viewer/P5_internal_best_sampled_marker.png",
+      "sha256": "4ee2efaaacb3a9c67b5fcea8a1ee3ec0ee2dc486e5b5e629183a2371431e9a09",
+      "bytes": 152287
+    }
+  ]
+}
