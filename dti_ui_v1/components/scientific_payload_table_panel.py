@@ -8,7 +8,7 @@ def render_scientific_payload_table(source_path):
 
     path = Path(source_path)
 
-    st.subheader("Scientific Payload Table")
+    st.subheader("Diagnostic data table")
 
     if not path.exists():
         st.warning("Diagnostic source not found")

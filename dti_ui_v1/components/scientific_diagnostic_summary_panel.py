@@ -4,7 +4,7 @@ import streamlit as st
 def render_scientific_diagnostic_summary(summary):
 
     st.subheader(
-        "Scientific Diagnostic Summary"
+        "Diagnostic data summary"
     )
 
     st.write(

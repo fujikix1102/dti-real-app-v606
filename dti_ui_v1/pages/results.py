@@ -172,7 +172,7 @@ def _render_perfect_fit_artifact_extensions():
         render_perfect_fit_artifact_viewer()
 
     with st.expander(
-        "A/B Route Contract Comparison",
+        "Saved artifact type comparison",
         expanded=False,
     ):
         render_ab_route_comparison_panel()
@@ -187,26 +187,26 @@ def render() -> None:
             "LOCAL_DIAGNOSTIC_SOURCE"
         )
         st.caption(
-            "Scientific Result Bridge: "
-            + scientific_bridge_payload.get("status", "UNKNOWN")
+            "Diagnostic data status: "
+            + scientific_bridge_payload.get("public_status", "review display only")
         )
     except Exception as exc:
-        st.caption("Scientific Result Bridge unavailable: " + str(exc))
+        st.caption("Diagnostic data status unavailable: " + str(exc))
 
     st.title("Results")
 
     with st.expander(
-        "Scientific Diagnostic Interaction",
+        "Filter diagnostic records",
         expanded=False,
     ):
         render_scientific_diagnostic_filter_panel()
 
 
 
-    with st.expander("Section 8: Primary Comparison Graph", expanded=False):
+    with st.expander("Primary diagnostic comparison graph", expanded=False):
         render_section8_comparison_chart("data/section8_source_record/section8_primary_comparison_graph_normalized.tsv")
 
-    with st.expander("Scientific Diagnostic Summary", expanded=False):
+    with st.expander("Diagnostic data summary", expanded=False):
 
         diagnostic_summary = build_diagnostic_summary(
             "data/desi_dr2_cosmology_products/diagnostic_numeric_summary.tsv"
@@ -218,14 +218,14 @@ def render() -> None:
 
 
 
-    with st.expander("Scientific Payload Metadata", expanded=False):
+    with st.expander("Diagnostic data source details", expanded=False):
         render_scientific_payload_metadata(
             "data/desi_dr2_cosmology_products/diagnostic_numeric_summary.tsv"
         )
 
 
 
-    with st.expander("Scientific Payload Table", expanded=False):
+    with st.expander("Diagnostic data table", expanded=False):
         render_scientific_payload_table(
             "data/desi_dr2_cosmology_products/diagnostic_numeric_summary.tsv"
         )

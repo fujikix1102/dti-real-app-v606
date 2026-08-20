@@ -4,7 +4,7 @@ import altair as alt
 from pathlib import Path
 
 def render_section8_comparison_chart(source_path: str):
-    st.subheader("Section 8: Primary Comparison Graph")
+    st.subheader("Primary diagnostic comparison graph")
 
     p = Path(source_path)
     if not p.exists():
@@ -30,7 +30,7 @@ def render_section8_comparison_chart(source_path: str):
 
         st.altair_chart(chart, use_container_width=True)
 
-        with st.expander("Raw Diagnostic Data (Schema Hardened)", expanded=False):
+        with st.expander("Underlying diagnostic table", expanded=False):
             # [ROUTE A HARDENING] プレビューテーブルのPyArrowクラッシュを防止
             safe_df = df.astype(str)
             st.dataframe(safe_df, hide_index=True, use_container_width=True)
@@ -41,4 +41,4 @@ def render_section8_comparison_chart(source_path: str):
         )
 
     except Exception as exc:
-        st.error("Failed to render Section 8 chart: " + str(exc))
+        st.error("Failed to render diagnostic comparison chart: " + str(exc))

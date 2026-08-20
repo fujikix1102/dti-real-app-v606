@@ -9,7 +9,7 @@ def render_scientific_payload_metadata(source_path):
 
     path = Path(source_path)
 
-    st.subheader("Scientific Payload Metadata")
+    st.subheader("Diagnostic data source details")
 
     if not path.exists():
         st.warning("Source not found")

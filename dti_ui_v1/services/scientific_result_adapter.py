@@ -20,4 +20,5 @@ def build_scientific_result_payload(
             "physical_claim": False,
         },
         "status": "DIAGNOSTIC_PAYLOAD_ONLY",
+        "public_status": "review display only; no posterior, MCMC, or model-ranking claim",
     }
