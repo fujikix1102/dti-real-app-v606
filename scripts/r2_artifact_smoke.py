@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from typing import Any
@@ -53,6 +54,36 @@ def _check_artifact(payload: dict[str, Any], *, expected_key: str | None = None)
     return failures
 
 
+def _token_rotation_audit(max_age_days: int) -> dict[str, Any]:
+    raw = os.getenv("R2_TOKEN_ROTATED_AT_UTC", "").strip()
+    if not raw:
+        return {
+            "configured": False,
+            "ok": True,
+            "warning": "R2_TOKEN_ROTATED_AT_UTC is not configured",
+            "max_age_days": max_age_days,
+        }
+    try:
+        rotated_at = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        if rotated_at.tzinfo is None:
+            rotated_at = rotated_at.replace(tzinfo=timezone.utc)
+    except ValueError as exc:
+        return {
+            "configured": True,
+            "ok": False,
+            "error": f"invalid_R2_TOKEN_ROTATED_AT_UTC:{exc}",
+            "max_age_days": max_age_days,
+        }
+    age_days = (datetime.now(timezone.utc) - rotated_at).total_seconds() / 86400
+    return {
+        "configured": True,
+        "ok": age_days <= max_age_days,
+        "rotated_at_utc": rotated_at.isoformat(),
+        "age_days": round(age_days, 3),
+        "max_age_days": max_age_days,
+    }
+
+
 def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
     checked_at = datetime.now(timezone.utc).isoformat()
     failures: list[str] = []
@@ -71,6 +102,10 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
     run_count = int(index.get("run_count") or len(runs))
     if run_count < args.min_run_count:
         failures.append(f"r2_run_count_below_min:{run_count}<{args.min_run_count}")
+
+    rotation = _token_rotation_audit(args.token_max_age_days)
+    if not rotation.get("ok"):
+        failures.append("r2_token_rotation_audit_failed")
 
     latest_key = (
         f"{external.get('prefix')}/index/latest.json"
@@ -127,6 +162,7 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             "latest_key": latest_key,
             "latest_ok": latest_ok,
             "artifact_checks": artifact_checks,
+            "token_rotation": rotation,
         },
         "boundary": {
             "compute": "NO",
@@ -144,6 +180,7 @@ def main() -> int:
     parser.add_argument("--public-url", default="")
     parser.add_argument("--min-run-count", type=int, default=1)
     parser.add_argument("--max-artifacts", type=int, default=5)
+    parser.add_argument("--token-max-age-days", type=int, default=90)
     parser.add_argument("--timeout", type=int, default=20)
     args = parser.parse_args()
 

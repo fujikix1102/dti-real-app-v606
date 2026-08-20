@@ -16,8 +16,11 @@ jobs:
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       R2_BUCKET: ${{ vars.R2_BUCKET || 'dti-perfect-fit-artifacts' }}
       R2_PREFIX: ${{ vars.R2_PREFIX || 'dti-perfect-fit' }}
+      R2_TOKEN_ROTATED_AT_UTC: ${{ vars.R2_TOKEN_ROTATED_AT_UTC }}
+      R2_TOKEN_MAX_AGE_DAYS: ${{ vars.R2_TOKEN_MAX_AGE_DAYS || '90' }}
       PUBLIC_APP_URL: ${{ vars.PUBLIC_APP_URL || 'https://dti-perfect-fit.streamlit.app/' }}
       PYTHONPATH: ${{ github.workspace }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,7 +48,27 @@ jobs:
             --public-url "$PUBLIC_APP_URL" \
             --min-run-count 1 \
             --max-artifacts 5 \
+            --token-max-age-days "$R2_TOKEN_MAX_AGE_DAYS" \
             | tee monitor-output/r2-artifact-smoke.json
+
+      - name: Notify Slack on failure
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import requests
+
+          payload = {
+              "text": (
+                  "DTI R2 artifact monitor failed: "
+                  f"{os.environ.get('GITHUB_SERVER_URL')}/"
+                  f"{os.environ.get('GITHUB_REPOSITORY')}/actions/runs/"
+                  f"{os.environ.get('GITHUB_RUN_ID')}"
+              )
+          }
+          requests.post(os.environ["SLACK_WEBHOOK_URL"], json=payload, timeout=20).raise_for_status()
+          PY
 
       - name: Upload smoke report
         if: always()

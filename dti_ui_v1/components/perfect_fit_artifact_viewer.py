@@ -8,6 +8,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 import pandas as pd
 import streamlit as st
+import altair as alt
 
 from dti_ui_v1.components.safe_json_display import render_safe_json
 from dti_ui_v1.services.run_store import (
@@ -156,6 +157,131 @@ def _r2_summary_payload(
     }
 
 
+def _research_notebook_markdown(rows: list[Mapping[str, Any]]) -> str:
+    if rows:
+        frame = _compact_r2_rows(rows)
+        headers = list(frame.columns)
+        table_lines = [
+            "| " + " | ".join(headers) + " |",
+            "| " + " | ".join(["---"] * len(headers)) + " |",
+        ]
+        for _, row in frame.iterrows():
+            table_lines.append(
+                "| "
+                + " | ".join(str(row.get(column, "")) for column in headers)
+                + " |"
+            )
+        table = "\n".join(table_lines)
+    else:
+        table = "No R2 runs."
+    return "\n".join(
+        [
+            "# DTI PERFECT FIT R2 Research Notebook",
+            "",
+            "## Scope",
+            "",
+            "This notebook summarizes public R2 run artifacts visible to the application.",
+            "",
+            "## Boundary",
+            "",
+            "- Compute is not triggered by this export.",
+            "- MCMC is not executed.",
+            "- Posterior inference is not claimed.",
+            "- Model comparison preference is not claimed.",
+            "- Manuscript or pointer promotion is not performed by this export.",
+            "",
+            "## Runs",
+            "",
+            table,
+            "",
+            "## Reproducibility",
+            "",
+            "Each run is represented by an immutable artifact key and artifact SHA when available.",
+        ]
+    )
+
+
+def _manuscript_pointer_review(rows: list[Mapping[str, Any]]) -> dict[str, Any]:
+    run_count = len(rows)
+    has_sha = all(bool(row.get("artifact_sha256")) for row in rows if isinstance(row, Mapping))
+    has_multiple_routes = len(
+        {
+            str(row.get("route"))
+            for row in rows
+            if isinstance(row, Mapping) and row.get("route")
+        }
+    ) > 1
+    return {
+        "schema_version": "dti-manuscript-pointer-admissibility-review-v1",
+        "decision": "NOT_PROMOTED_REVIEW_ONLY",
+        "manuscript_ready": False,
+        "pointer_promotion_ready": False,
+        "run_count": run_count,
+        "checks": {
+            "artifacts_visible": run_count > 0,
+            "artifact_sha_present": has_sha,
+            "multiple_routes_visible": has_multiple_routes,
+            "posterior_claim": "NO",
+            "mcmc_claim": "NO",
+            "model_comparison_claim": "NO",
+        },
+        "required_before_promotion": [
+            "Explicit manuscript admissibility gate",
+            "Claim-by-claim evidence mapping",
+            "Independent review of public/private posterior boundaries",
+            "Decision record approving any pointer update",
+        ],
+    }
+
+
+def _render_r2_comparison_graphs(frame: pd.DataFrame) -> None:
+    if frame.empty:
+        return
+    numeric_columns = ["H0", "A_DTI", "f_EDE", "z_c"]
+    available = [
+        column
+        for column in numeric_columns
+        if column in frame.columns and pd.to_numeric(frame[column], errors="coerce").notna().any()
+    ]
+    if not available:
+        return
+    chart_frame = frame.copy()
+    chart_frame["created_at"] = pd.to_datetime(chart_frame["created_at"], errors="coerce")
+    chart_frame = chart_frame.dropna(subset=["created_at"])
+    if chart_frame.empty:
+        return
+    long_frame = chart_frame.melt(
+        id_vars=["created_at", "route", "status", "run_id"],
+        value_vars=available,
+        var_name="parameter",
+        value_name="value",
+    )
+    long_frame["value"] = pd.to_numeric(long_frame["value"], errors="coerce")
+    long_frame = long_frame.dropna(subset=["value"])
+    if long_frame.empty:
+        return
+    st.markdown("### R2 multi-run parameter graph")
+    chart = (
+        alt.Chart(long_frame)
+        .mark_line(point=True)
+        .encode(
+            x=alt.X("created_at:T", title="Created"),
+            y=alt.Y("value:Q", title="Value"),
+            color=alt.Color("parameter:N", title="Parameter"),
+            strokeDash=alt.StrokeDash("route:N", title="Route"),
+            tooltip=[
+                alt.Tooltip("created_at:T", title="Created"),
+                alt.Tooltip("route:N", title="Route"),
+                alt.Tooltip("parameter:N", title="Parameter"),
+                alt.Tooltip("value:Q", title="Value", format=".6g"),
+                alt.Tooltip("run_id:N", title="Run ID"),
+            ],
+        )
+        .properties(height=320)
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+
 def render_perfect_fit_artifact_viewer():
     st.subheader("PERFECT FIT Artifact Viewer")
 
@@ -246,6 +372,7 @@ def render_perfect_fit_artifact_viewer():
                 hide_index=True,
                 use_container_width=True,
             )
+            _render_r2_comparison_graphs(r2_frame)
             csv_bytes = r2_frame.to_csv(index=False).encode("utf-8")
             summary_payload = _r2_summary_payload(
                 index=external_index,
@@ -298,6 +425,30 @@ def render_perfect_fit_artifact_viewer():
                 file_name="dti_r2_token_audit.json",
                 mime="application/json",
                 key="perfect_fit_r2_token_audit_download_v1",
+                width="stretch",
+            )
+            notebook_text = _research_notebook_markdown(filtered_runs)
+            review_payload = _manuscript_pointer_review(filtered_runs)
+            extra_export_columns = st.columns(2)
+            extra_export_columns[0].download_button(
+                "Download research notebook MD",
+                data=notebook_text,
+                file_name="dti_r2_research_notebook.md",
+                mime="text/markdown",
+                key="perfect_fit_r2_research_notebook_download_v1",
+                width="stretch",
+            )
+            extra_export_columns[1].download_button(
+                "Download manuscript/pointer review JSON",
+                data=json.dumps(
+                    review_payload,
+                    ensure_ascii=False,
+                    indent=2,
+                    allow_nan=False,
+                ),
+                file_name="dti_manuscript_pointer_review.json",
+                mime="application/json",
+                key="perfect_fit_manuscript_pointer_review_download_v1",
                 width="stretch",
             )
             choices = [
