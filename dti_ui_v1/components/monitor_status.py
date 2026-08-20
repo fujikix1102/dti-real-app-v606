@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
@@ -28,15 +29,29 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 @st.cache_data(ttl=5, show_spinner=False)
 def _health() -> dict[str, Any]:
+    started = time.perf_counter()
+    checked_at = datetime.now(timezone.utc).astimezone().isoformat()
     try:
         response = requests.get(HEALTH_ENDPOINT, timeout=1.5)
+        latency_ms = round((time.perf_counter() - started) * 1000.0, 1)
         body = response.json()
     except Exception as exc:
-        return {"online": False, "status": "unreachable", "detail": str(exc)}
+        latency_ms = round((time.perf_counter() - started) * 1000.0, 1)
+        return {
+            "online": False,
+            "status": "unreachable",
+            "checked_at": checked_at,
+            "latency_ms": latency_ms,
+            "endpoint": HEALTH_ENDPOINT,
+            "detail": str(exc),
+        }
 
     return {
         "online": response.ok and body.get("status") == "ok",
         "status": body.get("status", f"http_{response.status_code}"),
+        "checked_at": checked_at,
+        "latency_ms": latency_ms,
+        "endpoint": HEALTH_ENDPOINT,
         "version": body.get("version"),
         "classy_available": body.get("classy_available"),
         "detail": body.get("classy_import_error", ""),
@@ -124,6 +139,12 @@ def render_monitor_status() -> None:
     cards[1].metric("Completed routes", completed)
     cards[2].metric("General runs retained", len(history))
     cards[3].metric("Saved run artifacts", len(artifacts))
+    st.caption(
+        "Backend health checked "
+        f"{health.get('checked_at', 'unknown')} · "
+        f"latency {health.get('latency_ms', 'n/a')} ms · "
+        f"version {health.get('version', 'unknown')}"
+    )
 
     session_tab, routes_tab, evidence_tab, audit_tab = st.tabs(
         ("Current session", "Route activity", "Evidence records", "Audit log")

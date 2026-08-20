@@ -7,12 +7,15 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
+from dti_ui_v1.components.safe_json_display import render_safe_json
+
 
 T_CMB_K = 2.7255
 K2_TO_UK2 = 1.0e12
 HISTORY_KEY = "general_class_compute_history_v1"
 
 _GENERAL_CLASS_INPUT_DEFAULTS = {
+    "perfect_fit_A_DTI_v1": 0.0,
     "perfect_fit_general_class_H0_v1": 72.9,
     "perfect_fit_general_class_omega_b_v1": 0.02440,
     "perfect_fit_general_class_f_EDE_v2": 0.082,
@@ -32,6 +35,11 @@ _GENERAL_CLASS_REQUEST_FIELDS = {
     "tau_reio": "perfect_fit_general_class_tau_reio_v1",
     "f_EDE": "perfect_fit_general_class_f_EDE_v2",
     "z_c": "perfect_fit_general_class_z_c_v2",
+}
+
+_WORKING_INPUT_FIELDS = {
+    "A_DTI": "perfect_fit_A_DTI_v1",
+    **_GENERAL_CLASS_REQUEST_FIELDS,
 }
 
 from dti_ui_v1.services.general_class_compute_service import (
@@ -119,6 +127,32 @@ def _general_class_request_payload(state: Mapping[str, Any]) -> dict[str, float]
         field: float(state[session_key])
         for field, session_key in _GENERAL_CLASS_REQUEST_FIELDS.items()
     }
+
+
+def _working_input_payload(state: Mapping[str, Any]) -> dict[str, float]:
+    return {
+        field: float(state[session_key])
+        for field, session_key in _WORKING_INPUT_FIELDS.items()
+    }
+
+
+def _render_latest_run_card(metadata: Mapping[str, Any] | None) -> None:
+    if not isinstance(metadata, Mapping):
+        return
+    st.markdown("### Latest Run")
+    cols = st.columns(4)
+    cols[0].metric("status", "SUCCESS")
+    cols[1].metric("artifact files", metadata.get("artifact_count", "n/a"))
+    cols[2].metric("runtime", metadata.get("storage", {}).get("persistence", "unknown"))
+    cols[3].metric("sha256", str(metadata.get("artifact_sha256", ""))[:12])
+    render_safe_json(
+        {
+            "run_id": metadata.get("run_id"),
+            "artifact": metadata.get("path"),
+            "sha256": metadata.get("artifact_sha256"),
+            "runtime": metadata.get("storage", {}),
+        }
+    )
 
 
 def _line_chart(
@@ -220,6 +254,16 @@ def render_general_class_compute_panel() -> None:
 
     with column_1:
         st.number_input(
+            "A_DTI",
+            min_value=0.0,
+            max_value=1.0,
+            step=0.001,
+            format="%.6f",
+            key="perfect_fit_A_DTI_v1",
+            help="Recorded as a working PERFECT FIT input. The current General CLASS backend contract does not forward A_DTI.",
+        )
+
+        st.number_input(
             "H0",
             min_value=1.0,
             max_value=150.0,
@@ -302,14 +346,37 @@ def render_general_class_compute_panel() -> None:
     )
 
     current_payload = _general_class_request_payload(st.session_state)
+    working_payload = _working_input_payload(st.session_state)
+    st.markdown("**Single run contract**")
+    render_safe_json(
+        {
+            "model": "DTI PERFECT FIT",
+            "parameters": working_payload,
+            "backend_payload": current_payload,
+            "will_compute": "YES CLASS backend single run",
+            "will_not_compute": [
+                "NO MCMC",
+                "NO posterior",
+                "NO scan",
+                "NO pointer promotion",
+                "NO manuscript update",
+            ],
+            "A_DTI_backend_binding": "RECORDED_ONLY_NOT_FORWARDED_BY_CURRENT_GENERAL_CLASS_CONTRACT",
+        }
+    )
+    confirmed = st.checkbox(
+        "Confirm single run contract",
+        key="perfect_fit_general_class_confirm_single_run_v1",
+    )
     with st.expander("Current run input payload", expanded=False):
-        st.json(current_payload)
+        render_safe_json(working_payload)
 
     run_requested = st.button(
         "Run CLASS / AxiCLASS computation",
         type="primary",
         key="perfect_fit_general_class_run_v1",
         width="stretch",
+        disabled=not confirmed,
     )
 
     if not run_requested:
@@ -321,14 +388,14 @@ def render_general_class_compute_panel() -> None:
         result = execute_general_class_compute(request)
 
     st.markdown("**Submitted parameters**")
-    st.json(dict(result.submitted_payload))
+    render_safe_json(dict(result.submitted_payload))
 
     if not result.accepted:
         st.error(
             f"General CLASS request failed: {result.status}"
         )
         st.caption(result.detail)
-        st.json(dict(result.response_payload))
+        render_safe_json(dict(result.response_payload))
         return
 
     st.success("CLASS / AxiCLASS computation accepted.")
@@ -337,7 +404,11 @@ def render_general_class_compute_panel() -> None:
     try:
         artifact = save_run_artifact(
             route="class_compute",
-            request=result.submitted_payload,
+            request={
+                **dict(result.submitted_payload),
+                "A_DTI": working_payload["A_DTI"],
+                "input_contract": "A_DTI_recorded_only_general_CLASS_parameters_forwarded",
+            },
             response=response,
         )
     except Exception as exc:
@@ -348,6 +419,8 @@ def render_general_class_compute_panel() -> None:
             "Audit artifact saved · "
             f"SHA-256 {artifact['artifact_sha256']} · {artifact['path']}"
         )
+        st.session_state["perfect_fit_latest_run_artifact_v1"] = dict(artifact)
+        _render_latest_run_card(artifact)
     history = st.session_state.setdefault(HISTORY_KEY, [])
     history.append(
         {
@@ -415,7 +488,7 @@ def render_general_class_compute_panel() -> None:
                     source_identity = desi_bao.get("source_identity")
                     if isinstance(source_identity, Mapping):
                         st.caption("Official input file identities")
-                        st.json(dict(source_identity))
+                        render_safe_json(dict(source_identity))
         elif desi_bao.get("status") == "failed":
             st.error(
                 "CLASS/AxiCLASS completed, but DESI DR2 BAO likelihood "
@@ -455,7 +528,7 @@ def render_general_class_compute_panel() -> None:
         if isinstance(component, Mapping):
             if component.get("status") == "ok":
                 with st.expander(f"{label} likelihood details"):
-                    st.json(dict(component))
+                    render_safe_json(dict(component))
             elif component.get("status") == "unavailable":
                 st.warning(f"{label} assets were unavailable: {component.get('detail')}")
 
@@ -655,7 +728,7 @@ def render_general_class_compute_panel() -> None:
             )
 
     with st.expander("Complete backend response", expanded=False):
-        st.json(dict(response))
+        render_safe_json(dict(response))
 
     st.caption(
         "Boundary: this panel performs direct CLASS/AxiCLASS physical "

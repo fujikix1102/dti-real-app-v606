@@ -5,6 +5,7 @@ import unittest
 from dti_ui_v1.components.general_class_compute_panel import (
     _GENERAL_CLASS_INPUT_DEFAULTS,
     _general_class_request_payload,
+    _working_input_payload,
 )
 
 
@@ -39,6 +40,22 @@ class GeneralClassComputePanelStateTests(unittest.TestCase):
                 "z_c": 4000.0,
             },
         )
+
+    def test_working_payload_retains_a_dti_without_forwarding_to_backend(self) -> None:
+        state = dict(_GENERAL_CLASS_INPUT_DEFAULTS)
+        state.update(
+            {
+                "perfect_fit_A_DTI_v1": 0.001,
+                "perfect_fit_general_class_H0_v1": 68.0,
+            }
+        )
+
+        backend_payload = _general_class_request_payload(state)
+        working_payload = _working_input_payload(state)
+
+        self.assertNotIn("A_DTI", backend_payload)
+        self.assertEqual(working_payload["A_DTI"], 0.001)
+        self.assertEqual(working_payload["H0"], 68.0)
 
 
 if __name__ == "__main__":

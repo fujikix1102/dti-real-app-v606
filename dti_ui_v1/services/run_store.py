@@ -94,11 +94,16 @@ def save_run_artifact(
     request: Mapping[str, Any],
     response: Mapping[str, Any],
 ) -> dict[str, Any]:
-    created_at = datetime.now(timezone.utc).isoformat()
+    created = datetime.now(timezone.utc)
+    created_at = created.isoformat()
     directory = _artifact_directory()
     storage = _storage_context(directory)
+    route_label = route.replace("/", "_").strip("_")
+    stamp = created.strftime("%Y%m%dT%H%M%S.%fZ")
+    run_id = f"{stamp}_{route_label}"
     core = {
         "schema_version": SCHEMA_VERSION,
+        "run_id": run_id,
         "created_at_utc": created_at,
         "route": route,
         "request": dict(request),
@@ -121,8 +126,7 @@ def save_run_artifact(
     artifact = {**core, "artifact_sha256": sha256}
 
     directory.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
-    filename = f"{stamp}_{route.replace('/', '_').strip('_')}_{sha256[:12]}.json"
+    filename = f"{run_id}_{sha256[:12]}.json"
     destination = directory / filename
     temporary = directory / f".{filename}.tmp"
     temporary.write_text(
@@ -133,6 +137,7 @@ def save_run_artifact(
     artifact_count = len(list(directory.glob("*.json")))
     return {
         "schema_version": SCHEMA_VERSION,
+        "run_id": run_id,
         "created_at_utc": created_at,
         "artifact_sha256": sha256,
         "path": str(destination),
@@ -154,12 +159,137 @@ def list_run_artifacts(limit: int = 100) -> list[dict[str, Any]]:
             continue
         records.append(
             {
+                "run_id": payload.get("run_id"),
                 "path": str(path),
                 "route": payload.get("route"),
                 "created_at_utc": payload.get("created_at_utc"),
                 "artifact_sha256": payload.get("artifact_sha256"),
                 "status": payload.get("response", {}).get("status"),
+                "H0": payload.get("request", {}).get("H0"),
+                "A_DTI": payload.get("request", {}).get("A_DTI"),
+                "f_EDE": payload.get("request", {}).get("f_EDE"),
+                "z_c": payload.get("request", {}).get("z_c"),
                 "runtime_store": payload.get("storage", {}).get("persistence"),
             }
         )
     return records
+
+
+def list_run_artifact_paths(limit: int = 100) -> list[Path]:
+    directory = _artifact_directory()
+    if not directory.exists():
+        return []
+    return sorted(
+        directory.glob("*.json"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )[:limit]
+
+
+def load_run_artifact(path: str | Path) -> dict[str, Any]:
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError("run_artifact_root_must_be_mapping")
+    return payload
+
+
+def build_run_manifest(payload: Mapping[str, Any]) -> dict[str, Any]:
+    request = payload.get("request", {})
+    response = payload.get("response", {})
+    reproducibility = payload.get("reproducibility", {})
+    storage = payload.get("storage", {})
+    if not isinstance(request, Mapping):
+        request = {}
+    if not isinstance(response, Mapping):
+        response = {}
+    if not isinstance(reproducibility, Mapping):
+        reproducibility = {}
+    if not isinstance(storage, Mapping):
+        storage = {}
+    return {
+        "manifest_schema": "dti-run-manifest-v1",
+        "run_id": payload.get("run_id"),
+        "created_at_utc": payload.get("created_at_utc"),
+        "route": payload.get("route"),
+        "artifact_sha256": payload.get("artifact_sha256"),
+        "status": response.get("status"),
+        "parameters": {
+            key: request.get(key)
+            for key in ("H0", "A_DTI", "omega_b", "omega_cdm", "z_c", "f_EDE")
+            if key in request
+        },
+        "result_summary": {
+            key: response.get(key)
+            for key in (
+                "engine",
+                "model_loglike",
+                "model_chi2",
+                "rdrag_Mpc",
+            )
+            if key in response
+        },
+        "runtime": reproducibility.get("runtime", {}),
+        "request_replay": reproducibility.get("request_replay", {}),
+        "storage": storage,
+        "boundary": reproducibility.get(
+            "scientific_boundary",
+            "Single-point deterministic calculation; no posterior or evidence claim.",
+        ),
+    }
+
+
+def build_notebook_export(payload: Mapping[str, Any]) -> str:
+    manifest = build_run_manifest(payload)
+    parameters = manifest.get("parameters", {})
+    lines = [
+        "# DTI PERFECT FIT run notebook",
+        "",
+        f"- run_id: {manifest.get('run_id')}",
+        f"- created_at_utc: {manifest.get('created_at_utc')}",
+        f"- route: {manifest.get('route')}",
+        f"- status: {manifest.get('status')}",
+        f"- artifact_sha256: {manifest.get('artifact_sha256')}",
+        "",
+        "## Parameters",
+        "",
+    ]
+    if isinstance(parameters, Mapping) and parameters:
+        for key, value in parameters.items():
+            lines.append(f"- {key}: {value}")
+    else:
+        lines.append("- No editable parameters recorded.")
+    lines.extend(
+        [
+            "",
+            "## Boundary",
+            "",
+            str(manifest.get("boundary")),
+            "",
+            "## Reproduction",
+            "",
+            "Replay the request using the route and payload recorded in the run manifest.",
+            "This export does not contain posterior samples, MCMC output, or model-comparison claims.",
+        ]
+    )
+    return "\n".join(lines) + "\n"
+
+
+def build_reproduction_package(payload: Mapping[str, Any]) -> dict[str, str]:
+    manifest = build_run_manifest(payload)
+    run_id = str(manifest.get("run_id") or "dti_run")
+    return {
+        f"{run_id}_manifest.json": json.dumps(
+            manifest,
+            ensure_ascii=False,
+            indent=2,
+            allow_nan=False,
+        ),
+        f"{run_id}_notebook.md": build_notebook_export(payload),
+        f"{run_id}_artifact.json": json.dumps(
+            dict(payload),
+            ensure_ascii=False,
+            indent=2,
+            allow_nan=False,
+            default=str,
+        ),
+    }

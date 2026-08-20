@@ -15,6 +15,7 @@ from dti_ui_v1.services.run_store import (
 
 _RESULT_KEY = "perfect_fit_locked_compute_result"
 _ERROR_KEY = "perfect_fit_locked_compute_error"
+_LOCKED_A_DTI_KEY = "perfect_fit_locked_A_DTI_v1"
 
 
 def _payload(result: Any) -> dict[str, Any]:
@@ -25,6 +26,7 @@ def _payload(result: Any) -> dict[str, Any]:
 
 
 def render_perfect_fit_compute_panel() -> None:
+    st.session_state.setdefault(_LOCKED_A_DTI_KEY, 0.0)
     st.subheader("Locked baseline DESI DR2 BAO compute")
 
     st.info(
@@ -52,13 +54,49 @@ def render_perfect_fit_compute_panel() -> None:
             "runtime only. They do not update a separate local checkout's "
             "data/run_artifacts directory."
         )
-    timeout = st.number_input("HTTP timeout", 1, 600, 120, 1)
+    input_columns = st.columns(2)
+    with input_columns[0]:
+        st.number_input(
+            "A_DTI",
+            min_value=0.0,
+            max_value=1.0,
+            step=0.001,
+            format="%.6f",
+            key=_LOCKED_A_DTI_KEY,
+            help="Recorded as a working PERFECT FIT input. Locked baseline backend execution remains fixed.",
+        )
+    with input_columns[1]:
+        timeout = st.number_input("HTTP timeout", 1, 600, 120, 1)
     st.code(
         "route=LOCKED_BASELINE_ONLY\nuse_locked_baseline=true\n"
+        "A_DTI_backend_binding=RECORDED_ONLY_NOT_FORWARDED\n"
         "arbitrary_parameter_execution=NO\nfallback_endpoint=NO\nretry=NO",
         language="text",
     )
+    render_safe_json(
+        {
+            "model": "DTI PERFECT FIT locked baseline",
+            "working_inputs": {
+                "A_DTI": float(st.session_state[_LOCKED_A_DTI_KEY]),
+                "timeout_seconds": float(timeout),
+            },
+            "will_compute": "YES fixed DESI DR2 BAO locked baseline only",
+            "will_not_compute": [
+                "NO arbitrary parameter execution",
+                "NO MCMC",
+                "NO posterior",
+                "NO scan",
+            ],
+        }
+    )
+    confirmed = st.checkbox(
+        "Confirm locked baseline single run contract",
+        key="perfect_fit_locked_confirm_single_run_v1",
+    )
     if st.button("Run locked baseline compute", type="primary", width="stretch"):
+        if not confirmed:
+            st.warning("Confirm the single run contract before execution.")
+            return
         st.session_state.pop(_RESULT_KEY, None)
         st.session_state.pop(_ERROR_KEY, None)
         request = LockedBaselineRequest(
@@ -73,7 +111,11 @@ def render_perfect_fit_compute_panel() -> None:
             st.session_state[_RESULT_KEY] = result_payload
             st.session_state["perfect_fit_locked_artifact"] = save_run_artifact(
                 route="locked_baseline_desi_dr2_bao",
-                request={"use_locked_baseline": True},
+                request={
+                    "use_locked_baseline": True,
+                    "A_DTI": float(st.session_state[_LOCKED_A_DTI_KEY]),
+                    "input_contract": "A_DTI_recorded_only_locked_baseline_not_forwarded",
+                },
                 response=result_payload,
             )
         except Exception as exc:
@@ -107,11 +149,19 @@ def render_perfect_fit_compute_panel() -> None:
             f"Audit artifact saved in this app runtime · "
             f"SHA-256 {artifact.get('artifact_sha256')}"
         )
+        st.markdown("### Latest Run")
+        cards = st.columns(4)
+        cards[0].metric("status", "SUCCESS")
+        cards[1].metric("run_id", str(artifact.get("run_id", ""))[:18])
+        cards[2].metric("artifact files", artifact.get("artifact_count", "n/a"))
+        cards[3].metric("sha256", str(artifact.get("artifact_sha256", ""))[:12])
         render_safe_json(
             {
+                "run_id": artifact.get("run_id"),
                 "artifact_path_this_runtime": artifact.get("path"),
                 "artifact_directory_this_runtime": artifact.get("artifact_directory"),
                 "saved_artifact_count_this_runtime": artifact.get("artifact_count"),
+                "A_DTI": float(st.session_state[_LOCKED_A_DTI_KEY]),
                 "runtime_store": persistence,
                 "local_checkout_sync": False,
                 "boundary": (

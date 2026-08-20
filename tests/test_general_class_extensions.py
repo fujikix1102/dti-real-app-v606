@@ -65,12 +65,35 @@ class GeneralClassExtensionTests(unittest.TestCase):
                 metadata = run_store.save_run_artifact(
                     route="class_compute",
                     request={"H0": 67.0},
-                    response={"status": "ok"},
+                    response={
+                        "status": "ok",
+                        "engine": "test-engine",
+                        "model_chi2": 12.5,
+                    },
                 )
                 payload = json.loads(Path(metadata["path"]).read_text(encoding="utf-8"))
+                self.assertEqual(payload["run_id"], metadata["run_id"])
                 self.assertEqual(payload["artifact_sha256"], metadata["artifact_sha256"])
                 self.assertEqual(run_store.list_run_artifacts()[0]["status"], "ok")
+                self.assertEqual(run_store.list_run_artifacts()[0]["H0"], 67.0)
+                self.assertEqual(run_store.list_run_artifact_paths()[0], Path(metadata["path"]))
                 self.assertIn("reproducibility", payload)
+
+                manifest = run_store.build_run_manifest(payload)
+                self.assertEqual(manifest["manifest_schema"], "dti-run-manifest-v1")
+                self.assertEqual(manifest["parameters"]["H0"], 67.0)
+                self.assertEqual(manifest["artifact_sha256"], metadata["artifact_sha256"])
+                self.assertEqual(manifest["result_summary"]["engine"], "test-engine")
+                self.assertEqual(manifest["result_summary"]["model_chi2"], 12.5)
+
+                notebook = run_store.build_notebook_export(payload)
+                self.assertIn("# DTI PERFECT FIT run notebook", notebook)
+                self.assertIn("H0: 67.0", notebook)
+
+                package = run_store.build_reproduction_package(payload)
+                self.assertTrue(any(name.endswith("_manifest.json") for name in package))
+                self.assertTrue(any(name.endswith("_notebook.md") for name in package))
+                self.assertTrue(any(name.endswith("_artifact.json") for name in package))
             finally:
                 if previous is None:
                     os.environ.pop("DTI_RUN_ARTIFACT_DIR", None)
