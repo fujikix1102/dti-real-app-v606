@@ -204,6 +204,52 @@ class RunStoreRuntimePersistenceTests(unittest.TestCase):
         self.assertIn("old_run", index_payload)
         self.assertIn(str(saved["run_id"]), index_payload)
 
+    def test_rebuild_r2_index_from_runtime_artifacts(self) -> None:
+        fake_put_response = Mock()
+        fake_put_response.status_code = 200
+        fake_put_response.headers = {"ETag": '"abc"'}
+        fake_put_response.raise_for_status.return_value = None
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.dict(
+                os.environ,
+                {
+                    "DTI_RUN_ARTIFACT_DIR": tmpdir,
+                    "DTI_EXTERNAL_STORAGE_BACKEND": "r2",
+                    "R2_ACCOUNT_ID": "account",
+                    "R2_ACCESS_KEY_ID": "access",
+                    "R2_SECRET_ACCESS_KEY": "secret",
+                    "R2_BUCKET": "dti-perfect-fit-artifacts",
+                    "R2_PREFIX": "research/dti",
+                },
+                clear=False,
+            ):
+                with patch(
+                    "dti_ui_v1.services.run_store.requests.request",
+                    return_value=fake_put_response,
+                ):
+                    saved_one = run_store.save_run_artifact(
+                        route="class_compute",
+                        request={"H0": 72.9},
+                        response={"status": "ok"},
+                    )
+                    saved_two = run_store.save_run_artifact(
+                        route="locked_baseline_desi_dr2_bao",
+                        request={"A_DTI": 0.0},
+                        response={"status": "SUCCESS_LOCKED_BASELINE"},
+                    )
+                with patch(
+                    "dti_ui_v1.services.run_store.requests.request",
+                    return_value=fake_put_response,
+                ) as request:
+                    rebuilt = run_store.rebuild_external_run_index_from_runtime()
+
+        self.assertTrue(rebuilt["uploaded"])
+        self.assertEqual(rebuilt["run_count"], 2)
+        payload = request.call_args.kwargs["data"].decode("utf-8")
+        self.assertIn(str(saved_one["run_id"]), payload)
+        self.assertIn(str(saved_two["run_id"]), payload)
+
 
 if __name__ == "__main__":
     unittest.main()

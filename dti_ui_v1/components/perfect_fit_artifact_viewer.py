@@ -19,6 +19,7 @@ from dti_ui_v1.services.run_store import (
     load_external_run_artifact,
     list_run_artifact_paths,
     list_run_artifacts,
+    rebuild_external_run_index_from_runtime,
 )
 
 
@@ -106,6 +107,25 @@ def _package_zip_bytes(files: Mapping[str, str]) -> bytes:
     return buffer.getvalue()
 
 
+def _compact_r2_rows(rows: list[Mapping[str, Any]]) -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "created_at": row.get("created_at_utc"),
+                "route": row.get("route"),
+                "status": row.get("status"),
+                "H0": row.get("H0"),
+                "A_DTI": row.get("A_DTI"),
+                "f_EDE": row.get("f_EDE"),
+                "z_c": row.get("z_c"),
+                "sha12": str(row.get("artifact_sha256") or "")[:12],
+                "run_id": row.get("run_id"),
+            }
+            for row in rows
+        ]
+    )
+
+
 def render_perfect_fit_artifact_viewer():
     st.subheader("PERFECT FIT Artifact Viewer")
 
@@ -131,7 +151,25 @@ def render_perfect_fit_artifact_viewer():
         )
         r2_runs = external_index.get("runs", [])
         if isinstance(r2_runs, list) and r2_runs:
-            r2_frame = pd.DataFrame(r2_runs)
+            routes = sorted(
+                {
+                    str(row.get("route"))
+                    for row in r2_runs
+                    if isinstance(row, Mapping) and row.get("route")
+                }
+            )
+            route_filter = st.selectbox(
+                "R2 route filter",
+                ["all", *routes],
+                key="perfect_fit_r2_route_filter_v1",
+            )
+            filtered_runs = [
+                row
+                for row in r2_runs
+                if isinstance(row, Mapping)
+                and (route_filter == "all" or row.get("route") == route_filter)
+            ]
+            r2_frame = _compact_r2_rows(filtered_runs)
             st.dataframe(
                 r2_frame,
                 hide_index=True,
@@ -139,7 +177,7 @@ def render_perfect_fit_artifact_viewer():
             )
             choices = [
                 row
-                for row in r2_runs
+                for row in filtered_runs
                 if isinstance(row, Mapping) and row.get("artifact_key")
             ]
             selected_r2 = st.selectbox(
@@ -148,6 +186,7 @@ def render_perfect_fit_artifact_viewer():
                 format_func=lambda row: str(row.get("run_id")),
                 key="perfect_fit_r2_artifact_selector_v1",
             )
+            selected_r2_artifact = None
             if st.button(
                 "Load R2 artifact",
                 key="perfect_fit_r2_artifact_load_v1",
@@ -162,6 +201,66 @@ def render_perfect_fit_artifact_viewer():
                         "exception_type": type(exc).__name__,
                         "detail": str(exc),
                     }
+            if st.button(
+                "Rebuild R2 index from runtime artifacts",
+                key="perfect_fit_r2_rebuild_index_v1",
+            ):
+                st.session_state["perfect_fit_r2_rebuild_result_v1"] = (
+                    rebuild_external_run_index_from_runtime()
+                )
+            rebuild_result = st.session_state.get("perfect_fit_r2_rebuild_result_v1")
+            if isinstance(rebuild_result, dict):
+                st.caption(
+                    "R2 index rebuild: "
+                    f"uploaded={rebuild_result.get('uploaded')} · "
+                    f"run_count={rebuild_result.get('run_count')} · "
+                    f"error={rebuild_result.get('error')}"
+                )
+            if selected_r2:
+                try:
+                    selected_r2_artifact = load_external_run_artifact(
+                        str(selected_r2.get("artifact_key"))
+                    )
+                except Exception:
+                    selected_r2_artifact = None
+            if isinstance(selected_r2_artifact, dict):
+                st.download_button(
+                    "Download selected R2 artifact JSON",
+                    data=json.dumps(
+                        selected_r2_artifact,
+                        ensure_ascii=False,
+                        indent=2,
+                        allow_nan=False,
+                        default=str,
+                    ),
+                    file_name=f"{selected_r2_artifact.get('run_id', 'r2_artifact')}.json",
+                    mime="application/json",
+                    key="perfect_fit_r2_artifact_download_v1",
+                    width="stretch",
+                )
+            compare_candidates = [
+                row
+                for row in filtered_runs
+                if isinstance(row, Mapping) and row.get("artifact_key")
+            ]
+            if len(compare_candidates) >= 2:
+                comparison = st.multiselect(
+                    "Compare R2 runs",
+                    compare_candidates,
+                    default=compare_candidates[:2],
+                    max_selections=2,
+                    format_func=lambda row: str(row.get("run_id")),
+                    key="perfect_fit_r2_compare_runs_v1",
+                )
+                if len(comparison) == 2:
+                    st.markdown("### R2 run comparison")
+                    st.dataframe(
+                        pd.DataFrame(
+                            _parameter_rows(comparison[0], comparison[1])
+                        ),
+                        hide_index=True,
+                        use_container_width=True,
+                    )
         loaded_r2_error = st.session_state.get(
             "perfect_fit_loaded_r2_artifact_error_v1"
         )

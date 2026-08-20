@@ -338,6 +338,24 @@ def _merge_r2_run_index(
     }
 
 
+def _r2_index_key() -> str:
+    external = _external_storage_context()
+    prefix = str(external.get("prefix") or "").strip("/")
+    return f"{prefix}/index/runs_manifest.json" if prefix else "index/runs_manifest.json"
+
+
+def _r2_artifact_key_for_run(run_id: str) -> str:
+    external = _external_storage_context()
+    prefix = str(external.get("prefix") or "").strip("/")
+    date_prefix = run_id[:8] if len(run_id) >= 8 else "unknown_date"
+    key_prefix = (
+        f"{prefix}/runs/{date_prefix}/{run_id}"
+        if prefix
+        else f"runs/{date_prefix}/{run_id}"
+    )
+    return f"{key_prefix}/artifact.json"
+
+
 def _mirror_artifact_to_external_storage(
     artifact: Mapping[str, Any],
     *,
@@ -359,7 +377,7 @@ def _mirror_artifact_to_external_storage(
     key_prefix = f"{prefix}/runs/{date_prefix}/{run_id}" if prefix else f"runs/{date_prefix}/{run_id}"
     artifact_key = f"{key_prefix}/artifact.json"
     latest_key = f"{prefix}/index/latest.json" if prefix else "index/latest.json"
-    run_index_key = f"{prefix}/index/runs_manifest.json" if prefix else "index/runs_manifest.json"
+    run_index_key = _r2_index_key()
     try:
         run_index = _merge_r2_run_index(
             artifact,
@@ -393,8 +411,7 @@ def get_external_run_index() -> dict[str, Any]:
     external = _external_storage_context()
     if not external["configured"] or external["backend"] != "r2":
         return {"configured": False, "runs": [], "error": None}
-    prefix = str(external.get("prefix") or "").strip("/")
-    index_key = f"{prefix}/index/runs_manifest.json" if prefix else "index/runs_manifest.json"
+    index_key = _r2_index_key()
     try:
         payload = _r2_get_json(index_key, now=datetime.now(timezone.utc))
     except Exception as exc:
@@ -425,6 +442,52 @@ def load_external_run_artifact(artifact_key: str) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError("r2_artifact_root_must_be_mapping")
     return payload
+
+
+def rebuild_external_run_index_from_runtime(limit: int = 200) -> dict[str, Any]:
+    external = _external_storage_context()
+    if not external["configured"] or external["backend"] != "r2":
+        return {"configured": False, "uploaded": False, "run_count": 0, "error": None}
+    now = datetime.now(timezone.utc)
+    runs: list[dict[str, Any]] = []
+    for path in list_run_artifact_paths(limit=limit):
+        try:
+            payload = load_run_artifact(path)
+        except Exception:
+            continue
+        run_id = str(payload.get("run_id") or "")
+        if not run_id:
+            continue
+        runs.append(_r2_run_index_entry(payload, _r2_artifact_key_for_run(run_id)))
+    runs = sorted(
+        runs,
+        key=lambda item: str(item.get("created_at_utc") or ""),
+        reverse=True,
+    )[:limit]
+    index_payload = {
+        "schema_version": "dti-r2-run-index-v1",
+        "updated_at_utc": now.isoformat(),
+        "run_count": len(runs),
+        "runs": runs,
+    }
+    index_key = _r2_index_key()
+    try:
+        upload = _r2_put_json(index_key, index_payload, now=now)
+    except Exception as exc:
+        return {
+            "configured": True,
+            "uploaded": False,
+            "index_key": index_key,
+            "run_count": len(runs),
+            "error": str(exc),
+        }
+    return {
+        "configured": True,
+        "uploaded": bool(upload.get("uploaded")),
+        "index_key": index_key,
+        "run_count": len(runs),
+        "error": None,
+    }
 
 
 def get_run_artifact_store_status() -> dict[str, Any]:
