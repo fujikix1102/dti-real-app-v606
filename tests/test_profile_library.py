@@ -24,6 +24,9 @@ class ProfileLibraryTests(unittest.TestCase):
         profiles = load_profile_library(LIBRARY_PATH)
         self.assertGreaterEqual(len(profiles), 4)
         self.assertEqual(set(profiles[0]["parameters"]), set(SESSION_KEYS))
+        labels = {profile["label"] for profile in profiles}
+        self.assertIn("FUJIKI DTI candidate", labels)
+        self.assertIn("LCDM-like control · H0 67", labels)
 
     def test_apply_sets_only_declared_compute_keys_and_provenance(self):
         profile = load_profile_library(LIBRARY_PATH)[0]

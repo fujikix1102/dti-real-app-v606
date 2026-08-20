@@ -14,6 +14,10 @@ from dti_ui_v1.contracts.numeric_precision import (
     OBJECTIVE_CONTRACTS,
     PRESET_LABEL,
 )
+from dti_ui_v1.components.profile_library import (
+    apply_profile,
+    load_profile_library,
+)
 
 
 def _working_key(field_key: str) -> str:
@@ -29,6 +33,21 @@ def _reset_working_copy() -> None:
         ] = contract.float_value
 
 
+def _apply_precision_profile(profile: dict) -> None:
+    parameters = profile["parameters"]
+    for field_key, source_key in (
+        ("H0", "H0"),
+        ("omega_b", "omega_b"),
+        ("omega_cdm", "omega_cdm"),
+        ("n_s", "n_s"),
+        ("ln10_10_A_s", "ln10_10_As"),
+        ("tau_reio", "tau_reio"),
+    ):
+        st.session_state[_working_key(field_key)] = float(parameters[source_key])
+    apply_profile(profile, st.session_state)
+    st.session_state["active_precision_preset_label_v1"] = profile["label"]
+
+
 def render_precision_reference() -> None:
     st.subheader("Precision-controlled baseline")
 
@@ -37,11 +56,35 @@ def render_precision_reference() -> None:
         "a separate working copy and do not alter the source preset."
     )
 
-    st.selectbox(
+    profile_options = [
+        {
+            "id": "locked_baseline",
+            "label": PRESET_LABEL,
+            "kind": "LOCKED_BASELINE",
+            "source": "Source-precision locked baseline contract",
+            "note": "Immutable reference baseline; applying copies values into the working fields.",
+            "parameters": {
+                "H0": BASELINE_CONTRACTS["H0"].float_value,
+                "omega_b": BASELINE_CONTRACTS["omega_b"].float_value,
+                "omega_cdm": BASELINE_CONTRACTS["omega_cdm"].float_value,
+                "n_s": BASELINE_CONTRACTS["n_s"].float_value,
+                "ln10_10_As": BASELINE_CONTRACTS["ln10_10_A_s"].float_value,
+                "tau_reio": BASELINE_CONTRACTS["tau_reio"].float_value,
+                "f_EDE": 0.0,
+                "z_c": 3500.0,
+            },
+        },
+        *load_profile_library(),
+    ]
+    labels = {profile["label"]: profile for profile in profile_options}
+    selected_label = st.selectbox(
         "Preset",
-        options=(PRESET_LABEL,),
-        disabled=True,
+        options=list(labels),
         key="perfect_fit_precision_preset",
+    )
+    selected_profile = labels[selected_label]
+    st.caption(
+        f"{selected_profile['kind']} · {selected_profile['source']}"
     )
 
     working_values: dict[str, float] = {}
@@ -89,12 +132,16 @@ def render_precision_reference() -> None:
         st.button(
             "Use working configuration",
             type="primary",
-            disabled=True,
-            help=(
-                "Enabled only after the verified backend request contract "
-                "accepts these parameters."
-            ),
+            help="Copies the selected preset into the editable working copy and executable form. It does not run compute.",
             key="perfect_fit_precision_apply",
+            on_click=_apply_precision_profile,
+            args=(selected_profile,),
+        )
+    active_preset = st.session_state.get("active_precision_preset_label_v1")
+    if active_preset:
+        st.success(
+            f"Loaded preset into working copy: {active_preset}. "
+            "Open Execution to confirm and run one deterministic CLASS/AxiCLASS computation."
         )
 
     # precision_two_column_summary_v1
