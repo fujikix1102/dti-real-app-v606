@@ -11,6 +11,12 @@ from dti_ui_v1.services.posterior_readback_public_viewer import (
 )
 
 
+PUBLIC_APP_URL = "https://dti-perfect-fit.streamlit.app/"
+ZENODO_RECORD_URL = "https://zenodo.org/records/22036236"
+ZENODO_VERSION_DOI = "10.5281/zenodo.22036236"
+ZENODO_CONCEPT_DOI = "10.5281/zenodo.22036235"
+
+
 def _render_posterior_readback_public_viewer() -> None:
     st.markdown("### Public diagnostic viewer")
     st.caption("Asset-gated display only. No posterior inference, no MCMC, no claim promotion.")
@@ -35,6 +41,12 @@ def _render_posterior_readback_public_viewer() -> None:
 
 def render_workspace_runtime_alignment_panel() -> None:
     st.subheader("DTI PERFECT FIT Workspace Runtime")
+    st.info(
+        "Citable manuscript package: "
+        f"[Zenodo record]({ZENODO_RECORD_URL}) "
+        f"(version DOI: {ZENODO_VERSION_DOI}; concept DOI: {ZENODO_CONCEPT_DOI}). "
+        f"This public app is the deterministic companion at [{PUBLIC_APP_URL}]({PUBLIC_APP_URL})."
+    )
 
     # DTI_INTERNAL_POSTERIOR_READBACK_PLOT_STATUS_PANEL_PUBLIC_RENDER_LAYER_V1_BEGIN
     with st.expander("Internal posterior-readback plot package status", expanded=False):
