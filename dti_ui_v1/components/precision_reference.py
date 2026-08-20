@@ -48,6 +48,14 @@ def _apply_precision_profile(profile: dict) -> None:
     st.session_state["active_precision_preset_label_v1"] = profile["label"]
 
 
+def _benchmark_profile(profile_options: list[dict]) -> dict:
+    for profile in profile_options:
+        if profile.get("id") == "fujiki_dti_candidate":
+            return profile
+
+    return profile_options[0]
+
+
 def render_precision_reference() -> None:
     st.subheader("Precision-controlled baseline")
 
@@ -83,9 +91,12 @@ def render_precision_reference() -> None:
         key="perfect_fit_precision_preset",
     )
     selected_profile = labels[selected_label]
+    benchmark_profile = _benchmark_profile(profile_options)
     st.caption(
         f"{selected_profile['kind']} · {selected_profile['source']}"
     )
+    if selected_profile.get("note"):
+        st.caption(str(selected_profile["note"]))
 
     working_values: dict[str, float] = {}
 
@@ -119,7 +130,18 @@ def render_precision_reference() -> None:
                     **number_input_kwargs(field_key),
                 )
 
-    left, right = st.columns(2)
+    st.info(
+        "Level 2 flow: choose or edit values here, copy them to the "
+        "Execution form, then open Execution and confirm one deterministic "
+        "CLASS/AxiCLASS run. This page does not start compute."
+    )
+    st.caption(
+        "Accepted public input ranges: H0 1-150; omega_b 0.000001-1; "
+        "omega_cdm 0.000001-2; n_s 0.1-2; ln(10^10 A_s) 0-10; "
+        "tau_reio 0-1. A_DTI, f_EDE, and z_c are shown in Execution."
+    )
+
+    left, middle, right = st.columns(3)
 
     with left:
         st.button(
@@ -128,14 +150,29 @@ def render_precision_reference() -> None:
             on_click=_reset_working_copy,
         )
 
-    with right:
+    with middle:
         st.button(
-            "Use working configuration",
+            "Apply selected preset",
             type="primary",
-            help="Copies the selected preset into the editable working copy and executable form. It does not run compute.",
+            help=(
+                "Copies the selected preset into the editable working copy "
+                "and Execution form. It does not run compute."
+            ),
             key="perfect_fit_precision_apply",
             on_click=_apply_precision_profile,
             args=(selected_profile,),
+        )
+
+    with right:
+        st.button(
+            "Benchmark Run values",
+            help=(
+                "Loads a known Level 2 test profile into the Execution form. "
+                "It does not run compute."
+            ),
+            key="perfect_fit_precision_benchmark",
+            on_click=_apply_precision_profile,
+            args=(benchmark_profile,),
         )
     active_preset = st.session_state.get("active_precision_preset_label_v1")
     if active_preset:

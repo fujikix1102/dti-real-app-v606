@@ -257,6 +257,16 @@ def render_general_class_compute_panel() -> None:
         "Pantheon+ marginalizes the absolute-magnitude intercept analytically. "
         "These are single-point likelihoods, not a posterior."
     )
+    st.caption(
+        "To run: apply a preset from Configuration or edit values below, "
+        "check Confirm single run contract, then press Run. Public runs are "
+        "limited to one deterministic backend request per browser session."
+    )
+    st.caption(
+        "Accepted input ranges: A_DTI 0-1; H0 1-150; omega_b 0.000001-1; "
+        "omega_cdm 0.000001-2; n_s 0.1-2; ln(10^10 A_s) 0-10; "
+        "tau_reio 0-1; f_EDE 0-0.5; z_c 10-100000."
+    )
 
     column_1, column_2, column_3 = st.columns(3)
 
@@ -383,6 +393,16 @@ def render_general_class_compute_panel() -> None:
         st.info(
             "This browser session has already used its public single-run allowance. "
             "Reloading or using a new session is required for another public run."
+        )
+    elif not confirmed:
+        st.info(
+            "Run button is waiting for confirmation. Check "
+            "'Confirm single run contract' to enable one deterministic "
+            "CLASS/AxiCLASS request."
+        )
+    else:
+        st.success(
+            "Run button is enabled for one deterministic CLASS/AxiCLASS request."
         )
     with st.expander("Current run input payload", expanded=False):
         render_safe_json(working_payload)
