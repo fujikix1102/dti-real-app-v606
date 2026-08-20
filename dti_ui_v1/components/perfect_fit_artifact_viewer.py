@@ -14,6 +14,7 @@ from dti_ui_v1.services.run_store import (
     build_notebook_export,
     build_reproduction_package,
     build_run_manifest,
+    get_run_artifact_store_status,
     list_run_artifact_paths,
     list_run_artifacts,
 )
@@ -112,6 +113,8 @@ def render_perfect_fit_artifact_viewer():
         "packages are not included. Public runtime storage is separate "
         "from the local checkout and is not automatically synchronized."
     )
+    st.markdown("### Artifact storage")
+    render_safe_json(get_run_artifact_store_status())
 
     files = _artifacts()
 

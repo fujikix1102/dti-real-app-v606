@@ -19,10 +19,10 @@ class V606ProfileAdapterTest(unittest.TestCase):
         expected_sha = os.environ.get("V606_PROFILE_ARCHIVE_SHA256")
 
         if not source:
-            raise RuntimeError("V606_PROFILE_ARCHIVE is not set")
+            raise unittest.SkipTest("V606_PROFILE_ARCHIVE is not set")
 
         if not expected_sha:
-            raise RuntimeError("V606_PROFILE_ARCHIVE_SHA256 is not set")
+            raise unittest.SkipTest("V606_PROFILE_ARCHIVE_SHA256 is not set")
 
         cls.library = load_v606_profile_library(
             Path(source),

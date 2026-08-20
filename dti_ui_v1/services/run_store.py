@@ -12,6 +12,7 @@ from typing import Any, Mapping
 
 SCHEMA_VERSION = "dti-run-artifact-v2"
 STREAMLIT_RUNTIME_PREFIX = "/mount/src/"
+DURABLE_ARTIFACT_DIR_ENV = "DTI_DURABLE_ARTIFACT_DIR"
 
 
 def _runtime_identity() -> dict[str, Any]:
@@ -36,6 +37,13 @@ def _artifact_directory() -> Path:
     return Path(__file__).resolve().parents[2] / "data" / "run_artifacts"
 
 
+def _durable_artifact_directory() -> Path | None:
+    configured = os.getenv(DURABLE_ARTIFACT_DIR_ENV)
+    if not configured:
+        return None
+    return Path(configured).expanduser().resolve()
+
+
 def _is_streamlit_cloud_runtime(directory: Path) -> bool:
     directory_text = str(directory)
     return (
@@ -48,18 +56,29 @@ def _is_streamlit_cloud_runtime(directory: Path) -> bool:
 
 def _storage_context(directory: Path) -> dict[str, Any]:
     is_streamlit_cloud = _is_streamlit_cloud_runtime(directory)
+    durable_directory = _durable_artifact_directory()
+    durable_configured = durable_directory is not None
     persistence = (
-        "ephemeral_streamlit_runtime"
-        if is_streamlit_cloud
-        else "local_or_configured_filesystem"
+        "durable_mirror_configured"
+        if durable_configured
+        else (
+            "ephemeral_streamlit_runtime"
+            if is_streamlit_cloud
+            else "local_or_configured_filesystem"
+        )
     )
     user_visible_notice = (
+        f"Durable artifact mirror is configured at {durable_directory}. "
+        "Artifacts are written to the runtime store and mirrored there."
+        if durable_configured
+        else (
         "Streamlit Cloud runtime storage is ephemeral and separate from any "
         "local checkout. Download or copy the JSON before the app runtime is "
         "recycled if durable persistence has not been configured."
         if is_streamlit_cloud
         else "Artifacts are stored in this runtime's configured filesystem. "
         "Counts reflect this checkout or DTI_RUN_ARTIFACT_DIR only."
+        )
     )
     return {
         "artifact_directory": str(directory),
@@ -69,9 +88,23 @@ def _storage_context(directory: Path) -> dict[str, Any]:
             else "local_or_configured"
         ),
         "persistence": persistence,
-        "durable_persistence_available": not is_streamlit_cloud,
+        "durable_persistence_available": durable_configured or not is_streamlit_cloud,
+        "durable_mirror_configured": durable_configured,
+        "durable_artifact_directory": str(durable_directory) if durable_directory else None,
         "user_visible_notice": user_visible_notice,
     }
+
+
+def _write_artifact_json(directory: Path, filename: str, artifact: Mapping[str, Any]) -> Path:
+    directory.mkdir(parents=True, exist_ok=True)
+    destination = directory / filename
+    temporary = directory / f".{filename}.tmp"
+    temporary.write_text(
+        json.dumps(artifact, ensure_ascii=False, indent=2, allow_nan=False),
+        encoding="utf-8",
+    )
+    temporary.replace(destination)
+    return destination
 
 
 def get_run_artifact_store_status() -> dict[str, Any]:
@@ -98,6 +131,7 @@ def save_run_artifact(
     created_at = created.isoformat()
     directory = _artifact_directory()
     storage = _storage_context(directory)
+    durable_directory = _durable_artifact_directory()
     route_label = route.replace("/", "_").strip("_")
     stamp = created.strftime("%Y%m%dT%H%M%S.%fZ")
     run_id = f"{stamp}_{route_label}"
@@ -125,15 +159,11 @@ def save_run_artifact(
     sha256 = hashlib.sha256(canonical).hexdigest()
     artifact = {**core, "artifact_sha256": sha256}
 
-    directory.mkdir(parents=True, exist_ok=True)
     filename = f"{run_id}_{sha256[:12]}.json"
-    destination = directory / filename
-    temporary = directory / f".{filename}.tmp"
-    temporary.write_text(
-        json.dumps(artifact, ensure_ascii=False, indent=2, allow_nan=False),
-        encoding="utf-8",
-    )
-    temporary.replace(destination)
+    destination = _write_artifact_json(directory, filename, artifact)
+    durable_destination = None
+    if durable_directory is not None and durable_directory != directory:
+        durable_destination = _write_artifact_json(durable_directory, filename, artifact)
     artifact_count = len(list(directory.glob("*.json")))
     return {
         "schema_version": SCHEMA_VERSION,
@@ -144,6 +174,7 @@ def save_run_artifact(
         "artifact_directory": str(directory),
         "artifact_count": artifact_count,
         "storage": storage,
+        "durable_path": str(durable_destination) if durable_destination else None,
     }
 
 
@@ -231,6 +262,11 @@ def build_run_manifest(payload: Mapping[str, Any]) -> dict[str, Any]:
         "runtime": reproducibility.get("runtime", {}),
         "request_replay": reproducibility.get("request_replay", {}),
         "storage": storage,
+        "durable_storage": {
+            "configured": bool(storage.get("durable_mirror_configured")),
+            "artifact_directory": storage.get("durable_artifact_directory"),
+            "persistence": storage.get("persistence"),
+        },
         "boundary": reproducibility.get(
             "scientific_boundary",
             "Single-point deterministic calculation; no posterior or evidence claim.",
