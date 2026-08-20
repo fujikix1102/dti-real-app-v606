@@ -70,6 +70,75 @@ def _nested_value(payload: Mapping[str, Any], dotted_key: str) -> Any:
     return value
 
 
+def _short_time(value: Any) -> str:
+    text = str(value or "")
+    if not text:
+        return "time unknown"
+    if "T" in text:
+        date_part, time_part = text.split("T", 1)
+        return f"{date_part} {time_part[:8]} UTC"
+    return text
+
+
+def _run_kind(row: Mapping[str, Any]) -> str:
+    route = str(row.get("route") or "")
+    run_id = str(row.get("run_id") or "")
+    if route == "class_compute":
+        return "Single deterministic CLASS/AxiCLASS run"
+    if route == "locked_baseline_desi_dr2_bao" or "locked_baseline" in run_id:
+        return "Locked baseline reference artifact"
+    return "Saved computation artifact"
+
+
+def _format_number(value: Any) -> str | None:
+    if value is None:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    return f"{number:.6g}"
+
+
+def _run_field(row: Mapping[str, Any], key: str) -> Any:
+    if row.get(key) is not None:
+        return row.get(key)
+    request = row.get("request")
+    if isinstance(request, Mapping):
+        return request.get(key)
+    return None
+
+
+def _run_parameter_summary(row: Mapping[str, Any]) -> str:
+    parts = []
+    for key in ("H0", "A_DTI", "f_EDE", "z_c"):
+        value = _format_number(_run_field(row, key))
+        if value is not None:
+            parts.append(f"{key}={value}")
+    return ", ".join(parts) if parts else "parameters not indexed"
+
+
+def _research_run_label(row: Mapping[str, Any]) -> str:
+    return (
+        f"{_run_kind(row)} · {_run_parameter_summary(row)} · "
+        f"{_short_time(row.get('created_at_utc'))}"
+    )
+
+
+def _run_explanation(row: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "display_name": _research_run_label(row),
+        "meaning": _run_kind(row),
+        "parameter_summary": _run_parameter_summary(row),
+        "status": row.get("status") or "unknown",
+        "created": _short_time(row.get("created_at_utc")),
+        "scope": "Single saved artifact; no MCMC, posterior, scan, or model-comparison claim.",
+        "internal_run_id": row.get("run_id"),
+        "artifact_sha256": row.get("artifact_sha256"),
+        "artifact_key": row.get("artifact_key"),
+    }
+
+
 def _response_rows(
     current: Mapping[str, Any],
     previous: Mapping[str, Any] | None,
@@ -114,15 +183,16 @@ def _compact_r2_rows(rows: list[Mapping[str, Any]]) -> pd.DataFrame:
     return pd.DataFrame(
         [
             {
-                "created_at": row.get("created_at_utc"),
-                "route": row.get("route"),
+                "display_name": _research_run_label(row),
+                "meaning": _run_kind(row),
                 "status": row.get("status"),
                 "H0": row.get("H0"),
                 "A_DTI": row.get("A_DTI"),
                 "f_EDE": row.get("f_EDE"),
                 "z_c": row.get("z_c"),
+                "created_utc": row.get("created_at_utc"),
                 "sha12": str(row.get("artifact_sha256") or "")[:12],
-                "run_id": row.get("run_id"),
+                "internal_run_id": row.get("run_id"),
             }
             for row in rows
         ]
@@ -173,14 +243,14 @@ def _research_notebook_markdown(rows: list[Mapping[str, Any]]) -> str:
             )
         table = "\n".join(table_lines)
     else:
-        table = "No R2 runs."
+        table = "No saved public artifacts."
     return "\n".join(
         [
-            "# DTI PERFECT FIT R2 Research Notebook",
+            "# DTI PERFECT FIT Public Artifact Notebook",
             "",
             "## Scope",
             "",
-            "This notebook summarizes public R2 run artifacts visible to the application.",
+            "This notebook summarizes public saved run artifacts visible to the application.",
             "",
             "## Boundary",
             "",
@@ -246,12 +316,12 @@ def _render_r2_comparison_graphs(frame: pd.DataFrame) -> None:
     if not available:
         return
     chart_frame = frame.copy()
-    chart_frame["created_at"] = pd.to_datetime(chart_frame["created_at"], errors="coerce")
-    chart_frame = chart_frame.dropna(subset=["created_at"])
+    chart_frame["created_utc"] = pd.to_datetime(chart_frame["created_utc"], errors="coerce")
+    chart_frame = chart_frame.dropna(subset=["created_utc"])
     if chart_frame.empty:
         return
     long_frame = chart_frame.melt(
-        id_vars=["created_at", "route", "status", "run_id"],
+        id_vars=["created_utc", "meaning", "status", "display_name"],
         value_vars=available,
         var_name="parameter",
         value_name="value",
@@ -261,20 +331,24 @@ def _render_r2_comparison_graphs(frame: pd.DataFrame) -> None:
     if long_frame.empty:
         return
     st.markdown("### R2 multi-run parameter graph")
+    st.caption(
+        "Each point is one saved public artifact. The graph compares stored "
+        "single-run inputs only; it is not a posterior or model preference plot."
+    )
     chart = (
         alt.Chart(long_frame)
         .mark_line(point=True)
         .encode(
-            x=alt.X("created_at:T", title="Created"),
+            x=alt.X("created_utc:T", title="Created"),
             y=alt.Y("value:Q", title="Value"),
             color=alt.Color("parameter:N", title="Parameter"),
-            strokeDash=alt.StrokeDash("route:N", title="Route"),
+            strokeDash=alt.StrokeDash("meaning:N", title="Artifact type"),
             tooltip=[
-                alt.Tooltip("created_at:T", title="Created"),
-                alt.Tooltip("route:N", title="Route"),
+                alt.Tooltip("created_utc:T", title="Created"),
+                alt.Tooltip("meaning:N", title="Artifact type"),
                 alt.Tooltip("parameter:N", title="Parameter"),
                 alt.Tooltip("value:Q", title="Value", format=".6g"),
-                alt.Tooltip("run_id:N", title="Run ID"),
+                alt.Tooltip("display_name:N", title="Run"),
             ],
         )
         .properties(height=320)
@@ -286,12 +360,17 @@ def render_perfect_fit_artifact_viewer():
     st.subheader("PERFECT FIT Artifact Viewer")
 
     st.info(
-        "Workspace runtime notice: this view represents the deployed "
-        "Streamlit runtime. Local development files, backups, and review "
-        "packages are not included. Public runtime storage is separate "
-        "from the local checkout and is not automatically synchronized."
+        "This page lists saved public computation records. Each record is a "
+        "single artifact with parameters, result payload, timestamp, and SHA-256 "
+        "hash. It is for review and reproduction; loading an artifact does not "
+        "start a new calculation."
     )
     st.markdown("### Artifact storage")
+    st.caption(
+        "R2 is the durable object storage used by this app for public artifacts. "
+        "The long internal IDs are retained for reproducibility, but the table "
+        "below uses human-readable labels."
+    )
     render_safe_json(get_run_artifact_store_status())
     external_index = get_external_run_index()
     if external_index.get("configured"):
@@ -314,7 +393,12 @@ def render_perfect_fit_artifact_viewer():
                     "error": metrics.get("error"),
                 }
             )
-        st.markdown("### R2 artifact index")
+        st.markdown("### Public saved artifact index")
+        st.caption(
+            "Public durable artifact index. These rows are saved outputs from "
+            "single deterministic runs or locked reference records, not posterior "
+            "samples and not manuscript claims."
+        )
         render_safe_json(
             {
                 "backend": external_index.get("backend"),
@@ -334,7 +418,7 @@ def render_perfect_fit_artifact_viewer():
                 }
             )
             search = st.text_input(
-                "R2 search",
+                "Search saved artifacts",
                 value="",
                 key="perfect_fit_r2_search_v1",
             ).strip().lower()
@@ -346,12 +430,17 @@ def render_perfect_fit_artifact_viewer():
                 }
             )
             route_filter = st.selectbox(
-                "R2 route filter",
+                "Artifact type filter",
                 ["all", *routes],
+                format_func=lambda value: {
+                    "all": "all artifact types",
+                    "class_compute": "single deterministic CLASS/AxiCLASS run",
+                    "locked_baseline_desi_dr2_bao": "locked baseline reference",
+                }.get(str(value), str(value)),
                 key="perfect_fit_r2_route_filter_v1",
             )
             status_filter = st.selectbox(
-                "R2 status filter",
+                "Status filter",
                 ["all", *status_values],
                 key="perfect_fit_r2_status_filter_v1",
             )
@@ -371,6 +460,28 @@ def render_perfect_fit_artifact_viewer():
                 r2_frame,
                 hide_index=True,
                 use_container_width=True,
+                column_config={
+                    "display_name": st.column_config.TextColumn(
+                        "Run description",
+                        width="large",
+                    ),
+                    "meaning": st.column_config.TextColumn(
+                        "Artifact type",
+                        width="medium",
+                    ),
+                    "created_utc": st.column_config.TextColumn(
+                        "Created UTC",
+                        width="medium",
+                    ),
+                    "internal_run_id": st.column_config.TextColumn(
+                        "Internal ID",
+                        width="medium",
+                    ),
+                    "sha12": st.column_config.TextColumn(
+                        "SHA-256 prefix",
+                        width="small",
+                    ),
+                },
             )
             _render_r2_comparison_graphs(r2_frame)
             csv_bytes = r2_frame.to_csv(index=False).encode("utf-8")
@@ -380,7 +491,7 @@ def render_perfect_fit_artifact_viewer():
             )
             export_columns = st.columns(3)
             export_columns[0].download_button(
-                "Download R2 runs CSV",
+                "Download saved artifact table CSV",
                 data=csv_bytes,
                 file_name="dti_r2_runs.csv",
                 mime="text/csv",
@@ -388,7 +499,7 @@ def render_perfect_fit_artifact_viewer():
                 width="stretch",
             )
             export_columns[1].download_button(
-                "Download R2 summary JSON",
+                "Download saved artifact summary JSON",
                 data=json.dumps(
                     summary_payload,
                     ensure_ascii=False,
@@ -402,7 +513,7 @@ def render_perfect_fit_artifact_viewer():
                 width="stretch",
             )
             export_columns[2].download_button(
-                "Download R2 audit JSON",
+                "Download storage access audit JSON",
                 data=json.dumps(
                     {
                         "schema_version": "dti-r2-token-audit-v1",
@@ -439,7 +550,7 @@ def render_perfect_fit_artifact_viewer():
                 width="stretch",
             )
             extra_export_columns[1].download_button(
-                "Download manuscript/pointer review JSON",
+                "Download publication-readiness review JSON",
                 data=json.dumps(
                     review_payload,
                     ensure_ascii=False,
@@ -457,14 +568,21 @@ def render_perfect_fit_artifact_viewer():
                 if isinstance(row, Mapping) and row.get("artifact_key")
             ]
             selected_r2 = st.selectbox(
-                "R2 artifact",
+                "Saved artifact",
                 choices,
-                format_func=lambda row: str(row.get("run_id")),
+                format_func=_research_run_label,
                 key="perfect_fit_r2_artifact_selector_v1",
             )
+            st.caption(
+                "Select one saved artifact to inspect or download. Selecting "
+                "does not run compute."
+            )
+            if selected_r2:
+                st.markdown("#### Selected artifact explanation")
+                render_safe_json(_run_explanation(selected_r2))
             selected_r2_artifact = None
             if st.button(
-                "Load R2 artifact",
+                "Load selected saved artifact",
                 key="perfect_fit_r2_artifact_load_v1",
             ):
                 try:
@@ -478,14 +596,14 @@ def render_perfect_fit_artifact_viewer():
                         "detail": str(exc),
                     }
             if st.button(
-                "Rebuild R2 index from runtime artifacts",
+                "Rebuild public artifact index from app runtime files",
                 key="perfect_fit_r2_rebuild_index_v1",
             ):
                 st.session_state["perfect_fit_r2_rebuild_result_v1"] = (
                     rebuild_external_run_index_from_runtime()
                 )
             if st.button(
-                "Rebuild R2 index from bucket",
+                "Rebuild public artifact index from storage bucket",
                 key="perfect_fit_r2_remote_rebuild_index_v1",
             ):
                 st.session_state["perfect_fit_r2_rebuild_result_v1"] = (
@@ -494,7 +612,7 @@ def render_perfect_fit_artifact_viewer():
             rebuild_result = st.session_state.get("perfect_fit_r2_rebuild_result_v1")
             if isinstance(rebuild_result, dict):
                 st.caption(
-                    "R2 index rebuild: "
+                    "Public artifact index rebuild: "
                     f"uploaded={rebuild_result.get('uploaded')} · "
                     f"run_count={rebuild_result.get('run_count')} · "
                     f"discovered={rebuild_result.get('discovered_artifact_count', 'runtime')} · "
@@ -509,7 +627,7 @@ def render_perfect_fit_artifact_viewer():
                     selected_r2_artifact = None
             if isinstance(selected_r2_artifact, dict):
                 st.download_button(
-                    "Download selected R2 artifact JSON",
+                    "Download selected saved artifact JSON",
                     data=json.dumps(
                         selected_r2_artifact,
                         ensure_ascii=False,
@@ -529,15 +647,20 @@ def render_perfect_fit_artifact_viewer():
             ]
             if len(compare_candidates) >= 2:
                 comparison = st.multiselect(
-                    "Compare R2 runs",
+                    "Compare saved runs",
                     compare_candidates,
                     default=compare_candidates[:2],
                     max_selections=2,
-                    format_func=lambda row: str(row.get("run_id")),
+                    format_func=_research_run_label,
                     key="perfect_fit_r2_compare_runs_v1",
                 )
                 if len(comparison) == 2:
-                    st.markdown("### R2 run comparison")
+                    st.markdown("### Saved run comparison")
+                    st.caption(
+                        "Compares stored input parameters between two saved "
+                        "artifacts. It does not compare posterior samples or "
+                        "claim model preference."
+                    )
                     comparison_frame = pd.DataFrame(
                         _parameter_rows(comparison[0], comparison[1])
                     )
@@ -547,7 +670,7 @@ def render_perfect_fit_artifact_viewer():
                         use_container_width=True,
                     )
                     st.download_button(
-                        "Download R2 comparison CSV",
+                        "Download saved run comparison CSV",
                         data=comparison_frame.to_csv(index=False).encode("utf-8"),
                         file_name="dti_r2_run_comparison.csv",
                         mime="text/csv",
@@ -558,15 +681,17 @@ def render_perfect_fit_artifact_viewer():
             "perfect_fit_loaded_r2_artifact_error_v1"
         )
         if isinstance(loaded_r2_error, dict):
-            st.error("R2 artifact load failed.")
+            st.error("Saved artifact load failed.")
             render_safe_json(loaded_r2_error)
         loaded_r2 = st.session_state.get("perfect_fit_loaded_r2_artifact_v1")
         if isinstance(loaded_r2, dict):
-            st.markdown("### Loaded R2 artifact")
+            st.markdown("### Loaded saved artifact")
             render_safe_json(
                 {
-                    "run_id": loaded_r2.get("run_id"),
-                    "route": loaded_r2.get("route"),
+                    "display_name": _research_run_label(loaded_r2),
+                    "meaning": _run_kind(loaded_r2),
+                    "internal_run_id": loaded_r2.get("run_id"),
+                    "internal_route": loaded_r2.get("route"),
                     "artifact_sha256": loaded_r2.get("artifact_sha256"),
                     "created_at_utc": loaded_r2.get("created_at_utc"),
                     "storage": loaded_r2.get("storage"),
@@ -601,12 +726,14 @@ def render_perfect_fit_artifact_viewer():
 
     st.caption(f"File: {selected}")
 
-    st.markdown("### Identity")
+    st.markdown("### Artifact identity")
 
     st.write(
         {
-            "run_id": payload.get("run_id"),
-            "route": payload.get("route"),
+            "display_name": _research_run_label(payload),
+            "meaning": _run_kind(payload),
+            "internal_run_id": payload.get("run_id"),
+            "internal_route": payload.get("route"),
             "artifact_sha256": payload.get("artifact_sha256"),
             "created_at_utc": payload.get("created_at_utc"),
         }
