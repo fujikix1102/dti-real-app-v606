@@ -102,9 +102,14 @@ class RunStoreRuntimePersistenceTests(unittest.TestCase):
         )
 
     def test_r2_external_storage_uploads_artifact_and_latest_index(self) -> None:
-        fake_response = Mock()
-        fake_response.headers = {"ETag": '"abc"'}
-        fake_response.raise_for_status.return_value = None
+        fake_get_response = Mock()
+        fake_get_response.status_code = 404
+        fake_get_response.headers = {}
+        fake_get_response.raise_for_status.return_value = None
+        fake_put_response = Mock()
+        fake_put_response.status_code = 200
+        fake_put_response.headers = {"ETag": '"abc"'}
+        fake_put_response.raise_for_status.return_value = None
 
         with tempfile.TemporaryDirectory() as tmpdir:
             with patch.dict(
@@ -121,9 +126,9 @@ class RunStoreRuntimePersistenceTests(unittest.TestCase):
                 clear=False,
             ):
                 with patch(
-                    "dti_ui_v1.services.run_store.requests.put",
-                    return_value=fake_response,
-                ) as put:
+                    "dti_ui_v1.services.run_store.requests.request",
+                    side_effect=[fake_get_response, fake_put_response, fake_put_response, fake_put_response],
+                ) as request:
                     saved = run_store.save_run_artifact(
                         route="class_compute",
                         request={"H0": 73.1},
@@ -132,15 +137,72 @@ class RunStoreRuntimePersistenceTests(unittest.TestCase):
 
         self.assertTrue(saved["external_storage"]["configured"])
         self.assertEqual(saved["external_storage"]["backend"], "r2")
-        self.assertEqual(len(saved["external_storage"]["uploads"]), 2)
-        self.assertEqual(put.call_count, 2)
-        uploaded_urls = [call.args[0] for call in put.call_args_list]
+        self.assertEqual(len(saved["external_storage"]["uploads"]), 3)
+        self.assertEqual(request.call_count, 4)
+        uploaded_urls = [
+            call.args[1]
+            for call in request.call_args_list
+            if call.args[0] == "PUT"
+        ]
         self.assertTrue(
             any(url.endswith("/artifact.json") for url in uploaded_urls)
         )
         self.assertTrue(
             any(url.endswith("/research/dti/index/latest.json") for url in uploaded_urls)
         )
+        self.assertTrue(
+            any(url.endswith("/research/dti/index/runs_manifest.json") for url in uploaded_urls)
+        )
+
+    def test_r2_external_run_index_merges_existing_runs(self) -> None:
+        fake_get_response = Mock()
+        fake_get_response.status_code = 200
+        fake_get_response.headers = {}
+        fake_get_response.json.return_value = {
+            "schema_version": "dti-r2-run-index-v1",
+            "runs": [
+                {
+                    "run_id": "old_run",
+                    "created_at_utc": "2026-08-20T00:00:00+00:00",
+                    "artifact_key": "research/dti/runs/old/artifact.json",
+                }
+            ],
+        }
+        fake_get_response.raise_for_status.return_value = None
+        fake_put_response = Mock()
+        fake_put_response.status_code = 200
+        fake_put_response.headers = {"ETag": '"abc"'}
+        fake_put_response.raise_for_status.return_value = None
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.dict(
+                os.environ,
+                {
+                    "DTI_RUN_ARTIFACT_DIR": tmpdir,
+                    "DTI_EXTERNAL_STORAGE_BACKEND": "r2",
+                    "R2_ACCOUNT_ID": "account",
+                    "R2_ACCESS_KEY_ID": "access",
+                    "R2_SECRET_ACCESS_KEY": "secret",
+                    "R2_BUCKET": "dti-perfect-fit-artifacts",
+                    "R2_PREFIX": "research/dti",
+                },
+                clear=False,
+            ):
+                with patch(
+                    "dti_ui_v1.services.run_store.requests.request",
+                    side_effect=[fake_get_response, fake_put_response, fake_put_response, fake_put_response],
+                ) as request:
+                    saved = run_store.save_run_artifact(
+                        route="class_compute",
+                        request={"H0": 73.1},
+                        response={"status": "ok"},
+                    )
+
+        self.assertTrue(saved["external_storage"]["configured"])
+        index_call = request.call_args_list[-1]
+        index_payload = index_call.kwargs["data"].decode("utf-8")
+        self.assertIn("old_run", index_payload)
+        self.assertIn(str(saved["run_id"]), index_payload)
 
 
 if __name__ == "__main__":

@@ -183,18 +183,18 @@ def _signing_key(secret_access_key: str, date_stamp: str) -> bytes:
     return hmac.new(key_service, b"aws4_request", hashlib.sha256).digest()
 
 
-def _r2_put_json(key: str, payload: Mapping[str, Any], *, now: datetime) -> dict[str, Any]:
+def _r2_signed_request(
+    method: str,
+    key: str,
+    *,
+    now: datetime,
+    body: bytes = b"",
+    content_type: str = "application/json",
+) -> requests.Response:
     config = _r2_config()
     if not config["configured"]:
-        return {"uploaded": False, "reason": "r2_not_configured", "key": key}
+        raise RuntimeError("r2_not_configured")
 
-    body = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        allow_nan=False,
-        default=str,
-    ).encode("utf-8")
     payload_hash = hashlib.sha256(body).hexdigest()
     amz_date = now.strftime("%Y%m%dT%H%M%SZ")
     date_stamp = now.strftime("%Y%m%d")
@@ -204,14 +204,14 @@ def _r2_put_json(key: str, payload: Mapping[str, Any], *, now: datetime) -> dict
     endpoint = f"https://{host}{canonical_uri}"
     signed_headers = "content-type;host;x-amz-content-sha256;x-amz-date"
     canonical_headers = (
-        "content-type:application/json\n"
+        f"content-type:{content_type}\n"
         f"host:{host}\n"
         f"x-amz-content-sha256:{payload_hash}\n"
         f"x-amz-date:{amz_date}\n"
     )
     canonical_request = "\n".join(
         (
-            "PUT",
+            method.upper(),
             canonical_uri,
             "",
             canonical_headers,
@@ -239,11 +239,27 @@ def _r2_put_json(key: str, payload: Mapping[str, Any], *, now: datetime) -> dict
             f"Credential={config['access_key_id']}/{credential_scope}, "
             f"SignedHeaders={signed_headers}, Signature={signature}"
         ),
-        "Content-Type": "application/json",
+        "Content-Type": content_type,
         "x-amz-content-sha256": payload_hash,
         "x-amz-date": amz_date,
     }
-    response = requests.put(endpoint, data=body, headers=headers, timeout=30)
+    return requests.request(method.upper(), endpoint, data=body, headers=headers, timeout=30)
+
+
+def _r2_put_json(key: str, payload: Mapping[str, Any], *, now: datetime) -> dict[str, Any]:
+    config = _r2_config()
+    if not config["configured"]:
+        return {"uploaded": False, "reason": "r2_not_configured", "key": key}
+
+    body = json.dumps(
+        payload,
+        ensure_ascii=False,
+        indent=2,
+        allow_nan=False,
+        default=str,
+    ).encode("utf-8")
+    encoded_key = "/".join(quote(part, safe="") for part in key.split("/"))
+    response = _r2_signed_request("PUT", key, now=now, body=body)
     response.raise_for_status()
     public_url = (
         f"{config['public_base_url']}/{encoded_key}"
@@ -257,6 +273,68 @@ def _r2_put_json(key: str, payload: Mapping[str, Any], *, now: datetime) -> dict
         "key": key,
         "public_url": public_url,
         "etag": response.headers.get("ETag"),
+    }
+
+
+def _r2_get_json(key: str, *, now: datetime) -> dict[str, Any] | None:
+    response = _r2_signed_request("GET", key, now=now)
+    if response.status_code == 404:
+        return None
+    response.raise_for_status()
+    payload = response.json()
+    return payload if isinstance(payload, dict) else None
+
+
+def _r2_run_index_entry(artifact: Mapping[str, Any], artifact_key: str) -> dict[str, Any]:
+    request = artifact.get("request", {})
+    response = artifact.get("response", {})
+    if not isinstance(request, Mapping):
+        request = {}
+    if not isinstance(response, Mapping):
+        response = {}
+    return {
+        "run_id": artifact.get("run_id"),
+        "created_at_utc": artifact.get("created_at_utc"),
+        "route": artifact.get("route"),
+        "artifact_sha256": artifact.get("artifact_sha256"),
+        "status": response.get("status"),
+        "artifact_key": artifact_key,
+        "H0": request.get("H0"),
+        "A_DTI": request.get("A_DTI"),
+        "f_EDE": request.get("f_EDE"),
+        "z_c": request.get("z_c"),
+    }
+
+
+def _merge_r2_run_index(
+    artifact: Mapping[str, Any],
+    *,
+    artifact_key: str,
+    index_key: str,
+    now: datetime,
+    limit: int = 200,
+) -> dict[str, Any]:
+    current = _r2_get_json(index_key, now=now) or {}
+    existing_runs = current.get("runs", [])
+    if not isinstance(existing_runs, list):
+        existing_runs = []
+    entry = _r2_run_index_entry(artifact, artifact_key)
+    merged: dict[str, dict[str, Any]] = {}
+    for item in existing_runs:
+        if isinstance(item, Mapping) and item.get("run_id"):
+            merged[str(item["run_id"])] = dict(item)
+    if entry.get("run_id"):
+        merged[str(entry["run_id"])] = entry
+    runs = sorted(
+        merged.values(),
+        key=lambda item: str(item.get("created_at_utc") or ""),
+        reverse=True,
+    )[:limit]
+    return {
+        "schema_version": "dti-r2-run-index-v1",
+        "updated_at_utc": now.isoformat(),
+        "run_count": len(runs),
+        "runs": runs,
     }
 
 
@@ -279,11 +357,20 @@ def _mirror_artifact_to_external_storage(
     date_prefix = created.strftime("%Y%m%d")
     prefix = str(external.get("prefix") or "").strip("/")
     key_prefix = f"{prefix}/runs/{date_prefix}/{run_id}" if prefix else f"runs/{date_prefix}/{run_id}"
+    artifact_key = f"{key_prefix}/artifact.json"
     latest_key = f"{prefix}/index/latest.json" if prefix else "index/latest.json"
+    run_index_key = f"{prefix}/index/runs_manifest.json" if prefix else "index/runs_manifest.json"
     try:
+        run_index = _merge_r2_run_index(
+            artifact,
+            artifact_key=artifact_key,
+            index_key=run_index_key,
+            now=created,
+        )
         uploads = [
-            _r2_put_json(f"{key_prefix}/artifact.json", artifact, now=created),
+            _r2_put_json(artifact_key, artifact, now=created),
             _r2_put_json(latest_key, artifact, now=created),
+            _r2_put_json(run_index_key, run_index, now=created),
         ]
     except Exception as exc:
         return {
@@ -300,6 +387,44 @@ def _mirror_artifact_to_external_storage(
         "uploads": uploads,
         "error": None,
     }
+
+
+def get_external_run_index() -> dict[str, Any]:
+    external = _external_storage_context()
+    if not external["configured"] or external["backend"] != "r2":
+        return {"configured": False, "runs": [], "error": None}
+    prefix = str(external.get("prefix") or "").strip("/")
+    index_key = f"{prefix}/index/runs_manifest.json" if prefix else "index/runs_manifest.json"
+    try:
+        payload = _r2_get_json(index_key, now=datetime.now(timezone.utc))
+    except Exception as exc:
+        return {
+            "configured": True,
+            "backend": "r2",
+            "bucket": external.get("bucket"),
+            "index_key": index_key,
+            "runs": [],
+            "error": str(exc),
+        }
+    if not isinstance(payload, dict):
+        payload = {}
+    runs = payload.get("runs", [])
+    return {
+        "configured": True,
+        "backend": "r2",
+        "bucket": external.get("bucket"),
+        "index_key": index_key,
+        "run_count": payload.get("run_count", len(runs) if isinstance(runs, list) else 0),
+        "runs": runs if isinstance(runs, list) else [],
+        "error": None,
+    }
+
+
+def load_external_run_artifact(artifact_key: str) -> dict[str, Any]:
+    payload = _r2_get_json(artifact_key, now=datetime.now(timezone.utc))
+    if not isinstance(payload, dict):
+        raise ValueError("r2_artifact_root_must_be_mapping")
+    return payload
 
 
 def get_run_artifact_store_status() -> dict[str, Any]:

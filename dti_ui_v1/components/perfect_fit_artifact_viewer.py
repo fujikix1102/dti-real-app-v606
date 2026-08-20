@@ -14,7 +14,9 @@ from dti_ui_v1.services.run_store import (
     build_notebook_export,
     build_reproduction_package,
     build_run_manifest,
+    get_external_run_index,
     get_run_artifact_store_status,
+    load_external_run_artifact,
     list_run_artifact_paths,
     list_run_artifacts,
 )
@@ -115,6 +117,69 @@ def render_perfect_fit_artifact_viewer():
     )
     st.markdown("### Artifact storage")
     render_safe_json(get_run_artifact_store_status())
+    external_index = get_external_run_index()
+    if external_index.get("configured"):
+        st.markdown("### R2 artifact index")
+        render_safe_json(
+            {
+                "backend": external_index.get("backend"),
+                "bucket": external_index.get("bucket"),
+                "index_key": external_index.get("index_key"),
+                "run_count": external_index.get("run_count"),
+                "error": external_index.get("error"),
+            }
+        )
+        r2_runs = external_index.get("runs", [])
+        if isinstance(r2_runs, list) and r2_runs:
+            r2_frame = pd.DataFrame(r2_runs)
+            st.dataframe(
+                r2_frame,
+                hide_index=True,
+                use_container_width=True,
+            )
+            choices = [
+                row
+                for row in r2_runs
+                if isinstance(row, Mapping) and row.get("artifact_key")
+            ]
+            selected_r2 = st.selectbox(
+                "R2 artifact",
+                choices,
+                format_func=lambda row: str(row.get("run_id")),
+                key="perfect_fit_r2_artifact_selector_v1",
+            )
+            if st.button(
+                "Load R2 artifact",
+                key="perfect_fit_r2_artifact_load_v1",
+            ):
+                try:
+                    r2_payload = load_external_run_artifact(
+                        str(selected_r2.get("artifact_key"))
+                    )
+                    st.session_state["perfect_fit_loaded_r2_artifact_v1"] = r2_payload
+                except Exception as exc:
+                    st.session_state["perfect_fit_loaded_r2_artifact_error_v1"] = {
+                        "exception_type": type(exc).__name__,
+                        "detail": str(exc),
+                    }
+        loaded_r2_error = st.session_state.get(
+            "perfect_fit_loaded_r2_artifact_error_v1"
+        )
+        if isinstance(loaded_r2_error, dict):
+            st.error("R2 artifact load failed.")
+            render_safe_json(loaded_r2_error)
+        loaded_r2 = st.session_state.get("perfect_fit_loaded_r2_artifact_v1")
+        if isinstance(loaded_r2, dict):
+            st.markdown("### Loaded R2 artifact")
+            render_safe_json(
+                {
+                    "run_id": loaded_r2.get("run_id"),
+                    "route": loaded_r2.get("route"),
+                    "artifact_sha256": loaded_r2.get("artifact_sha256"),
+                    "created_at_utc": loaded_r2.get("created_at_utc"),
+                    "storage": loaded_r2.get("storage"),
+                }
+            )
 
     files = _artifacts()
 
