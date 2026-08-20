@@ -19,6 +19,7 @@ from dti_ui_v1.services.run_store import (
     load_external_run_artifact,
     list_run_artifact_paths,
     list_run_artifacts,
+    rebuild_external_run_index_from_remote,
     rebuild_external_run_index_from_runtime,
 )
 
@@ -312,12 +313,20 @@ def render_perfect_fit_artifact_viewer():
                 st.session_state["perfect_fit_r2_rebuild_result_v1"] = (
                     rebuild_external_run_index_from_runtime()
                 )
+            if st.button(
+                "Rebuild R2 index from bucket",
+                key="perfect_fit_r2_remote_rebuild_index_v1",
+            ):
+                st.session_state["perfect_fit_r2_rebuild_result_v1"] = (
+                    rebuild_external_run_index_from_remote()
+                )
             rebuild_result = st.session_state.get("perfect_fit_r2_rebuild_result_v1")
             if isinstance(rebuild_result, dict):
                 st.caption(
                     "R2 index rebuild: "
                     f"uploaded={rebuild_result.get('uploaded')} · "
                     f"run_count={rebuild_result.get('run_count')} · "
+                    f"discovered={rebuild_result.get('discovered_artifact_count', 'runtime')} · "
                     f"error={rebuild_result.get('error')}"
                 )
             if selected_r2:

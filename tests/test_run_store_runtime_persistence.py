@@ -250,6 +250,59 @@ class RunStoreRuntimePersistenceTests(unittest.TestCase):
         self.assertIn(str(saved_one["run_id"]), payload)
         self.assertIn(str(saved_two["run_id"]), payload)
 
+    def test_rebuild_r2_index_from_remote_bucket_listing(self) -> None:
+        list_response = Mock()
+        list_response.status_code = 200
+        list_response.text = """<?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <Contents><Key>research/dti/runs/20260820/remote_run/artifact.json</Key></Contents>
+  <Contents><Key>research/dti/index/latest.json</Key></Contents>
+</ListBucketResult>
+"""
+        list_response.raise_for_status.return_value = None
+        artifact_response = Mock()
+        artifact_response.status_code = 200
+        artifact_response.json.return_value = {
+            "run_id": "remote_run",
+            "created_at_utc": "2026-08-20T01:00:00+00:00",
+            "route": "class_compute",
+            "artifact_sha256": "abc",
+            "request": {"H0": 72.9},
+            "response": {"status": "ok"},
+        }
+        artifact_response.raise_for_status.return_value = None
+        put_response = Mock()
+        put_response.status_code = 200
+        put_response.headers = {"ETag": '"abc"'}
+        put_response.raise_for_status.return_value = None
+
+        with patch.dict(
+            os.environ,
+            {
+                "DTI_EXTERNAL_STORAGE_BACKEND": "r2",
+                "R2_ACCOUNT_ID": "account",
+                "R2_ACCESS_KEY_ID": "access",
+                "R2_SECRET_ACCESS_KEY": "secret",
+                "R2_BUCKET": "dti-perfect-fit-artifacts",
+                "R2_PREFIX": "research/dti",
+            },
+            clear=False,
+        ):
+            with patch(
+                "dti_ui_v1.services.run_store.requests.request",
+                side_effect=[list_response, artifact_response, put_response],
+            ) as request:
+                rebuilt = run_store.rebuild_external_run_index_from_remote()
+
+        self.assertTrue(rebuilt["uploaded"])
+        self.assertEqual(rebuilt["run_count"], 1)
+        self.assertEqual(rebuilt["discovered_artifact_count"], 1)
+        list_call = request.call_args_list[0]
+        self.assertEqual(list_call.args[0], "GET")
+        self.assertIn("list-type=2", list_call.args[1])
+        payload = request.call_args_list[-1].kwargs["data"].decode("utf-8")
+        self.assertIn("remote_run", payload)
+
 
 if __name__ == "__main__":
     unittest.main()

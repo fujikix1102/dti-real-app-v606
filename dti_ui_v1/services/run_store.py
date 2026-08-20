@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 from urllib.parse import quote
+from xml.etree import ElementTree
 
 import requests
 
@@ -190,6 +191,7 @@ def _r2_signed_request(
     now: datetime,
     body: bytes = b"",
     content_type: str = "application/json",
+    query: Mapping[str, str] | None = None,
 ) -> requests.Response:
     config = _r2_config()
     if not config["configured"]:
@@ -201,7 +203,14 @@ def _r2_signed_request(
     host = f"{config['account_id']}.r2.cloudflarestorage.com"
     encoded_key = "/".join(quote(part, safe="") for part in key.split("/"))
     canonical_uri = f"/{quote(config['bucket'], safe='')}/{encoded_key}"
+    query_items = sorted((query or {}).items())
+    canonical_query = "&".join(
+        f"{quote(str(key), safe='-_.~')}={quote(str(value), safe='-_.~')}"
+        for key, value in query_items
+    )
     endpoint = f"https://{host}{canonical_uri}"
+    if canonical_query:
+        endpoint = f"{endpoint}?{canonical_query}"
     signed_headers = "content-type;host;x-amz-content-sha256;x-amz-date"
     canonical_headers = (
         f"content-type:{content_type}\n"
@@ -213,7 +222,7 @@ def _r2_signed_request(
         (
             method.upper(),
             canonical_uri,
-            "",
+            canonical_query,
             canonical_headers,
             signed_headers,
             payload_hash,
@@ -283,6 +292,30 @@ def _r2_get_json(key: str, *, now: datetime) -> dict[str, Any] | None:
     response.raise_for_status()
     payload = response.json()
     return payload if isinstance(payload, dict) else None
+
+
+def _r2_list_artifact_keys(*, now: datetime, max_keys: int = 1000) -> list[str]:
+    external = _external_storage_context()
+    prefix = str(external.get("prefix") or "").strip("/")
+    runs_prefix = f"{prefix}/runs/" if prefix else "runs/"
+    response = _r2_signed_request(
+        "GET",
+        "",
+        now=now,
+        query={
+            "list-type": "2",
+            "prefix": runs_prefix,
+            "max-keys": str(max_keys),
+        },
+    )
+    response.raise_for_status()
+    root = ElementTree.fromstring(response.text)
+    keys: list[str] = []
+    for key_node in root.findall(".//{*}Key"):
+        key = key_node.text or ""
+        if key.endswith("/artifact.json"):
+            keys.append(key)
+    return sorted(set(keys), reverse=True)
 
 
 def _r2_run_index_entry(artifact: Mapping[str, Any], artifact_key: str) -> dict[str, Any]:
@@ -486,6 +519,65 @@ def rebuild_external_run_index_from_runtime(limit: int = 200) -> dict[str, Any]:
         "uploaded": bool(upload.get("uploaded")),
         "index_key": index_key,
         "run_count": len(runs),
+        "error": None,
+    }
+
+
+def rebuild_external_run_index_from_remote(limit: int = 200) -> dict[str, Any]:
+    external = _external_storage_context()
+    if not external["configured"] or external["backend"] != "r2":
+        return {
+            "configured": False,
+            "uploaded": False,
+            "run_count": 0,
+            "error": None,
+        }
+    now = datetime.now(timezone.utc)
+    try:
+        artifact_keys = _r2_list_artifact_keys(now=now, max_keys=limit)
+    except Exception as exc:
+        return {
+            "configured": True,
+            "uploaded": False,
+            "run_count": 0,
+            "error": str(exc),
+        }
+    runs: list[dict[str, Any]] = []
+    for key in artifact_keys[:limit]:
+        try:
+            payload = load_external_run_artifact(key)
+        except Exception:
+            continue
+        runs.append(_r2_run_index_entry(payload, key))
+    runs = sorted(
+        runs,
+        key=lambda item: str(item.get("created_at_utc") or ""),
+        reverse=True,
+    )[:limit]
+    index_payload = {
+        "schema_version": "dti-r2-run-index-v1",
+        "updated_at_utc": now.isoformat(),
+        "run_count": len(runs),
+        "runs": runs,
+    }
+    index_key = _r2_index_key()
+    try:
+        upload = _r2_put_json(index_key, index_payload, now=now)
+    except Exception as exc:
+        return {
+            "configured": True,
+            "uploaded": False,
+            "index_key": index_key,
+            "run_count": len(runs),
+            "discovered_artifact_count": len(artifact_keys),
+            "error": str(exc),
+        }
+    return {
+        "configured": True,
+        "uploaded": bool(upload.get("uploaded")),
+        "index_key": index_key,
+        "run_count": len(runs),
+        "discovered_artifact_count": len(artifact_keys),
         "error": None,
     }
 
