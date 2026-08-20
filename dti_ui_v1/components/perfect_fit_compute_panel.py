@@ -45,6 +45,13 @@ def render_perfect_fit_compute_panel() -> None:
         f"{store_status.get('artifact_directory')} · "
         f"files visible to this runtime: {store_status.get('artifact_count')}"
     )
+    external_storage = store_status.get("external_storage", {})
+    if isinstance(external_storage, dict):
+        st.caption(
+            "External artifact storage: "
+            f"{external_storage.get('backend') or 'none'} · "
+            f"configured={bool(external_storage.get('configured'))}"
+        )
     if (
         store_status.get("persistence")
         == "ephemeral_streamlit_runtime"
@@ -93,10 +100,14 @@ def render_perfect_fit_compute_panel() -> None:
         "Confirm locked baseline single run contract",
         key="perfect_fit_locked_confirm_single_run_v1",
     )
-    if st.button("Run locked baseline compute", type="primary", width="stretch"):
-        if not confirmed:
-            st.warning("Confirm the single run contract before execution.")
-            return
+    if not confirmed:
+        st.info("Confirm the single run contract to enable the locked baseline run.")
+    if st.button(
+        "Run locked baseline compute",
+        type="primary",
+        width="stretch",
+        disabled=not confirmed,
+    ):
         st.session_state.pop(_RESULT_KEY, None)
         st.session_state.pop(_ERROR_KEY, None)
         request = LockedBaselineRequest(
@@ -163,6 +174,7 @@ def render_perfect_fit_compute_panel() -> None:
                 "saved_artifact_count_this_runtime": artifact.get("artifact_count"),
                 "A_DTI": float(st.session_state[_LOCKED_A_DTI_KEY]),
                 "runtime_store": persistence,
+                "external_storage": artifact.get("external_storage"),
                 "local_checkout_sync": False,
                 "boundary": (
                     "This count and path describe only the currently running "

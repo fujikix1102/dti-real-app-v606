@@ -151,6 +151,7 @@ def _render_latest_run_card(metadata: Mapping[str, Any] | None) -> None:
             "artifact": metadata.get("path"),
             "sha256": metadata.get("artifact_sha256"),
             "runtime": metadata.get("storage", {}),
+            "external_storage": metadata.get("external_storage"),
         }
     )
 
