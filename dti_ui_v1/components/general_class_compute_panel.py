@@ -13,6 +13,8 @@ from dti_ui_v1.components.safe_json_display import render_safe_json
 T_CMB_K = 2.7255
 K2_TO_UK2 = 1.0e12
 HISTORY_KEY = "general_class_compute_history_v1"
+PUBLIC_SINGLE_RUN_LIMIT_KEY = "perfect_fit_public_single_run_count_v1"
+PUBLIC_SINGLE_RUN_MAX_PER_SESSION = 1
 
 _GENERAL_CLASS_INPUT_DEFAULTS = {
     "perfect_fit_A_DTI_v1": 0.0,
@@ -134,6 +136,11 @@ def _working_input_payload(state: Mapping[str, Any]) -> dict[str, float]:
         field: float(state[session_key])
         for field, session_key in _WORKING_INPUT_FIELDS.items()
     }
+
+
+def _public_single_run_remaining(state: Mapping[str, Any]) -> int:
+    used = int(state.get(PUBLIC_SINGLE_RUN_LIMIT_KEY, 0) or 0)
+    return max(0, PUBLIC_SINGLE_RUN_MAX_PER_SESSION - used)
 
 
 def _render_latest_run_card(metadata: Mapping[str, Any] | None) -> None:
@@ -348,6 +355,7 @@ def render_general_class_compute_panel() -> None:
 
     current_payload = _general_class_request_payload(st.session_state)
     working_payload = _working_input_payload(st.session_state)
+    remaining_runs = _public_single_run_remaining(st.session_state)
     st.markdown("**Single run contract**")
     render_safe_json(
         {
@@ -355,6 +363,8 @@ def render_general_class_compute_panel() -> None:
             "parameters": working_payload,
             "backend_payload": current_payload,
             "will_compute": "YES CLASS backend single run",
+            "public_limit": "ONE_RUN_PER_BROWSER_SESSION",
+            "remaining_session_runs": remaining_runs,
             "will_not_compute": [
                 "NO MCMC",
                 "NO posterior",
@@ -369,6 +379,11 @@ def render_general_class_compute_panel() -> None:
         "Confirm single run contract",
         key="perfect_fit_general_class_confirm_single_run_v1",
     )
+    if remaining_runs <= 0:
+        st.info(
+            "This browser session has already used its public single-run allowance. "
+            "Reloading or using a new session is required for another public run."
+        )
     with st.expander("Current run input payload", expanded=False):
         render_safe_json(working_payload)
 
@@ -377,13 +392,16 @@ def render_general_class_compute_panel() -> None:
         type="primary",
         key="perfect_fit_general_class_run_v1",
         width="stretch",
-        disabled=not confirmed,
+        disabled=(not confirmed or remaining_runs <= 0),
     )
 
     if not run_requested:
         return
 
-    request = GeneralClassRequest(**_general_class_request_payload(st.session_state))
+    request = GeneralClassRequest(
+        **_general_class_request_payload(st.session_state),
+        timeout_seconds=120.0,
+    )
 
     with st.spinner("Calling the CLASS backend..."):
         result = execute_general_class_compute(request)
@@ -400,6 +418,9 @@ def render_general_class_compute_panel() -> None:
         return
 
     st.success("CLASS / AxiCLASS computation accepted.")
+    st.session_state[PUBLIC_SINGLE_RUN_LIMIT_KEY] = (
+        int(st.session_state.get(PUBLIC_SINGLE_RUN_LIMIT_KEY, 0) or 0) + 1
+    )
 
     response = result.response_payload
     try:

@@ -4,6 +4,7 @@ import unittest
 
 from dti_ui_v1.components.general_class_compute_panel import (
     _GENERAL_CLASS_INPUT_DEFAULTS,
+    _public_single_run_remaining,
     _general_class_request_payload,
     _working_input_payload,
 )
@@ -56,6 +57,15 @@ class GeneralClassComputePanelStateTests(unittest.TestCase):
         self.assertNotIn("A_DTI", backend_payload)
         self.assertEqual(working_payload["A_DTI"], 0.001)
         self.assertEqual(working_payload["H0"], 68.0)
+
+    def test_public_single_run_limit_allows_one_run_per_session(self) -> None:
+        self.assertEqual(_public_single_run_remaining({}), 1)
+        self.assertEqual(
+            _public_single_run_remaining(
+                {"perfect_fit_public_single_run_count_v1": 1}
+            ),
+            0,
+        )
 
 
 if __name__ == "__main__":

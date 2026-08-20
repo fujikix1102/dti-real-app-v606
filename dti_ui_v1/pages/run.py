@@ -30,19 +30,20 @@ def render() -> None:
     st.subheader("DTI Runtime Evidence Display")
 
     st.caption(
-        "READ ONLY / DISPLAY ONLY / "
-        "NO COMPUTE / NO LIKELIHOOD / "
-        "NO POSTERIOR / NO MCMC"
+        "LEVEL 2 PUBLIC SINGLE-RUN ENABLED / "
+        "DETERMINISTIC CLASS-AXICLASS ONLY / "
+        "NO POSTERIOR / NO MCMC / NO SCAN"
     )
 
     st.json(
         {
             "page_entry": "dti_ui_v1.pages.run.render",
-            "display_mode": "READ_ONLY",
-            "compute_execution": False,
-            "likelihood_evaluation": False,
+            "display_mode": "LEVEL_2_SINGLE_RUN",
+            "compute_execution": "single_deterministic_class_axiclass_only",
+            "likelihood_evaluation": "backend_component_values_when_available",
             "posterior_inference": False,
             "mcmc": False,
+            "scan": False,
         }
     )
 
@@ -54,8 +55,8 @@ def render() -> None:
     st.subheader("Runtime Status Panel")
 
     st.caption(
-        "DISPLAY ONLY / DEPLOYMENT IDENTITY / "
-        "NO COMPUTE / NO LIKELIHOOD / NO POSTERIOR / NO MCMC"
+        "DEPLOYMENT IDENTITY / PUBLIC SINGLE DETERMINISTIC RUN / "
+        "NO POSTERIOR / NO MCMC / NO SCAN"
     )
 
     st.info(
@@ -65,11 +66,12 @@ def render() -> None:
     st.json(
         {
             "page_entry": "dti_ui_v1.pages.run.render",
-            "display_mode": "READ_ONLY",
-            "compute_execution": False,
-            "likelihood_evaluation": False,
+            "display_mode": "LEVEL_2_SINGLE_RUN",
+            "compute_execution": "single_deterministic_class_axiclass_only",
+            "likelihood_evaluation": "backend_component_values_when_available",
             "posterior_inference": False,
             "mcmc": False,
+            "scan": False,
         }
     )
 
