@@ -745,6 +745,10 @@ def render_perfect_fit_artifact_viewer():
     package_zip = _package_zip_bytes(package_files)
 
     st.markdown("### Reproduction exports")
+    st.caption(
+        "Quick local inspection after download: unzip the reproduction ZIP, "
+        "then run `python -m json.tool dti_reproduction/*_manifest.json`."
+    )
     export_columns = st.columns(3)
     export_columns[0].download_button(
         "Download manifest JSON",

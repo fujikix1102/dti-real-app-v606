@@ -26,6 +26,9 @@ from dti_ui_v1.components.scientific_result_live_panel import (
 from dti_ui_v1.components.scientific_result_page_bridge import get_scientific_result_page_context
 
 from dti_ui_v1.components.fixed_h0_bao_charts import render_fixed_h0_bao_charts
+from dti_ui_v1.components.companion_reference_panel import (
+    render_companion_reference_panel,
+)
 
 from dti_ui_v1.components.likelihood_page_binding import (
     build_page_likelihood_section,
@@ -170,6 +173,12 @@ def _render_perfect_fit_artifact_extensions():
         expanded=False,
     ):
         render_perfect_fit_artifact_viewer()
+
+    with st.expander(
+        "Companion reference and citation",
+        expanded=False,
+    ):
+        render_companion_reference_panel()
 
     with st.expander(
         "Saved artifact type comparison",

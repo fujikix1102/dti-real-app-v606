@@ -91,6 +91,11 @@ class GeneralClassExtensionTests(unittest.TestCase):
                 self.assertIn("H0: 67.0", notebook)
 
                 package = run_store.build_reproduction_package(payload)
+                self.assertIn("README_REPRODUCTION.md", package)
+                self.assertIn(
+                    "python -m json.tool *_manifest.json",
+                    package["README_REPRODUCTION.md"],
+                )
                 self.assertTrue(any(name.endswith("_manifest.json") for name in package))
                 self.assertTrue(any(name.endswith("_notebook.md") for name in package))
                 self.assertTrue(any(name.endswith("_artifact.json") for name in package))

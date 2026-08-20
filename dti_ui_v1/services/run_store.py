@@ -933,7 +933,28 @@ def build_notebook_export(payload: Mapping[str, Any]) -> str:
 def build_reproduction_package(payload: Mapping[str, Any]) -> dict[str, str]:
     manifest = build_run_manifest(payload)
     run_id = str(manifest.get("run_id") or "dti_run")
+    readme = "\n".join(
+        [
+            "# DTI PERFECT FIT reproduction package",
+            "",
+            "This package contains the saved artifact, manifest, and notebook export.",
+            "",
+            "## Quick local inspection",
+            "",
+            "```bash",
+            "python -m json.tool *_manifest.json",
+            "python -m json.tool *_artifact.json",
+            "```",
+            "",
+            "## Boundary",
+            "",
+            "This package does not contain posterior samples, MCMC output, or a model-ranking claim.",
+            "Full backend replay requires a local CLASS/AxiCLASS environment matching the artifact manifest and backend contract.",
+            "",
+        ]
+    )
     return {
+        "README_REPRODUCTION.md": readme,
         f"{run_id}_manifest.json": json.dumps(
             manifest,
             ensure_ascii=False,
