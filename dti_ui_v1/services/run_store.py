@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import os
 import platform
@@ -8,11 +9,20 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.parse import quote
 
+import requests
 
 SCHEMA_VERSION = "dti-run-artifact-v2"
 STREAMLIT_RUNTIME_PREFIX = "/mount/src/"
 DURABLE_ARTIFACT_DIR_ENV = "DTI_DURABLE_ARTIFACT_DIR"
+EXTERNAL_STORAGE_BACKEND_ENV = "DTI_EXTERNAL_STORAGE_BACKEND"
+R2_ACCOUNT_ID_ENV = "R2_ACCOUNT_ID"
+R2_ACCESS_KEY_ID_ENV = "R2_ACCESS_KEY_ID"
+R2_SECRET_ACCESS_KEY_ENV = "R2_SECRET_ACCESS_KEY"
+R2_BUCKET_ENV = "R2_BUCKET"
+R2_PREFIX_ENV = "R2_PREFIX"
+R2_PUBLIC_BASE_URL_ENV = "R2_PUBLIC_BASE_URL"
 
 
 def _runtime_identity() -> dict[str, Any]:
@@ -42,6 +52,60 @@ def _durable_artifact_directory() -> Path | None:
     if not configured:
         return None
     return Path(configured).expanduser().resolve()
+
+
+def _r2_config() -> dict[str, Any]:
+    backend = os.getenv(EXTERNAL_STORAGE_BACKEND_ENV, "").strip().lower()
+    account_id = os.getenv(R2_ACCOUNT_ID_ENV, "").strip()
+    access_key_id = os.getenv(R2_ACCESS_KEY_ID_ENV, "").strip()
+    secret_access_key = os.getenv(R2_SECRET_ACCESS_KEY_ENV, "").strip()
+    bucket = os.getenv(R2_BUCKET_ENV, "").strip()
+    prefix = os.getenv(R2_PREFIX_ENV, "dti-perfect-fit").strip().strip("/")
+    public_base_url = os.getenv(R2_PUBLIC_BASE_URL_ENV, "").strip().rstrip("/")
+    configured = backend == "r2" and all(
+        (account_id, access_key_id, secret_access_key, bucket)
+    )
+    return {
+        "backend": backend or None,
+        "configured": configured,
+        "account_id": account_id,
+        "access_key_id": access_key_id,
+        "secret_access_key": secret_access_key,
+        "bucket": bucket,
+        "prefix": prefix,
+        "public_base_url": public_base_url,
+    }
+
+
+def _external_storage_context() -> dict[str, Any]:
+    r2 = _r2_config()
+    if r2["backend"] == "r2":
+        missing = [
+            key
+            for key, value in (
+                (R2_ACCOUNT_ID_ENV, r2["account_id"]),
+                (R2_ACCESS_KEY_ID_ENV, r2["access_key_id"]),
+                (R2_SECRET_ACCESS_KEY_ENV, r2["secret_access_key"]),
+                (R2_BUCKET_ENV, r2["bucket"]),
+            )
+            if not value
+        ]
+        return {
+            "backend": "r2",
+            "configured": r2["configured"],
+            "bucket": r2["bucket"] or None,
+            "prefix": r2["prefix"],
+            "public_base_url": r2["public_base_url"] or None,
+            "missing": missing,
+        }
+    return {
+        "backend": None,
+        "configured": False,
+        "bucket": None,
+        "prefix": None,
+        "public_base_url": None,
+        "missing": [],
+    }
 
 
 def _is_streamlit_cloud_runtime(directory: Path) -> bool:
@@ -91,6 +155,7 @@ def _storage_context(directory: Path) -> dict[str, Any]:
         "durable_persistence_available": durable_configured or not is_streamlit_cloud,
         "durable_mirror_configured": durable_configured,
         "durable_artifact_directory": str(durable_directory) if durable_directory else None,
+        "external_storage": _external_storage_context(),
         "user_visible_notice": user_visible_notice,
     }
 
@@ -105,6 +170,136 @@ def _write_artifact_json(directory: Path, filename: str, artifact: Mapping[str, 
     )
     temporary.replace(destination)
     return destination
+
+
+def _signing_key(secret_access_key: str, date_stamp: str) -> bytes:
+    key_date = hmac.new(
+        ("AWS4" + secret_access_key).encode("utf-8"),
+        date_stamp.encode("utf-8"),
+        hashlib.sha256,
+    ).digest()
+    key_region = hmac.new(key_date, b"auto", hashlib.sha256).digest()
+    key_service = hmac.new(key_region, b"s3", hashlib.sha256).digest()
+    return hmac.new(key_service, b"aws4_request", hashlib.sha256).digest()
+
+
+def _r2_put_json(key: str, payload: Mapping[str, Any], *, now: datetime) -> dict[str, Any]:
+    config = _r2_config()
+    if not config["configured"]:
+        return {"uploaded": False, "reason": "r2_not_configured", "key": key}
+
+    body = json.dumps(
+        payload,
+        ensure_ascii=False,
+        indent=2,
+        allow_nan=False,
+        default=str,
+    ).encode("utf-8")
+    payload_hash = hashlib.sha256(body).hexdigest()
+    amz_date = now.strftime("%Y%m%dT%H%M%SZ")
+    date_stamp = now.strftime("%Y%m%d")
+    host = f"{config['account_id']}.r2.cloudflarestorage.com"
+    encoded_key = "/".join(quote(part, safe="") for part in key.split("/"))
+    canonical_uri = f"/{quote(config['bucket'], safe='')}/{encoded_key}"
+    endpoint = f"https://{host}{canonical_uri}"
+    signed_headers = "content-type;host;x-amz-content-sha256;x-amz-date"
+    canonical_headers = (
+        "content-type:application/json\n"
+        f"host:{host}\n"
+        f"x-amz-content-sha256:{payload_hash}\n"
+        f"x-amz-date:{amz_date}\n"
+    )
+    canonical_request = "\n".join(
+        (
+            "PUT",
+            canonical_uri,
+            "",
+            canonical_headers,
+            signed_headers,
+            payload_hash,
+        )
+    )
+    credential_scope = f"{date_stamp}/auto/s3/aws4_request"
+    string_to_sign = "\n".join(
+        (
+            "AWS4-HMAC-SHA256",
+            amz_date,
+            credential_scope,
+            hashlib.sha256(canonical_request.encode("utf-8")).hexdigest(),
+        )
+    )
+    signature = hmac.new(
+        _signing_key(config["secret_access_key"], date_stamp),
+        string_to_sign.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    headers = {
+        "Authorization": (
+            "AWS4-HMAC-SHA256 "
+            f"Credential={config['access_key_id']}/{credential_scope}, "
+            f"SignedHeaders={signed_headers}, Signature={signature}"
+        ),
+        "Content-Type": "application/json",
+        "x-amz-content-sha256": payload_hash,
+        "x-amz-date": amz_date,
+    }
+    response = requests.put(endpoint, data=body, headers=headers, timeout=30)
+    response.raise_for_status()
+    public_url = (
+        f"{config['public_base_url']}/{encoded_key}"
+        if config["public_base_url"]
+        else None
+    )
+    return {
+        "uploaded": True,
+        "backend": "r2",
+        "bucket": config["bucket"],
+        "key": key,
+        "public_url": public_url,
+        "etag": response.headers.get("ETag"),
+    }
+
+
+def _mirror_artifact_to_external_storage(
+    artifact: Mapping[str, Any],
+    *,
+    created: datetime,
+) -> dict[str, Any]:
+    external = _external_storage_context()
+    if not external["configured"]:
+        return {"configured": False, "uploads": [], "error": None}
+    if external["backend"] != "r2":
+        return {
+            "configured": False,
+            "uploads": [],
+            "error": f"unsupported_external_backend:{external['backend']}",
+        }
+
+    run_id = str(artifact.get("run_id") or "unknown_run")
+    date_prefix = created.strftime("%Y%m%d")
+    prefix = str(external.get("prefix") or "").strip("/")
+    key_prefix = f"{prefix}/runs/{date_prefix}/{run_id}" if prefix else f"runs/{date_prefix}/{run_id}"
+    latest_key = f"{prefix}/index/latest.json" if prefix else "index/latest.json"
+    try:
+        uploads = [
+            _r2_put_json(f"{key_prefix}/artifact.json", artifact, now=created),
+            _r2_put_json(latest_key, artifact, now=created),
+        ]
+    except Exception as exc:
+        return {
+            "configured": True,
+            "backend": "r2",
+            "bucket": external.get("bucket"),
+            "uploads": [],
+            "error": str(exc),
+        }
+    return {
+        "configured": True,
+        "backend": "r2",
+        "bucket": external.get("bucket"),
+        "uploads": uploads,
+        "error": None,
+    }
 
 
 def get_run_artifact_store_status() -> dict[str, Any]:
@@ -164,6 +359,7 @@ def save_run_artifact(
     durable_destination = None
     if durable_directory is not None and durable_directory != directory:
         durable_destination = _write_artifact_json(durable_directory, filename, artifact)
+    external_storage = _mirror_artifact_to_external_storage(artifact, created=created)
     artifact_count = len(list(directory.glob("*.json")))
     return {
         "schema_version": SCHEMA_VERSION,
@@ -175,6 +371,7 @@ def save_run_artifact(
         "artifact_count": artifact_count,
         "storage": storage,
         "durable_path": str(durable_destination) if durable_destination else None,
+        "external_storage": external_storage,
     }
 
 
@@ -267,6 +464,7 @@ def build_run_manifest(payload: Mapping[str, Any]) -> dict[str, Any]:
             "artifact_directory": storage.get("durable_artifact_directory"),
             "persistence": storage.get("persistence"),
         },
+        "external_storage": storage.get("external_storage", {}),
         "boundary": reproducibility.get(
             "scientific_boundary",
             "Single-point deterministic calculation; no posterior or evidence claim.",

@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from dti_ui_v1.services import run_store
 
@@ -73,6 +73,74 @@ class RunStoreRuntimePersistenceTests(unittest.TestCase):
                     manifest["durable_storage"]["artifact_directory"],
                     str(Path(durable_dir).resolve()),
                 )
+
+    def test_r2_external_storage_is_inactive_without_complete_config(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.dict(
+                os.environ,
+                {
+                    "DTI_RUN_ARTIFACT_DIR": tmpdir,
+                    "DTI_EXTERNAL_STORAGE_BACKEND": "r2",
+                    "R2_BUCKET": "dti-perfect-fit-artifacts",
+                },
+                clear=False,
+            ):
+                saved = run_store.save_run_artifact(
+                    route="class_compute",
+                    request={"H0": 73.1},
+                    response={"status": "ok"},
+                )
+
+        self.assertFalse(saved["external_storage"]["configured"])
+        self.assertEqual(saved["external_storage"]["uploads"], [])
+        self.assertFalse(
+            saved["storage"]["external_storage"]["configured"]
+        )
+        self.assertIn(
+            "R2_ACCOUNT_ID",
+            saved["storage"]["external_storage"]["missing"],
+        )
+
+    def test_r2_external_storage_uploads_artifact_and_latest_index(self) -> None:
+        fake_response = Mock()
+        fake_response.headers = {"ETag": '"abc"'}
+        fake_response.raise_for_status.return_value = None
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.dict(
+                os.environ,
+                {
+                    "DTI_RUN_ARTIFACT_DIR": tmpdir,
+                    "DTI_EXTERNAL_STORAGE_BACKEND": "r2",
+                    "R2_ACCOUNT_ID": "account",
+                    "R2_ACCESS_KEY_ID": "access",
+                    "R2_SECRET_ACCESS_KEY": "secret",
+                    "R2_BUCKET": "dti-perfect-fit-artifacts",
+                    "R2_PREFIX": "research/dti",
+                },
+                clear=False,
+            ):
+                with patch(
+                    "dti_ui_v1.services.run_store.requests.put",
+                    return_value=fake_response,
+                ) as put:
+                    saved = run_store.save_run_artifact(
+                        route="class_compute",
+                        request={"H0": 73.1},
+                        response={"status": "ok"},
+                    )
+
+        self.assertTrue(saved["external_storage"]["configured"])
+        self.assertEqual(saved["external_storage"]["backend"], "r2")
+        self.assertEqual(len(saved["external_storage"]["uploads"]), 2)
+        self.assertEqual(put.call_count, 2)
+        uploaded_urls = [call.args[0] for call in put.call_args_list]
+        self.assertTrue(
+            any(url.endswith("/artifact.json") for url in uploaded_urls)
+        )
+        self.assertTrue(
+            any(url.endswith("/research/dti/index/latest.json") for url in uploaded_urls)
+        )
 
 
 if __name__ == "__main__":
