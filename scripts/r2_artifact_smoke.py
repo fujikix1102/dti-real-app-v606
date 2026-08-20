@@ -5,7 +5,8 @@ import json
 import sys
 from datetime import datetime, timezone
 from typing import Any
-from urllib.request import Request, urlopen
+
+import requests
 
 from dti_ui_v1.services.run_store import (
     _external_storage_context,
@@ -19,10 +20,17 @@ def _check_public_url(url: str | None, timeout: int) -> dict[str, Any]:
     if not url:
         return {"checked": False, "ok": True, "reason": "not_configured"}
     try:
-        request = Request(url, headers={"User-Agent": "dti-r2-artifact-smoke/1.0"})
-        with urlopen(request, timeout=timeout) as response:
-            status = int(response.status)
-            return {"checked": True, "ok": 200 <= status < 400, "status": status}
+        response = requests.get(
+            url,
+            headers={"User-Agent": "dti-r2-artifact-smoke/1.0"},
+            timeout=timeout,
+        )
+        return {
+            "checked": True,
+            "ok": 200 <= int(response.status_code) < 400,
+            "status": int(response.status_code),
+            "final_url": response.url,
+        }
     except Exception as exc:
         return {"checked": True, "ok": False, "error": str(exc)}
 
