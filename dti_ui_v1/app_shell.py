@@ -23,6 +23,10 @@ from dti_ui_v1.contracts.display_contract import (
 
 PageRenderer = Callable[[], None]
 APP_NAVIGATION = tuple(NAVIGATION_ITEMS[:4]) + ("Atlas", "Consistency", "Audit DTI") + tuple(NAVIGATION_ITEMS[4:])
+PUBLIC_APP_URL = "https://dti-perfect-fit.streamlit.app/"
+ZENODO_RECORD_URL = "https://zenodo.org/records/22036236"
+ZENODO_VERSION_DOI = "10.5281/zenodo.22036236"
+ZENODO_CONCEPT_DOI = "10.5281/zenodo.22036235"
 
 
 def page_registry() -> dict[str, tuple[str, str]]:
@@ -74,6 +78,15 @@ def render_sidebar() -> str:
         st.caption("Joint likelihood: DESI DR2 + Planck 2018 + relative Pantheon+")
         st.caption("Local ladder: overlap-safe summary comparison")
         st.caption("Inference: deterministic single-point scoring; no MCMC")
+        with st.expander("Publication / DOI", expanded=False):
+            st.markdown(f"[Zenodo record]({ZENODO_RECORD_URL})")
+            st.caption(f"Version DOI: {ZENODO_VERSION_DOI}")
+            st.caption(f"Concept DOI: {ZENODO_CONCEPT_DOI}")
+            st.markdown(f"[Public app]({PUBLIC_APP_URL})")
+            st.caption(
+                "The Zenodo package is the citable manuscript artifact. "
+                "This app is the deterministic public companion, not a posterior service."
+            )
         with st.expander("Interface boundaries"):
             st.write(
                 "General AxiCLASS propagation is evaluated against DESI DR2 BAO; "

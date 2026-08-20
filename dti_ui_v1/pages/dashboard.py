@@ -20,6 +20,10 @@ from dti_ui_v1.components.workspace_runtime_alignment_panel import (
 HEALTH_ENDPOINT = DEFAULT_CLASS_ENDPOINT.replace("/class/compute", "/health")
 BACKEND_LABEL = "Local backend" if DEFAULT_CLASS_ENDPOINT == LOCAL_CLASS_ENDPOINT else "Compute backend"
 A_DTI_INPUT_KEY = "perfect_fit_a_dti_input_v1"
+PUBLIC_APP_URL = "https://dti-perfect-fit.streamlit.app/"
+ZENODO_RECORD_URL = "https://zenodo.org/records/22036236"
+ZENODO_VERSION_DOI = "10.5281/zenodo.22036236"
+ZENODO_CONCEPT_DOI = "10.5281/zenodo.22036235"
 
 
 def _backend_status() -> tuple[str, str]:
@@ -43,6 +47,12 @@ def render() -> None:
 
     
     st.caption("AxiCLASS propagation, joint observational scoring, comparison, and audit")
+    st.info(
+        "Citable manuscript package: "
+        f"[Zenodo record]({ZENODO_RECORD_URL}) "
+        f"(version DOI: {ZENODO_VERSION_DOI}; concept DOI: {ZENODO_CONCEPT_DOI}). "
+        f"This public app is the deterministic companion at [{PUBLIC_APP_URL}]({PUBLIC_APP_URL})."
+    )
     backend, version = _backend_status()
     artifacts = list_run_artifacts()
     store_status = get_run_artifact_store_status()
