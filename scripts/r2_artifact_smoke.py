@@ -25,12 +25,15 @@ def _check_public_url(url: str | None, timeout: int) -> dict[str, Any]:
             url,
             headers={"User-Agent": "dti-r2-artifact-smoke/1.0"},
             timeout=timeout,
+            allow_redirects=False,
         )
+        status = int(response.status_code)
         return {
             "checked": True,
-            "ok": 200 <= int(response.status_code) < 400,
-            "status": int(response.status_code),
+            "ok": 200 <= status < 400,
+            "status": status,
             "final_url": response.url,
+            "reason": "redirect_not_followed" if 300 <= status < 400 else "http_response",
         }
     except Exception as exc:
         return {"checked": True, "ok": False, "error": str(exc)}
